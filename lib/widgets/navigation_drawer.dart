@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:solian/providers/navigation.dart';
 import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -14,7 +16,19 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
 
   void _onSelect(String name, int idx) {
     setState(() => _selectedIndex = idx);
+    context.read<NavigationProvider>().selectedIndex = idx;
     router.goNamed(name);
+  }
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        _selectedIndex = context.read<NavigationProvider>().selectedIndex;
+      });
+    });
+
+    super.initState();
   }
 
   @override
