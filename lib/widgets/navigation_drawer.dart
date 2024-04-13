@@ -27,6 +27,13 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
         ),
         "explore",
       ),
+      (
+        NavigationDrawerDestination(
+          icon: const Icon(Icons.account_circle),
+          label: Text(AppLocalizations.of(context)!.account),
+        ),
+        "account",
+      ),
     ];
 
     return NavigationDrawer(

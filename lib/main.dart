@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:solian/providers/layout_provider.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/timeago.dart';
-import 'package:solian/widgets/wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
@@ -33,11 +32,9 @@ class SolianApp extends StatelessWidget {
             OverlayEntry(builder: (context) {
               return MultiProvider(
                 providers: [
-                  Provider(create: (_) => LayoutConfig(context))
+                  Provider(create: (_) => AuthProvider()),
                 ],
-                child: LayoutWrapper(
-                  child: child,
-                ),
+                child: child,
               );
             })
           ],

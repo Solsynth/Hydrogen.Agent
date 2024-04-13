@@ -1,4 +1,9 @@
 {
   "solian": "Solian",
-  "explore": "Explore"
+  "explore": "Explore",
+  "account": "Account",
+  "signIn": "Sign In",
+  "signInCaption": "Sign in to create post, start a realm, message your friend and more!",
+  "signUp": "Sign Up",
+  "signUpCaption": "Create an account on Solarpass and then get the access of entire Solar Networks!"
 }

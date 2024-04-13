@@ -1,15 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:solian/providers/layout_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:solian/widgets/posts/item.dart';
+import 'package:solian/widgets/wrapper.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -51,12 +50,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () {
-      // Wait for the context
-      context.read<LayoutConfig>().title =
-          AppLocalizations.of(context)!.explore;
-    });
-
     super.initState();
 
     _pagingController.addPageRequestListener((pageKey) => fetchFeed(pageKey));
@@ -64,18 +57,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () => Future.sync(
-        () => _pagingController.refresh(),
-      ),
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: PagedListView<int, Post>.separated(
-            pagingController: _pagingController,
-            separatorBuilder: (context, index) => const Divider(thickness: 0.3),
-            builderDelegate: PagedChildBuilderDelegate<Post>(
-              itemBuilder: (context, item, index) => PostItem(item: item),
+    return LayoutWrapper(
+      title: AppLocalizations.of(context)!.explore,
+      child: RefreshIndicator(
+        onRefresh: () => Future.sync(
+          () => _pagingController.refresh(),
+        ),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: PagedListView<int, Post>.separated(
+              pagingController: _pagingController,
+              separatorBuilder: (context, index) => const Divider(thickness: 0.3),
+              builderDelegate: PagedChildBuilderDelegate<Post>(
+                itemBuilder: (context, item, index) => PostItem(item: item),
+              ),
             ),
           ),
         ),

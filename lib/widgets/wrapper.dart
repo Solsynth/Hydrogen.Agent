@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:solian/providers/layout_provider.dart';
 import 'package:solian/widgets/navigation_drawer.dart';
 
 class LayoutWrapper extends StatelessWidget {
   final Widget? child;
+  final String title;
 
-  const LayoutWrapper({super.key, this.child});
+  const LayoutWrapper({super.key, this.child, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    var cfg = context.watch<LayoutConfig>();
-
     return Scaffold(
       drawer: const SolianNavigationDrawer(),
-      appBar: AppBar(title: Text(cfg.title)),
+      appBar: AppBar(title: Text(title)),
       body: child ?? Container(),
     );
   }
