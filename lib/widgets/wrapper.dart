@@ -14,20 +14,8 @@ class LayoutWrapper extends StatelessWidget {
 
     return Scaffold(
       drawer: const SolianNavigationDrawer(),
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              title: Text(cfg.title),
-              elevation: 10.0,
-              expandedHeight: 50,
-              floating: true,
-              snap: true,
-            ),
-          ];
-        },
-        body: child ?? Container(),
-      ),
+      appBar: AppBar(title: Text(cfg.title)),
+      body: child ?? Container(),
     );
   }
 }
