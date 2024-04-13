@@ -7,8 +7,9 @@ import 'package:timeago/timeago.dart' as timeago;
 
 class PostItem extends StatefulWidget {
   final Post item;
+  final bool? brief;
 
-  const PostItem({super.key, required this.item});
+  const PostItem({super.key, required this.item, this.brief});
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -20,9 +21,9 @@ class _PostItemState extends State<PostItem> {
   Widget renderContent() {
     switch (widget.item.modelType) {
       case "article":
-        return ArticleContent(item: widget.item, brief: true);
+        return ArticleContent(item: widget.item, brief: widget.brief ?? true);
       default:
-        return MomentContent(item: widget.item, brief: true);
+        return MomentContent(item: widget.item, brief: widget.brief ?? true);
     }
   }
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -65,17 +66,35 @@ class _ExploreScreenState extends State<ExploreScreen> {
         ),
         child: Center(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 720),
+            constraints: const BoxConstraints(maxWidth: 640),
             child: PagedListView<int, Post>.separated(
               pagingController: _pagingController,
-              separatorBuilder: (context, index) => const Divider(thickness: 0.3),
+              separatorBuilder: (context, index) =>
+                  const Divider(thickness: 0.3),
               builderDelegate: PagedChildBuilderDelegate<Post>(
-                itemBuilder: (context, item, index) => PostItem(item: item),
+                itemBuilder: (context, item, index) => GestureDetector(
+                  child: PostItem(item: item),
+                  onTap: () {
+                    router.goNamed(
+                      'posts.screen',
+                      pathParameters: {
+                        'alias': item.alias,
+                        'dataset': '${item.modelType}s',
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 }
