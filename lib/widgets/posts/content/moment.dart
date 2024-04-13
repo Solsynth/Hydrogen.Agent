@@ -15,7 +15,7 @@ class MomentContent extends StatelessWidget {
       data: item.content,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(0),
     );
   }
 }

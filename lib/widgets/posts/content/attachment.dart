@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:solian/models/post.dart';
@@ -8,8 +9,9 @@ import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
   final Attachment item;
+  final String? badge;
 
-  const AttachmentItem({super.key, required this.item});
+  const AttachmentItem({super.key, required this.item, this.badge});
 
   @override
   State<AttachmentItem> createState() => _AttachmentItemState();
@@ -36,9 +38,22 @@ class _AttachmentItemState extends State<AttachmentItem> {
           borderRadius: const BorderRadius.all(borderRadius),
           child: Hero(
             tag: getTag(),
-            child: Image.network(
-              getFileUri().toString(),
-              fit: BoxFit.cover,
+            child: Stack(
+              children: [
+                Image.network(
+                  getFileUri().toString(),
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                widget.badge == null
+                    ? Container()
+                    : Positioned(
+                        right: 12,
+                        bottom: 8,
+                        child: Chip(label: Text(widget.badge!)),
+                      )
+              ],
             ),
           ),
         ),
@@ -110,18 +125,21 @@ class AttachmentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var renderProgress = 0;
     return FlutterCarousel(
       options: CarouselOptions(
         aspectRatio: 16 / 9,
-        showIndicator: true,
-        slideIndicator: const CircularSlideIndicator(),
+        viewportFraction: 1,
       ),
       items: items.map((item) {
+        renderProgress++;
+        final badge = '$renderProgress/${items.length}';
         return Builder(
           builder: (BuildContext context) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: AttachmentItem(item: item),
+              child: AttachmentItem(
+                  item: item, badge: items.length <= 1 ? null : badge),
             );
           },
         );

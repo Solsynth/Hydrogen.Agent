@@ -89,7 +89,7 @@ class CommentListHeader extends StatelessWidget {
     final auth = context.read<AuthProvider>();
 
     return Container(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 20),
+      padding: const EdgeInsets.only(left: 8, right: 8, top: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

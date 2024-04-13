@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:solian/models/post.dart';
 import 'package:markdown/markdown.dart' as markdown;
+import 'package:solian/utils/service_url.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class ArticleContent extends StatelessWidget {
@@ -12,31 +13,30 @@ class ArticleContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return brief
-        ? Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Text(
-                  item.description,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                )
-              ],
-            ),
+    final headingPart = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          item.title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        Text(
+          item.description,
+          style: Theme.of(context).textTheme.bodyMedium,
         )
+      ],
+    );
+
+    return brief
+        ? headingPart
         : Column(
             children: [
-              ListTile(
-                title: Text(item.title),
-                subtitle: Text(item.description),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: headingPart,
               ),
-              const Divider(color: Color(0xffefefef)),
               Markdown(
+                padding: const EdgeInsets.all(0),
                 selectable: !brief,
                 data: item.content,
                 shrinkWrap: true,
@@ -51,6 +51,15 @@ class ArticleContent extends StatelessWidget {
                     href,
                     mode: LaunchMode.externalApplication,
                   );
+                },
+                imageBuilder: (url, _, __) {
+                  if (url.toString().startsWith("/api/attachments")) {
+                    return Image.network(
+                        getRequestUri('interactive', url.toString())
+                            .toString());
+                  } else {
+                    return Image.network(url.toString());
+                  }
                 },
               ),
             ],
