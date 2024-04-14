@@ -7,10 +7,10 @@ import 'package:solian/screens/auth.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:solian/utils/service_url.dart';
 
-final authClient = AuthProvider();
-
 class AuthProvider {
-  AuthProvider();
+  AuthProvider() {
+    pickClient();
+  }
 
   final deviceEndpoint =
       getRequestUri('passport', '/api/notifications/subscribe');
@@ -61,7 +61,8 @@ class AuthProvider {
       basicAuth: false,
     );
 
-    var authorizationUrl = grant.getAuthorizationUrl(redirectUrl, scopes: ["openid"]);
+    var authorizationUrl =
+        grant.getAuthorizationUrl(redirectUrl, scopes: ["openid"]);
 
     if (Platform.isAndroid || Platform.isIOS) {
       // Use WebView to get authorization url

@@ -7,5 +7,12 @@
   "signUp": "注册",
   "signUpCaption": "在 Solarpass 注册一个账号以获得整个 Solar Networks 的存取权！",
   "post": "帖子",
-  "comment": "评论"
+  "postVerb": "发表",
+  "comment": "评论",
+  "attachment": "附件",
+  "attachmentAdd": "附加新附件",
+  "pickPhoto": "相册照片",
+  "newMoment": "记录时刻",
+  "postIdentityNotify": "你将会以该身份发表本帖子",
+  "postContentPlaceholder": "发生什么事了？！"
 }

@@ -8,8 +8,8 @@ import 'package:solian/utils/service_url.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
+import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/item.dart';
-import 'package:solian/widgets/wrapper.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -58,7 +58,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWrapper(
+    return IndentWrapper(
+      noSafeArea: true,
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () async {
+          final did = await router.pushNamed("posts.moments.new");
+          if (did == true) _pagingController.refresh();
+        },
+      ),
       title: AppLocalizations.of(context)!.explore,
       child: RefreshIndicator(
         onRefresh: () => Future.sync(
@@ -75,7 +83,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 itemBuilder: (context, item, index) => GestureDetector(
                   child: PostItem(item: item),
                   onTap: () {
-                    router.goNamed(
+                    router.pushNamed(
                       'posts.screen',
                       pathParameters: {
                         'alias': item.alias,

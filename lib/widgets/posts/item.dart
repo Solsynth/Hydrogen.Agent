@@ -80,7 +80,7 @@ class _PostItemState extends State<PostItem> {
                     children: [
                       ...headingParts,
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.only(left: 12, right: 12, top: 4),
                         child: renderContent(),
                       ),
                       renderAttachments(),

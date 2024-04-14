@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/wrapper.dart';
+import 'package:solian/widgets/common_wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -66,7 +66,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     caption: AppLocalizations.of(context)!.signInCaption,
                     onTap: () {
                       auth.signIn(context).then((_) {
-                        authClient.isAuthorized().then((val) {
+                        auth.isAuthorized().then((val) {
                           setState(() => isAuthorized = val);
                         });
                       });
@@ -90,13 +90,15 @@ class _AccountScreenState extends State<AccountScreen> {
 class NameCard extends StatelessWidget {
   const NameCard({super.key});
 
-  Future<Widget> renderAvatar() async {
-    final profiles = await authClient.getProfiles();
+  Future<Widget> renderAvatar(BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+    final profiles = await auth.getProfiles();
     return CircleAvatar(backgroundImage: NetworkImage(profiles["picture"]));
   }
 
-  Future<Column> renderLabel() async {
-    final profiles = await authClient.getProfiles();
+  Future<Column> renderLabel(BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+    final profiles = await auth.getProfiles();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -122,7 +124,7 @@ class NameCard extends StatelessWidget {
           child: Row(
             children: [
               FutureBuilder(
-                future: renderAvatar(),
+                future: renderAvatar(context),
                 builder:
                     (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                   if (snapshot.hasData) {
@@ -134,7 +136,7 @@ class NameCard extends StatelessWidget {
               ),
               const SizedBox(width: 20),
               FutureBuilder(
-                future: renderLabel(),
+                future: renderLabel(context),
                 builder:
                     (BuildContext context, AsyncSnapshot<Column> snapshot) {
                   if (snapshot.hasData) {

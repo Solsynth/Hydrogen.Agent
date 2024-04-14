@@ -7,5 +7,12 @@
   "signUp": "Sign Up",
   "signUpCaption": "Create an account on Solarpass and then get the access of entire Solar Networks!",
   "post": "Post",
-  "comment": "Comment"
+  "postVerb": "Post",
+  "comment": "Comment",
+  "attachment": "Attachment",
+  "attachmentAdd": "Add new attachment",
+  "pickPhoto": "Gallery photo",
+  "newMoment": "Record a moment",
+  "postIdentityNotify": "You will create this post as",
+  "postContentPlaceholder": "What's happened?!"
 }

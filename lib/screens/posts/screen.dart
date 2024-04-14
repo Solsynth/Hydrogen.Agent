@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/item.dart';
-import 'package:solian/widgets/wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PostScreen extends StatefulWidget {
@@ -43,7 +43,8 @@ class _PostScreenState extends State<PostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutWrapper(
+    return IndentWrapper(
+      hideDrawer: true,
       title: AppLocalizations.of(context)!.post,
       child: FutureBuilder(
         future: fetchPost(context),

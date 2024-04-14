@@ -12,7 +12,9 @@ class LayoutWrapper extends StatelessWidget {
     return Scaffold(
       drawer: const SolianNavigationDrawer(),
       appBar: AppBar(title: Text(title)),
-      body: child ?? Container(),
+      body: SafeArea(
+        child: child ?? Container(),
+      ),
     );
   }
 }
