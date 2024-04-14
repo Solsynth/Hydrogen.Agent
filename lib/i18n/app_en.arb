@@ -6,7 +6,11 @@
   "signInCaption": "Sign in to create post, start a realm, message your friend and more!",
   "signUp": "Sign Up",
   "signUpCaption": "Create an account on Solarpass and then get the access of entire Solar Networks!",
+  "confirmation": "Confirmation",
+  "confirmCancel": "Not sure",
+  "confirmOkay": "OK",
   "edit": "Edit",
+  "delete": "Delete",
   "action": "Action",
   "report": "Report",
   "post": "Post",
@@ -17,5 +21,6 @@
   "pickPhoto": "Gallery photo",
   "newMoment": "Record a moment",
   "postIdentityNotify": "You will create this post as",
-  "postContentPlaceholder": "What's happened?!"
+  "postContentPlaceholder": "What's happened?!",
+  "postDeleteConfirm": "Are you sure you want to delete this post? This operation cannot be revert!"
 }

@@ -6,7 +6,11 @@
   "signInCaption": "登陆以发表帖子、文章、创建领域、和你的朋友聊天，以及获取更多功能！",
   "signUp": "注册",
   "signUpCaption": "在 Solarpass 注册一个账号以获得整个 Solar Networks 的存取权！",
+  "confirmation": "确认",
+  "confirmCancel": "不太确定",
+  "confirmOkay": "确定",
   "edit": "编辑",
+  "delete": "删除",
   "action": "操作",
   "report": "举报",
   "post": "帖子",
@@ -17,5 +21,6 @@
   "pickPhoto": "相册照片",
   "newMoment": "记录时刻",
   "postIdentityNotify": "你将会以该身份发表本帖子",
-  "postContentPlaceholder": "发生什么事了？！"
+  "postContentPlaceholder": "发生什么事了？！",
+  "postDeleteConfirm": "你确定要删除这篇帖子吗？这意味着这个帖子将永远被我们丢弃在硬盘海中！该操作不可被反转！"
 }

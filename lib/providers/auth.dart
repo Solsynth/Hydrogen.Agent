@@ -32,7 +32,7 @@ class AuthProvider {
   Future<bool> pickClient() async {
     if (await storage.containsKey(key: storageKey)) {
       try {
-        var credentials =
+        final credentials =
             oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
         client = oauth2.Client(credentials,
             identifier: clientId, secret: clientSecret);
@@ -64,20 +64,14 @@ class AuthProvider {
     var authorizationUrl =
         grant.getAuthorizationUrl(redirectUrl, scopes: ["openid"]);
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      // Use WebView to get authorization url
-      var responseUrl = await Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(
-          builder: (context) => AuthorizationScreen(authorizationUrl),
-        ),
-      );
+    var responseUrl = await Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (context) => AuthorizationScreen(authorizationUrl),
+      ),
+    );
 
-      var responseUri = Uri.parse(responseUrl);
-      return await grant
-          .handleAuthorizationResponse(responseUri.queryParameters);
-    } else {
-      throw UnimplementedError("unsupported platform");
-    }
+    var responseUri = Uri.parse(responseUrl);
+    return await grant.handleAuthorizationResponse(responseUri.queryParameters);
   }
 
   Future<void> fetchProfiles() async {
@@ -89,10 +83,11 @@ class AuthProvider {
 
   Future<void> refreshToken() async {
     if (client != null) {
-      var credentials = await client?.credentials.refresh(
+      final credentials = await client?.credentials.refresh(
           identifier: clientId, secret: clientSecret, basicAuth: false);
-
-      storage.write(key: storageKey, value: credentials!.toJson());
+      client = oauth2.Client(credentials!,
+          identifier: clientId, secret: clientSecret);
+      storage.write(key: storageKey, value: credentials.toJson());
     }
   }
 
@@ -117,7 +112,6 @@ class AuthProvider {
                 .add(const Duration(minutes: 3))
                 .isBefore(DateTime.now())) {
           await refreshToken();
-          await pickClient();
           lastRefreshedAt = DateTime.now();
         }
       }
