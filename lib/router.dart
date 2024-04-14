@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/explore.dart';
+import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
 
@@ -18,10 +19,19 @@ final router = GoRouter(
       builder: (context, state) => const AccountScreen(),
     ),
     GoRoute(
-      path: '/posts/moments/do/editor',
+      path: '/posts/publish/moments',
       name: 'posts.moments.editor',
       builder: (context, state) =>
           MomentEditorScreen(editing: state.extra as Post?),
+    ),
+    GoRoute(
+      path: '/posts/publish/comments',
+      name: 'posts.comments.editor',
+      builder: (context, state) {
+        final args = state.extra as CommentPostArguments;
+        return CommentEditorScreen(
+            editing: args.editing, related: args.related);
+      },
     ),
     GoRoute(
       path: '/posts/:dataset/:alias',

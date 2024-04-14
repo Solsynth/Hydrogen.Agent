@@ -8,6 +8,7 @@ import 'package:solian/models/post.dart';
 import 'package:http/http.dart' as http;
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/posts/item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -117,14 +118,16 @@ class CommentListHeader extends StatelessWidget {
             future: auth.isAuthorized(),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data == true) {
-                return TextButton.icon(
-                  icon: const Icon(Icons.add_comment_outlined),
-                  label: const Text("LEAVE COMMENT"),
+                return TextButton(
                   onPressed: () async {
-                    final did =
-                        await router.push("posts.comments.new", extra: related);
+                    final did = await router.pushNamed(
+                      "posts.comments.editor",
+                      extra: CommentPostArguments(related: related),
+                    );
                     if (did == true) paging.refresh();
                   },
+                  style: TextButton.styleFrom(shape: const CircleBorder()),
+                  child: const Icon(Icons.add_comment_outlined),
                 );
               } else {
                 return Container();

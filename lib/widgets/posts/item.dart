@@ -145,10 +145,13 @@ class _PostItemState extends State<PostItem> {
               child: Divider(thickness: 0.3),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: renderContent(),
             ),
-            renderAttachments()
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: renderAttachments(),
+            )
           ],
         ),
         onLongPress: () {

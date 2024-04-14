@@ -130,6 +130,7 @@ class AttachmentList extends StatelessWidget {
       options: CarouselOptions(
         aspectRatio: 16 / 9,
         viewportFraction: 1,
+        showIndicator: false,
       ),
       items: items.map((item) {
         renderProgress++;
