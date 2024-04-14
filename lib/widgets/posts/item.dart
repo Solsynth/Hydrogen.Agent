@@ -3,13 +3,15 @@ import 'package:solian/models/post.dart';
 import 'package:solian/widgets/posts/content/article.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:solian/widgets/posts/content/moment.dart';
+import 'package:solian/widgets/posts/item_action.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PostItem extends StatefulWidget {
   final Post item;
   final bool? brief;
+  final Function? onUpdate;
 
-  const PostItem({super.key, required this.item, this.brief});
+  const PostItem({super.key, required this.item, this.brief, this.onUpdate});
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -17,6 +19,16 @@ class PostItem extends StatefulWidget {
 
 class _PostItemState extends State<PostItem> {
   Map<String, dynamic>? reactionList;
+
+  void viewActions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => PostItemAction(
+        item: widget.item,
+        onUpdate: widget.onUpdate,
+      ),
+    );
+  }
 
   Widget renderContent() {
     switch (widget.item.modelType) {
@@ -64,73 +76,84 @@ class _PostItemState extends State<PostItem> {
     ];
 
     if (widget.brief ?? true) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.item.author.avatar),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...headingParts,
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12, top: 4),
-                        child: renderContent(),
-                      ),
-                      renderAttachments(),
-                    ],
+      return GestureDetector(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.item.author.avatar),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...headingParts,
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 12, right: 12, top: 4),
+                          child: renderContent(),
+                        ),
+                        renderAttachments(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
+        onLongPress: () {
+          viewActions(context);
+        },
       );
     } else {
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12, top: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.item.author.avatar),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...headingParts,
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          getAuthorDescribe(),
-                          maxLines: 1,
-                        ),
-                      ),
-                    ],
+      return GestureDetector(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(widget.item.author.avatar),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ...headingParts,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            getAuthorDescribe(),
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 6),
-            child: Divider(thickness: 0.3),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: renderContent(),
-          ),
-          renderAttachments()
-        ],
+            const Padding(
+              padding: EdgeInsets.only(top: 6),
+              child: Divider(thickness: 0.3),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: renderContent(),
+            ),
+            renderAttachments()
+          ],
+        ),
+        onLongPress: () {
+          viewActions(context);
+        },
       );
     }
   }

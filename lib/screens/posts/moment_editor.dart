@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
@@ -10,16 +11,19 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
 
-class NewMomentScreen extends StatefulWidget {
-  const NewMomentScreen({super.key});
+class MomentEditorScreen extends StatefulWidget {
+  final Post? editing;
+
+  const MomentEditorScreen({super.key, this.editing});
 
   @override
-  State<NewMomentScreen> createState() => _NewMomentScreenState();
+  State<MomentEditorScreen> createState() => _MomentEditorScreenState();
 }
 
-class _NewMomentScreenState extends State<NewMomentScreen> {
+class _MomentEditorScreenState extends State<MomentEditorScreen> {
   final _textController = TextEditingController();
 
+  String? _alias;
   bool _isSubmitting = false;
 
   List<Attachment> _attachments = List.empty(growable: true);
@@ -34,21 +38,24 @@ class _NewMomentScreenState extends State<NewMomentScreen> {
     );
   }
 
-  Future<void> createPost(BuildContext context) async {
+  Future<void> applyPost(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
+    final uri = widget.editing == null
+        ? getRequestUri('interactive', '/api/p/moments')
+        : getRequestUri('interactive', '/api/p/moments/${widget.editing!.id}');
+
+    final req = Request(widget.editing == null ? "POST" : "PUT", uri);
+    req.headers['Content-Type'] = 'application/json';
+    req.body = jsonEncode(<String, dynamic>{
+      'alias': _alias,
+      'content': _textController.value.text,
+      'attachments': _attachments,
+    });
+
     setState(() => _isSubmitting = true);
-    var res = await auth.client!.post(
-      getRequestUri('interactive', '/api/p/moments'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'content': _textController.value.text,
-        'attachments': _attachments,
-      }),
-    );
+    var res = await Response.fromStream(await auth.client!.send(req));
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -63,6 +70,17 @@ class _NewMomentScreenState extends State<NewMomentScreen> {
   }
 
   @override
+  void initState() {
+    if (widget.editing != null) {
+      _alias = widget.editing!.alias;
+      _textController.text = widget.editing!.content;
+      _attachments = widget.editing!.attachments ?? List.empty(growable: true);
+    }
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
 
@@ -71,8 +89,8 @@ class _NewMomentScreenState extends State<NewMomentScreen> {
       title: AppLocalizations.of(context)!.newMoment,
       appBarActions: <Widget>[
         TextButton(
-          onPressed: !_isSubmitting ? () => createPost(context) : null,
-          child: Text(AppLocalizations.of(context)!.postVerb),
+          onPressed: !_isSubmitting ? () => applyPost(context) : null,
+          child: Text(AppLocalizations.of(context)!.postVerb.toUpperCase()),
         ),
       ],
       child: Center(

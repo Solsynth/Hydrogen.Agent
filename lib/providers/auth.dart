@@ -115,8 +115,9 @@ class AuthProvider {
         if (lastRefreshedAt == null ||
             lastRefreshedAt!
                 .add(const Duration(minutes: 3))
-                .isAfter(DateTime.now())) {
+                .isBefore(DateTime.now())) {
           await refreshToken();
+          await pickClient();
           lastRefreshedAt = DateTime.now();
         }
       }

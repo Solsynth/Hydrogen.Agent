@@ -63,7 +63,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.edit),
         onPressed: () async {
-          final did = await router.pushNamed("posts.moments.new");
+          final did = await router.pushNamed("posts.moments.editor");
           if (did == true) _pagingController.refresh();
         },
       ),
@@ -81,7 +81,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   const Divider(thickness: 0.3),
               builderDelegate: PagedChildBuilderDelegate<Post>(
                 itemBuilder: (context, item, index) => GestureDetector(
-                  child: PostItem(item: item),
+                  child: PostItem(
+                    item: item,
+                    onUpdate: () => _pagingController.refresh(),
+                  ),
                   onTap: () {
                     router.pushNamed(
                       'posts.screen',

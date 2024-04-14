@@ -173,8 +173,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 12.0,
+                  horizontal: 8,
+                  vertical: 12,
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.attachment,
