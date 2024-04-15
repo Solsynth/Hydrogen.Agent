@@ -62,26 +62,22 @@ class _PostItemState extends State<PostItem> {
   }
 
   Widget renderReactions() {
-    if (reactionList != null && reactionList!.isNotEmpty) {
-      return Container(
-        height: 48,
-        padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
-        child: ReactionList(
-          item: widget.item,
-          reactionList: reactionList,
-          onReact: (symbol, changes) {
-            setState(() {
-              if (!reactionList!.containsKey(symbol)) {
-                reactionList![symbol] = 0;
-              }
-              reactionList![symbol] += changes;
-            });
-          },
-        ),
-      );
-    } else {
-      return Container();
-    }
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
+      child: ReactionList(
+        item: widget.item,
+        reactionList: reactionList,
+        onReact: (symbol, changes) {
+          setState(() {
+            if (!reactionList!.containsKey(symbol)) {
+              reactionList![symbol] = 0;
+            }
+            reactionList![symbol] += changes;
+          });
+        },
+      ),
+    );
   }
 
   String getAuthorDescribe() => widget.item.author.description.isNotEmpty

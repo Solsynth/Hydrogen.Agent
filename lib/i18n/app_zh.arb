@@ -13,6 +13,8 @@
   "delete": "删除",
   "action": "操作",
   "report": "举报",
+  "reaction": "反应",
+  "reactVerb": "作出反应",
   "post": "帖子",
   "postVerb": "发表",
   "comment": "评论",
@@ -23,5 +25,7 @@
   "newComment": "留下评论",
   "postIdentityNotify": "你将会以该身份发表本帖子",
   "postContentPlaceholder": "发生什么事了？！",
-  "postDeleteConfirm": "你确定要删除这篇帖子吗？这意味着这个帖子将永远被我们丢弃在硬盘海中！该操作不可被反转！"
+  "postDeleteConfirm": "你确定要删除这篇帖子吗？这意味着这个帖子将永远被我们丢弃在硬盘海中！该操作不可被反转！",
+  "reactionAdded": "你的反应已被添加。",
+  "reactionRemoved": "你的反应已被移除。"
 }

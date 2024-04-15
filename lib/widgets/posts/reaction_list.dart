@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/reaction.dart';
 import 'package:solian/widgets/posts/reaction_action.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ReactionList extends StatefulWidget {
   final Post item;
@@ -79,7 +80,7 @@ class _ReactionListState extends State<ReactionList> {
         }),
         ActionChip(
           avatar: const Icon(Icons.add_reaction, color: Colors.teal),
-          label: const Text("React"),
+          label: Text(AppLocalizations.of(context)!.reactVerb),
           visualDensity: density,
           onPressed: () => viewReactMenu(context),
         ),

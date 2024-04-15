@@ -13,6 +13,8 @@
   "delete": "Delete",
   "action": "Action",
   "report": "Report",
+  "reaction": "Reaction",
+  "reactVerb": "React",
   "post": "Post",
   "postVerb": "Post",
   "comment": "Comment",
@@ -23,5 +25,7 @@
   "newComment": "Leave a comment",
   "postIdentityNotify": "You will create this post as",
   "postContentPlaceholder": "What's happened?!",
-  "postDeleteConfirm": "Are you sure you want to delete this post? This operation cannot be revert!"
+  "postDeleteConfirm": "Are you sure you want to delete this post? This operation cannot be revert!",
+  "reactionAdded": "Your reaction has been added.",
+  "reactionRemoved": "Your reaction has been removed."
 }

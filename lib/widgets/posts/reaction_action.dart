@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/reaction.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> doReact(
   String dataset,
@@ -36,19 +37,19 @@ Future<void> doReact(
   if (res.statusCode == 201) {
     onReact(symbol, 1);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Your reaction has been added onto this post."),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.reactionAdded),
       ),
     );
   } else if (res.statusCode == 204) {
     onReact(symbol, -1);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Your reaction has been removed from this post."),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.reactionRemoved),
       ),
     );
   } else {
-    var message = utf8.decode(res.bodyBytes);
+    final message = utf8.decode(res.bodyBytes);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Something went wrong... $message")),
     );
@@ -112,7 +113,7 @@ class _ReactionActionPopupState extends State<ReactionActionPopup> {
               vertical: 12,
             ),
             child: Text(
-              'Add a reaction',
+              AppLocalizations.of(context)!.reaction,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
