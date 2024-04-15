@@ -181,7 +181,14 @@ class _PostItemState extends State<PostItem> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: renderAttachments(),
-          )
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: renderReactions(),
+            ),
+          ),
         ],
       );
     }
