@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:solian/models/post.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class MomentContent extends StatelessWidget {
   final Post item;
@@ -16,6 +17,13 @@ class MomentContent extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(0),
+      onTapLink: (text, href, title) async {
+        if (href == null) return;
+        await launchUrlString(
+          href,
+          mode: LaunchMode.externalApplication,
+        );
+      },
     );
   }
 }

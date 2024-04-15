@@ -1,47 +1,53 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:solian/widgets/posts/attachment_screen.dart';
+import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
-  final Attachment item;
+  final int type;
+  final String url;
+  final String? tag;
   final String? badge;
 
-  const AttachmentItem({super.key, required this.item, this.badge});
+  const AttachmentItem({
+    super.key,
+    required this.type,
+    required this.url,
+    this.tag,
+    this.badge,
+  });
 
   @override
   State<AttachmentItem> createState() => _AttachmentItemState();
 }
 
 class _AttachmentItemState extends State<AttachmentItem> {
-  String getTag() => 'attachment-${widget.item.fileId}';
-
-  Uri getFileUri() =>
-      getRequestUri('interactive', '/api/attachments/o/${widget.item.fileId}');
+  String getTag() => 'attachment-${widget.tag ?? const Uuid().v4()}';
 
   VideoPlayerController? _vpController;
   ChewieController? _chewieController;
 
   @override
   Widget build(BuildContext context) {
-    const borderRadius = Radius.circular(16);
+    const borderRadius = Radius.circular(8);
+    final tag = getTag();
 
     Widget content;
 
-    if (widget.item.type == 1) {
+    if (widget.type == 1) {
       content = GestureDetector(
         child: ClipRRect(
           borderRadius: const BorderRadius.all(borderRadius),
           child: Hero(
-            tag: getTag(),
+            tag: tag,
             child: Stack(
               children: [
                 Image.network(
-                  getFileUri().toString(),
+                  widget.url,
                   width: double.infinity,
                   height: double.infinity,
                   fit: BoxFit.cover,
@@ -62,15 +68,15 @@ class _AttachmentItemState extends State<AttachmentItem> {
             context,
             MaterialPageRoute(builder: (_) {
               return AttachmentScreen(
-                tag: getTag(),
-                url: getFileUri().toString(),
+                tag: tag,
+                url: widget.url,
               );
             }),
           );
         },
       );
     } else {
-      _vpController = VideoPlayerController.networkUrl(getFileUri());
+      _vpController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
       _chewieController = ChewieController(
         videoPlayerController: _vpController!,
       );
@@ -123,6 +129,9 @@ class AttachmentList extends StatelessWidget {
 
   const AttachmentList({super.key, required this.items});
 
+  Uri getFileUri(String fileId) =>
+      getRequestUri('interactive', '/api/attachments/o/$fileId');
+
   @override
   Widget build(BuildContext context) {
     var renderProgress = 0;
@@ -140,7 +149,11 @@ class AttachmentList extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: AttachmentItem(
-                  item: item, badge: items.length <= 1 ? null : badge),
+                type: item.type,
+                tag: item.fileId,
+                url: getFileUri(item.fileId).toString(),
+                badge: items.length <= 1 ? null : badge,
+              ),
             );
           },
         );

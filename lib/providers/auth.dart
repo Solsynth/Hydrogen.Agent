@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -8,9 +7,7 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:solian/utils/service_url.dart';
 
 class AuthProvider {
-  AuthProvider() {
-    pickClient();
-  }
+  AuthProvider();
 
   final deviceEndpoint =
       getRequestUri('passport', '/api/notifications/subscribe');
@@ -26,7 +23,10 @@ class AuthProvider {
   static const storageKey = "identity";
   static const profileKey = "profiles";
 
+  /// Before use this variable to make request
+  /// **MAKE SURE YOU HAVE CALL THE isAuthorized() METHOD**
   oauth2.Client? client;
+
   DateTime? lastRefreshedAt;
 
   Future<bool> pickClient() async {
@@ -83,9 +83,9 @@ class AuthProvider {
 
   Future<void> refreshToken() async {
     if (client != null) {
-      final credentials = await client?.credentials.refresh(
+      final credentials = await client!.credentials.refresh(
           identifier: clientId, secret: clientSecret, basicAuth: false);
-      client = oauth2.Client(credentials!,
+      client = oauth2.Client(credentials,
           identifier: clientId, secret: clientSecret);
       storage.write(key: storageKey, value: credentials.toJson());
     }
@@ -106,14 +106,15 @@ class AuthProvider {
   Future<bool> isAuthorized() async {
     const storage = FlutterSecureStorage();
     if (await storage.containsKey(key: storageKey)) {
-      if (client != null) {
-        if (lastRefreshedAt == null ||
-            lastRefreshedAt!
-                .add(const Duration(minutes: 3))
-                .isBefore(DateTime.now())) {
-          await refreshToken();
-          lastRefreshedAt = DateTime.now();
-        }
+      if (client == null) {
+        await pickClient();
+      }
+      if (lastRefreshedAt == null ||
+          DateTime.now()
+              .subtract(const Duration(minutes: 3))
+              .isAfter(lastRefreshedAt!)) {
+        await refreshToken();
+        lastRefreshedAt = DateTime.now();
       }
       return true;
     } else {

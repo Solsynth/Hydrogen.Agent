@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:solian/models/post.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class ArticleContent extends StatelessWidget {
@@ -53,13 +54,17 @@ class ArticleContent extends StatelessWidget {
                   );
                 },
                 imageBuilder: (url, _, __) {
+                  Uri uri;
                   if (url.toString().startsWith("/api/attachments")) {
-                    return Image.network(
-                        getRequestUri('interactive', url.toString())
-                            .toString());
+                    uri = getRequestUri('interactive', url.toString());
                   } else {
-                    return Image.network(url.toString());
+                    uri = url;
                   }
+
+                  return AttachmentItem(
+                    type: 1,
+                    url: uri.toString(),
+                  );
                 },
               ),
             ],

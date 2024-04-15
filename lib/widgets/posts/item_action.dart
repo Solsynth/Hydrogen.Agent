@@ -9,8 +9,14 @@ import 'package:solian/widgets/posts/item_deletion.dart';
 class PostItemAction extends StatelessWidget {
   final Post item;
   final Function? onUpdate;
+  final Function? onDelete;
 
-  const PostItemAction({super.key, required this.item, this.onUpdate});
+  const PostItemAction({
+    super.key,
+    required this.item,
+    this.onUpdate,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +38,6 @@ class PostItemAction extends StatelessWidget {
             child: FutureBuilder(
               future: auth.getProfiles(),
               builder: (context, snapshot) {
-                print(snapshot);
                 if (snapshot.hasData) {
                   final authorizedItems = [
                     ListTile(
@@ -59,7 +64,7 @@ class PostItemAction extends StatelessWidget {
                             item: item,
                             dataset: dataset,
                             onDelete: (did) {
-                              if(did == true && onUpdate != null) onUpdate!();
+                              if (did == true && onDelete != null) onDelete!();
                             },
                           ),
                         );

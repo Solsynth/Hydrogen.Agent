@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,7 +26,7 @@ class AttachmentEditor extends StatefulWidget {
 class _AttachmentEditorState extends State<AttachmentEditor> {
   final _imagePicker = ImagePicker();
 
-  bool isSubmitting = false;
+  bool _isSubmitting = false;
 
   List<Attachment> _attachments = List.empty(growable: true);
 
@@ -47,7 +46,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    setState(() => isSubmitting = true);
+    setState(() => _isSubmitting = true);
 
     final file = File(image.path);
     final hashcode = await calculateSha256(file);
@@ -63,7 +62,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
         SnackBar(content: Text("Something went wrong... $err")),
       );
     } finally {
-      setState(() => isSubmitting = false);
+      setState(() => _isSubmitting = false);
     }
   }
 
@@ -77,7 +76,6 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     req.fields['hashcode'] = hashcode;
 
     var res = await auth.client!.send(req);
-    print(res);
     if (res.statusCode == 200) {
       var result = Attachment.fromJson(
         jsonDecode(utf8.decode(await res.stream.toBytes()))["info"],
@@ -98,7 +96,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
       getRequestUri('interactive', '/api/attachments/${item.id}'),
     );
 
-    setState(() => isSubmitting = true);
+    setState(() => _isSubmitting = true);
     var res = await auth.client!.send(req);
     if (res.statusCode == 200) {
       setState(() => _attachments.removeAt(index));
@@ -109,7 +107,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
         SnackBar(content: Text("Something went wrong... $err")),
       );
     }
-    setState(() => isSubmitting = false);
+    setState(() => _isSubmitting = false);
   }
 
   Future<String> calculateSha256(File file) async {
@@ -186,7 +184,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data == true) {
                     return TextButton(
-                      onPressed: isSubmitting
+                      onPressed: _isSubmitting
                           ? null
                           : () => viewAttachMethods(context),
                       style: TextButton.styleFrom(shape: const CircleBorder()),
@@ -200,7 +198,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
             ],
           ),
         ),
-        isSubmitting ? const LinearProgressIndicator() : Container(),
+        _isSubmitting ? const LinearProgressIndicator() : Container(),
         Expanded(
           child: ListView.separated(
             itemCount: _attachments.length,

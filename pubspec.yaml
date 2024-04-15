@@ -55,6 +55,7 @@ dependencies:
   webview_flutter: ^4.7.0
   crypto: ^3.0.3
   image_picker: ^1.0.8
+  uuid: ^4.4.0
 
 dev_dependencies:
   flutter_test:
