@@ -69,6 +69,12 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
     setState(() => _isSubmitting = false);
   }
 
+  void cancelEditing() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void initState() {
     if (widget.editing != null) {
@@ -83,6 +89,20 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
+
+    final editingBanner = MaterialBanner(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      leading: const Icon(Icons.edit_note),
+      backgroundColor: const Color(0xFFE0E0E0),
+      dividerColor: const Color.fromARGB(1, 0, 0, 0),
+      content: Text(AppLocalizations.of(context)!.postEditNotify),
+      actions: [
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.cancel),
+          onPressed: () => cancelEditing(),
+        ),
+      ],
+    );
 
     return IndentWrapper(
       hideDrawer: true,
@@ -121,8 +141,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
               const Divider(thickness: 0.3),
               Expanded(
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: TextField(
                     maxLines: null,
                     autofocus: true,
@@ -130,12 +149,12 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
                     keyboardType: TextInputType.multiline,
                     controller: _textController,
                     decoration: InputDecoration.collapsed(
-                      hintText:
-                          AppLocalizations.of(context)!.postContentPlaceholder,
+                      hintText: AppLocalizations.of(context)!.postContentPlaceholder,
                     ),
                   ),
                 ),
               ),
+              widget.editing != null ? editingBanner : Container(),
               Container(
                 decoration: const BoxDecoration(
                   border: Border(

@@ -79,6 +79,12 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
     setState(() => _isSubmitting = false);
   }
 
+  void cancelEditing() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void initState() {
     if (widget.editing != null) {
@@ -93,6 +99,20 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
+
+    final editingBanner = MaterialBanner(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      leading: const Icon(Icons.edit_note),
+      backgroundColor: const Color(0xFFE0E0E0),
+      dividerColor: const Color.fromARGB(1, 0, 0, 0),
+      content: Text(AppLocalizations.of(context)!.postEditNotify),
+      actions: [
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.cancel),
+          onPressed: () => cancelEditing(),
+        ),
+      ],
+    );
 
     return IndentWrapper(
       hideDrawer: true,
@@ -146,6 +166,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
                   ),
                 ),
               ),
+              widget.editing != null ? editingBanner : Container(),
               Container(
                 decoration: const BoxDecoration(
                   border: Border(
