@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
+import 'package:solian/screens/chat/index.dart';
 import 'package:solian/screens/explore.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
@@ -12,6 +13,11 @@ final router = GoRouter(
       path: '/',
       name: 'explore',
       builder: (context, state) => const ExploreScreen(),
+    ),
+    GoRoute(
+      path: '/chat',
+      name: 'chat',
+      builder: (context, state) => const ChatIndexScreen(),
     ),
     GoRoute(
       path: '/account',

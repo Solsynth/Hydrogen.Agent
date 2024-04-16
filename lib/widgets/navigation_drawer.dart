@@ -43,6 +43,13 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
       ),
       (
         NavigationDrawerDestination(
+          icon: const Icon(Icons.send),
+          label: Text(AppLocalizations.of(context)!.chat),
+        ),
+        "chat",
+      ),
+      (
+        NavigationDrawerDestination(
           icon: const Icon(Icons.account_circle),
           label: Text(AppLocalizations.of(context)!.account),
         ),
