@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/content/article.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:solian/widgets/posts/content/moment.dart';
@@ -38,6 +43,36 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
+  void viewComments(BuildContext context) {
+    final PagingController<int, Post> commentPaging =
+        PagingController(firstPageKey: 0);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          children: [
+            CommentListHeader(
+              related: widget.item,
+              paging: commentPaging,
+            ),
+            Expanded(
+              child: CustomScrollView(
+                slivers: [
+                  CommentList(
+                    related: widget.item,
+                    dataset: '${widget.item.modelType}s',
+                    paging: commentPaging,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget renderContent() {
     switch (widget.item.modelType) {
       case 'article':
@@ -62,20 +97,36 @@ class _PostItemState extends State<PostItem> {
   }
 
   Widget renderReactions() {
+    const density = VisualDensity(horizontal: -4, vertical: -2);
+
     return Container(
       height: 48,
       padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
-      child: ReactionList(
-        item: widget.item,
-        reactionList: reactionList,
-        onReact: (symbol, changes) {
-          setState(() {
-            if (!reactionList!.containsKey(symbol)) {
-              reactionList![symbol] = 0;
-            }
-            reactionList![symbol] += changes;
-          });
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ActionChip(
+            avatar: const Icon(Icons.comment),
+            label: Text(widget.item.commentCount.toString()),
+            tooltip: 'Comment',
+            onPressed: () => viewComments(context),
+          ),
+          const VerticalDivider(thickness: 0.3, indent: 8, endIndent: 8),
+          Expanded(
+            child: ReactionList(
+              item: widget.item,
+              reactionList: reactionList,
+              onReact: (symbol, changes) {
+                setState(() {
+                  if (!reactionList!.containsKey(symbol)) {
+                    reactionList![symbol] = 0;
+                  }
+                  reactionList![symbol] += changes;
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

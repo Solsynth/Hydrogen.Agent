@@ -4,6 +4,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/widgets/posts/item_deletion.dart';
 
 class PostItemAction extends StatelessWidget {
@@ -17,6 +18,31 @@ class PostItemAction extends StatelessWidget {
     this.onUpdate,
     this.onDelete,
   });
+
+  void viewEditor() async {
+    bool ok = false;
+    switch (item.modelType) {
+      case 'article':
+        ok = await router.pushNamed(
+          'posts.articles.editor',
+          extra: item,
+        ) as bool;
+      case 'moment':
+        ok = await router.pushNamed(
+          'posts.moments.editor',
+          extra: item,
+        ) as bool;
+      case 'comment':
+        ok = await router.pushNamed(
+          'posts.comments.editor',
+          extra: CommentPostArguments(editing: item),
+        ) as bool;
+    }
+
+    if (ok == true && onUpdate != null) {
+      onUpdate!();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +69,7 @@ class PostItemAction extends StatelessWidget {
                     ListTile(
                       leading: const Icon(Icons.edit),
                       title: Text(AppLocalizations.of(context)!.edit),
-                      onTap: () {
-                        router
-                            .pushNamed('posts.moments.editor', extra: item)
-                            .then((did) {
-                          if (did == true && onUpdate != null) {
-                            onUpdate!();
-                          }
-                        });
-                      },
+                      onTap: () => viewEditor(),
                     ),
                     ListTile(
                       leading: const Icon(Icons.delete),

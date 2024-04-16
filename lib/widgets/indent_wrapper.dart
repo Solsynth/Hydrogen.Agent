@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:solian/widgets/common_wrapper.dart';
 import 'package:solian/widgets/navigation_drawer.dart';
 
-class IndentWrapper extends StatelessWidget {
-  final Widget? child;
-  final Widget? floatingActionButton;
-  final List<Widget>? appBarActions;
+class IndentWrapper extends LayoutWrapper {
   final bool? hideDrawer;
-  final bool? noSafeArea;
-  final String title;
 
-  const IndentWrapper({super.key, this.child, required this.title, this.floatingActionButton, this.appBarActions, this.hideDrawer, this.noSafeArea});
+  const IndentWrapper({
+    super.key,
+    super.child,
+    required super.title,
+    super.floatingActionButton,
+    super.appBarActions,
+    this.hideDrawer,
+    super.noSafeArea,
+  }) : super();
 
   @override
   Widget build(BuildContext context) {

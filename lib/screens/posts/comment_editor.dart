@@ -12,14 +12,14 @@ import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
 
 class CommentPostArguments {
-  final Post related;
+  final Post? related;
   final Post? editing;
 
-  CommentPostArguments({required this.related, this.editing});
+  CommentPostArguments({this.related, this.editing});
 }
 
 class CommentEditorScreen extends StatefulWidget {
-  final Post related;
+  final Post? related;
   final Post? editing;
 
   const CommentEditorScreen({super.key, required this.related, this.editing});
@@ -50,9 +50,10 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final relatedDataset = '${widget.related.modelType}s';
+    final alias = widget.related?.alias ?? 'not-found';
+    final relatedDataset = '${widget.related?.modelType ?? 'comment'}s';
     final uri = widget.editing == null
-        ? getRequestUri('interactive', '/api/p/$relatedDataset/${widget.related.alias}/comments')
+        ? getRequestUri('interactive', '/api/p/$relatedDataset/$alias/comments')
         : getRequestUri('interactive', '/api/p/comments/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? "POST" : "PUT", uri);
