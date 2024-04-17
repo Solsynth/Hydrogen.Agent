@@ -48,14 +48,14 @@ dependencies:
   timeago: ^3.6.1
   flutter_carousel_widget: ^2.2.0
   media_kit_video: ^1.2.4
-  chewie: ^1.8.1
-  video_player: ^2.8.6
   flutter_secure_storage: ^9.0.0
   oauth2: ^2.0.2
   webview_flutter: ^4.7.0
   crypto: ^3.0.3
   image_picker: ^1.0.8
   uuid: ^4.4.0
+  media_kit: ^1.1.10+1
+  media_kit_libs_video: ^1.0.4
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:chewie/chewie.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:solian/widgets/posts/attachment_screen.dart';
 import 'package:uuid/uuid.dart';
-import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
   final int type;
@@ -28,8 +28,13 @@ class AttachmentItem extends StatefulWidget {
 class _AttachmentItemState extends State<AttachmentItem> {
   String getTag() => 'attachment-${widget.tag ?? const Uuid().v4()}';
 
-  VideoPlayerController? _vpController;
-  ChewieController? _chewieController;
+  late final _videoPlayer = Player(
+    configuration: PlayerConfiguration(
+      title: "Attachment #${getTag()}",
+      logLevel: MPVLogLevel.error,
+    ),
+  );
+  late final _videoController = VideoController(_videoPlayer);
 
   @override
   Widget build(BuildContext context) {
@@ -76,30 +81,17 @@ class _AttachmentItemState extends State<AttachmentItem> {
         },
       );
     } else {
-      _vpController = VideoPlayerController.networkUrl(Uri.parse(widget.url));
-      _chewieController = ChewieController(
-        videoPlayerController: _vpController!,
+      _videoPlayer.open(
+        Media(widget.url),
+        play: false,
       );
 
-      content = FutureBuilder(
-        future: () async {
-          await _vpController?.initialize();
-          return true;
-        }(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ClipRRect(
-              borderRadius: const BorderRadius.all(borderRadius),
-              child: Chewie(
-                controller: _chewieController!,
-              ),
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+      content = ClipRRect(
+        borderRadius: const BorderRadius.all(borderRadius),
+        child: Video(
+          controller: _videoController,
+          key: Key(getTag()),
+        ),
       );
     }
 
@@ -118,8 +110,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
 
   @override
   void dispose() {
-    _vpController?.dispose();
-    _chewieController?.dispose();
+    _videoPlayer.dispose();
     super.dispose();
   }
 }
@@ -129,8 +120,7 @@ class AttachmentList extends StatelessWidget {
 
   const AttachmentList({super.key, required this.items});
 
-  Uri getFileUri(String fileId) =>
-      getRequestUri('interactive', '/api/attachments/o/$fileId');
+  Uri getFileUri(String fileId) => getRequestUri('interactive', '/api/attachments/o/$fileId');
 
   @override
   Widget build(BuildContext context) {

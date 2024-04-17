@@ -5,8 +5,10 @@ import 'package:solian/providers/navigation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/timeago.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/utils/video_player.dart';
 
 void main() {
+  initVideo();
   initTimeAgo();
 
   runApp(const SolianApp());
