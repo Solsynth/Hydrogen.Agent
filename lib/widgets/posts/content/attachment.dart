@@ -117,10 +117,11 @@ class _AttachmentItemState extends State<AttachmentItem> {
 
 class AttachmentList extends StatelessWidget {
   final List<Attachment> items;
+  final String provider;
 
-  const AttachmentList({super.key, required this.items});
+  const AttachmentList({super.key, required this.items, required this.provider});
 
-  Uri getFileUri(String fileId) => getRequestUri('interactive', '/api/attachments/o/$fileId');
+  Uri getFileUri(String fileId) => getRequestUri(provider, '/api/attachments/o/$fileId');
 
   @override
   Widget build(BuildContext context) {

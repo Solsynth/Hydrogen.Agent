@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
@@ -10,6 +7,7 @@ import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:solian/widgets/posts/content/moment.dart';
 import 'package:solian/widgets/posts/item_action.dart';
 import 'package:solian/widgets/posts/reaction_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class PostItem extends StatefulWidget {
@@ -89,7 +87,7 @@ class _PostItemState extends State<PostItem> {
         widget.item.attachments!.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: 8),
-        child: AttachmentList(items: widget.item.attachments!),
+        child: AttachmentList(items: widget.item.attachments!, provider: 'interactive'),
       );
     } else {
       return Container();
@@ -97,8 +95,6 @@ class _PostItemState extends State<PostItem> {
   }
 
   Widget renderReactions() {
-    const density = VisualDensity(horizontal: -4, vertical: -2);
-
     return Container(
       height: 48,
       padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
@@ -108,7 +104,7 @@ class _PostItemState extends State<PostItem> {
           ActionChip(
             avatar: const Icon(Icons.comment),
             label: Text(widget.item.commentCount.toString()),
-            tooltip: 'Comment',
+            tooltip: AppLocalizations.of(context)!.comment,
             onPressed: () => viewComments(context),
           ),
           const VerticalDivider(thickness: 0.3, indent: 8, endIndent: 8),

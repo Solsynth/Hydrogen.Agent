@@ -44,6 +44,7 @@ class _PostScreenState extends State<PostScreen> {
   @override
   Widget build(BuildContext context) {
     return IndentWrapper(
+      noSafeArea: true,
       hideDrawer: true,
       title: AppLocalizations.of(context)!.post,
       child: FutureBuilder(

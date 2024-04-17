@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -64,7 +65,14 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
               ),
               title: Text(element.name),
               subtitle: Text(element.description),
-              onTap: () {},
+              onTap: () {
+                router.pushNamed(
+                  'chat.channel',
+                  pathParameters: {
+                    'channel': element.alias,
+                  },
+                );
+              },
             );
           },
         ),
