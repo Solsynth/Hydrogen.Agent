@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/message.dart';
+import 'package:solian/widgets/chat/message_editor.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:http/http.dart' as http;
 
@@ -90,31 +92,37 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return IndentWrapper(
-      noSafeArea: true,
       hideDrawer: true,
       title: _channelMeta?.name ?? "Loading...",
-      child: PagedListView<int, Message>(
-        pagingController: _pagingController,
-        builderDelegate: PagedChildBuilderDelegate<Message>(
-          itemBuilder: (context, item, index) {
-            bool isMerged = false, hasMerged = false;
-            if (index > 0) {
-              isMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
-            }
-            if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
-              hasMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
-            }
-            return Container(
-              padding: EdgeInsets.only(
-                top: !isMerged ? 8 : 0,
-                bottom: !hasMerged ? 8 : 0,
-                left: 12,
-                right: 12,
+      child: Column(
+        children: [
+          Expanded(
+            child: PagedListView<int, Message>(
+              pagingController: _pagingController,
+              builderDelegate: PagedChildBuilderDelegate<Message>(
+                itemBuilder: (context, item, index) {
+                  bool isMerged = false, hasMerged = false;
+                  if (index > 0) {
+                    isMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
+                  }
+                  if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
+                    hasMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
+                  }
+                  return Container(
+                    padding: EdgeInsets.only(
+                      top: !isMerged ? 8 : 0,
+                      bottom: !hasMerged ? 8 : 0,
+                      left: 12,
+                      right: 12,
+                    ),
+                    child: ChatMessage(item: item, underMerged: isMerged),
+                  );
+                },
               ),
-              child: ChatMessage(item: item, underMerged: isMerged),
-            );
-          },
-        ),
+            ),
+          ),
+          ChatMessageEditor(channel: widget.alias),
+        ],
       ),
     );
   }

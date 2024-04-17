@@ -33,5 +33,6 @@
   "postDeleteConfirm": "Are you sure you want to delete this post? This operation cannot be revert!",
   "postEditNotify": "You are about editing a post that already published.",
   "reactionAdded": "Your reaction has been added.",
-  "reactionRemoved": "Your reaction has been removed."
+  "reactionRemoved": "Your reaction has been removed.",
+  "chatMessagePlaceholder": "Write a message..."
 }

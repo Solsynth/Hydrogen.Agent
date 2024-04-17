@@ -33,5 +33,6 @@
   "postDeleteConfirm": "你确定要删除这篇帖子吗？这意味着这个帖子将永远被我们丢弃在硬盘海中！该操作不可被反转！",
   "postEditNotify": "你正在修改一个已经发布了的帖子。",
   "reactionAdded": "你的反应已被添加。",
-  "reactionRemoved": "你的反应已被移除。"
+  "reactionRemoved": "你的反应已被移除。",
+  "chatMessagePlaceholder": "发条消息……"
 }
