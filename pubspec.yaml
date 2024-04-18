@@ -57,6 +57,8 @@ dependencies:
   media_kit: ^1.1.10+1
   media_kit_libs_video: ^1.0.4
   hive_flutter: ^1.1.0
+  flutter_launcher_icons: ^0.13.1
+  web_socket_channel: ^2.4.5
 
 dev_dependencies:
   flutter_test:
@@ -111,3 +113,21 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon.png"
+    background_color: "#ffffff"
+    theme_color: "#4b5094"
+  windows:
+    generate: true
+    image_path: "assets/icon.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/icon.png"

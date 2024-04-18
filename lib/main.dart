@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/timeago.dart';
@@ -37,6 +38,7 @@ class SolianApp extends StatelessWidget {
                 providers: [
                   Provider(create: (_) => NavigationProvider()),
                   Provider(create: (_) => AuthProvider()),
+                  Provider(create: (_) => ChatProvider()),
                 ],
                 child: child,
               );

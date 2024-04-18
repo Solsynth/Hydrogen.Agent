@@ -46,7 +46,11 @@ class ChatMessage extends StatelessWidget {
       return Row(
         children: [
           const SizedBox(width: 40),
-          Expanded(child: contentPart),
+          Expanded(
+            child: Column(
+              children: [contentPart, renderAttachment()],
+            ),
+          ),
         ],
       );
     } else {
