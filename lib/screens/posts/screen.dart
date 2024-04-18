@@ -60,6 +60,7 @@ class _PostScreenState extends State<PostScreen> {
                       child: PostItem(
                         item: snapshot.data!,
                         brief: false,
+                        ripple: false,
                       ),
                     ),
                     SliverToBoxAdapter(

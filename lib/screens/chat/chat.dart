@@ -10,6 +10,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
+import 'package:solian/widgets/chat/message_action.dart';
 import 'package:solian/widgets/chat/message_editor.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:http/http.dart' as http;
@@ -49,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!await auth.isAuthorized()) return;
 
     final offset = pageKey;
-    const take = 5;
+    const take = 10;
 
     var uri = getRequestUri(
       'messaging',
@@ -96,6 +97,25 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  Message? _editingItem;
+  Message? _replyingItem;
+
+  void viewActions(Message item) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ChatMessageAction(
+        channel: widget.alias,
+        item: item,
+        onEdit: () => setState(() {
+          _editingItem = item;
+        }),
+        onReply: () => setState(() {
+          _replyingItem = item;
+        }),
+      ),
+    );
+  }
+
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -128,24 +148,35 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
                       isMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
                     }
-                    return Container(
-                      padding: EdgeInsets.only(
-                        top: !isMerged ? 8 : 0,
-                        bottom: !hasMerged ? 8 : 0,
-                        left: 12,
-                        right: 12,
+                    return InkWell(
+                      child: Container(
+                        padding: EdgeInsets.only(
+                          top: !isMerged ? 8 : 0,
+                          bottom: !hasMerged ? 8 : 0,
+                          left: 12,
+                          right: 12,
+                        ),
+                        child: ChatMessage(
+                          key: Key('m${item.id}'),
+                          item: item,
+                          underMerged: isMerged,
+                        ),
                       ),
-                      child: ChatMessage(
-                        key: Key('m${item.id}'),
-                        item: item,
-                        underMerged: isMerged,
-                      ),
+                      onLongPress: () => viewActions(item),
                     );
                   },
                 ),
               ),
             ),
-            ChatMessageEditor(channel: widget.alias),
+            ChatMessageEditor(
+              channel: widget.alias,
+              editing: _editingItem,
+              replying: _replyingItem,
+              onReset: () => setState(() {
+                _editingItem = null;
+                _replyingItem = null;
+              }),
+            ),
           ],
         ),
         onInsertMessage: (message) => addMessage(message),

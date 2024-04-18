@@ -75,11 +75,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               pagingController: _pagingController,
               separatorBuilder: (context, index) => const Divider(thickness: 0.3),
               builderDelegate: PagedChildBuilderDelegate<Post>(
-                itemBuilder: (context, item, index) => GestureDetector(
-                  child: PostItem(
-                    item: item,
-                    onUpdate: () => _pagingController.refresh(),
-                  ),
+                itemBuilder: (context, item, index) => PostItem(
+                  item: item,
+                  onUpdate: () => _pagingController.refresh(),
                   onTap: () {
                     router.pushNamed(
                       'posts.screen',

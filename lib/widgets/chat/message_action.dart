@@ -1,48 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/message.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
+import 'package:solian/widgets/chat/message_deletion.dart';
 import 'package:solian/widgets/posts/item_deletion.dart';
 
-class PostItemAction extends StatelessWidget {
-  final Post item;
-  final Function? onUpdate;
-  final Function? onDelete;
+class ChatMessageAction extends StatelessWidget {
+  final String channel;
+  final Message item;
+  final Function? onEdit;
+  final Function? onReply;
 
-  const PostItemAction({
+  const ChatMessageAction({
     super.key,
+    required this.channel,
     required this.item,
-    this.onUpdate,
-    this.onDelete,
+    this.onEdit,
+    this.onReply,
   });
-
-  void viewEditor() async {
-    bool ok = false;
-    switch (item.modelType) {
-      case 'article':
-        ok = await router.pushNamed(
-          'posts.articles.editor',
-          extra: item,
-        ) as bool;
-      case 'moment':
-        ok = await router.pushNamed(
-          'posts.moments.editor',
-          extra: item,
-        ) as bool;
-      case 'comment':
-        ok = await router.pushNamed(
-          'posts.comments.editor',
-          extra: CommentPostArguments(editing: item),
-        ) as bool;
-    }
-
-    if (ok == true && onUpdate != null) {
-      onUpdate!();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +33,19 @@ class PostItemAction extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 20, top: 20, bottom: 12),
-            child: Text(
-              AppLocalizations.of(context)!.action,
-              style: Theme.of(context).textTheme.headlineSmall,
+            padding: const EdgeInsets.only(left: 20, top: 20, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.action,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                Text(
+                  'Message ID #${item.id.toString().padLeft(8, '0')}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -69,21 +57,25 @@ class PostItemAction extends StatelessWidget {
                     ListTile(
                       leading: const Icon(Icons.edit),
                       title: Text(AppLocalizations.of(context)!.edit),
-                      onTap: () => viewEditor(),
+                      onTap: () {
+                        if (onEdit != null) onEdit!();
+                        if (Navigator.canPop(context)) Navigator.pop(context);
+                      },
                     ),
                     ListTile(
                       leading: const Icon(Icons.delete),
                       title: Text(AppLocalizations.of(context)!.delete),
                       onTap: () {
-                        final dataset = '${item.modelType}s';
                         showDialog(
                           context: context,
-                          builder: (context) => ItemDeletionDialog(
+                          builder: (context) => ChatMessageDeletionDialog(
                             item: item,
-                            dataset: dataset,
+                            channel: channel,
                           ),
                         ).then((did) {
-                          if (did == true && onDelete != null) onDelete!();
+                          if (did == true && Navigator.canPop(context)) {
+                            Navigator.pop(context);
+                          }
                         });
                       },
                     )
@@ -91,13 +83,14 @@ class PostItemAction extends StatelessWidget {
 
                   return ListView(
                     children: [
-                      ...(snapshot.data['id'] == item.authorId
-                          ? authorizedItems
-                          : List.empty()),
+                      ...(snapshot.data['id'] == item.sender.accountId ? authorizedItems : List.empty()),
                       ListTile(
-                        leading: const Icon(Icons.report),
-                        title: Text(AppLocalizations.of(context)!.report),
-                        onTap: () {},
+                        leading: const Icon(Icons.reply),
+                        title: Text(AppLocalizations.of(context)!.reply),
+                        onTap: () {
+                          if (onReply != null) onReply!();
+                          if (Navigator.canPop(context)) Navigator.pop(context);
+                        },
                       )
                     ],
                   );

@@ -13,15 +13,19 @@ import 'package:timeago/timeago.dart' as timeago;
 class PostItem extends StatefulWidget {
   final Post item;
   final bool? brief;
+  final bool? ripple;
   final Function? onUpdate;
   final Function? onDelete;
+  final Function? onTap;
 
   const PostItem({
     super.key,
     required this.item,
     this.brief,
+    this.ripple,
     this.onUpdate,
     this.onDelete,
+    this.onTap,
   });
 
   @override
@@ -31,7 +35,7 @@ class PostItem extends StatefulWidget {
 class _PostItemState extends State<PostItem> {
   Map<String, dynamic>? reactionList;
 
-  void viewActions(BuildContext context) {
+  void viewActions() {
     showModalBottomSheet(
       context: context,
       builder: (context) => PostItemAction(
@@ -41,9 +45,8 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
-  void viewComments(BuildContext context) {
-    final PagingController<int, Post> commentPaging =
-        PagingController(firstPageKey: 0);
+  void viewComments() {
+    final PagingController<int, Post> commentPaging = PagingController(firstPageKey: 0);
 
     showModalBottomSheet(
       context: context,
@@ -83,8 +86,7 @@ class _PostItemState extends State<PostItem> {
   Widget renderAttachments() {
     if (widget.item.modelType == 'article') return Container();
 
-    if (widget.item.attachments != null &&
-        widget.item.attachments!.isNotEmpty) {
+    if (widget.item.attachments != null && widget.item.attachments!.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: 8),
         child: AttachmentList(items: widget.item.attachments!, provider: 'interactive'),
@@ -105,7 +107,7 @@ class _PostItemState extends State<PostItem> {
             avatar: const Icon(Icons.comment),
             label: Text(widget.item.commentCount.toString()),
             tooltip: AppLocalizations.of(context)!.comment,
-            onPressed: () => viewComments(context),
+            onPressed: () => viewComments(),
           ),
           const VerticalDivider(thickness: 0.3, indent: 8, endIndent: 8),
           Expanded(
@@ -127,9 +129,8 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
-  String getAuthorDescribe() => widget.item.author.description.isNotEmpty
-      ? widget.item.author.description
-      : 'No description yet.';
+  String getAuthorDescribe() =>
+      widget.item.author.description.isNotEmpty ? widget.item.author.description : 'No description yet.';
 
   @override
   void initState() {
@@ -174,8 +175,7 @@ class _PostItemState extends State<PostItem> {
                     children: [
                       ...headingParts,
                       Padding(
-                        padding:
-                            const EdgeInsets.only(left: 12, right: 12, top: 4),
+                        padding: const EdgeInsets.only(left: 12, right: 12, top: 4),
                         child: renderContent(),
                       ),
                       renderAttachments(),
@@ -240,11 +240,24 @@ class _PostItemState extends State<PostItem> {
       );
     }
 
-    return GestureDetector(
-      child: content,
-      onLongPress: () {
-        viewActions(context);
-      },
-    );
+    final ripple = widget.ripple ?? true;
+
+    if (ripple) {
+      return InkWell(
+        child: content,
+        onTap: () {
+          if (widget.onTap != null) widget.onTap!();
+        },
+        onLongPress: () => viewActions(),
+      );
+    } else {
+      return GestureDetector(
+        child: content,
+        onTap: () {
+          if (widget.onTap != null) widget.onTap!();
+        },
+        onLongPress: () => viewActions(),
+      );
+    }
   }
 }

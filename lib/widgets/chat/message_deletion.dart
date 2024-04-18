@@ -2,34 +2,34 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/message.dart';
 import 'package:solian/models/post.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 
-class ItemDeletionDialog extends StatefulWidget {
-  final Post item;
-  final String dataset;
+class ChatMessageDeletionDialog extends StatefulWidget {
+  final String channel;
+  final Message item;
 
-  const ItemDeletionDialog({
+  const ChatMessageDeletionDialog({
     super.key,
     required this.item,
-    required this.dataset,
+    required this.channel,
   });
 
   @override
-  State<ItemDeletionDialog> createState() => _ItemDeletionDialogState();
+  State<ChatMessageDeletionDialog> createState() => _ChatMessageDeletionDialogState();
 }
 
-class _ItemDeletionDialogState extends State<ItemDeletionDialog> {
+class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
   bool _isSubmitting = false;
 
   void doDeletion(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final uri =
-        getRequestUri('interactive', '/api/p/moments/${widget.item.id}');
+    final uri = getRequestUri('messaging', '/api/channels/${widget.channel}/messages/${widget.item.id}');
 
     setState(() => _isSubmitting = true);
     final res = await auth.client!.delete(uri);
@@ -48,7 +48,7 @@ class _ItemDeletionDialogState extends State<ItemDeletionDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.confirmation),
-      content: Text(AppLocalizations.of(context)!.postDeleteConfirm),
+      content: Text(AppLocalizations.of(context)!.chatMessageDeleteConfirm),
       actions: <Widget>[
         TextButton(
           onPressed: _isSubmitting ? null : () => Navigator.pop(context, false),
