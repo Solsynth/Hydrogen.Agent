@@ -79,10 +79,20 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void addMessage(Message item) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _pagingController.itemList?.insert(0, item);
-      });
+    setState(() {
+      _pagingController.itemList?.insert(0, item);
+    });
+  }
+
+  void updateMessage(Message item) {
+    setState(() {
+      _pagingController.itemList = _pagingController.itemList?.map((x) => x.id == item.id ? item : x).toList();
+    });
+  }
+
+  void deleteMessage(Message item) {
+    setState(() {
+      _pagingController.itemList = _pagingController.itemList?.where((x) => x.id != item.id).toList();
     });
   }
 
@@ -138,7 +148,9 @@ class _ChatScreenState extends State<ChatScreen> {
             ChatMessageEditor(channel: widget.alias),
           ],
         ),
-        onNewMessage: (message) => addMessage(message),
+        onInsertMessage: (message) => addMessage(message),
+        onUpdateMessage: (message) => updateMessage(message),
+        onDeleteMessage: (message) => deleteMessage(message),
       ),
     );
   }
