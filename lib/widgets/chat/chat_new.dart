@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -17,6 +18,20 @@ class ChatNewAction extends StatelessWidget {
             child: Text(
               AppLocalizations.of(context)!.chatNew,
               style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.add),
+                  title: Text(AppLocalizations.of(context)!.chatNewCreate),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.travel_explore),
+                  title: Text(AppLocalizations.of(context)!.chatNewJoin),
+                ),
+              ],
             ),
           ),
         ],

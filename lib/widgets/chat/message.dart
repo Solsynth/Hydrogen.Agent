@@ -29,20 +29,21 @@ class ChatMessage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.only(left: 8, right: 8),
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.rotationY(math.pi),
-                    child: const Icon(Icons.reply, size: 16),
-                  ),
-                  const SizedBox(width: 8),
-                  CircleAvatar(
-                    radius: 10,
-                    backgroundImage: NetworkImage(item.replyTo!.sender.account.avatar),
-                  ),
-                ]),
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(math.pi),
+                  child: const Icon(Icons.reply, size: 16),
+                ),
+                const SizedBox(width: 8),
+                CircleAvatar(
+                  radius: 10,
+                  backgroundImage: NetworkImage(item.replyTo!.sender.account.avatar),
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: Column(

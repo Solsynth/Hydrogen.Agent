@@ -38,6 +38,8 @@
   "reactionAdded": "你的反应已被添加。",
   "reactionRemoved": "你的反应已被移除。",
   "chatNew": "新聊天",
+  "chatNewCreate": "新建频道",
+  "chatNewJoin": "加入已有频道",
   "chatMessagePlaceholder": "发条消息……",
   "chatMessageEditNotify": "你正在编辑信息中……",
   "chatMessageReplyNotify": "你正在回复消息中……",

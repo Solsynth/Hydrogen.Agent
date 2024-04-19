@@ -38,6 +38,8 @@
   "reactionAdded": "Your reaction has been added.",
   "reactionRemoved": "Your reaction has been removed.",
   "chatNew": "New Chat",
+  "chatNewCreate": "Create a channel",
+  "chatNewJoin": "Join a exists channel",
   "chatMessagePlaceholder": "Write a message...",
   "chatMessageEditNotify": "You are about editing a message.",
   "chatMessageReplyNotify": "You are about replying a message.",
