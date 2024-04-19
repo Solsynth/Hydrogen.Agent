@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/message.dart';
-import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/widgets/chat/message_deletion.dart';
-import 'package:solian/widgets/posts/item_deletion.dart';
 
 class ChatMessageAction extends StatelessWidget {
   final String channel;

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -54,13 +56,24 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.read<AuthProvider>();
+
     return IndentWrapper(
       noSafeArea: true,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.edit),
-        onPressed: () async {
-          final did = await router.pushNamed("posts.moments.editor");
-          if (did == true) _pagingController.refresh();
+      floatingActionButton: FutureBuilder(
+        future: auth.isAuthorized(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data!) {
+            return FloatingActionButton(
+              child: const Icon(Icons.edit),
+              onPressed: () async {
+                final did = await router.pushNamed("posts.moments.editor");
+                if (did == true) _pagingController.refresh();
+              },
+            );
+          } else {
+            return Container();
+          }
         },
       ),
       title: AppLocalizations.of(context)!.explore,
@@ -71,9 +84,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
         child: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: 640),
-            child: PagedListView<int, Post>.separated(
+            child: PagedListView<int, Post>(
               pagingController: _pagingController,
-              separatorBuilder: (context, index) => const Divider(thickness: 0.3),
               builderDelegate: PagedChildBuilderDelegate<Post>(
                 itemBuilder: (context, item, index) => PostItem(
                   item: item,

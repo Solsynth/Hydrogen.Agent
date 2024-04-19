@@ -11,7 +11,6 @@ class ChatMessageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Markdown(
-      selectable: true,
       data: item.content,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
