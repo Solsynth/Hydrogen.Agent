@@ -1,0 +1,188 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+import 'package:solian/models/channel.dart';
+import 'package:solian/providers/auth.dart';
+import 'package:solian/router.dart';
+import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
+
+class ChannelEditor extends StatefulWidget {
+  final Channel? editing;
+
+  const ChannelEditor({super.key, this.editing});
+
+  @override
+  State<ChannelEditor> createState() => _ChannelEditorState();
+}
+
+class _ChannelEditorState extends State<ChannelEditor> {
+  final _aliasController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  bool _isSubmitting = false;
+
+  Future<void> applyChannel(BuildContext context) async {
+    setState(() => _isSubmitting = true);
+
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    final uri = widget.editing == null
+        ? getRequestUri('messaging', '/api/channels')
+        : getRequestUri('messaging', '/api/channels/${widget.editing!.id}');
+
+    final req = Request(widget.editing == null ? "POST" : "PUT", uri);
+    req.headers['Content-Type'] = 'application/json';
+    req.body = jsonEncode(<String, dynamic>{
+      'alias': _aliasController.value.text.toLowerCase(),
+      'name': _nameController.value.text,
+      'description': _descriptionController.value.text,
+    });
+
+    var res = await Response.fromStream(await auth.client!.send(req));
+    if (res.statusCode != 200) {
+      var message = utf8.decode(res.bodyBytes);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong... $message")),
+      );
+    } else {
+      if (router.canPop()) {
+        router.pop(true);
+      }
+    }
+    setState(() => _isSubmitting = false);
+  }
+
+  void randomizeAlias() {
+    _aliasController.text = const Uuid().v4().replaceAll('-', '');
+  }
+
+  void cancelEditing() {
+    if (router.canPop()) {
+      router.pop(false);
+    }
+  }
+
+  @override
+  void initState() {
+    if (widget.editing != null) {
+      _aliasController.text = widget.editing!.alias;
+      _nameController.text = widget.editing!.name;
+      _descriptionController.text = widget.editing!.description;
+    }
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final editingBanner = MaterialBanner(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      leading: const Icon(Icons.edit_note),
+      backgroundColor: const Color(0xFFE0E0E0),
+      dividerColor: const Color.fromARGB(1, 0, 0, 0),
+      content: Text(AppLocalizations.of(context)!.chatChannelEditNotify),
+      actions: [
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.cancel),
+          onPressed: () => cancelEditing(),
+        ),
+      ],
+    );
+
+    return IndentWrapper(
+      hideDrawer: true,
+      title: AppLocalizations.of(context)!.chatChannelOrganize,
+      appBarActions: <Widget>[
+        TextButton(
+          onPressed: !_isSubmitting ? () => applyChannel(context) : null,
+          child: Text(AppLocalizations.of(context)!.apply.toUpperCase()),
+        ),
+      ],
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Column(
+            children: [
+              _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+              ListTile(
+                title: Text(AppLocalizations.of(context)!.chatChannelUsage),
+                subtitle: Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
+                leading: const CircleAvatar(
+                  backgroundColor: Colors.teal,
+                  child: Icon(Icons.tag, color: Colors.white),
+                ),
+              ),
+              const Divider(thickness: 0.3),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        autofocus: true,
+                        controller: _aliasController,
+                        decoration: InputDecoration.collapsed(
+                          hintText: AppLocalizations.of(context)!.chatChannelAliasLabel,
+                        ),
+                        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                      ),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        shape: const CircleBorder(),
+                        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+                      ),
+                      onPressed: () => randomizeAlias(),
+                      child: const Icon(Icons.refresh),
+                    )
+                  ],
+                ),
+              ),
+              const Divider(thickness: 0.3),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: TextField(
+                  autocorrect: true,
+                  controller: _nameController,
+                  decoration: InputDecoration.collapsed(
+                    hintText: AppLocalizations.of(context)!.chatChannelNameLabel,
+                  ),
+                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                ),
+              ),
+              const Divider(thickness: 0.3),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: TextField(
+                    minLines: 5,
+                    maxLines: null,
+                    autocorrect: true,
+                    keyboardType: TextInputType.multiline,
+                    controller: _descriptionController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: AppLocalizations.of(context)!.chatChannelDescriptionLabel,
+                    ),
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+              ),
+              widget.editing != null ? editingBanner : Container(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

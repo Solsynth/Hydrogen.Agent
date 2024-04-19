@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/post.dart';
@@ -40,8 +41,13 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
   }
 
   Future<void> applyPost(BuildContext context) async {
+    setState(() => _isSubmitting = true);
+
     final auth = context.read<AuthProvider>();
-    if (!await auth.isAuthorized()) return;
+    if (!await auth.isAuthorized()) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
 
     final uri = widget.editing == null
         ? getRequestUri('interactive', '/api/p/moments')
@@ -55,7 +61,6 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
       'attachments': _attachments,
     });
 
-    setState(() => _isSubmitting = true);
     var res = await Response.fromStream(await auth.client!.send(req));
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
@@ -71,8 +76,8 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
   }
 
   void cancelEditing() {
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
+    if (router.canPop()) {
+      router.pop(false);
     }
   }
 
@@ -119,7 +124,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
           constraints: const BoxConstraints(maxWidth: 640),
           child: Column(
             children: [
-              _isSubmitting ? const LinearProgressIndicator() : Container(),
+              _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
               FutureBuilder(
                 future: auth.getProfiles(),
                 builder: (context, snapshot) {

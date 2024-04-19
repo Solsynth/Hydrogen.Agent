@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/post.dart';
@@ -48,8 +49,13 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
   }
 
   Future<void> applyPost(BuildContext context) async {
+    setState(() => _isSubmitting = true);
+
     final auth = context.read<AuthProvider>();
-    if (!await auth.isAuthorized()) return;
+    if (!await auth.isAuthorized()) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
 
     final alias = widget.related?.alias ?? 'not-found';
     final relatedDataset = '${widget.related?.modelType ?? 'comment'}s';
@@ -65,7 +71,6 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
       'attachments': _attachments,
     });
 
-    setState(() => _isSubmitting = true);
     var res = await Response.fromStream(await auth.client!.send(req));
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
@@ -81,8 +86,8 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
   }
 
   void cancelEditing() {
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
+    if (router.canPop()) {
+      router.pop(false);
     }
   }
 
@@ -129,7 +134,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
           constraints: const BoxConstraints(maxWidth: 640),
           child: Column(
             children: [
-              _isSubmitting ? const LinearProgressIndicator() : Container(),
+              _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
               FutureBuilder(
                 future: auth.getProfiles(),
                 builder: (context, snapshot) {

@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/chat/chat.dart';
@@ -7,6 +8,7 @@ import 'package:solian/screens/explore.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
+import 'package:solian/widgets/chat/channel_editor.dart';
 
 final router = GoRouter(
   routes: [
@@ -21,7 +23,12 @@ final router = GoRouter(
       builder: (context, state) => const ChatIndexScreen(),
     ),
     GoRoute(
-      path: '/chat/:channel',
+      path: '/chat/create',
+      name: 'chat.channel.editor',
+      builder: (context, state) => ChannelEditor(editing: state.extra as Channel?),
+    ),
+    GoRoute(
+      path: '/chat/c/:channel',
       name: 'chat.channel',
       builder: (context, state) => ChatScreen(alias: state.pathParameters['channel'] as String),
     ),
@@ -33,16 +40,14 @@ final router = GoRouter(
     GoRoute(
       path: '/posts/publish/moments',
       name: 'posts.moments.editor',
-      builder: (context, state) =>
-          MomentEditorScreen(editing: state.extra as Post?),
+      builder: (context, state) => MomentEditorScreen(editing: state.extra as Post?),
     ),
     GoRoute(
       path: '/posts/publish/comments',
       name: 'posts.comments.editor',
       builder: (context, state) {
         final args = state.extra as CommentPostArguments;
-        return CommentEditorScreen(
-            editing: args.editing, related: args.related);
+        return CommentEditorScreen(editing: args.editing, related: args.related);
       },
     ),
     GoRoute(

@@ -1,9 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/router.dart';
 
 class ChatNewAction extends StatelessWidget {
-  const ChatNewAction({super.key});
+  final Function onUpdate;
+
+  const ChatNewAction({super.key, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,16 @@ class ChatNewAction extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.add),
                   title: Text(AppLocalizations.of(context)!.chatNewCreate),
+                  onTap: () {
+                    router.pushNamed('chat.channel.editor').then((did) {
+                      if (did == true) {
+                        onUpdate();
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        }
+                      }
+                    });
+                  },
                 ),
                 ListTile(
                   leading: const Icon(Icons.travel_explore),

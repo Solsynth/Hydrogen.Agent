@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -184,7 +185,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 20),
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -215,7 +216,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
             ],
           ),
         ),
-        _isSubmitting ? const LinearProgressIndicator() : Container(),
+        _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
         Expanded(
           child: ListView.separated(
             itemCount: _attachments.length,

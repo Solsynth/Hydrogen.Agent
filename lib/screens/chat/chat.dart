@@ -8,6 +8,7 @@ import 'package:solian/models/message.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/chat/channel_action.dart';
 import 'package:solian/widgets/chat/maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
@@ -31,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final http.Client _client = http.Client();
 
-  Future<void> fetchMetadata(BuildContext context) async {
+  Future<void> fetchMetadata() async {
     var uri = getRequestUri('messaging', '/api/channels/${widget.alias}');
     var res = await _client.get(uri);
     if (res.statusCode == 200) {
@@ -120,7 +121,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
-      fetchMetadata(context);
+      fetchMetadata();
     });
 
     _pagingController.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
@@ -133,6 +134,9 @@ class _ChatScreenState extends State<ChatScreen> {
     return IndentWrapper(
       hideDrawer: true,
       title: _channelMeta?.name ?? "Loading...",
+      appBarActions: [
+        _channelMeta != null ? ChannelAction(channel: _channelMeta!, onUpdate: () => fetchMetadata()) : Container(),
+      ],
       child: ChatMaintainer(
         child: Column(
           children: [
@@ -141,6 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 reverse: true,
                 pagingController: _pagingController,
                 builderDelegate: PagedChildBuilderDelegate<Message>(
+                  noItemsFoundIndicatorBuilder: (_) => Container(),
                   itemBuilder: (context, item, index) {
                     bool isMerged = false, hasMerged = false;
                     if (index > 0) {

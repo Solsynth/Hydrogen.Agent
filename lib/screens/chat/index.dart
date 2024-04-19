@@ -21,7 +21,7 @@ class ChatIndexScreen extends StatefulWidget {
 class _ChatIndexScreenState extends State<ChatIndexScreen> {
   List<Channel> _channels = List.empty();
 
-  Future<void> fetchChannels(BuildContext context) async {
+  Future<void> fetchChannels() async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
@@ -44,14 +44,14 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
   void viewNewChatAction() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => const ChatNewAction(),
+      builder: (context) => ChatNewAction(onUpdate: () => fetchChannels()),
     );
   }
 
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
-      fetchChannels(context);
+      fetchChannels();
     });
 
     super.initState();
@@ -85,7 +85,7 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
             }
 
             return RefreshIndicator(
-              onRefresh: () => fetchChannels(context),
+              onRefresh: () => fetchChannels(),
               child: ListView.builder(
                 itemCount: _channels.length,
                 itemBuilder: (context, index) {
