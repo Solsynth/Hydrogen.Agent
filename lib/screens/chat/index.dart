@@ -8,6 +8,7 @@ import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/signin_required.dart';
 
 class ChatIndexScreen extends StatefulWidget {
   const ChatIndexScreen({super.key});
@@ -50,33 +51,43 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.read<AuthProvider>();
+
     return IndentWrapper(
       title: AppLocalizations.of(context)!.chat,
-      child: RefreshIndicator(
-        onRefresh: () => fetchChannels(context),
-        child: ListView.builder(
-          itemCount: _channels.length,
-          itemBuilder: (context, index) {
-            final element = _channels[index];
-            return ListTile(
-              leading: const CircleAvatar(
-                backgroundColor: Colors.indigo,
-                child: Icon(Icons.tag, color: Colors.white),
+      child: FutureBuilder(
+          future: auth.isAuthorized(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || !snapshot.data!) {
+              return const SignInRequiredScreen();
+            }
+
+            return RefreshIndicator(
+              onRefresh: () => fetchChannels(context),
+              child: ListView.builder(
+                itemCount: _channels.length,
+                itemBuilder: (context, index) {
+                  final element = _channels[index];
+                  return ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: Colors.indigo,
+                      child: Icon(Icons.tag, color: Colors.white),
+                    ),
+                    title: Text(element.name),
+                    subtitle: Text(element.description),
+                    onTap: () {
+                      router.pushNamed(
+                        'chat.channel',
+                        pathParameters: {
+                          'channel': element.alias,
+                        },
+                      );
+                    },
+                  );
+                },
               ),
-              title: Text(element.name),
-              subtitle: Text(element.description),
-              onTap: () {
-                router.pushNamed(
-                  'chat.channel',
-                  pathParameters: {
-                    'channel': element.alias,
-                  },
-                );
-              },
             );
-          },
-        ),
-      ),
+          }),
     );
   }
 }

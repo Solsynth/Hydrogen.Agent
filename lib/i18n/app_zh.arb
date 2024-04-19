@@ -5,6 +5,7 @@
   "account": "账号",
   "signIn": "登陆",
   "signInCaption": "登陆以发表帖子、文章、创建领域、和你的朋友聊天，以及获取更多功能！",
+  "signInRequired": "请先登陆",
   "signUp": "注册",
   "signUpCaption": "在 Solarpass 注册一个账号以获得整个 Solar Networks 的存取权！",
   "confirmation": "确认",
