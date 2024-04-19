@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/widgets/chat/content.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
@@ -25,14 +23,11 @@ class ChatMessage extends StatelessWidget {
   }
 
   Widget renderReply() {
-    final padding =
-        underMerged ? const EdgeInsets.only(left: 14, right: 8, top: 4) : const EdgeInsets.only(left: 8, right: 8);
-
     if (item.replyTo != null) {
       return Row(
         children: [
           Container(
-            padding: padding,
+            padding: const EdgeInsets.only(left: 8, right: 8),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,

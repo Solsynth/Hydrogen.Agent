@@ -6,6 +6,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/chat/chat_new.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/signin_required.dart';
@@ -40,6 +41,13 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
     }
   }
 
+  void viewNewChatAction() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => const ChatNewAction(),
+    );
+  }
+
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -55,6 +63,20 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
 
     return IndentWrapper(
       title: AppLocalizations.of(context)!.chat,
+      floatingActionButton: FutureBuilder(
+        future: auth.isAuthorized(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data!) {
+            return FloatingActionButton.extended(
+              icon: const Icon(Icons.add),
+              label: Text(AppLocalizations.of(context)!.chatNew),
+              onPressed: () => viewNewChatAction(),
+            );
+          } else {
+            return Container();
+          }
+        },
+      ),
       child: FutureBuilder(
           future: auth.isAuthorized(),
           builder: (context, snapshot) {

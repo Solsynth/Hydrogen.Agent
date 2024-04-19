@@ -37,6 +37,7 @@
   "postEditNotify": "You are about editing a post that already published.",
   "reactionAdded": "Your reaction has been added.",
   "reactionRemoved": "Your reaction has been removed.",
+  "chatNew": "New Chat",
   "chatMessagePlaceholder": "Write a message...",
   "chatMessageEditNotify": "You are about editing a message.",
   "chatMessageReplyNotify": "You are about replying a message.",

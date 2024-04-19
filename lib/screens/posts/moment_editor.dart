@@ -32,6 +32,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditor(
+        provider: 'interactive',
         current: _attachments,
         onUpdate: (value) => _attachments = value,
       ),
@@ -151,6 +152,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
                     decoration: InputDecoration.collapsed(
                       hintText: AppLocalizations.of(context)!.postContentPlaceholder,
                     ),
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                   ),
                 ),
               ),

@@ -40,6 +40,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditor(
+        provider: 'interactive',
         current: _attachments,
         onUpdate: (value) => _attachments = value,
       ),
@@ -151,8 +152,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
               const Divider(thickness: 0.3),
               Expanded(
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: TextField(
                     maxLines: null,
                     autofocus: true,
@@ -160,9 +160,9 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
                     keyboardType: TextInputType.multiline,
                     controller: _textController,
                     decoration: InputDecoration.collapsed(
-                      hintText:
-                          AppLocalizations.of(context)!.postContentPlaceholder,
+                      hintText: AppLocalizations.of(context)!.postContentPlaceholder,
                     ),
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                   ),
                 ),
               ),

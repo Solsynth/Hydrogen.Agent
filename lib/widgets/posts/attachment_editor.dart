@@ -13,10 +13,16 @@ import 'package:solian/utils/service_url.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AttachmentEditor extends StatefulWidget {
+  final String provider;
   final List<Attachment> current;
   final void Function(List<Attachment> data) onUpdate;
 
-  const AttachmentEditor({super.key, required this.current, required this.onUpdate});
+  const AttachmentEditor({
+    super.key,
+    required this.provider,
+    required this.current,
+    required this.onUpdate,
+  });
 
   @override
   State<AttachmentEditor> createState() => _AttachmentEditorState();
@@ -97,10 +103,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
 
   Future<void> uploadAttachment(File file, String hashcode) async {
     final auth = context.read<AuthProvider>();
-    final req = MultipartRequest(
-      'POST',
-      getRequestUri('interactive', '/api/attachments'),
-    );
+
+    final req = MultipartRequest('POST', getRequestUri(widget.provider, '/api/attachments'));
     req.files.add(await MultipartFile.fromPath('attachment', file.path));
     req.fields['hashcode'] = hashcode;
 
@@ -119,10 +123,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
   Future<void> disposeAttachment(BuildContext context, Attachment item, int index) async {
     final auth = context.read<AuthProvider>();
 
-    final req = MultipartRequest(
-      'DELETE',
-      getRequestUri('interactive', '/api/attachments/${item.id}'),
-    );
+    final req = MultipartRequest('DELETE', getRequestUri(widget.provider, '/api/attachments/${item.id}'));
 
     setState(() => _isSubmitting = true);
     var res = await auth.client!.send(req);
@@ -293,14 +294,16 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            child: GridView.count(
+              primary: false,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              crossAxisCount: 4,
               children: [
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
                   onTap: () => pickImage(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
+                  child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -314,8 +317,7 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
                   onTap: () => takeImage(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
+                  child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -329,12 +331,11 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
                   onTap: () => pickVideo(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
+                  child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.camera, color: Colors.indigo),
+                        const Icon(Icons.camera, color: Colors.teal),
                         const SizedBox(height: 8),
                         Text(AppLocalizations.of(context)!.pickVideo),
                       ],
@@ -344,12 +345,11 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
                   onTap: () => takeVideo(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
+                  child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.video_call, color: Colors.indigo),
+                        const Icon(Icons.video_call, color: Colors.teal),
                         const SizedBox(height: 8),
                         Text(AppLocalizations.of(context)!.takeVideo),
                       ],

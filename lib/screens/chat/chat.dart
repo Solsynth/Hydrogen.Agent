@@ -74,6 +74,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   bool getMessageMergeable(Message? a, Message? b) {
+    if (a?.replyTo != null || b?.replyTo != null) return false;
     if (a == null || b == null) return false;
     if (a.senderId != b.senderId) return false;
     return a.createdAt.difference(b.createdAt).inMinutes <= 5;

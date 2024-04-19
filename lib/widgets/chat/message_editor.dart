@@ -5,8 +5,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/message.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/posts/attachment_editor.dart';
+import 'package:badges/badges.dart' as badge;
 
 class ChatMessageEditor extends StatefulWidget {
   final String channel;
@@ -25,6 +28,19 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
 
   bool _isSubmitting = false;
 
+  List<Attachment> _attachments = List.empty(growable: true);
+
+  void viewAttachments(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => AttachmentEditor(
+        provider: 'messaging',
+        current: _attachments,
+        onUpdate: (value) => _attachments = value,
+      ),
+    );
+  }
+
   Future<void> sendMessage(BuildContext context) async {
     if (_isSubmitting) return;
 
@@ -39,6 +55,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     req.headers['Content-Type'] = 'application/json';
     req.body = jsonEncode(<String, dynamic>{
       'content': _textController.value.text,
+      'attachments': _attachments,
       'reply_to': widget.replying?.id,
     });
 
@@ -57,6 +74,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
 
   void reset() {
     _textController.clear();
+    _attachments.clear();
 
     if (widget.onReset != null) widget.onReset!();
   }
@@ -65,6 +83,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     if (widget.editing != null) {
       setState(() {
         _textController.text = widget.editing!.content;
+        _attachments = widget.editing!.attachments ?? List.empty(growable: true);
       });
     }
   }
@@ -116,7 +135,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
         widget.replying != null ? replyingBanner : Container(),
         Container(
           height: 56,
-          padding: const EdgeInsets.only(top: 4, left: 16, right: 8),
+          padding: const EdgeInsets.only(top: 4, bottom: 4, right: 8),
           decoration: const BoxDecoration(
             border: Border(
               top: BorderSide(width: 0.3, color: Color(0xffdedede)),
@@ -125,6 +144,16 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              badge.Badge(
+                showBadge: _attachments.isNotEmpty,
+                badgeContent: Text(_attachments.length.toString(), style: const TextStyle(color: Colors.white)),
+                position: badge.BadgePosition.custom(top: -2, end: 8),
+                child: TextButton(
+                  style: TextButton.styleFrom(shape: const CircleBorder(), padding: const EdgeInsets.all(4)),
+                  onPressed: !_isSubmitting ? () => viewAttachments(context) : null,
+                  child: const Icon(Icons.attach_file),
+                ),
+              ),
               Expanded(
                 child: TextField(
                   controller: _textController,
@@ -136,6 +165,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
                     hintText: AppLocalizations.of(context)!.chatMessagePlaceholder,
                   ),
                   onSubmitted: (_) => sendMessage(context),
+                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                 ),
               ),
               TextButton(
