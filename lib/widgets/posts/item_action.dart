@@ -91,7 +91,7 @@ class PostItemAction extends StatelessWidget {
 
                   return ListView(
                     children: [
-                      ...(snapshot.data['id'] == item.authorId
+                      ...(snapshot.data['id'] == item.author.externalId
                           ? authorizedItems
                           : List.empty()),
                       ListTile(
