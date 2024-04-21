@@ -3,7 +3,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInScreen extends StatelessWidget {
   final _usernameController = TextEditingController();
@@ -59,9 +61,33 @@ class SignInScreen extends StatelessWidget {
                   auth.signin(context, username, password).then((_) {
                     router.pop(true);
                   }).catchError((e) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(e.toString()),
-                    ));
+                    List<String> messages = e.toString().split('\n');
+                    if (messages.last.contains("risk")) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(AppLocalizations.of(context)!.riskDetection),
+                            content: Text(AppLocalizations.of(context)!.signInRiskDetected),
+                            actions: [
+                              TextButton(
+                                child: Text(AppLocalizations.of(context)!.next),
+                                onPressed: () {
+                                  launchUrlString(getRequestUri('passport', '/sign-in').toString());
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(messages.last),
+                      ));
+                    }
                   });
                 },
               )
