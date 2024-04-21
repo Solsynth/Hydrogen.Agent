@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/common_wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -48,7 +49,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ),
                   onTap: () {
-                    auth.signOff();
+                    auth.signoff();
                     setState(() {
                       isAuthorized = false;
                     });
@@ -65,19 +66,19 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: AppLocalizations.of(context)!.signIn,
                     caption: AppLocalizations.of(context)!.signInCaption,
                     onTap: () {
-                      auth.signIn(context).then((_) {
-                        auth.isAuthorized().then((val) {
-                          setState(() => isAuthorized = val);
+                      router.pushNamed('auth.sign-in').then((did) {
+                        auth.isAuthorized().then((value) {
+                          setState(() => isAuthorized = value);
                         });
                       });
                     },
                   ),
                   ActionCard(
-                    icon: const Icon(Icons.plus_one, color: Colors.white),
+                    icon: const Icon(Icons.add, color: Colors.white),
                     title: AppLocalizations.of(context)!.signUp,
                     caption: AppLocalizations.of(context)!.signUpCaption,
                     onTap: () {
-                      launchUrl(getRequestUri('passport', '/auth/sign-up'));
+                      launchUrl(getRequestUri('passport', '/sign-up'));
                     },
                   ),
                 ],

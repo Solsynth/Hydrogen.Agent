@@ -2,16 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:solian/screens/auth.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:solian/utils/service_url.dart';
 
 class AuthProvider {
   AuthProvider();
 
-  final deviceEndpoint =
-      getRequestUri('passport', '/api/notifications/subscribe');
-  final authorizationEndpoint = getRequestUri('passport', '/auth/o/connect');
+  final deviceEndpoint = getRequestUri('passport', '/api/notifications/subscribe');
   final tokenEndpoint = getRequestUri('passport', '/api/auth/token');
   final userinfoEndpoint = getRequestUri('passport', '/api/users/me');
   final redirectUrl = Uri.parse('solian://auth');
@@ -32,14 +29,12 @@ class AuthProvider {
   Future<bool> pickClient() async {
     if (await storage.containsKey(key: storageKey)) {
       try {
-        final credentials =
-            oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
-        client = oauth2.Client(credentials,
-            identifier: clientId, secret: clientSecret);
+        final credentials = oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
+        client = oauth2.Client(credentials, identifier: clientId, secret: clientSecret);
         await fetchProfiles();
         return true;
       } catch (e) {
-        signOff();
+        signoff();
         return false;
       }
     } else {
@@ -47,31 +42,20 @@ class AuthProvider {
     }
   }
 
-  Future<oauth2.Client> createClient(BuildContext context) async {
-    // If logged in
+  Future<oauth2.Client> createClient(BuildContext context, String username, String password) async {
     if (await pickClient()) {
       return client!;
     }
 
-    var grant = oauth2.AuthorizationCodeGrant(
-      clientId,
-      authorizationEndpoint,
+    return await oauth2.resourceOwnerPasswordGrant(
       tokenEndpoint,
+      username,
+      password,
+      identifier: clientId,
       secret: clientSecret,
+      scopes: ["openid"],
       basicAuth: false,
     );
-
-    var authorizationUrl =
-        grant.getAuthorizationUrl(redirectUrl, scopes: ["openid"]);
-
-    var responseUrl = await Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        builder: (context) => AuthorizationScreen(authorizationUrl),
-      ),
-    );
-
-    var responseUri = Uri.parse(responseUrl);
-    return await grant.handleAuthorizationResponse(responseUri.queryParameters);
   }
 
   Future<void> fetchProfiles() async {
@@ -83,22 +67,21 @@ class AuthProvider {
 
   Future<void> refreshToken() async {
     if (client != null) {
-      final credentials = await client!.credentials.refresh(
-          identifier: clientId, secret: clientSecret, basicAuth: false);
-      client = oauth2.Client(credentials,
-          identifier: clientId, secret: clientSecret);
+      final credentials =
+          await client!.credentials.refresh(identifier: clientId, secret: clientSecret, basicAuth: false);
+      client = oauth2.Client(credentials, identifier: clientId, secret: clientSecret);
       storage.write(key: storageKey, value: credentials.toJson());
     }
   }
 
-  Future<void> signIn(BuildContext context) async {
-    client = await createClient(context);
+  Future<void> signin(BuildContext context, String username, String password) async {
+    client = await createClient(context, username, password);
     storage.write(key: storageKey, value: client!.credentials.toJson());
 
     await fetchProfiles();
   }
 
-  void signOff() {
+  void signoff() {
     storage.delete(key: profileKey);
     storage.delete(key: storageKey);
   }
@@ -109,10 +92,7 @@ class AuthProvider {
       if (client == null) {
         await pickClient();
       }
-      if (lastRefreshedAt == null ||
-          DateTime.now()
-              .subtract(const Duration(minutes: 3))
-              .isAfter(lastRefreshedAt!)) {
+      if (lastRefreshedAt == null || DateTime.now().subtract(const Duration(minutes: 3)).isAfter(lastRefreshedAt!)) {
         await refreshToken();
         lastRefreshedAt = DateTime.now();
       }

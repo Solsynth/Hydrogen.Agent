@@ -8,6 +8,7 @@ import 'package:solian/screens/explore.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
+import 'package:solian/screens/signin.dart';
 import 'package:solian/widgets/chat/channel_editor.dart';
 
 final router = GoRouter(
@@ -57,6 +58,11 @@ final router = GoRouter(
         alias: state.pathParameters['alias'] as String,
         dataset: state.pathParameters['dataset'] as String,
       ),
+    ),
+    GoRoute(
+      path: '/auth/sign-in',
+      name: 'auth.sign-in',
+      builder: (context, state) => SignInScreen(),
     ),
   ],
 );
