@@ -34,7 +34,7 @@ class SignInScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   isDense: true,
                   border: const UnderlineInputBorder(),
-                  hintText: AppLocalizations.of(context)!.username,
+                  labelText: AppLocalizations.of(context)!.username,
                 ),
                 onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
               ),
@@ -47,7 +47,7 @@ class SignInScreen extends StatelessWidget {
                 decoration: InputDecoration(
                   isDense: true,
                   border: const UnderlineInputBorder(),
-                  hintText: AppLocalizations.of(context)!.password,
+                  labelText: AppLocalizations.of(context)!.password,
                 ),
                 onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
               ),
