@@ -11,6 +11,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/notification_notifier.dart';
 import 'package:solian/widgets/posts/item.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -76,6 +77,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           }
         },
       ),
+      appBarActions: const [NotificationButton()],
       title: AppLocalizations.of(context)!.explore,
       child: RefreshIndicator(
         onRefresh: () => Future.sync(

@@ -3,10 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/navigation.dart';
+import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/timeago.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/utils/video_player.dart';
+import 'package:solian/widgets/notification_notifier.dart';
 
 void main() {
   initVideo();
@@ -39,8 +41,9 @@ class SolianApp extends StatelessWidget {
                   Provider(create: (_) => NavigationProvider()),
                   Provider(create: (_) => AuthProvider()),
                   Provider(create: (_) => ChatProvider()),
+                  ChangeNotifierProvider(create: (_) => NotifyProvider()),
                 ],
-                child: child,
+                child: NotificationNotifier(child: child ?? Container()),
               );
             })
           ],

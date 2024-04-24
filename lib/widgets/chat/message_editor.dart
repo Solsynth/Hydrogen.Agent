@@ -36,7 +36,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
       builder: (context) => AttachmentEditor(
         provider: 'messaging',
         current: _attachments,
-        onUpdate: (value) => _attachments = value,
+        onUpdate: (value) => setState(() => _attachments = value),
       ),
     );
   }

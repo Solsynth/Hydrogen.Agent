@@ -31,7 +31,7 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
     final notify = ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context)!.connectingServer),
-        duration: const Duration(days: 1),
+        duration: const Duration(minutes: 1),
       ),
     );
 
@@ -55,6 +55,7 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
           }
         },
         onError: (_, __) => connect(),
+        onDone: () => connect(),
       );
 
       notify.close();
@@ -72,6 +73,8 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
 
   @override
   Widget build(BuildContext context) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+
     return widget.child;
   }
 }

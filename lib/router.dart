@@ -5,6 +5,7 @@ import 'package:solian/screens/account.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/screens/chat/index.dart';
 import 'package:solian/screens/explore.dart';
+import 'package:solian/screens/notification.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
@@ -58,6 +59,11 @@ final router = GoRouter(
         alias: state.pathParameters['alias'] as String,
         dataset: state.pathParameters['dataset'] as String,
       ),
+    ),
+    GoRoute(
+      path: '/notification',
+      name: 'notification',
+      builder: (context, state) => const NotificationScreen(),
     ),
     GoRoute(
       path: '/auth/sign-in',
