@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
+import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/screens/chat/index.dart';
 import 'package:solian/screens/chat/manage.dart';
@@ -19,6 +20,11 @@ final router = GoRouter(
       path: '/',
       name: 'explore',
       builder: (context, state) => const ExploreScreen(),
+    ),
+    GoRoute(
+      path: '/notification',
+      name: 'notification',
+      builder: (context, state) => const NotificationScreen(),
     ),
     GoRoute(
       path: '/chat',
@@ -67,14 +73,14 @@ final router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/notification',
-      name: 'notification',
-      builder: (context, state) => const NotificationScreen(),
-    ),
-    GoRoute(
       path: '/auth/sign-in',
       name: 'auth.sign-in',
       builder: (context, state) => SignInScreen(),
+    ),
+    GoRoute(
+      path: '/account/friend',
+      name: 'account.friend',
+      builder: (context, state) => const FriendScreen(),
     ),
   ],
 );

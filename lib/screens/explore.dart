@@ -83,26 +83,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
         onRefresh: () => Future.sync(
           () => _pagingController.refresh(),
         ),
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 640),
-            child: PagedListView<int, Post>(
-              pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<Post>(
-                itemBuilder: (context, item, index) => PostItem(
-                  item: item,
-                  onUpdate: () => _pagingController.refresh(),
-                  onTap: () {
-                    router.pushNamed(
-                      'posts.screen',
-                      pathParameters: {
-                        'alias': item.alias,
-                        'dataset': '${item.modelType}s',
-                      },
-                    );
+        child: PagedListView<int, Post>(
+          pagingController: _pagingController,
+          builderDelegate: PagedChildBuilderDelegate<Post>(
+            itemBuilder: (context, item, index) => PostItem(
+              item: item,
+              onUpdate: () => _pagingController.refresh(),
+              onTap: () {
+                router.pushNamed(
+                  'posts.screen',
+                  pathParameters: {
+                    'alias': item.alias,
+                    'dataset': '${item.modelType}s',
                   },
-                ),
-              ),
+                );
+              },
             ),
           ),
         ),

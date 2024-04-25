@@ -8,9 +8,9 @@ class Account {
   String avatar;
   String banner;
   String description;
-  String emailAddress;
+  String? emailAddress;
   int powerLevel;
-  int externalId;
+  int? externalId;
 
   Account({
     required this.id,
@@ -22,9 +22,9 @@ class Account {
     required this.avatar,
     required this.banner,
     required this.description,
-    required this.emailAddress,
+    this.emailAddress,
     required this.powerLevel,
-    required this.externalId,
+    this.externalId,
   });
 
   factory Account.fromJson(Map<String, dynamic> json) => Account(

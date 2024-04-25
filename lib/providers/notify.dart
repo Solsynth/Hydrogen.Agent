@@ -50,6 +50,11 @@ class NotifyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearAt(int index) {
+    notifications.removeAt(index);
+    notifyListeners();
+  }
+
   void clearNonRealtime() {
     notifications = notifications.where((x) => !x.isRealtime).toList();
   }

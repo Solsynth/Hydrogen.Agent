@@ -49,7 +49,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         index: index,
                         item: element,
                         onDismiss: () => setState(() {
-                          nty.notifications.removeAt(index);
+                          nty.clearAt(index);
                         }),
                       );
                     },

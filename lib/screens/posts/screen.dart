@@ -23,12 +23,10 @@ class PostScreen extends StatefulWidget {
 class _PostScreenState extends State<PostScreen> {
   final _client = http.Client();
 
-  final PagingController<int, Post> _commentPagingController =
-      PagingController(firstPageKey: 0);
+  final PagingController<int, Post> _commentPagingController = PagingController(firstPageKey: 0);
 
   Future<Post?> fetchPost(BuildContext context) async {
-    final uri = getRequestUri(
-        'interactive', '/api/p/${widget.dataset}/${widget.alias}');
+    final uri = getRequestUri('interactive', '/api/p/${widget.dataset}/${widget.alias}');
     final res = await _client.get(uri);
     if (res.statusCode != 200) {
       final err = utf8.decode(res.bodyBytes);
@@ -51,32 +49,27 @@ class _PostScreenState extends State<PostScreen> {
         future: fetchPost(context),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
-            return Center(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 640),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: PostItem(
-                        item: snapshot.data!,
-                        brief: false,
-                        ripple: false,
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: CommentListHeader(
-                        related: snapshot.data!,
-                        paging: _commentPagingController,
-                      ),
-                    ),
-                    CommentList(
-                      related: snapshot.data!,
-                      dataset: widget.dataset,
-                      paging: _commentPagingController,
-                    ),
-                  ],
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: PostItem(
+                    item: snapshot.data!,
+                    brief: false,
+                    ripple: false,
+                  ),
                 ),
-              ),
+                SliverToBoxAdapter(
+                  child: CommentListHeader(
+                    related: snapshot.data!,
+                    paging: _commentPagingController,
+                  ),
+                ),
+                CommentList(
+                  related: snapshot.data!,
+                  dataset: widget.dataset,
+                  paging: _commentPagingController,
+                ),
+              ],
             );
           } else {
             return const Center(

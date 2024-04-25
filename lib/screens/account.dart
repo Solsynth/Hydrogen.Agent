@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/common_wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -40,21 +40,25 @@ class _AccountScreenState extends State<AccountScreen> {
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                   child: NameCard(),
                 ),
-                InkWell(
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 18),
-                    child: ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text("Sign out"),
-                    ),
-                  ),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  leading: const Icon(Icons.diversity_1),
+                  title: Text(AppLocalizations.of(context)!.friend),
+                  onTap: () {
+                    router.goNamed('account.friend');
+                  },
+                ),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  leading: const Icon(Icons.logout),
+                  title: Text(AppLocalizations.of(context)!.signOut),
                   onTap: () {
                     auth.signoff();
                     setState(() {
                       isAuthorized = false;
                     });
                   },
-                )
+                ),
               ],
             )
           : Center(
@@ -126,8 +130,7 @@ class NameCard extends StatelessWidget {
             children: [
               FutureBuilder(
                 future: renderAvatar(context),
-                builder:
-                    (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                   if (snapshot.hasData) {
                     return snapshot.data!;
                   } else {
@@ -138,8 +141,7 @@ class NameCard extends StatelessWidget {
               const SizedBox(width: 20),
               FutureBuilder(
                 future: renderLabel(context),
-                builder:
-                    (BuildContext context, AsyncSnapshot<Column> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<Column> snapshot) {
                   if (snapshot.hasData) {
                     return snapshot.data!;
                   } else {
@@ -161,12 +163,7 @@ class ActionCard extends StatelessWidget {
   final String caption;
   final Function onTap;
 
-  const ActionCard(
-      {super.key,
-      required this.onTap,
-      required this.title,
-      required this.caption,
-      required this.icon});
+  const ActionCard({super.key, required this.onTap, required this.title, required this.caption, required this.icon});
 
   @override
   Widget build(BuildContext context) {
