@@ -46,6 +46,30 @@ class _FriendScreenState extends State<FriendScreen> {
     }
   }
 
+  Future<void> createFriendship(String username) async {
+    setState(() => _isSubmitting = true);
+
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    var res = await auth.client!.post(
+      getRequestUri('passport', '/api/users/me/friends?related=$username'),
+    );
+    if (res.statusCode == 200) {
+      await fetchFriendships();
+    } else {
+      var message = utf8.decode(res.bodyBytes);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong... $message")),
+      );
+    }
+
+    setState(() => _isSubmitting = false);
+  }
+
   Future<void> updateFriendship(Friendship relation, int status) async {
     setState(() => _isSubmitting = true);
 
@@ -67,6 +91,9 @@ class _FriendScreenState extends State<FriendScreen> {
       }),
     );
     if (res.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.friendAddDone)),
+      );
       await fetchFriendships();
     } else {
       var message = utf8.decode(res.bodyBytes);
@@ -76,6 +103,54 @@ class _FriendScreenState extends State<FriendScreen> {
     }
 
     setState(() => _isSubmitting = false);
+  }
+
+  void promptAddFriend() async {
+    final controller = TextEditingController();
+    final input = await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.friendAdd),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(AppLocalizations.of(context)!.friendAddHint),
+              const SizedBox(height: 18),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(Icons.account_circle),
+                  border: const OutlineInputBorder(),
+                  labelText: AppLocalizations.of(context)!.username,
+                ),
+                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context)!.next),
+              onPressed: () {
+                Navigator.pop(context, controller.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+
+    await createFriendship(input);
   }
 
   List<Friendship> filterWithStatus(int status) {
@@ -153,6 +228,12 @@ class _FriendScreenState extends State<FriendScreen> {
 
     return IndentWrapper(
       title: AppLocalizations.of(context)!.friend,
+      appBarActions: [
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => promptAddFriend(),
+        ),
+      ],
       child: RefreshIndicator(
         onRefresh: () => fetchFriendships(),
         child: CustomScrollView(
