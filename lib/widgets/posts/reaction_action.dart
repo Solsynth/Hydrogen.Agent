@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/reaction.dart';
 import 'package:solian/providers/auth.dart';
@@ -106,7 +107,7 @@ class _ReactionActionPopupState extends State<ReactionActionPopup> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 20),
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -118,7 +119,7 @@ class _ReactionActionPopupState extends State<ReactionActionPopup> {
             ),
           ),
         ),
-        _isSubmitting ? const LinearProgressIndicator() : Container(),
+        _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
         Expanded(
           child: ListView.builder(
             itemCount: reactions.length,

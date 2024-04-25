@@ -23,6 +23,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     return IndentWrapper(
       noSafeArea: true,
+      hideDrawer: true,
       title: AppLocalizations.of(context)!.notification,
       child: RefreshIndicator(
         onRefresh: () => nty.fetch(auth),

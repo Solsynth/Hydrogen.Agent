@@ -4,13 +4,14 @@ import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/screens/chat/index.dart';
+import 'package:solian/screens/chat/manage.dart';
+import 'package:solian/screens/chat/channel/channel_editor.dart';
 import 'package:solian/screens/explore.dart';
 import 'package:solian/screens/notification.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
 import 'package:solian/screens/signin.dart';
-import 'package:solian/widgets/chat/channel_editor.dart';
 
 final router = GoRouter(
   routes: [
@@ -27,12 +28,17 @@ final router = GoRouter(
     GoRoute(
       path: '/chat/create',
       name: 'chat.channel.editor',
-      builder: (context, state) => ChannelEditor(editing: state.extra as Channel?),
+      builder: (context, state) => ChannelEditorScreen(editing: state.extra as Channel?),
     ),
     GoRoute(
       path: '/chat/c/:channel',
       name: 'chat.channel',
       builder: (context, state) => ChatScreen(alias: state.pathParameters['channel'] as String),
+    ),
+    GoRoute(
+      path: '/chat/c/:channel/manage',
+      name: 'chat.channel.manage',
+      builder: (context, state) => ChatManageScreen(channel: state.extra as Channel),
     ),
     GoRoute(
       path: '/account',

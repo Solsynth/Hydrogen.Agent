@@ -13,7 +13,7 @@ class ChatProvider {
 
     await auth.refreshToken();
 
-    var ori = getRequestUri('messaging', '/api/unified');
+    var ori = getRequestUri('messaging', '/api/ws');
     var uri = Uri(
       scheme: ori.scheme.replaceFirst('http', 'ws'),
       host: ori.host,

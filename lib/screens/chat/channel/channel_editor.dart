@@ -12,16 +12,16 @@ import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-class ChannelEditor extends StatefulWidget {
+class ChannelEditorScreen extends StatefulWidget {
   final Channel? editing;
 
-  const ChannelEditor({super.key, this.editing});
+  const ChannelEditorScreen({super.key, this.editing});
 
   @override
-  State<ChannelEditor> createState() => _ChannelEditorState();
+  State<ChannelEditorScreen> createState() => _ChannelEditorScreenState();
 }
 
-class _ChannelEditorState extends State<ChannelEditor> {
+class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
   final _aliasController = TextEditingController();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();

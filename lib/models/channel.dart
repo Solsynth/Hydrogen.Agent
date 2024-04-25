@@ -1,3 +1,5 @@
+import 'package:solian/models/account.dart';
+
 class Channel {
   int id;
   DateTime createdAt;
@@ -7,9 +9,9 @@ class Channel {
   String name;
   String description;
   dynamic members;
-  dynamic messages;
   dynamic calls;
   int type;
+  Account account;
   int accountId;
   int realmId;
 
@@ -22,9 +24,9 @@ class Channel {
     required this.name,
     required this.description,
     this.members,
-    this.messages,
     this.calls,
     required this.type,
+    required this.account,
     required this.accountId,
     required this.realmId,
   });
@@ -38,9 +40,9 @@ class Channel {
     name: json["name"],
     description: json["description"],
     members: json["members"],
-    messages: json["messages"],
     calls: json["calls"],
     type: json["type"],
+    account: Account.fromJson(json["account"]),
     accountId: json["account_id"],
     realmId: json["realm_id"],
   );
@@ -54,9 +56,9 @@ class Channel {
     "name": name,
     "description": description,
     "members": members,
-    "messages": messages,
     "calls": calls,
     "type": type,
+    "account": account,
     "account_id": accountId,
     "realm_id": realmId,
   };

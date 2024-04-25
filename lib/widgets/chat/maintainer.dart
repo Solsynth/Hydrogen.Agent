@@ -28,6 +28,8 @@ class ChatMaintainer extends StatefulWidget {
 
 class _ChatMaintainerState extends State<ChatMaintainer> {
   void connect() {
+    ScaffoldMessenger.of(context).clearSnackBars();
+
     final notify = ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context)!.connectingServer),
@@ -73,8 +75,6 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
 
   @override
   Widget build(BuildContext context) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-
     return widget.child;
   }
 }

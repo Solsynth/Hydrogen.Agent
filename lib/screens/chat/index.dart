@@ -9,6 +9,7 @@ import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/chat_new.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/notification_notifier.dart';
 import 'package:solian/widgets/signin_required.dart';
 
 class ChatIndexScreen extends StatefulWidget {
@@ -63,6 +64,7 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
 
     return IndentWrapper(
       title: AppLocalizations.of(context)!.chat,
+      appBarActions: const [NotificationButton()],
       floatingActionButton: FutureBuilder(
         future: auth.isAuthorized(),
         builder: (context, snapshot) {
