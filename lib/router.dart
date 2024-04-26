@@ -6,7 +6,8 @@ import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/screens/chat/index.dart';
 import 'package:solian/screens/chat/manage.dart';
-import 'package:solian/screens/chat/channel/channel_editor.dart';
+import 'package:solian/screens/chat/channel/editor.dart';
+import 'package:solian/screens/chat/channel/member.dart';
 import 'package:solian/screens/explore.dart';
 import 'package:solian/screens/notification.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
@@ -45,6 +46,11 @@ final router = GoRouter(
       path: '/chat/c/:channel/manage',
       name: 'chat.channel.manage',
       builder: (context, state) => ChatManageScreen(channel: state.extra as Channel),
+    ),
+    GoRoute(
+      path: '/chat/c/:channel/member',
+      name: 'chat.channel.member',
+      builder: (context, state) => ChatMemberScreen(channel: state.extra as Channel),
     ),
     GoRoute(
       path: '/account',

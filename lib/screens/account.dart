@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/account/avatar.dart';
 import 'package:solian/widgets/common_wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -98,7 +99,7 @@ class NameCard extends StatelessWidget {
   Future<Widget> renderAvatar(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     final profiles = await auth.getProfiles();
-    return CircleAvatar(backgroundImage: NetworkImage(profiles["picture"]));
+    return AccountAvatar(source: profiles["picture"], direct: true);
   }
 
   Future<Column> renderLabel(BuildContext context) async {

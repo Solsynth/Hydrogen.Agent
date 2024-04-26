@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
+import 'package:solian/providers/friend.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
@@ -42,6 +43,7 @@ class SolianApp extends StatelessWidget {
                   Provider(create: (_) => AuthProvider()),
                   Provider(create: (_) => ChatProvider()),
                   ChangeNotifierProvider(create: (_) => NotifyProvider()),
+                  ChangeNotifierProvider(create: (_) => FriendProvider()),
                 ],
                 child: NotificationNotifier(child: child ?? Container()),
               );

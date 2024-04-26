@@ -7,6 +7,7 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/friendship.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/account/avatar.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -59,6 +60,9 @@ class _FriendScreenState extends State<FriendScreen> {
       getRequestUri('passport', '/api/users/me/friends?related=$username'),
     );
     if (res.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.friendAddDone)),
+      );
       await fetchFriendships();
     } else {
       var message = utf8.decode(res.bodyBytes);
@@ -91,9 +95,6 @@ class _FriendScreenState extends State<FriendScreen> {
       }),
     );
     if (res.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.friendAddDone)),
-      );
       await fetchFriendships();
     } else {
       var message = utf8.decode(res.bodyBytes);
@@ -172,10 +173,6 @@ class _FriendScreenState extends State<FriendScreen> {
     }
   }
 
-  String getAvatarUrl(String uuid) {
-    return getRequestUri('passport', '/api/avatar/$uuid').toString();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -211,9 +208,7 @@ class _FriendScreenState extends State<FriendScreen> {
         child: ListTile(
           title: Text(otherside.nick),
           subtitle: Text(otherside.name),
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(getAvatarUrl(otherside.avatar)),
-          ),
+          leading: AccountAvatar(source: otherside.avatar),
         ),
         onDismissed: (direction) {
           if (direction == DismissDirection.startToEnd) {

@@ -9,6 +9,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/account/avatar.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
 
@@ -145,8 +146,9 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
                       subtitle: Text(
                         AppLocalizations.of(context)!.postIdentityNotify,
                       ),
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(userinfo["picture"]),
+                      leading: AccountAvatar(
+                        source: userinfo["picture"],
+                        direct: true,
                       ),
                     );
                   } else {

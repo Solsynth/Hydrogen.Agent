@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/widgets/account/avatar.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/content/article.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
@@ -166,8 +167,9 @@ class _PostItemState extends State<PostItem> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.item.author.avatar),
+                AccountAvatar(
+                  source: widget.item.author.avatar,
+                  direct: true,
                 ),
                 Expanded(
                   child: Column(
@@ -196,8 +198,9 @@ class _PostItemState extends State<PostItem> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(widget.item.author.avatar),
+                AccountAvatar(
+                  source: widget.item.author.avatar,
+                  direct: true,
                 ),
                 Expanded(
                   child: Column(

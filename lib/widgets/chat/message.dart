@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solian/models/message.dart';
+import 'package:solian/widgets/account/avatar.dart';
 import 'package:solian/widgets/chat/content.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -38,9 +39,10 @@ class ChatMessage extends StatelessWidget {
                   child: const Icon(Icons.reply, size: 16),
                 ),
                 const SizedBox(width: 8),
-                CircleAvatar(
+                AccountAvatar(
                   radius: 10,
-                  backgroundImage: NetworkImage(item.replyTo!.sender.account.avatar),
+                  source: item.replyTo!.sender.account.avatar,
+                  direct: true,
                 ),
               ],
             ),
@@ -102,8 +104,9 @@ class ChatMessage extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(item.sender.account.avatar),
+              AccountAvatar(
+                source: item.sender.account.avatar,
+                direct: true,
               ),
               Expanded(
                 child: Column(

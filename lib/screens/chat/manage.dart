@@ -83,7 +83,13 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
                 ListTile(
                   leading: const Icon(Icons.supervisor_account),
                   title: Text(AppLocalizations.of(context)!.chatMember),
-                  onTap: () {},
+                  onTap: () {
+                    router.pushNamed(
+                      'chat.channel.member',
+                      extra: widget.channel,
+                      pathParameters: {'channel': widget.channel.alias},
+                    );
+                  },
                 ),
                 ...(isOwned ? authorizedItems : List.empty()),
               ],
