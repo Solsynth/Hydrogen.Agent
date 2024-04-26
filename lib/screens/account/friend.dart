@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
-import 'package:solian/models/account.dart';
 import 'package:solian/models/friendship.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
@@ -21,7 +20,7 @@ class FriendScreen extends StatefulWidget {
 class _FriendScreenState extends State<FriendScreen> {
   bool _isSubmitting = false;
 
-  int _currentSideId = 0;
+  int _selfId = 0;
   List<Friendship> _friendships = List.empty();
 
   Future<void> fetchFriendships() async {
@@ -29,7 +28,7 @@ class _FriendScreenState extends State<FriendScreen> {
     final prof = await auth.getProfiles();
     if (!await auth.isAuthorized()) return;
 
-    _currentSideId = prof['id'];
+    _selfId = prof['id'];
 
     var uri = getRequestUri('passport', '/api/users/me/friends');
 
@@ -77,7 +76,7 @@ class _FriendScreenState extends State<FriendScreen> {
   Future<void> updateFriendship(Friendship relation, int status) async {
     setState(() => _isSubmitting = true);
 
-    final otherside = getOtherside(relation);
+    final otherside = relation.getOtherside(_selfId);
 
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) {
@@ -161,16 +160,8 @@ class _FriendScreenState extends State<FriendScreen> {
   DismissDirection getDismissDirection(Friendship relation) {
     if (relation.status == 2) return DismissDirection.endToStart;
     if (relation.status == 1) return DismissDirection.startToEnd;
-    if (relation.status == 0 && relation.relatedId != _currentSideId) return DismissDirection.startToEnd;
+    if (relation.status == 0 && relation.relatedId != _selfId) return DismissDirection.startToEnd;
     return DismissDirection.horizontal;
-  }
-
-  Account getOtherside(Friendship relation) {
-    if (relation.accountId != _currentSideId) {
-      return relation.account;
-    } else {
-      return relation.related;
-    }
   }
 
   @override
@@ -186,7 +177,7 @@ class _FriendScreenState extends State<FriendScreen> {
   Widget build(BuildContext context) {
     Widget friendshipTileBuilder(context, index, status) {
       final element = filterWithStatus(status)[index];
-      final otherside = getOtherside(element);
+      final otherside = element.getOtherside(_selfId);
 
       final randomId = DateTime.now().microsecondsSinceEpoch >> 10;
 

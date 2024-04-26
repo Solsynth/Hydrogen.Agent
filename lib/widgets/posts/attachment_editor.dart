@@ -254,7 +254,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                 ),
               );
             },
-            separatorBuilder: (context, index) => const Divider(),
+            separatorBuilder: (context, index) => const Divider(thickness: 0.3),
           ),
         ),
       ],

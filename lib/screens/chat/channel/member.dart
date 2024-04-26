@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/account/friend_picker.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -81,6 +83,50 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     setState(() => _isSubmitting = false);
   }
 
+  Future<void> inviteMember(String username) async {
+    setState(() => _isSubmitting = true);
+
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/invite');
+
+    var res = await auth.client!.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'account_name': username,
+      }),
+    );
+    if (res.statusCode == 200) {
+      await fetchMemberships();
+    } else {
+      var message = utf8.decode(res.bodyBytes);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong... $message")),
+      );
+    }
+
+    setState(() => _isSubmitting = false);
+  }
+
+  void promptInviteMember() async {
+    final input = await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return const FriendPicker();
+      },
+    );
+    if (input == null) return;
+
+    await inviteMember((input as Account).name);
+  }
+
   bool getKickable(ChannelMember item) {
     if (_selfId != widget.channel.account.externalId) return false;
     if (item.accountId == widget.channel.accountId) return false;
@@ -101,6 +147,12 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       title: AppLocalizations.of(context)!.chatMember,
       noSafeArea: true,
       hideDrawer: true,
+      appBarActions: [
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => promptInviteMember(),
+        ),
+      ],
       child: RefreshIndicator(
         onRefresh: () => fetchMemberships(),
         child: CustomScrollView(
