@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
+import 'package:solian/screens/chat/call.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/screens/chat/index.dart';
 import 'package:solian/screens/chat/manage.dart';
@@ -41,6 +43,11 @@ final router = GoRouter(
       path: '/chat/c/:channel',
       name: 'chat.channel',
       builder: (context, state) => ChatScreen(alias: state.pathParameters['channel'] as String),
+    ),
+    GoRoute(
+      path: '/chat/c/:channel/call',
+      name: 'chat.channel.call',
+      builder: (context, state) => ChatCall(call: state.extra as Call),
     ),
     GoRoute(
       path: '/chat/c/:channel/manage',

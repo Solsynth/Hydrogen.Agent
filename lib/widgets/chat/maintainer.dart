@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/packet.dart';
@@ -15,6 +16,8 @@ class ChatMaintainer extends StatefulWidget {
   final Function(Message val) onInsertMessage;
   final Function(Message val) onUpdateMessage;
   final Function(Message val) onDeleteMessage;
+  final Function(Call val) onCallStarted;
+  final Function() onCallEnded;
 
   const ChatMaintainer({
     super.key,
@@ -23,6 +26,8 @@ class ChatMaintainer extends StatefulWidget {
     required this.onInsertMessage,
     required this.onUpdateMessage,
     required this.onDeleteMessage,
+    required this.onCallStarted,
+    required this.onCallEnded,
   });
 
   @override
@@ -59,6 +64,14 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
             case 'messages.burnt':
               final payload = Message.fromJson(result.payload!);
               if (payload.channelId == widget.channel.id) widget.onDeleteMessage(payload);
+              break;
+            case 'calls.new':
+              final payload = Call.fromJson(result.payload!);
+              if (payload.channelId == widget.channel.id) widget.onCallStarted(payload);
+              break;
+            case 'calls.end':
+              final payload = Call.fromJson(result.payload!);
+              if (payload.channelId == widget.channel.id) widget.onCallEnded();
               break;
           }
         },

@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/channel_action.dart';
 import 'package:solian/widgets/chat/maintainer.dart';
@@ -14,6 +17,7 @@ import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
 import 'package:solian/widgets/chat/message_editor.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 
 class ChatScreen extends StatefulWidget {
@@ -26,6 +30,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  Call? _ongoingCall;
   Channel? _channelMeta;
 
   final PagingController<int, Message> _pagingController = PagingController(firstPageKey: 0);
@@ -45,6 +50,24 @@ class _ChatScreenState extends State<ChatScreen> {
         SnackBar(content: Text("Something went wrong... $message")),
       );
       throw Exception(message);
+    }
+  }
+
+  Future<Call?> fetchCall() async {
+    var uri = getRequestUri('messaging', '/api/channels/${widget.alias}/calls/ongoing');
+    var res = await _client.get(uri);
+    if (res.statusCode == 200) {
+      final result = jsonDecode(utf8.decode(res.bodyBytes));
+      setState(() => _ongoingCall = Call.fromJson(result));
+      return _ongoingCall;
+    } else if (res.statusCode != 404) {
+      var message = utf8.decode(res.bodyBytes);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong... $message")),
+      );
+      throw Exception(message);
+    } else {
+      return null;
     }
   }
 
@@ -124,6 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     Future.delayed(Duration.zero, () {
       fetchMetadata();
+      fetchCall();
     });
 
     _pagingController.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
@@ -133,12 +157,61 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget chatHistoryBuilder(context, item, index) {
+      bool isMerged = false, hasMerged = false;
+      if (index > 0) {
+        hasMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
+      }
+      if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
+        isMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
+      }
+      return InkWell(
+        child: Container(
+          padding: EdgeInsets.only(
+            top: !isMerged ? 8 : 0,
+            bottom: !hasMerged ? 8 : 0,
+            left: 12,
+            right: 12,
+          ),
+          child: ChatMessage(
+            key: Key('m${item.id}'),
+            item: item,
+            underMerged: isMerged,
+          ),
+        ),
+        onLongPress: () => viewActions(item),
+      );
+    }
+
+    final callBanner = MaterialBanner(
+      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
+      leading: const Icon(Icons.call_received),
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
+      dividerColor: const Color.fromARGB(1, 0, 0, 0),
+      content: Text(AppLocalizations.of(context)!.chatCallOngoing),
+      actions: [
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.chatCallJoin),
+          onPressed: () {
+            router.pushNamed(
+              'chat.channel.call',
+              extra: _ongoingCall,
+              pathParameters: {'channel': widget.alias},
+            );
+          },
+        ),
+      ],
+    );
+
     return IndentWrapper(
       hideDrawer: true,
       title: _channelMeta?.name ?? "Loading...",
-      appBarActions: [
-        _channelMeta != null ? ChannelAction(channel: _channelMeta!, onUpdate: () => fetchMetadata()) : Container(),
-      ],
+      appBarActions: _channelMeta != null
+          ? [
+              ChannelCallAction(call: _ongoingCall, channel: _channelMeta!, onUpdate: () => fetchMetadata()),
+              ChannelManageAction(channel: _channelMeta!, onUpdate: () => fetchMetadata()),
+            ]
+          : [],
       child: FutureBuilder(
         future: fetchMetadata(),
         builder: (context, snapshot) {
@@ -148,56 +221,39 @@ class _ChatScreenState extends State<ChatScreen> {
 
           return ChatMaintainer(
             channel: snapshot.data!,
-            child: Column(
+            child: Stack(
               children: [
-                Expanded(
-                  child: PagedListView<int, Message>(
-                    reverse: true,
-                    pagingController: _pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<Message>(
-                      noItemsFoundIndicatorBuilder: (_) => Container(),
-                      itemBuilder: (context, item, index) {
-                        bool isMerged = false, hasMerged = false;
-                        if (index > 0) {
-                          hasMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
-                        }
-                        if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
-                          isMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
-                        }
-                        return InkWell(
-                          child: Container(
-                            padding: EdgeInsets.only(
-                              top: !isMerged ? 8 : 0,
-                              bottom: !hasMerged ? 8 : 0,
-                              left: 12,
-                              right: 12,
-                            ),
-                            child: ChatMessage(
-                              key: Key('m${item.id}'),
-                              item: item,
-                              underMerged: isMerged,
-                            ),
-                          ),
-                          onLongPress: () => viewActions(item),
-                        );
-                      },
+                Column(
+                  children: [
+                    Expanded(
+                      child: PagedListView<int, Message>(
+                        reverse: true,
+                        pagingController: _pagingController,
+                        builderDelegate: PagedChildBuilderDelegate<Message>(
+                          noItemsFoundIndicatorBuilder: (_) => Container(),
+                          itemBuilder: chatHistoryBuilder,
+                        ),
+                      ),
                     ),
-                  ),
+                    ChatMessageEditor(
+                      channel: widget.alias,
+                      editing: _editingItem,
+                      replying: _replyingItem,
+                      onReset: () => setState(() {
+                        _editingItem = null;
+                        _replyingItem = null;
+                      }),
+                    ),
+                  ],
                 ),
-                ChatMessageEditor(
-                  channel: widget.alias,
-                  editing: _editingItem,
-                  replying: _replyingItem,
-                  onReset: () => setState(() {
-                    _editingItem = null;
-                    _replyingItem = null;
-                  }),
-                ),
+                _ongoingCall != null ? callBanner.animate().slideY() : Container(),
               ],
             ),
             onInsertMessage: (message) => addMessage(message),
             onUpdateMessage: (message) => updateMessage(message),
             onDeleteMessage: (message) => deleteMessage(message),
+            onCallStarted: (call) => setState(() => _ongoingCall = call),
+            onCallEnded: () => setState(() => _ongoingCall = null),
           );
         },
       ),
