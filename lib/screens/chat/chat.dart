@@ -32,17 +32,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final http.Client _client = http.Client();
 
-  Future<void> fetchMetadata() async {
+  Future<Channel> fetchMetadata() async {
     var uri = getRequestUri('messaging', '/api/channels/${widget.alias}');
     var res = await _client.get(uri);
     if (res.statusCode == 200) {
       final result = jsonDecode(utf8.decode(res.bodyBytes));
       setState(() => _channelMeta = Channel.fromJson(result));
+      return _channelMeta!;
     } else {
       var message = utf8.decode(res.bodyBytes);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Something went wrong... $message")),
       );
+      throw Exception(message);
     }
   }
 
@@ -137,57 +139,67 @@ class _ChatScreenState extends State<ChatScreen> {
       appBarActions: [
         _channelMeta != null ? ChannelAction(channel: _channelMeta!, onUpdate: () => fetchMetadata()) : Container(),
       ],
-      child: ChatMaintainer(
-        child: Column(
-          children: [
-            Expanded(
-              child: PagedListView<int, Message>(
-                reverse: true,
-                pagingController: _pagingController,
-                builderDelegate: PagedChildBuilderDelegate<Message>(
-                  noItemsFoundIndicatorBuilder: (_) => Container(),
-                  itemBuilder: (context, item, index) {
-                    bool isMerged = false, hasMerged = false;
-                    if (index > 0) {
-                      hasMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
-                    }
-                    if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
-                      isMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
-                    }
-                    return InkWell(
-                      child: Container(
-                        padding: EdgeInsets.only(
-                          top: !isMerged ? 8 : 0,
-                          bottom: !hasMerged ? 8 : 0,
-                          left: 12,
-                          right: 12,
-                        ),
-                        child: ChatMessage(
-                          key: Key('m${item.id}'),
-                          item: item,
-                          underMerged: isMerged,
-                        ),
-                      ),
-                      onLongPress: () => viewActions(item),
-                    );
-                  },
+      child: FutureBuilder(
+        future: fetchMetadata(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return ChatMaintainer(
+            channel: snapshot.data!,
+            child: Column(
+              children: [
+                Expanded(
+                  child: PagedListView<int, Message>(
+                    reverse: true,
+                    pagingController: _pagingController,
+                    builderDelegate: PagedChildBuilderDelegate<Message>(
+                      noItemsFoundIndicatorBuilder: (_) => Container(),
+                      itemBuilder: (context, item, index) {
+                        bool isMerged = false, hasMerged = false;
+                        if (index > 0) {
+                          hasMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
+                        }
+                        if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
+                          isMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
+                        }
+                        return InkWell(
+                          child: Container(
+                            padding: EdgeInsets.only(
+                              top: !isMerged ? 8 : 0,
+                              bottom: !hasMerged ? 8 : 0,
+                              left: 12,
+                              right: 12,
+                            ),
+                            child: ChatMessage(
+                              key: Key('m${item.id}'),
+                              item: item,
+                              underMerged: isMerged,
+                            ),
+                          ),
+                          onLongPress: () => viewActions(item),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
+                ChatMessageEditor(
+                  channel: widget.alias,
+                  editing: _editingItem,
+                  replying: _replyingItem,
+                  onReset: () => setState(() {
+                    _editingItem = null;
+                    _replyingItem = null;
+                  }),
+                ),
+              ],
             ),
-            ChatMessageEditor(
-              channel: widget.alias,
-              editing: _editingItem,
-              replying: _replyingItem,
-              onReset: () => setState(() {
-                _editingItem = null;
-                _replyingItem = null;
-              }),
-            ),
-          ],
-        ),
-        onInsertMessage: (message) => addMessage(message),
-        onUpdateMessage: (message) => updateMessage(message),
-        onDeleteMessage: (message) => deleteMessage(message),
+            onInsertMessage: (message) => addMessage(message),
+            onUpdateMessage: (message) => updateMessage(message),
+            onDeleteMessage: (message) => deleteMessage(message),
+          );
+        },
       ),
     );
   }

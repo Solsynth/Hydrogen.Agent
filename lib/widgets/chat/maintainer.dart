@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatMaintainer extends StatefulWidget {
   final Widget child;
+  final Channel channel;
   final Function(Message val) onInsertMessage;
   final Function(Message val) onUpdateMessage;
   final Function(Message val) onDeleteMessage;
@@ -17,6 +19,7 @@ class ChatMaintainer extends StatefulWidget {
   const ChatMaintainer({
     super.key,
     required this.child,
+    required this.channel,
     required this.onInsertMessage,
     required this.onUpdateMessage,
     required this.onDeleteMessage,
@@ -46,13 +49,16 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
           final result = NetworkPackage.fromJson(jsonDecode(event));
           switch (result.method) {
             case 'messages.new':
-              widget.onInsertMessage(Message.fromJson(result.payload!));
+              final payload = Message.fromJson(result.payload!);
+              if (payload.channelId == widget.channel.id) widget.onInsertMessage(payload);
               break;
             case 'messages.update':
-              widget.onUpdateMessage(Message.fromJson(result.payload!));
+              final payload = Message.fromJson(result.payload!);
+              if (payload.channelId == widget.channel.id) widget.onUpdateMessage(payload);
               break;
             case 'messages.burnt':
-              widget.onDeleteMessage(Message.fromJson(result.payload!));
+              final payload = Message.fromJson(result.payload!);
+              if (payload.channelId == widget.channel.id) widget.onDeleteMessage(payload);
               break;
           }
         },

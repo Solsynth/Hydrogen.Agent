@@ -13,12 +13,18 @@ class ChannelAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () {
-        router.pushNamed(
+      onPressed: () async {
+        final result = await router.pushNamed(
           'chat.channel.manage',
           extra: channel,
           pathParameters: {'channel': channel.alias},
         );
+        switch(result) {
+          case 'disposed':
+            if(router.canPop()) router.pop('refresh');
+          case 'refresh':
+            onUpdate();
+        }
       },
       focusNode: _focusNode,
       style: TextButton.styleFrom(shape: const CircleBorder()),

@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/widgets/chat/channel_deletion.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -16,7 +18,20 @@ class ChatManageScreen extends StatefulWidget {
 }
 
 class _ChatManageScreenState extends State<ChatManageScreen> {
-  bool isOwned = false;
+  bool _isOwned = false;
+
+  void promptLeaveChannel() async {
+    final did = await showDialog(
+      context: context,
+      builder: (context) => ChannelDeletion(
+        channel: widget.channel,
+        isOwned: _isOwned,
+      ),
+    );
+    if (did == true && router.canPop()) {
+      router.pop('disposed');
+    }
+  }
 
   @override
   void initState() {
@@ -27,7 +42,7 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
       final prof = await auth.getProfiles();
 
       setState(() {
-        isOwned = prof['id'] == widget.channel.account.externalId;
+        _isOwned = prof['id'] == widget.channel.account.externalId;
       });
     });
   }
@@ -41,7 +56,7 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
         onTap: () async {
           router.pushNamed('chat.channel.editor', extra: widget.channel).then((did) {
             if (did == true) {
-              if (router.canPop()) router.pop(true);
+              if (router.canPop()) router.pop('refresh');
             }
           });
         },
@@ -64,10 +79,12 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
                   child: Icon(Icons.tag, color: Colors.white),
                 ),
                 const SizedBox(width: 16),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(widget.channel.name, style: Theme.of(context).textTheme.bodyLarge),
-                  Text(widget.channel.description, style: Theme.of(context).textTheme.bodySmall),
-                ])
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(widget.channel.name, style: Theme.of(context).textTheme.bodyLarge),
+                    Text(widget.channel.description, style: Theme.of(context).textTheme.bodySmall),
+                  ]),
+                )
               ],
             ),
           ),
@@ -91,7 +108,13 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
                     );
                   },
                 ),
-                ...(isOwned ? authorizedItems : List.empty()),
+                ...(_isOwned ? authorizedItems : List.empty()),
+                const Divider(thickness: 0.3),
+                ListTile(
+                  leading: _isOwned ? const Icon(Icons.delete) : const Icon(Icons.exit_to_app),
+                  title: Text(_isOwned ? AppLocalizations.of(context)!.delete : AppLocalizations.of(context)!.exit),
+                  onTap: () => promptLeaveChannel(),
+                ),
               ],
             ),
           ),

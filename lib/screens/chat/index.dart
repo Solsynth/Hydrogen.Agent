@@ -99,13 +99,17 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
                     ),
                     title: Text(element.name),
                     subtitle: Text(element.description),
-                    onTap: () {
-                      router.pushNamed(
+                    onTap: () async {
+                      final result = await router.pushNamed(
                         'chat.channel',
                         pathParameters: {
                           'channel': element.alias,
                         },
                       );
+                      switch(result) {
+                        case 'refresh':
+                          fetchChannels();
+                      }
                     },
                   );
                 },
