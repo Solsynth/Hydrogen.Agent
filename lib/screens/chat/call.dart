@@ -147,12 +147,12 @@ class _ChatCallState extends State<ChatCall> {
 
   void autoPublish() async {
     try {
-      if(_enableVideo) await _callRoom.localParticipant?.setCameraEnabled(true);
+      if (_enableVideo) await _callRoom.localParticipant?.setCameraEnabled(true);
     } catch (error) {
       await context.showErrorDialog(error);
     }
     try {
-      if(_enableAudio) await _callRoom.localParticipant?.setMicrophoneEnabled(true);
+      if (_enableAudio) await _callRoom.localParticipant?.setMicrophoneEnabled(true);
     } catch (error) {
       await context.showErrorDialog(error);
     }
@@ -277,6 +277,14 @@ class _ChatCallState extends State<ChatCall> {
         }
       }
     }
+
+    var checklistIdx = List<String>.empty(growable: true);
+    userMediaTracks = userMediaTracks.where((element) {
+      if(checklistIdx.contains(element.participant.sid)) return false;
+      checklistIdx.add(element.participant.sid);
+      return true;
+    }).toList();
+
     setState(() {
       _participantTracks = [...screenTracks, ...userMediaTracks];
     });
@@ -403,14 +411,21 @@ class _ChatCallState extends State<ChatCall> {
                 right: 0,
                 top: 0,
                 child: SizedBox(
-                  height: 120,
+                  height: 120 + 16,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: math.max(0, _participantTracks.length - 1),
-                    itemBuilder: (BuildContext context, int index) => SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: ParticipantWidget.widgetFor(_participantTracks[index + 1]),
+                    itemBuilder: (BuildContext context, int index) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(8)),
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          color: Theme.of(context).cardColor,
+                          child: ParticipantWidget.widgetFor(_participantTracks[index + 1]),
+                        ),
+                      ),
                     ),
                   ),
                 ),
