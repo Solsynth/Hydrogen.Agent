@@ -19,7 +19,7 @@ class NotificationNotifier extends StatefulWidget {
 }
 
 class _NotificationNotifierState extends State<NotificationNotifier> {
-  void connect() {
+  void connect() async {
     final notify = ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context)!.connectingServer),
@@ -30,19 +30,21 @@ class _NotificationNotifierState extends State<NotificationNotifier> {
     final auth = context.read<AuthProvider>();
     final nty = context.read<NotifyProvider>();
 
-    nty.fetch(auth);
-    nty.connect(auth).then((snapshot) {
-      snapshot!.stream.listen(
-        (event) {
-          final result = model.Notification.fromJson(jsonDecode(event));
-          nty.onRemoteMessage(result);
-        },
-        onError: (_, __) => connect(),
-        onDone: () => connect(),
-      );
+    if (await auth.isAuthorized()) {
+      nty.fetch(auth);
+      nty.connect(auth).then((snapshot) {
+        snapshot!.stream.listen(
+          (event) {
+            final result = model.Notification.fromJson(jsonDecode(event));
+            nty.onRemoteMessage(result);
+          },
+          onError: (_, __) => connect(),
+          onDone: () => connect(),
+        );
+      });
+    }
 
-      notify.close();
-    });
+    notify.close();
   }
 
   @override
