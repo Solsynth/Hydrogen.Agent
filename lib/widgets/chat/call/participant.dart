@@ -121,51 +121,47 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
 
   @override
   Widget build(BuildContext ctx) {
-    return Container(
-      child: Stack(
-        children: [
-          // Video
-          InkWell(
-            onTap: () => setState(() => _visible = !_visible),
-            child: _activeVideoTrack != null && !_activeVideoTrack!.muted
-                ? VideoTrackRenderer(
-                    _activeVideoTrack!,
-                    fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  )
-                : NoContentWidget(
-                    userinfo: _userinfoMetadata,
-                    isSpeaking: widget.participant.isSpeaking,
-                  ),
-          ),
-          if (widget.showStatsLayer)
-            Positioned(
-              top: 30,
-              right: 30,
-              child: ParticipantStatsWidget(
-                participant: widget.participant,
-              ),
-            ),
-          // Bottom bar
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...extraWidgets(widget.isScreenShare),
-                ParticipantInfoWidget(
-                  title: widget.participant.name.isNotEmpty
-                      ? '${widget.participant.name} (${widget.participant.identity})'
-                      : widget.participant.identity,
-                  audioAvailable: _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
-                  connectionQuality: widget.participant.connectionQuality,
-                  isScreenShare: widget.isScreenShare,
+    return Stack(
+      children: [
+        InkWell(
+          onTap: () => setState(() => _visible = !_visible),
+          child: _activeVideoTrack != null && !_activeVideoTrack!.muted
+              ? VideoTrackRenderer(
+                  _activeVideoTrack!,
+                  fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                )
+              : NoContentWidget(
+                  userinfo: _userinfoMetadata,
+                  isSpeaking: widget.participant.isSpeaking,
                 ),
-              ],
+        ),
+        if (widget.showStatsLayer)
+          Positioned(
+            top: 30,
+            right: 30,
+            child: ParticipantStatsWidget(
+              participant: widget.participant,
             ),
           ),
-        ],
-      ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...extraWidgets(widget.isScreenShare),
+              ParticipantInfoWidget(
+                title: widget.participant.name.isNotEmpty
+                    ? '${widget.participant.name} (${widget.participant.identity})'
+                    : widget.participant.identity,
+                audioAvailable: _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
+                connectionQuality: widget.participant.connectionQuality,
+                isScreenShare: widget.isScreenShare,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -239,7 +235,7 @@ class RemoteTrackPublicationMenuWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        color: Colors.black.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
         child: PopupMenuButton<Function>(
           tooltip: 'Subscribe menu',
           icon: Icon(icon,
