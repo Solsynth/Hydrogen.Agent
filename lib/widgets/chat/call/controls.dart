@@ -294,7 +294,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                     value: null,
                     onTap: disableVideo,
                     child: ListTile(
-                      leading: const Icon(Icons.videocam_off, color: Colors.white),
+                      leading: const Icon(Icons.videocam_off),
                       title: Text(AppLocalizations.of(context)!.chatCallVideoOff),
                     ),
                   ),

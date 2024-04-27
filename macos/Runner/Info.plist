@@ -30,5 +30,11 @@
 	<string>public.app-category.social-networking</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow you add photo to your message or post</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Allow you take photo/video for your message or post</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Allow you record audio for your message or post</string>
 </dict>
 </plist>

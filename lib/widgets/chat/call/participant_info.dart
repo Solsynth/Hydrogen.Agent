@@ -17,7 +17,7 @@ class ParticipantInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        color: Colors.black.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
         padding: const EdgeInsets.symmetric(
           vertical: 7,
           horizontal: 10,
@@ -31,6 +31,7 @@ class ParticipantInfoWidget extends StatelessWidget {
                 child: Text(
                   title!,
                   overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             isScreenShare

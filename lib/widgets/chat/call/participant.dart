@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:solian/models/account.dart';
 import 'package:solian/models/call.dart';
-import 'package:solian/widgets/chat/call/no_video.dart';
+import 'package:solian/widgets/chat/call/no_content.dart';
 import 'package:solian/widgets/chat/call/participant_info.dart';
 import 'package:solian/widgets/chat/call/participant_stats.dart';
 
@@ -83,6 +86,8 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
 
   TrackPublication? get _firstAudioPublication;
 
+  Account? _userinfoMetadata;
+
   @override
   void initState() {
     super.initState();
@@ -104,65 +109,65 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
     super.didUpdateWidget(oldWidget);
   }
 
-  void onParticipantChanged() => setState(() {});
+  void onParticipantChanged() {
+    setState(() {
+      if (widget.participant.metadata != null) {
+        _userinfoMetadata = Account.fromJson(jsonDecode(widget.participant.metadata!));
+      }
+    });
+  }
 
   List<Widget> extraWidgets(bool isScreenShare) => [];
 
   @override
-  Widget build(BuildContext ctx) => Container(
-        foregroundDecoration: BoxDecoration(
-          border: widget.participant.isSpeaking && !widget.isScreenShare
-              ? Border.all(
-                  width: 5,
-                  color: Theme.of(context).colorScheme.primary,
-                )
-              : null,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(ctx).cardColor,
-        ),
-        child: Stack(
-          children: [
-            // Video
-            InkWell(
-              onTap: () => setState(() => _visible = !_visible),
-              child: _activeVideoTrack != null && !_activeVideoTrack!.muted
-                  ? VideoTrackRenderer(
-                      _activeVideoTrack!,
-                      fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                    )
-                  : const NoVideoWidget(),
-            ),
-            if (widget.showStatsLayer)
-              Positioned(
-                  top: 30,
-                  right: 30,
-                  child: ParticipantStatsWidget(
-                    participant: widget.participant,
-                  )),
-            // Bottom bar
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ...extraWidgets(widget.isScreenShare),
-                  ParticipantInfoWidget(
-                    title: widget.participant.name.isNotEmpty
-                        ? '${widget.participant.name} (${widget.participant.identity})'
-                        : widget.participant.identity,
-                    audioAvailable:
-                        _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
-                    connectionQuality: widget.participant.connectionQuality,
-                    isScreenShare: widget.isScreenShare,
+  Widget build(BuildContext ctx) {
+    return Container(
+      child: Stack(
+        children: [
+          // Video
+          InkWell(
+            onTap: () => setState(() => _visible = !_visible),
+            child: _activeVideoTrack != null && !_activeVideoTrack!.muted
+                ? VideoTrackRenderer(
+                    _activeVideoTrack!,
+                    fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  )
+                : NoContentWidget(
+                    userinfo: _userinfoMetadata,
+                    isSpeaking: widget.participant.isSpeaking,
                   ),
-                ],
+          ),
+          if (widget.showStatsLayer)
+            Positioned(
+              top: 30,
+              right: 30,
+              child: ParticipantStatsWidget(
+                participant: widget.participant,
               ),
             ),
-          ],
-        ),
-      );
+          // Bottom bar
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...extraWidgets(widget.isScreenShare),
+                ParticipantInfoWidget(
+                  title: widget.participant.name.isNotEmpty
+                      ? '${widget.participant.name} (${widget.participant.identity})'
+                      : widget.participant.identity,
+                  audioAvailable: _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
+                  connectionQuality: widget.participant.connectionQuality,
+                  isScreenShare: widget.isScreenShare,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _LocalParticipantWidgetState extends _ParticipantWidgetState<LocalParticipantWidget> {
@@ -202,7 +207,6 @@ class _RemoteParticipantWidgetState extends _ParticipantWidgetState<RemotePartic
                 pub: _firstAudioPublication!,
                 icon: Icons.volume_up,
               ),
-            // Menu for RemoteTrackPublication<RemoteVideoTrack>
             if (_videoPublication != null)
               RemoteTrackPublicationMenuWidget(
                 pub: _videoPublication!,

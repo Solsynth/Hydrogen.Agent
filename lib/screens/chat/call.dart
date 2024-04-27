@@ -147,12 +147,12 @@ class _ChatCallState extends State<ChatCall> {
 
   void autoPublish() async {
     try {
-      if (_enableVideo) await _callRoom.localParticipant?.setCameraEnabled(true);
+      if(_enableVideo) await _callRoom.localParticipant?.setCameraEnabled(true);
     } catch (error) {
       await context.showErrorDialog(error);
     }
     try {
-      if (_enableAudio) await _callRoom.localParticipant?.setMicrophoneEnabled(true);
+      if(_enableAudio) await _callRoom.localParticipant?.setMicrophoneEnabled(true);
     } catch (error) {
       await context.showErrorDialog(error);
     }
@@ -204,17 +204,23 @@ class _ChatCallState extends State<ChatCall> {
     List<ParticipantTrack> userMediaTracks = [];
     List<ParticipantTrack> screenTracks = [];
     for (var participant in _callRoom.remoteParticipants.values) {
-      for (var t in participant.videoTrackPublications) {
+      for (var t in participant.trackPublications.values) {
         if (t.isScreenShare) {
           screenTracks.add(ParticipantTrack(
             participant: participant,
-            videoTrack: t.track,
+            videoTrack: t.track as VideoTrack,
             isScreenShare: true,
+          ));
+        } else if (t.track is VideoTrack) {
+          userMediaTracks.add(ParticipantTrack(
+            participant: participant,
+            videoTrack: t.track as VideoTrack,
+            isScreenShare: false,
           ));
         } else {
           userMediaTracks.add(ParticipantTrack(
             participant: participant,
-            videoTrack: t.track,
+            videoTrack: null,
             isScreenShare: false,
           ));
         }
@@ -247,19 +253,25 @@ class _ChatCallState extends State<ChatCall> {
       return a.participant.joinedAt.millisecondsSinceEpoch - b.participant.joinedAt.millisecondsSinceEpoch;
     });
 
-    final localParticipantTracks = _callRoom.localParticipant?.videoTrackPublications;
+    final localParticipantTracks = _callRoom.localParticipant?.trackPublications.values;
     if (localParticipantTracks != null) {
       for (var t in localParticipantTracks) {
         if (t.isScreenShare) {
           screenTracks.add(ParticipantTrack(
             participant: _callRoom.localParticipant!,
-            videoTrack: t.track,
+            videoTrack: t.track as VideoTrack,
             isScreenShare: true,
+          ));
+        } else if (t.track is VideoTrack) {
+          userMediaTracks.add(ParticipantTrack(
+            participant: _callRoom.localParticipant!,
+            videoTrack: t.track as VideoTrack,
+            isScreenShare: false,
           ));
         } else {
           userMediaTracks.add(ParticipantTrack(
             participant: _callRoom.localParticipant!,
-            videoTrack: t.track,
+            videoTrack: null,
             isScreenShare: false,
           ));
         }
@@ -363,7 +375,6 @@ class _ChatCallState extends State<ChatCall> {
   Widget build(BuildContext context) {
     return IndentWrapper(
       title: AppLocalizations.of(context)!.chatCall,
-      noSafeArea: true,
       hideDrawer: true,
       child: FutureBuilder(
         future: exchangeToken(),
@@ -377,15 +388,14 @@ class _ChatCallState extends State<ChatCall> {
               Column(
                 children: [
                   Expanded(
-                    child: _participantTracks.isNotEmpty
-                        ? ParticipantWidget.widgetFor(_participantTracks.first)
-                        : Container(),
+                    child: Container(
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      child: _participantTracks.isNotEmpty
+                          ? ParticipantWidget.widgetFor(_participantTracks.first)
+                          : Container(),
+                    ),
                   ),
-                  if (_callRoom.localParticipant != null)
-                    SafeArea(
-                      top: false,
-                      child: ControlsWidget(_callRoom, _callRoom.localParticipant!),
-                    )
+                  if (_callRoom.localParticipant != null) ControlsWidget(_callRoom, _callRoom.localParticipant!),
                 ],
               ),
               Positioned(
@@ -398,7 +408,7 @@ class _ChatCallState extends State<ChatCall> {
                     scrollDirection: Axis.horizontal,
                     itemCount: math.max(0, _participantTracks.length - 1),
                     itemBuilder: (BuildContext context, int index) => SizedBox(
-                      width: 180,
+                      width: 120,
                       height: 120,
                       child: ParticipantWidget.widgetFor(_participantTracks[index + 1]),
                     ),
@@ -423,8 +433,8 @@ class _ChatCallState extends State<ChatCall> {
     WakelockPlus.disable();
     (() async {
       _callRoom.removeListener(onRoomDidUpdate);
-      await _callRoom.disconnect();
       await _callListener.dispose();
+      await _callRoom.disconnect();
       await _callRoom.dispose();
     })();
     super.dispose();
