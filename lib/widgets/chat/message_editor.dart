@@ -27,6 +27,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   final _textController = TextEditingController();
 
   bool _isSubmitting = false;
+  int? _prevEditingId;
 
   List<Attachment> _attachments = List.empty(growable: true);
 
@@ -80,8 +81,9 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   }
 
   void syncWidget() {
-    if (widget.editing != null) {
+    if (widget.editing != null && _prevEditingId != widget.editing!.id) {
       setState(() {
+        _prevEditingId = widget.editing!.id;
         _textController.text = widget.editing!.content;
         _attachments = widget.editing!.attachments ?? List.empty(growable: true);
       });

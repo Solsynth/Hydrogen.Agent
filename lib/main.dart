@@ -12,6 +12,8 @@ import 'package:solian/utils/video_player.dart';
 import 'package:solian/widgets/notification_notifier.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   initVideo();
   initTimeAgo();
 

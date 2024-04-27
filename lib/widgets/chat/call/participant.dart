@@ -156,7 +156,6 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
                         _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
                     connectionQuality: widget.participant.connectionQuality,
                     isScreenShare: widget.isScreenShare,
-                    enabledE2EE: widget.participant.isEncrypted,
                   ),
                 ],
               ),

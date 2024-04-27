@@ -64,6 +64,7 @@ dependencies:
   permission_handler: ^11.3.1
   flutter_webrtc: ^0.10.3
   flutter_background: ^1.2.0
+  wakelock_plus: ^1.2.4
 
 dev_dependencies:
   flutter_test:

@@ -13,6 +13,7 @@ import 'package:solian/widgets/chat/call/participant.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:math' as math;
 
 import '../../widgets/chat/call/controls.dart';
@@ -50,9 +51,8 @@ class _ChatCallState extends State<ChatCall> {
 
   List<ParticipantTrack> _participantTracks = [];
 
-  bool get _fastConnection => _callRoom.engine.fastConnectOptions != null;
-
   Future<void> checkPermissions() async {
+    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
     await Permission.camera.request();
     await Permission.microphone.request();
     await Permission.bluetooth.request();
@@ -87,7 +87,7 @@ class _ChatCallState extends State<ChatCall> {
   }
 
   void joinRoom(String url, String token) async {
-    if(_isMounted) {
+    if (_isMounted) {
       return;
     } else {
       _isMounted = true;
@@ -145,16 +145,14 @@ class _ChatCallState extends State<ChatCall> {
     }
   }
 
-  void askPublish() async {
-    final result = await context.showPublishDialog();
-    if (result != true) return;
+  void autoPublish() async {
     try {
-      await _callRoom.localParticipant?.setCameraEnabled(true);
+      if (_enableVideo) await _callRoom.localParticipant?.setCameraEnabled(true);
     } catch (error) {
       await context.showErrorDialog(error);
     }
     try {
-      await _callRoom.localParticipant?.setMicrophoneEnabled(true);
+      if (_enableAudio) await _callRoom.localParticipant?.setMicrophoneEnabled(true);
     } catch (error) {
       await context.showErrorDialog(error);
     }
@@ -164,11 +162,7 @@ class _ChatCallState extends State<ChatCall> {
     _callRoom.addListener(onRoomDidUpdate);
     setupRoomListeners();
     sortParticipants();
-    WidgetsBindingCompatible.instance?.addPostFrameCallback((_) {
-      if (!_fastConnection) {
-        askPublish();
-      }
-    });
+    WidgetsBindingCompatible.instance?.addPostFrameCallback((_) => autoPublish());
 
     if (lkPlatformIsMobile()) {
       Hardware.instance.setSpeakerphoneOn(true);
@@ -362,6 +356,7 @@ class _ChatCallState extends State<ChatCall> {
     _callRoom = Room();
     _callListener = _callRoom.createListener();
     Hardware.instance.enumerateDevices().then(revertDevices);
+    WakelockPlus.enable();
   }
 
   @override
@@ -425,6 +420,7 @@ class _ChatCallState extends State<ChatCall> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     (() async {
       _callRoom.removeListener(onRoomDidUpdate);
       await _callRoom.disconnect();

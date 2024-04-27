@@ -6,7 +6,6 @@ class ParticipantInfoWidget extends StatelessWidget {
   final bool audioAvailable;
   final ConnectionQuality connectionQuality;
   final bool isScreenShare;
-  final bool enabledE2EE;
 
   const ParticipantInfoWidget({
     super.key,
@@ -14,7 +13,6 @@ class ParticipantInfoWidget extends StatelessWidget {
     this.audioAvailable = true,
     this.connectionQuality = ConnectionQuality.unknown,
     this.isScreenShare = false,
-    this.enabledE2EE = false,
   });
 
   @override
@@ -65,14 +63,6 @@ class ParticipantInfoWidget extends StatelessWidget {
                   size: 16,
                 ),
               ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Icon(
-                enabledE2EE ? Icons.lock : Icons.lock_open,
-                color: enabledE2EE ? Colors.green : Colors.red,
-                size: 16,
-              ),
-            ),
           ],
         ),
       );

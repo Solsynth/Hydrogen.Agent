@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
-import 'package:solian/widgets/chat/call/exts.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ControlsWidget extends StatefulWidget {
   final Room room;
@@ -61,11 +61,6 @@ class _ControlsWidgetState extends State<ControlsWidget> {
 
   void onChange() => setState(() {});
 
-  void unpublishAll() async {
-    final result = await context.showUnPublishDialog();
-    if (result == true) await participant.unpublishAllTracks();
-  }
-
   bool get isMuted => participant.isMuted;
 
   void disableAudio() async {
@@ -106,7 +101,6 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   }
 
   void toggleCamera() async {
-    //
     final track = participant.videoTrackPublications.firstOrNull?.track;
     if (track == null) return;
 
@@ -202,22 +196,6 @@ class _ControlsWidgetState extends State<ControlsWidget> {
     }
   }
 
-  void onTapUpdateSubscribePermission() async {
-    final result = await context.showSubscribePermissionDialog();
-    if (result != null) {
-      try {
-        widget.room.localParticipant?.setTrackSubscriptionPermissions(
-          allParticipantsAllowed: result,
-        );
-      } catch (e) {
-        final message = e.toString();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Something went wrong... $message'),
-        ));
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -230,17 +208,12 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         spacing: 5,
         runSpacing: 5,
         children: [
-          IconButton(
-            onPressed: unpublishAll,
-            icon: const Icon(Icons.cancel),
-            tooltip: 'Unpublish all',
-          ),
           if (participant.isMicrophoneEnabled())
             if (lkPlatformIs(PlatformType.android))
               IconButton(
                 onPressed: disableAudio,
                 icon: const Icon(Icons.mic),
-                tooltip: 'mute audio',
+                tooltip: AppLocalizations.of(context)!.chatCallMute,
               )
             else
               PopupMenuButton<MediaDevice>(
@@ -250,9 +223,9 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                     PopupMenuItem<MediaDevice>(
                       value: null,
                       onTap: isMuted ? enableAudio : disableAudio,
-                      child: const ListTile(
-                        leading: Icon(Icons.mic_off),
-                        title: Text('Mute Microphone'),
+                      child: ListTile(
+                        leading: const Icon(Icons.mic_off),
+                        title: Text(AppLocalizations.of(context)!.chatCallMute),
                       ),
                     ),
                     if (_audioInputs != null)
@@ -275,7 +248,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             IconButton(
               onPressed: enableAudio,
               icon: const Icon(Icons.mic_off),
-              tooltip: 'un-mute audio',
+              tooltip: AppLocalizations.of(context)!.chatCallUnMute,
             ),
           if (!lkPlatformIs(PlatformType.iOS))
             PopupMenuButton<MediaDevice>(
@@ -310,7 +283,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
               disabledColor: Colors.grey,
               onPressed: Hardware.instance.canSwitchSpeakerphone ? setSpeakerphoneOn : null,
               icon: Icon(_speakerphoneOn ? Icons.speaker_phone : Icons.phone_android),
-              tooltip: 'Switch SpeakerPhone',
+              tooltip: AppLocalizations.of(context)!.chatCallChangeSpeaker,
             ),
           if (participant.isCameraEnabled())
             PopupMenuButton<MediaDevice>(
@@ -320,12 +293,9 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                   PopupMenuItem<MediaDevice>(
                     value: null,
                     onTap: disableVideo,
-                    child: const ListTile(
-                      leading: Icon(
-                        Icons.videocam_off,
-                        color: Colors.white,
-                      ),
-                      title: Text('Disable Camera'),
+                    child: ListTile(
+                      leading: const Icon(Icons.videocam_off, color: Colors.white),
+                      title: Text(AppLocalizations.of(context)!.chatCallVideoOff),
                     ),
                   ),
                   if (_videoInputs != null)
@@ -348,30 +318,25 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             IconButton(
               onPressed: enableVideo,
               icon: const Icon(Icons.videocam_off),
-              tooltip: 'un-mute video',
+              tooltip: AppLocalizations.of(context)!.chatCallVideoOn,
             ),
           IconButton(
             icon: Icon(position == CameraPosition.back ? Icons.video_camera_back : Icons.video_camera_front),
             onPressed: () => toggleCamera(),
-            tooltip: 'toggle camera',
+            tooltip: AppLocalizations.of(context)!.chatCallVideoFlip,
           ),
           if (participant.isScreenShareEnabled())
             IconButton(
               icon: const Icon(Icons.monitor_outlined),
               onPressed: () => disableScreenShare(),
-              tooltip: 'unshare screen (experimental)',
+              tooltip: AppLocalizations.of(context)!.chatCallScreenOff,
             )
           else
             IconButton(
               icon: const Icon(Icons.monitor),
               onPressed: () => enableScreenShare(),
-              tooltip: 'share screen (experimental)',
+              tooltip: AppLocalizations.of(context)!.chatCallScreenOn,
             ),
-          IconButton(
-            onPressed: onTapUpdateSubscribePermission,
-            icon: const Icon(Icons.settings),
-            tooltip: 'Subscribe permission',
-          ),
         ],
       ),
     );
