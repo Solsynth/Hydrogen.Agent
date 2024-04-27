@@ -383,7 +383,7 @@ class _ChatCallState extends State<ChatCall> {
                 children: [
                   Expanded(
                     child: _participantTracks.isNotEmpty
-                        ? ParticipantWidget.widgetFor(_participantTracks.first, showStatsLayer: true)
+                        ? ParticipantWidget.widgetFor(_participantTracks.first)
                         : Container(),
                   ),
                   if (_callRoom.localParticipant != null)
