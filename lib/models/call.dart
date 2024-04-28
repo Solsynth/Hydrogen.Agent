@@ -64,5 +64,5 @@ class ParticipantTrack {
         required this.isScreenShare});
   VideoTrack? videoTrack;
   Participant participant;
-  final bool isScreenShare;
+  bool isScreenShare;
 }

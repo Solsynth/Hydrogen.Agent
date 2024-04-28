@@ -8,6 +8,7 @@ import 'package:solian/models/call.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/chat/call/controls.dart';
 import 'package:solian/widgets/chat/call/exts.dart';
 import 'package:solian/widgets/chat/call/participant.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
@@ -15,8 +16,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:math' as math;
-
-import '../../widgets/chat/call/controls.dart';
 
 class ChatCall extends StatefulWidget {
   final Call call;
@@ -52,7 +51,6 @@ class _ChatCallState extends State<ChatCall> {
   List<ParticipantTrack> _participantTracks = [];
 
   Future<void> checkPermissions() async {
-    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
     await Permission.camera.request();
     await Permission.microphone.request();
     await Permission.bluetooth.request();
@@ -201,32 +199,30 @@ class _ChatCallState extends State<ChatCall> {
   }
 
   void sortParticipants() {
-    List<ParticipantTrack> userMediaTracks = [];
     List<ParticipantTrack> screenTracks = [];
+    Map<String, ParticipantTrack> userMediaTracks = {};
     for (var participant in _callRoom.remoteParticipants.values) {
-      for (var t in participant.trackPublications.values) {
+      userMediaTracks[participant.sid] = ParticipantTrack(
+        participant: participant,
+        videoTrack: null,
+        isScreenShare: false,
+      );
+
+      for (var t in participant.videoTrackPublications) {
         if (t.isScreenShare) {
           screenTracks.add(ParticipantTrack(
             participant: participant,
             videoTrack: t.track as VideoTrack,
             isScreenShare: true,
           ));
-        } else if (t.track is VideoTrack) {
-          userMediaTracks.add(ParticipantTrack(
-            participant: participant,
-            videoTrack: t.track as VideoTrack,
-            isScreenShare: false,
-          ));
         } else {
-          userMediaTracks.add(ParticipantTrack(
-            participant: participant,
-            videoTrack: null,
-            isScreenShare: false,
-          ));
+          userMediaTracks[participant.sid]?.videoTrack = t.track;
         }
       }
     }
-    userMediaTracks.sort((a, b) {
+
+    final userMediaTrackList = userMediaTracks.values.toList();
+    userMediaTrackList.sort((a, b) {
       // Loudest people first
       if (a.participant.isSpeaking && b.participant.isSpeaking) {
         if (a.participant.audioLevel > b.participant.audioLevel) {
@@ -253,40 +249,30 @@ class _ChatCallState extends State<ChatCall> {
       return a.participant.joinedAt.millisecondsSinceEpoch - b.participant.joinedAt.millisecondsSinceEpoch;
     });
 
-    final localParticipantTracks = _callRoom.localParticipant?.trackPublications.values;
-    if (localParticipantTracks != null) {
-      for (var t in localParticipantTracks) {
-        if (t.isScreenShare) {
-          screenTracks.add(ParticipantTrack(
-            participant: _callRoom.localParticipant!,
-            videoTrack: t.track as VideoTrack,
-            isScreenShare: true,
-          ));
-        } else if (t.track is VideoTrack) {
-          userMediaTracks.add(ParticipantTrack(
-            participant: _callRoom.localParticipant!,
-            videoTrack: t.track as VideoTrack,
-            isScreenShare: false,
-          ));
-        } else {
-          userMediaTracks.add(ParticipantTrack(
-            participant: _callRoom.localParticipant!,
-            videoTrack: null,
-            isScreenShare: false,
-          ));
+    ParticipantTrack localTrack = ParticipantTrack(
+      participant: _callRoom.localParticipant!,
+      videoTrack: null,
+      isScreenShare: false,
+    );
+    if (_callRoom.localParticipant != null) {
+      final localParticipantTracks = _callRoom.localParticipant?.videoTrackPublications;
+      if (localParticipantTracks != null) {
+        for (var t in localParticipantTracks) {
+          if (t.isScreenShare) {
+            screenTracks.add(ParticipantTrack(
+              participant: _callRoom.localParticipant!,
+              videoTrack: t.track as VideoTrack,
+              isScreenShare: true,
+            ));
+          } else {
+            localTrack.videoTrack = t.track;
+          }
         }
       }
     }
 
-    var checklistIdx = List<String>.empty(growable: true);
-    userMediaTracks = userMediaTracks.where((element) {
-      if(checklistIdx.contains(element.participant.sid)) return false;
-      checklistIdx.add(element.participant.sid);
-      return true;
-    }).toList();
-
     setState(() {
-      _participantTracks = [...screenTracks, ...userMediaTracks];
+      _participantTracks = [...screenTracks, localTrack, ...userMediaTrackList];
     });
   }
 
