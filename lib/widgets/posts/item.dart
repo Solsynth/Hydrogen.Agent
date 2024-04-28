@@ -135,7 +135,7 @@ class _PostItemState extends State<PostItem> {
 
   @override
   void initState() {
-    reactionList = widget.item.reactionList;
+    reactionList = widget.item.reactionList ?? {};
     super.initState();
   }
 
