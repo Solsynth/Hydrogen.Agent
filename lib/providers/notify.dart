@@ -101,8 +101,9 @@ class NotifyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearNonRealtime() {
+  void clearRealtime() {
     notifications = notifications.where((x) => !x.isRealtime).toList();
+    notifyListeners();
   }
 
   void allRead() {

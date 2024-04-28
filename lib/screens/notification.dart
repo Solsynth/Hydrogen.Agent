@@ -21,8 +21,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final auth = context.read<AuthProvider>();
     final nty = context.watch<NotifyProvider>();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => nty.allRead());
-
     return IndentWrapper(
       noSafeArea: true,
       hideDrawer: true,
@@ -70,6 +68,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    final nty = context.read<NotifyProvider>();
+    nty.allRead();
+    nty.clearRealtime();
+    super.dispose();
   }
 }
 

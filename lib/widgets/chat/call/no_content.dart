@@ -60,6 +60,7 @@ class _NoContentWidgetState extends State<NoContentWidget> with SingleTickerProv
             ],
             child: AccountAvatar(
               source: widget.userinfo!.avatar,
+              backgroundColor: Colors.transparent,
               radius: radius,
               direct: true,
             )),

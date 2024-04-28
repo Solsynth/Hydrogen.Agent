@@ -11,6 +11,7 @@ import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/call/controls.dart';
 import 'package:solian/widgets/chat/call/exts.dart';
 import 'package:solian/widgets/chat/call/participant.dart';
+import 'package:solian/widgets/chat/call/participant_menu.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -49,9 +50,10 @@ class _ChatCallState extends State<ChatCall> {
   late EventsListener<RoomEvent> _callListener;
 
   List<ParticipantTrack> _participantTracks = [];
+  ParticipantTrack? _focusParticipant;
 
   Future<void> checkPermissions() async {
-    if(lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
+    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
 
     await Permission.camera.request();
     await Permission.microphone.request();
@@ -275,6 +277,7 @@ class _ChatCallState extends State<ChatCall> {
 
     setState(() {
       _participantTracks = [...screenTracks, localTrack, ...userMediaTrackList];
+      _focusParticipant ??= _participantTracks.first;
     });
   }
 
@@ -386,8 +389,11 @@ class _ChatCallState extends State<ChatCall> {
                   Expanded(
                     child: Container(
                       color: Theme.of(context).colorScheme.surfaceVariant,
-                      child: _participantTracks.isNotEmpty
-                          ? ParticipantWidget.widgetFor(_participantTracks.first)
+                      child: _focusParticipant != null
+                          ? InteractiveParticipantWidget(
+                              participant: _focusParticipant!,
+                              onTap: () {},
+                            )
                           : Container(),
                     ),
                   ),
@@ -399,22 +405,34 @@ class _ChatCallState extends State<ChatCall> {
                 right: 0,
                 top: 0,
                 child: SizedBox(
-                  height: 120 + 16,
+                  height: 128,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: math.max(0, _participantTracks.length - 1),
-                    itemBuilder: (BuildContext context, int index) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
-                        child: Container(
-                          width: 120,
-                          height: 120,
-                          color: Theme.of(context).cardColor,
-                          child: ParticipantWidget.widgetFor(_participantTracks[index + 1]),
+                    itemCount: math.max(0, _participantTracks.length),
+                    itemBuilder: (BuildContext context, int index) {
+                      final track = _participantTracks[index];
+                      if (track.participant.sid == _focusParticipant?.participant.sid) {
+                        return Container();
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 8),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(8)),
+                          child: InteractiveParticipantWidget(
+                            width: 120,
+                            height: 120,
+                            color: Theme.of(context).cardColor,
+                            participant: track,
+                            onTap: () {
+                              if (track.participant.sid != _focusParticipant?.participant.sid) {
+                                setState(() => _focusParticipant = track);
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -441,5 +459,46 @@ class _ChatCallState extends State<ChatCall> {
       await _callRoom.dispose();
     })();
     super.dispose();
+  }
+}
+
+class InteractiveParticipantWidget extends StatelessWidget {
+  final double? width;
+  final double? height;
+  final Color? color;
+  final ParticipantTrack participant;
+  final Function() onTap;
+
+  const InteractiveParticipantWidget({
+    super.key,
+    this.width,
+    this.height,
+    this.color,
+    required this.participant,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Container(
+        width: width,
+        height: height,
+        color: color,
+        child: ParticipantWidget.widgetFor(participant),
+      ),
+      onTap: () => onTap(),
+      onLongPress: () {
+        if (participant.participant is LocalParticipant) return;
+        showModalBottomSheet(
+          context: context,
+          builder: (context) => ParticipantMenu(
+            participant: participant.participant as RemoteParticipant,
+            videoTrack: participant.videoTrack,
+            isScreenShare: participant.isScreenShare,
+          ),
+        );
+      },
+    );
   }
 }
