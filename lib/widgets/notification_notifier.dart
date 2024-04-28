@@ -37,6 +37,7 @@ class _NotificationNotifierState extends State<NotificationNotifier> {
           (event) {
             final result = model.Notification.fromJson(jsonDecode(event));
             nty.onRemoteMessage(result);
+            nty.notifyMessage(result.subject, result.content);
           },
           onError: (_, __) => connect(),
           onDone: () => connect(),
@@ -75,10 +76,10 @@ class _NotificationButtonState extends State<NotificationButton> {
     final nty = context.watch<NotifyProvider>();
 
     return badge.Badge(
-      showBadge: nty.notifications.isNotEmpty,
+      showBadge: nty.unreadAmount > 0,
       position: badge.BadgePosition.custom(top: -2, end: 8),
       badgeContent: Text(
-        nty.notifications.length.toString(),
+        nty.unreadAmount.toString(),
         style: const TextStyle(color: Colors.white),
       ),
       child: IconButton(

@@ -51,6 +51,8 @@ class _ChatCallState extends State<ChatCall> {
   List<ParticipantTrack> _participantTracks = [];
 
   Future<void> checkPermissions() async {
+    if(lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
+
     await Permission.camera.request();
     await Permission.microphone.request();
     await Permission.bluetooth.request();

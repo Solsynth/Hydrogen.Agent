@@ -1,16 +1,42 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/models/notification.dart' as model;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:math' as math;
 
 class NotifyProvider extends ChangeNotifier {
   bool isOpened = false;
+  int unreadAmount = 0;
 
   List<model.Notification> notifications = List.empty(growable: true);
+
+  final FlutterLocalNotificationsPlugin localNotify = FlutterLocalNotificationsPlugin();
+
+  NotifyProvider() {
+    initNotify();
+    requestPermissions();
+  }
+
+  void initNotify() {
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: AndroidInitializationSettings('app_icon'),
+      iOS: DarwinInitializationSettings(),
+      macOS: DarwinInitializationSettings(),
+      linux: LinuxInitializationSettings(defaultActionName: 'Open notification'),
+    );
+
+    localNotify.initialize(initializationSettings);
+  }
+
+  Future<void> requestPermissions() async {
+    await Permission.notification.request();
+  }
 
   Future<void> fetch(AuthProvider auth) async {
     if (!await auth.isAuthorized()) return;
@@ -46,8 +72,28 @@ class NotifyProvider extends ChangeNotifier {
   }
 
   void onRemoteMessage(model.Notification item) {
+    unreadAmount++;
     notifications.add(item);
     notifyListeners();
+  }
+
+  void notifyMessage(String title, String body) {
+    localNotify.show(
+      math.max(1, math.Random().nextInt(100000000)),
+      title,
+      body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'general',
+          'General',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+        macOS: DarwinNotificationDetails(),
+        linux: LinuxNotificationDetails(),
+      ),
+    );
   }
 
   void clearAt(int index) {
@@ -57,5 +103,10 @@ class NotifyProvider extends ChangeNotifier {
 
   void clearNonRealtime() {
     notifications = notifications.where((x) => !x.isRealtime).toList();
+  }
+
+  void allRead() {
+    unreadAmount = 0;
+    notifyListeners();
   }
 }

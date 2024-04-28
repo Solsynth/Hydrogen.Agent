@@ -65,6 +65,7 @@ dependencies:
   flutter_webrtc: ^0.10.3
   flutter_background: ^1.2.0
   wakelock_plus: ^1.2.4
+  flutter_local_notifications: ^17.1.0
 
 dev_dependencies:
   flutter_test:
