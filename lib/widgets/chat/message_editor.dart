@@ -8,6 +8,7 @@ import 'package:solian/models/message.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
 import 'package:badges/badges.dart' as badge;
 
@@ -64,9 +65,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     var res = await Response.fromStream(await auth.client!.send(req));
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     } else {
       reset();
     }

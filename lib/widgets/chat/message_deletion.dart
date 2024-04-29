@@ -6,6 +6,7 @@ import 'package:solian/models/message.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 
 class ChatMessageDeletionDialog extends StatefulWidget {
   final String channel;
@@ -34,9 +35,7 @@ class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
     final res = await auth.client!.delete(uri);
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
       setState(() => _isSubmitting = false);
     } else {
       Navigator.pop(context, true);

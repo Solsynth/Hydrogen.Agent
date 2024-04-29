@@ -7,6 +7,7 @@ import 'package:solian/models/friendship.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -40,9 +41,7 @@ class _FriendScreenState extends State<FriendScreen> {
       });
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
   }
 
@@ -65,9 +64,7 @@ class _FriendScreenState extends State<FriendScreen> {
       await fetchFriendships();
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
 
     setState(() => _isSubmitting = false);
@@ -97,9 +94,7 @@ class _FriendScreenState extends State<FriendScreen> {
       await fetchFriendships();
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
 
     setState(() => _isSubmitting = false);

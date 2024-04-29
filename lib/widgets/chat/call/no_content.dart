@@ -7,8 +7,14 @@ import 'dart:math' as math;
 class NoContentWidget extends StatefulWidget {
   final Account? userinfo;
   final bool isSpeaking;
+  final bool isFixed;
 
-  const NoContentWidget({super.key, this.userinfo, required this.isSpeaking});
+  const NoContentWidget({
+    super.key,
+    this.userinfo,
+    this.isFixed = false,
+    required this.isSpeaking,
+  });
 
   @override
   State<NoContentWidget> createState() => _NoContentWidgetState();
@@ -35,35 +41,41 @@ class _NoContentWidgetState extends State<NoContentWidget> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    final radius = math.min(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height) * 0.1;
+    final double radius = widget.isFixed
+        ? 16
+        : math.min(
+            MediaQuery.of(context).size.width * 0.1,
+            MediaQuery.of(context).size.height * 0.1,
+          );
 
     return Container(
       alignment: Alignment.center,
       child: Center(
         child: Animate(
-            autoPlay: false,
-            controller: _animationController,
-            effects: [
-              CustomEffect(
-                begin: widget.isSpeaking ? 2 : 0,
-                end: 8,
-                curve: Curves.easeInOut,
-                duration: 1250.ms,
-                builder: (context, value, child) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(radius + 8)),
-                    border: value > 0 ? Border.all(color: Colors.green, width: value) : null,
-                  ),
-                  child: child,
+          autoPlay: false,
+          controller: _animationController,
+          effects: [
+            CustomEffect(
+              begin: widget.isSpeaking ? 2 : 0,
+              end: 8,
+              curve: Curves.easeInOut,
+              duration: 1250.ms,
+              builder: (context, value, child) => Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(radius + 8)),
+                  border: value > 0 ? Border.all(color: Colors.green, width: value) : null,
                 ),
-              )
-            ],
-            child: AccountAvatar(
-              source: widget.userinfo!.avatar,
-              backgroundColor: Colors.transparent,
-              radius: radius,
-              direct: true,
-            )),
+                child: child,
+              ),
+            )
+          ],
+          child: AccountAvatar(
+            source: widget.userinfo!.avatar,
+            backgroundColor: Colors.transparent,
+            radius: radius,
+            direct: true,
+          ),
+        ),
       ),
     );
   }

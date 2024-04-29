@@ -72,7 +72,7 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
               Image.asset("assets/logo.png", width: 26, height: 26),
               const SizedBox(width: 10),
               Text(
-                AppLocalizations.of(context)!.solian,
+                AppLocalizations.of(context)!.appName,
                 style: const TextStyle(fontWeight: FontWeight.w900),
               ),
             ],

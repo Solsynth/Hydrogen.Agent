@@ -12,6 +12,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/exts.dart';
 
 class AttachmentEditor extends StatefulWidget {
   final String provider;
@@ -67,9 +68,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     try {
       await uploadAttachment(file, hashcode);
     } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $err")),
-      );
+      context.showErrorDialog(err);
     } finally {
       setState(() => _isSubmitting = false);
     }
@@ -94,9 +93,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     try {
       await uploadAttachment(file, hashcode);
     } catch (err) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $err")),
-      );
+      context.showErrorDialog(err);
     } finally {
       setState(() => _isSubmitting = false);
     }
@@ -133,9 +130,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
       widget.onUpdate(_attachments);
     } else {
       final err = utf8.decode(await res.stream.toBytes());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $err")),
-      );
+      context.showErrorDialog(err);
     }
     setState(() => _isSubmitting = false);
   }

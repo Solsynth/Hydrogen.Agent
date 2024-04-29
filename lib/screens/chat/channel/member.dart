@@ -9,6 +9,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/account/avatar.dart';
 import 'package:solian/widgets/account/friend_picker.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -45,9 +46,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       });
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
   }
 
@@ -75,9 +74,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       await fetchMemberships();
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
 
     setState(() => _isSubmitting = false);
@@ -107,9 +104,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       await fetchMemberships();
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
 
     setState(() => _isSubmitting = false);

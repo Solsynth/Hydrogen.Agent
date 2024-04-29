@@ -21,6 +21,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final auth = context.read<AuthProvider>();
     final nty = context.watch<NotifyProvider>();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      nty.allRead();
+    });
+
     return IndentWrapper(
       noSafeArea: true,
       hideDrawer: true,
@@ -48,9 +52,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       return NotificationItem(
                         index: index,
                         item: element,
-                        onDismiss: () => setState(() {
-                          nty.clearAt(index);
-                        }),
+                        onDismiss: () => nty.clearAt(index),
                       );
                     },
                   ),
@@ -68,14 +70,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    final nty = context.read<NotifyProvider>();
-    nty.allRead();
-    nty.clearRealtime();
-    super.dispose();
   }
 }
 
@@ -141,7 +135,7 @@ class NotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key('n$index'),
+      key: Key((DateTime.now().millisecondsSinceEpoch << 10).toString()),
       onDismissed: (direction) {
         markAsRead(item, context).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(

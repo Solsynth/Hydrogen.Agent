@@ -12,6 +12,7 @@ import 'package:solian/widgets/chat/call/controls.dart';
 import 'package:solian/widgets/chat/call/exts.dart';
 import 'package:solian/widgets/chat/call/participant.dart';
 import 'package:solian/widgets/chat/call/participant_menu.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -81,9 +82,7 @@ class _ChatCallState extends State<ChatCall> {
       return (_token!, _endpoint!);
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
       throw Exception(message);
     }
   }
@@ -138,10 +137,7 @@ class _ChatCallState extends State<ChatCall> {
 
       setupRoom();
     } catch (e) {
-      final message = e.toString();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(e);
     } finally {
       notify.close();
     }
@@ -182,9 +178,6 @@ class _ChatCallState extends State<ChatCall> {
         if (router.canPop()) router.pop();
       })
       ..on<ParticipantEvent>((event) => sortParticipants())
-      ..on<RoomRecordingStatusChanged>((event) {
-        context.showRecordingStatusChangedDialog(event.activeRecording);
-      })
       ..on<LocalTrackPublishedEvent>((_) => sortParticipants())
       ..on<LocalTrackUnpublishedEvent>((_) => sortParticipants())
       ..on<TrackSubscribedEvent>((_) => sortParticipants())
@@ -203,30 +196,22 @@ class _ChatCallState extends State<ChatCall> {
   }
 
   void sortParticipants() {
-    List<ParticipantTrack> screenTracks = [];
-    Map<String, ParticipantTrack> userMediaTracks = {};
+    Map<String, ParticipantTrack> mediaTracks = {};
     for (var participant in _callRoom.remoteParticipants.values) {
-      userMediaTracks[participant.sid] = ParticipantTrack(
+      mediaTracks[participant.sid] = ParticipantTrack(
         participant: participant,
         videoTrack: null,
         isScreenShare: false,
       );
 
       for (var t in participant.videoTrackPublications) {
-        if (t.isScreenShare) {
-          screenTracks.add(ParticipantTrack(
-            participant: participant,
-            videoTrack: t.track as VideoTrack,
-            isScreenShare: true,
-          ));
-        } else {
-          userMediaTracks[participant.sid]?.videoTrack = t.track;
-        }
+        mediaTracks[participant.sid]?.videoTrack = t.track;
+        mediaTracks[participant.sid]?.isScreenShare = t.isScreenShare;
       }
     }
 
-    final userMediaTrackList = userMediaTracks.values.toList();
-    userMediaTrackList.sort((a, b) {
+    final mediaTrackList = mediaTracks.values.toList();
+    mediaTrackList.sort((a, b) {
       // Loudest people first
       if (a.participant.isSpeaking && b.participant.isSpeaking) {
         if (a.participant.audioLevel > b.participant.audioLevel) {
@@ -262,22 +247,20 @@ class _ChatCallState extends State<ChatCall> {
       final localParticipantTracks = _callRoom.localParticipant?.videoTrackPublications;
       if (localParticipantTracks != null) {
         for (var t in localParticipantTracks) {
-          if (t.isScreenShare) {
-            screenTracks.add(ParticipantTrack(
-              participant: _callRoom.localParticipant!,
-              videoTrack: t.track as VideoTrack,
-              isScreenShare: true,
-            ));
-          } else {
-            localTrack.videoTrack = t.track;
-          }
+          localTrack.videoTrack = t.track;
+          localTrack.isScreenShare = t.isScreenShare;
         }
       }
     }
 
     setState(() {
-      _participantTracks = [...screenTracks, localTrack, ...userMediaTrackList];
-      _focusParticipant ??= _participantTracks.first;
+      _participantTracks = [localTrack, ...mediaTrackList];
+      if (_focusParticipant == null) {
+        _focusParticipant = _participantTracks.first;
+      } else {
+        final idx = _participantTracks.indexWhere((x) => _focusParticipant!.participant.sid == x.participant.sid);
+        _focusParticipant = _participantTracks[idx];
+      }
     });
   }
 
@@ -466,6 +449,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
   final double? width;
   final double? height;
   final Color? color;
+  final bool? isFixed;
   final ParticipantTrack participant;
   final Function() onTap;
 
@@ -474,6 +458,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
     this.width,
     this.height,
     this.color,
+    this.isFixed = false,
     required this.participant,
     required this.onTap,
   });
@@ -485,7 +470,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
         width: width,
         height: height,
         color: color,
-        child: ParticipantWidget.widgetFor(participant),
+        child: ParticipantWidget.widgetFor(participant, isFixed: true),
       ),
       onTap: () => onTap(),
       onLongPress: () {

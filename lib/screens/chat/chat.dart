@@ -16,6 +16,7 @@ import 'package:solian/widgets/chat/maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
 import 'package:solian/widgets/chat/message_editor.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
@@ -46,9 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return _channelMeta!;
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
       throw Exception(message);
     }
   }
@@ -62,9 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return _ongoingCall;
     } else if (res.statusCode != 404) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
       throw Exception(message);
     } else {
       return null;

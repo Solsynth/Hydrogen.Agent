@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/item.dart';
@@ -30,9 +31,7 @@ class _PostScreenState extends State<PostScreen> {
     final res = await _client.get(uri);
     if (res.statusCode != 200) {
       final err = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $err")),
-      );
+      context.showErrorDialog(err);
       return null;
     } else {
       return Post.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));

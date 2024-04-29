@@ -10,13 +10,24 @@ import 'package:solian/widgets/chat/call/participant_info.dart';
 import 'package:solian/widgets/chat/call/participant_stats.dart';
 
 abstract class ParticipantWidget extends StatefulWidget {
-  static ParticipantWidget widgetFor(ParticipantTrack participantTrack, {bool showStatsLayer = false}) {
+  static ParticipantWidget widgetFor(ParticipantTrack participantTrack,
+      {bool isFixed = false, bool showStatsLayer = false}) {
     if (participantTrack.participant is LocalParticipant) {
-      return LocalParticipantWidget(participantTrack.participant as LocalParticipant, participantTrack.videoTrack,
-          participantTrack.isScreenShare, showStatsLayer);
+      return LocalParticipantWidget(
+        participantTrack.participant as LocalParticipant,
+        participantTrack.videoTrack,
+        isFixed,
+        participantTrack.isScreenShare,
+        showStatsLayer,
+      );
     } else if (participantTrack.participant is RemoteParticipant) {
-      return RemoteParticipantWidget(participantTrack.participant as RemoteParticipant, participantTrack.videoTrack,
-          participantTrack.isScreenShare, showStatsLayer);
+      return RemoteParticipantWidget(
+        participantTrack.participant as RemoteParticipant,
+        participantTrack.videoTrack,
+        isFixed,
+        participantTrack.isScreenShare,
+        showStatsLayer,
+      );
     }
     throw UnimplementedError('Unknown participant type');
   }
@@ -24,6 +35,7 @@ abstract class ParticipantWidget extends StatefulWidget {
   abstract final Participant participant;
   abstract final VideoTrack? videoTrack;
   abstract final bool isScreenShare;
+  abstract final bool isFixed;
   abstract final bool showStatsLayer;
   final VideoQuality quality;
 
@@ -39,6 +51,8 @@ class LocalParticipantWidget extends ParticipantWidget {
   @override
   final VideoTrack? videoTrack;
   @override
+  final bool isFixed;
+  @override
   final bool isScreenShare;
   @override
   final bool showStatsLayer;
@@ -46,6 +60,7 @@ class LocalParticipantWidget extends ParticipantWidget {
   const LocalParticipantWidget(
     this.participant,
     this.videoTrack,
+    this.isFixed,
     this.isScreenShare,
     this.showStatsLayer, {
     super.key,
@@ -61,6 +76,8 @@ class RemoteParticipantWidget extends ParticipantWidget {
   @override
   final VideoTrack? videoTrack;
   @override
+  final bool isFixed;
+  @override
   final bool isScreenShare;
   @override
   final bool showStatsLayer;
@@ -68,6 +85,7 @@ class RemoteParticipantWidget extends ParticipantWidget {
   const RemoteParticipantWidget(
     this.participant,
     this.videoTrack,
+    this.isFixed,
     this.isScreenShare,
     this.showStatsLayer, {
     super.key,
@@ -79,8 +97,6 @@ class RemoteParticipantWidget extends ParticipantWidget {
 
 abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends State<T> {
   VideoTrack? get _activeVideoTrack;
-
-  TrackPublication? get _videoPublication;
 
   TrackPublication? get _firstAudioPublication;
 
@@ -126,15 +142,14 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
               )
             : NoContentWidget(
                 userinfo: _userinfoMetadata,
+                isFixed: widget.isFixed,
                 isSpeaking: widget.participant.isSpeaking,
               ),
         if (widget.showStatsLayer)
           Positioned(
             top: 30,
             right: 30,
-            child: ParticipantStatsWidget(
-              participant: widget.participant,
-            ),
+            child: ParticipantStatsWidget(participant: widget.participant),
           ),
         Align(
           alignment: Alignment.bottomCenter,
@@ -143,9 +158,7 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
             mainAxisSize: MainAxisSize.min,
             children: [
               ParticipantInfoWidget(
-                title: widget.participant.name.isNotEmpty
-                    ? widget.participant.name
-                    : widget.participant.identity,
+                title: widget.participant.name.isNotEmpty ? widget.participant.name : widget.participant.identity,
                 audioAvailable: _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
                 connectionQuality: widget.participant.connectionQuality,
                 isScreenShare: widget.isScreenShare,
@@ -160,10 +173,6 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
 
 class _LocalParticipantWidgetState extends _ParticipantWidgetState<LocalParticipantWidget> {
   @override
-  LocalTrackPublication<LocalVideoTrack>? get _videoPublication =>
-      widget.participant.videoTrackPublications.where((element) => element.sid == widget.videoTrack?.sid).firstOrNull;
-
-  @override
   LocalTrackPublication<LocalAudioTrack>? get _firstAudioPublication =>
       widget.participant.audioTrackPublications.firstOrNull;
 
@@ -172,10 +181,6 @@ class _LocalParticipantWidgetState extends _ParticipantWidgetState<LocalParticip
 }
 
 class _RemoteParticipantWidgetState extends _ParticipantWidgetState<RemoteParticipantWidget> {
-  @override
-  RemoteTrackPublication<RemoteVideoTrack>? get _videoPublication =>
-      widget.participant.videoTrackPublications.where((element) => element.sid == widget.videoTrack?.sid).firstOrNull;
-
   @override
   RemoteTrackPublication<RemoteAudioTrack>? get _firstAudioPublication =>
       widget.participant.audioTrackPublications.firstOrNull;

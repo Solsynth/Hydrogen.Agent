@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
@@ -24,17 +25,25 @@ class NotifyProvider extends ChangeNotifier {
   }
 
   void initNotify() {
+    const androidSettings = AndroidInitializationSettings('app_icon');
+    const darwinSettings = DarwinInitializationSettings(
+      notificationCategories: [
+        DarwinNotificationCategory("general"),
+      ],
+    );
+    const linuxSettings = LinuxInitializationSettings(defaultActionName: 'Open notification');
     const InitializationSettings initializationSettings = InitializationSettings(
-      android: AndroidInitializationSettings('app_icon'),
-      iOS: DarwinInitializationSettings(),
-      macOS: DarwinInitializationSettings(),
-      linux: LinuxInitializationSettings(defaultActionName: 'Open notification'),
+      android: androidSettings,
+      iOS: darwinSettings,
+      macOS: darwinSettings,
+      linux: linuxSettings,
     );
 
     localNotify.initialize(initializationSettings);
   }
 
   Future<void> requestPermissions() async {
+    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
     await Permission.notification.request();
   }
 
@@ -78,20 +87,30 @@ class NotifyProvider extends ChangeNotifier {
   }
 
   void notifyMessage(String title, String body) {
+    const androidSettings = AndroidNotificationDetails(
+      'general',
+      'General',
+      importance: Importance.high,
+      priority: Priority.high,
+      silent: true,
+    );
+    const darwinSettings = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBanner: true,
+      presentBadge: true,
+      presentSound: false,
+    );
+    const linuxSettings = LinuxNotificationDetails();
+
     localNotify.show(
       math.max(1, math.Random().nextInt(100000000)),
       title,
       body,
       const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'general',
-          'General',
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(),
-        macOS: DarwinNotificationDetails(),
-        linux: LinuxNotificationDetails(),
+        android: androidSettings,
+        iOS: darwinSettings,
+        macOS: darwinSettings,
+        linux: linuxSettings,
       ),
     );
   }

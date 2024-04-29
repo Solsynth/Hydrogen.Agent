@@ -6,6 +6,7 @@ import 'package:solian/models/channel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 
 class ChannelDeletion extends StatefulWidget {
   final Channel channel;
@@ -34,9 +35,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     } else if (Navigator.canPop(context)) {
       Navigator.pop(context, true);
     }
@@ -58,9 +57,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     } else if (Navigator.canPop(context)) {
       Navigator.pop(context, true);
     }

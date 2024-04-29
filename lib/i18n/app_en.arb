@@ -1,5 +1,5 @@
 {
-  "solian": "Solian",
+  "appName": "Solar Network",
   "explore": "Explore",
   "chat": "Chat",
   "account": "Account",
@@ -28,6 +28,7 @@
   "report": "Report",
   "reply": "Reply",
   "settings": "Settings",
+  "errorHappened": "An Error Occurred",
   "notification": "Notification",
   "notifyDone": "You're done!",
   "notifyDoneCaption": "There are no notifications unread for you.",

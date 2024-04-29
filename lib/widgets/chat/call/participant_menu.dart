@@ -21,16 +21,11 @@ class ParticipantMenu extends StatefulWidget {
 }
 
 class _ParticipantMenuState extends State<ParticipantMenu> {
-  @override
   RemoteTrackPublication<RemoteVideoTrack>? get _videoPublication =>
       widget.participant.videoTrackPublications.where((element) => element.sid == widget.videoTrack?.sid).firstOrNull;
 
-  @override
   RemoteTrackPublication<RemoteAudioTrack>? get _firstAudioPublication =>
       widget.participant.audioTrackPublications.firstOrNull;
-
-  @override
-  VideoTrack? get _activeVideoTrack => widget.videoTrack;
 
   void tookAction() {
     if (Navigator.canPop(context)) {

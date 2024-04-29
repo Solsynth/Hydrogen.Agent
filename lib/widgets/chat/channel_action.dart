@@ -7,6 +7,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 
 class ChannelCallAction extends StatefulWidget {
   final Call? call;
@@ -36,9 +37,7 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
     var res = await auth.client!.post(uri);
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
 
     setState(() => _isSubmitting = false);
@@ -58,9 +57,7 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
     var res = await auth.client!.delete(uri);
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
 
     setState(() => _isSubmitting = false);

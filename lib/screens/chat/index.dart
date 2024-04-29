@@ -7,6 +7,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/chat_new.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/notification_notifier.dart';
@@ -36,9 +37,7 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
       });
     } else {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     }
   }
 

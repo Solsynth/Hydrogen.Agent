@@ -1,5 +1,5 @@
 {
-  "solian": "索链",
+  "appName": "Solar",
   "explore": "探索",
   "chat": "聊天",
   "account": "账号",
@@ -28,6 +28,7 @@
   "report": "举报",
   "reply": "回复",
   "settings": "设置",
+  "errorHappened": "发生了错误",
   "notification": "通知",
   "notifyDone": "所有通知已读！",
   "notifyDoneCaption": "这里没有什么东西可以给你看的了～",

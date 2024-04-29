@@ -10,6 +10,7 @@ import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
 
@@ -75,9 +76,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
     var res = await Response.fromStream(await auth.client!.send(req));
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
     } else {
       if (router.canPop()) {
         router.pop(true);

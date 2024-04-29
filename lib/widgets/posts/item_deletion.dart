@@ -6,6 +6,7 @@ import 'package:solian/models/post.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 
 class ItemDeletionDialog extends StatefulWidget {
   final Post item;
@@ -35,9 +36,7 @@ class _ItemDeletionDialogState extends State<ItemDeletionDialog> {
     final res = await auth.client!.delete(uri);
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong... $message")),
-      );
+      context.showErrorDialog(message);
       setState(() => _isSubmitting = false);
     } else {
       Navigator.pop(context, true);

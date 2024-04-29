@@ -6,6 +6,7 @@ import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/exts.dart';
 
 class ControlsWidget extends StatefulWidget {
   final Room room;
@@ -134,9 +135,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         await participant.publishVideoTrack(track);
       } catch (e) {
         final message = e.toString();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Something went wrong... $message'),
-        ));
+        context.showErrorDialog(message);
       }
       return;
     }
