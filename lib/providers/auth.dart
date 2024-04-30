@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:solian/utils/service_url.dart';
 
-class AuthProvider {
+class AuthProvider extends ChangeNotifier {
   AuthProvider();
 
   final deviceEndpoint = getRequestUri('passport', '/api/notifications/subscribe');
@@ -63,6 +63,7 @@ class AuthProvider {
       var userinfo = await client!.get(userinfoEndpoint);
       storage.write(key: profileKey, value: utf8.decode(userinfo.bodyBytes));
     }
+    notifyListeners();
   }
 
   Future<void> refreshToken() async {
@@ -72,6 +73,7 @@ class AuthProvider {
       client = oauth2.Client(credentials, identifier: clientId, secret: clientSecret);
       storage.write(key: storageKey, value: credentials.toJson());
     }
+    notifyListeners();
   }
 
   Future<void> signin(BuildContext context, String username, String password) async {

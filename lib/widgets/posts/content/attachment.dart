@@ -62,7 +62,9 @@ class _AttachmentItemState extends State<AttachmentItem> {
                     : Positioned(
                         right: 12,
                         bottom: 8,
-                        child: Chip(label: Text(widget.badge!)),
+                        child: Material(
+                          child: Chip(label: Text(widget.badge!)),
+                        ),
                       )
               ],
             ),

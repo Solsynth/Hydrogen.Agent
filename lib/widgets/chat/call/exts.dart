@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 extension SolianCallExt on BuildContext {
   Future<bool?> showPlayAudioManuallyDialog() => showDialog<bool>(
@@ -24,16 +25,16 @@ extension SolianCallExt on BuildContext {
   Future<bool?> showDisconnectDialog() => showDialog<bool>(
         context: this,
         builder: (ctx) => AlertDialog(
-          title: const Text('Disconnect'),
-          content: const Text('Are you sure to disconnect?'),
+          title: Text(AppLocalizations.of(this)!.chatCallDisconnect),
+          content: Text(AppLocalizations.of(this)!.chatCallDisconnectConfirm),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(this)!.confirmCancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Disconnect'),
+              child: Text(AppLocalizations.of(this)!.confirmOkay),
             ),
           ],
         ),

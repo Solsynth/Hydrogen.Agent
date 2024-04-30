@@ -9,6 +9,7 @@ import 'package:solian/router.dart';
 import 'package:solian/utils/timeago.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/utils/video_player.dart';
+import 'package:solian/widgets/chat/call/call_overlay.dart';
 import 'package:solian/widgets/notification_notifier.dart';
 
 void main() {
@@ -36,21 +37,22 @@ class SolianApp extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
       builder: (context, child) {
-        return Overlay(
-          initialEntries: [
-            OverlayEntry(builder: (context) {
-              return MultiProvider(
-                providers: [
-                  Provider(create: (_) => NavigationProvider()),
-                  Provider(create: (_) => AuthProvider()),
-                  Provider(create: (_) => ChatProvider()),
-                  ChangeNotifierProvider(create: (_) => NotifyProvider()),
-                  ChangeNotifierProvider(create: (_) => FriendProvider()),
-                ],
-                child: NotificationNotifier(child: child ?? Container()),
-              );
-            })
+        return MultiProvider(
+          providers: [
+            Provider(create: (_) => NavigationProvider()),
+            ChangeNotifierProvider(create: (_) => AuthProvider()),
+            ChangeNotifierProvider(create: (_) => ChatProvider()),
+            ChangeNotifierProvider(create: (_) => NotifyProvider()),
+            ChangeNotifierProvider(create: (_) => FriendProvider()),
           ],
+          child: Overlay(
+            initialEntries: [
+              OverlayEntry(builder: (context) {
+                return NotificationNotifier(child: child ?? Container());
+              }),
+              OverlayEntry(builder: (context) => const CallOverlay()),
+            ],
+          ),
         );
       },
     );

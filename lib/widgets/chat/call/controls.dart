@@ -6,6 +6,10 @@ import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:solian/providers/chat.dart';
+import 'package:solian/router.dart';
+import 'package:solian/widgets/chat/call/exts.dart';
 import 'package:solian/widgets/exts.dart';
 
 class ControlsWidget extends StatefulWidget {
@@ -64,11 +68,22 @@ class _ControlsWidgetState extends State<ControlsWidget> {
 
   bool get isMuted => participant.isMuted;
 
+  void disconnect() async {
+    if (await context.showDisconnectDialog() != true) return;
+
+    final chat = context.read<ChatProvider>();
+    if (chat.call != null) {
+      chat.call!.deactivate();
+      chat.call!.dispose();
+      router.pop();
+    }
+  }
+
   void disableAudio() async {
     await participant.setMicrophoneEnabled(false);
   }
 
-  Future<void> enableAudio() async {
+  void enableAudio() async {
     await participant.setMicrophoneEnabled(true);
   }
 
@@ -207,11 +222,17 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         spacing: 5,
         runSpacing: 5,
         children: [
+          IconButton(
+            icon: Transform.flip(flipX: true, child: const Icon(Icons.exit_to_app)),
+            color: Theme.of(context).colorScheme.onSurface,
+            onPressed: disconnect,
+          ),
           if (participant.isMicrophoneEnabled())
             if (lkPlatformIs(PlatformType.android))
               IconButton(
                 onPressed: disableAudio,
                 icon: const Icon(Icons.mic),
+                color: Theme.of(context).colorScheme.onSurface,
                 tooltip: AppLocalizations.of(context)!.chatCallMute,
               )
             else
@@ -247,42 +268,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             IconButton(
               onPressed: enableAudio,
               icon: const Icon(Icons.mic_off),
+              color: Theme.of(context).colorScheme.onSurface,
               tooltip: AppLocalizations.of(context)!.chatCallUnMute,
-            ),
-          if (!lkPlatformIs(PlatformType.iOS))
-            PopupMenuButton<MediaDevice>(
-              icon: const Icon(Icons.volume_up),
-              itemBuilder: (BuildContext context) {
-                return [
-                  const PopupMenuItem<MediaDevice>(
-                    value: null,
-                    child: ListTile(
-                      leading: Icon(Icons.speaker),
-                      title: Text('Select Audio Output'),
-                    ),
-                  ),
-                  if (_audioOutputs != null)
-                    ..._audioOutputs!.map((device) {
-                      return PopupMenuItem<MediaDevice>(
-                        value: device,
-                        child: ListTile(
-                          leading: (device.deviceId == widget.room.selectedAudioOutputDeviceId)
-                              ? const Icon(Icons.check_box_outlined)
-                              : const Icon(Icons.check_box_outline_blank),
-                          title: Text(device.label),
-                        ),
-                        onTap: () => selectAudioOutput(device),
-                      );
-                    })
-                ];
-              },
-            ),
-          if (!kIsWeb && lkPlatformIs(PlatformType.iOS))
-            IconButton(
-              disabledColor: Colors.grey,
-              onPressed: Hardware.instance.canSwitchSpeakerphone ? setSpeakerphoneOn : null,
-              icon: Icon(_speakerphoneOn ? Icons.speaker_phone : Icons.phone_android),
-              tooltip: AppLocalizations.of(context)!.chatCallChangeSpeaker,
             ),
           if (participant.isCameraEnabled())
             PopupMenuButton<MediaDevice>(
@@ -317,22 +304,61 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             IconButton(
               onPressed: enableVideo,
               icon: const Icon(Icons.videocam_off),
+              color: Theme.of(context).colorScheme.onSurface,
               tooltip: AppLocalizations.of(context)!.chatCallVideoOn,
             ),
           IconButton(
             icon: Icon(position == CameraPosition.back ? Icons.video_camera_back : Icons.video_camera_front),
+            color: Theme.of(context).colorScheme.onSurface,
             onPressed: () => toggleCamera(),
             tooltip: AppLocalizations.of(context)!.chatCallVideoFlip,
           ),
+          if (!lkPlatformIs(PlatformType.iOS))
+            PopupMenuButton<MediaDevice>(
+              icon: const Icon(Icons.volume_up),
+              itemBuilder: (BuildContext context) {
+                return [
+                  const PopupMenuItem<MediaDevice>(
+                    value: null,
+                    child: ListTile(
+                      leading: Icon(Icons.speaker),
+                      title: Text('Select Audio Output'),
+                    ),
+                  ),
+                  if (_audioOutputs != null)
+                    ..._audioOutputs!.map((device) {
+                      return PopupMenuItem<MediaDevice>(
+                        value: device,
+                        child: ListTile(
+                          leading: (device.deviceId == widget.room.selectedAudioOutputDeviceId)
+                              ? const Icon(Icons.check_box_outlined)
+                              : const Icon(Icons.check_box_outline_blank),
+                          title: Text(device.label),
+                        ),
+                        onTap: () => selectAudioOutput(device),
+                      );
+                    })
+                ];
+              },
+            ),
+          if (!kIsWeb && lkPlatformIs(PlatformType.iOS))
+            IconButton(
+              onPressed: Hardware.instance.canSwitchSpeakerphone ? setSpeakerphoneOn : null,
+              color: Theme.of(context).colorScheme.onSurface,
+              icon: Icon(_speakerphoneOn ? Icons.speaker_phone : Icons.phone_android),
+              tooltip: AppLocalizations.of(context)!.chatCallChangeSpeaker,
+            ),
           if (participant.isScreenShareEnabled())
             IconButton(
               icon: const Icon(Icons.monitor_outlined),
+              color: Theme.of(context).colorScheme.onSurface,
               onPressed: () => disableScreenShare(),
               tooltip: AppLocalizations.of(context)!.chatCallScreenOff,
             )
           else
             IconButton(
               icon: const Icon(Icons.monitor),
+              color: Theme.of(context).colorScheme.onSurface,
               onPressed: () => enableScreenShare(),
               tooltip: AppLocalizations.of(context)!.chatCallScreenOn,
             ),

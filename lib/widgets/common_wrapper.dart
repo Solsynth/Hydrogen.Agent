@@ -5,7 +5,7 @@ class LayoutWrapper extends StatelessWidget {
   final Widget? child;
   final Widget? floatingActionButton;
   final List<Widget>? appBarActions;
-  final bool? noSafeArea;
+  final bool noSafeArea;
   final String title;
 
   const LayoutWrapper({
@@ -14,7 +14,7 @@ class LayoutWrapper extends StatelessWidget {
     required this.title,
     this.floatingActionButton,
     this.appBarActions,
-    this.noSafeArea,
+    this.noSafeArea = false,
   });
 
   @override
@@ -25,7 +25,7 @@ class LayoutWrapper extends StatelessWidget {
       appBar: AppBar(title: Text(title), actions: appBarActions),
       floatingActionButton: floatingActionButton,
       drawer: const SolianNavigationDrawer(),
-      body: (noSafeArea ?? false) ? content : SafeArea(child: content),
+      body: noSafeArea ? content : SafeArea(child: content),
     );
   }
 }

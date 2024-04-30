@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:solian/router.dart';
 import 'package:solian/widgets/common_wrapper.dart';
 import 'package:solian/widgets/navigation_drawer.dart';
 
 class IndentWrapper extends LayoutWrapper {
-  final bool? hideDrawer;
+  final bool hideDrawer;
 
   const IndentWrapper({
     super.key,
@@ -11,8 +12,8 @@ class IndentWrapper extends LayoutWrapper {
     required super.title,
     super.floatingActionButton,
     super.appBarActions,
-    this.hideDrawer,
-    super.noSafeArea,
+    this.hideDrawer = false,
+    super.noSafeArea = false,
   }) : super();
 
   @override
@@ -20,10 +21,17 @@ class IndentWrapper extends LayoutWrapper {
     final content = child ?? Container();
 
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: appBarActions),
+      appBar: AppBar(
+        leading: hideDrawer ? IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => router.pop(),
+        ) : null,
+        title: Text(title),
+        actions: appBarActions,
+      ),
       floatingActionButton: floatingActionButton,
-      drawer: (hideDrawer ?? false) ? null : const SolianNavigationDrawer(),
-      body: (noSafeArea ?? false) ? content : SafeArea(child: content),
+      drawer: const SolianNavigationDrawer(),
+      body: noSafeArea ? content : SafeArea(child: content),
     );
   }
 }
