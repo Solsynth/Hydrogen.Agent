@@ -42,7 +42,7 @@ class _NoContentWidgetState extends State<NoContentWidget> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final double radius = widget.isFixed
-        ? 16
+        ? 32
         : math.min(
             MediaQuery.of(context).size.width * 0.1,
             MediaQuery.of(context).size.height * 0.1,
