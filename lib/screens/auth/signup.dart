@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:solian/providers/auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/router.dart';
+import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatelessWidget {
   final _emailController = TextEditingController();
@@ -10,11 +14,11 @@ class SignUpScreen extends StatelessWidget {
   final _nicknameController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  final http.Client _client = http.Client();
+
   SignUpScreen({super.key});
 
-  void performSignIn(BuildContext context) {
-    final auth = context.read<AuthProvider>();
-
+  void performSignIn(BuildContext context) async {
     final email = _emailController.value.text;
     final username = _usernameController.value.text;
     final nickname = _passwordController.value.text;
@@ -23,6 +27,43 @@ class SignUpScreen extends StatelessWidget {
         username.isEmpty ||
         nickname.isEmpty ||
         password.isEmpty) return;
+
+    final uri = getRequestUri('passport', '/api/users');
+    final res = await _client.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'name': username,
+        'nick': nickname,
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (res.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(AppLocalizations.of(context)!.signUpDone),
+            content: Text(AppLocalizations.of(context)!.signUpDoneCaption),
+            actions: [
+              TextButton(
+                child: Text(AppLocalizations.of(context)!.confirmOkay),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      ).then((_) {
+        router.replaceNamed('auth.sign-in');
+      });
+    } else {
+      var message = utf8.decode(res.bodyBytes);
+      context.showErrorDialog(message);
+    }
   }
 
   @override
