@@ -88,7 +88,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
     final editingBanner = MaterialBanner(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
       leading: const Icon(Icons.edit_note),
-      backgroundColor: const Color(0xFFE0E0E0),
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),
       content: Text(AppLocalizations.of(context)!.chatChannelEditNotify),
       actions: [

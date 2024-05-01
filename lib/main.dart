@@ -30,9 +30,16 @@ class SolianApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Solian',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(brightness: Brightness.light, seedColor: Colors.indigo),
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(brightness: Brightness.dark, seedColor: Colors.indigo),
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.system,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
