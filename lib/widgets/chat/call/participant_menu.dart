@@ -22,7 +22,9 @@ class ParticipantMenu extends StatefulWidget {
 
 class _ParticipantMenuState extends State<ParticipantMenu> {
   RemoteTrackPublication<RemoteVideoTrack>? get _videoPublication =>
-      widget.participant.videoTrackPublications.where((element) => element.sid == widget.videoTrack?.sid).firstOrNull;
+      widget.participant.videoTrackPublications
+          .where((element) => element.sid == widget.videoTrack?.sid)
+          .firstOrNull;
 
   RemoteTrackPublication<RemoteAudioTrack>? get _firstAudioPublication =>
       widget.participant.audioTrackPublications.firstOrNull;
@@ -39,7 +41,8 @@ class _ParticipantMenuState extends State<ParticipantMenu> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
+          padding:
+              const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -59,9 +62,14 @@ class _ParticipantMenuState extends State<ParticipantMenu> {
                   leading: Icon(
                     Icons.volume_up,
                     color: {
-                      TrackSubscriptionState.notAllowed: Theme.of(context).colorScheme.error,
-                      TrackSubscriptionState.unsubscribed: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                      TrackSubscriptionState.subscribed: Theme.of(context).colorScheme.primary,
+                      TrackSubscriptionState.notAllowed:
+                          Theme.of(context).colorScheme.error,
+                      TrackSubscriptionState.unsubscribed: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
+                      TrackSubscriptionState.subscribed:
+                          Theme.of(context).colorScheme.primary,
                     }[_firstAudioPublication!.subscriptionState],
                   ),
                   title: Text(
@@ -83,9 +91,14 @@ class _ParticipantMenuState extends State<ParticipantMenu> {
                   leading: Icon(
                     widget.isScreenShare ? Icons.monitor : Icons.videocam,
                     color: {
-                      TrackSubscriptionState.notAllowed: Theme.of(context).colorScheme.error,
-                      TrackSubscriptionState.unsubscribed: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                      TrackSubscriptionState.subscribed: Theme.of(context).colorScheme.primary,
+                      TrackSubscriptionState.notAllowed:
+                          Theme.of(context).colorScheme.error,
+                      TrackSubscriptionState.unsubscribed: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
+                      TrackSubscriptionState.subscribed:
+                          Theme.of(context).colorScheme.primary,
                     }[_videoPublication!.subscriptionState],
                   ),
                   title: Text(
@@ -107,7 +120,9 @@ class _ParticipantMenuState extends State<ParticipantMenu> {
                 ...[30, 15, 8].map(
                   (x) => ListTile(
                     leading: Icon(
-                      _videoPublication?.fps == x ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+                      _videoPublication?.fps == x
+                          ? Icons.check_box_outlined
+                          : Icons.check_box_outline_blank,
                     ),
                     title: Text('Set preferred frame-per-second to $x'),
                     onTap: () {
@@ -125,7 +140,9 @@ class _ParticipantMenuState extends State<ParticipantMenu> {
                 ].map(
                   (x) => ListTile(
                     leading: Icon(
-                      _videoPublication?.videoQuality == x.$2 ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+                      _videoPublication?.videoQuality == x.$2
+                          ? Icons.check_box_outlined
+                          : Icons.check_box_outline_blank,
                     ),
                     title: Text('Set preferred quality to ${x.$1}'),
                     onTap: () {

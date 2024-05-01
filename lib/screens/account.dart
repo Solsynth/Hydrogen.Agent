@@ -83,7 +83,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: AppLocalizations.of(context)!.signUp,
                     caption: AppLocalizations.of(context)!.signUpCaption,
                     onTap: () {
-                      launchUrl(getRequestUri('passport', '/sign-up'));
+                      router.pushNamed('auth.sign-up');
                     },
                   ),
                 ],
@@ -131,7 +131,8 @@ class NameCard extends StatelessWidget {
             children: [
               FutureBuilder(
                 future: renderAvatar(context),
-                builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                   if (snapshot.hasData) {
                     return snapshot.data!;
                   } else {
@@ -142,7 +143,8 @@ class NameCard extends StatelessWidget {
               const SizedBox(width: 20),
               FutureBuilder(
                 future: renderLabel(context),
-                builder: (BuildContext context, AsyncSnapshot<Column> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<Column> snapshot) {
                   if (snapshot.hasData) {
                     return snapshot.data!;
                   } else {
@@ -164,7 +166,12 @@ class ActionCard extends StatelessWidget {
   final String caption;
   final Function onTap;
 
-  const ActionCard({super.key, required this.onTap, required this.title, required this.caption, required this.icon});
+  const ActionCard(
+      {super.key,
+      required this.onTap,
+      required this.title,
+      required this.caption,
+      required this.icon});
 
   @override
   Widget build(BuildContext context) {

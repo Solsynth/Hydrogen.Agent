@@ -22,7 +22,8 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  final PagingController<int, Post> _pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, Post> _pagingController =
+      PagingController(firstPageKey: 0);
 
   final http.Client _client = http.Client();
 
@@ -30,12 +31,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final offset = pageKey;
     const take = 5;
 
-    var uri = getRequestUri('interactive', '/api/feed?take=$take&offset=$offset');
+    var uri =
+        getRequestUri('interactive', '/api/feed?take=$take&offset=$offset');
 
     var res = await _client.get(uri);
     if (res.statusCode == 200) {
-      final result = PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
-      final items = result.data?.map((x) => Post.fromJson(x)).toList() ?? List.empty();
+      final result =
+          PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      final items =
+          result.data?.map((x) => Post.fromJson(x)).toList() ?? List.empty();
       final isLastPage = (result.count - pageKey) < take;
       if (isLastPage || result.data == null) {
         _pagingController.appendLastPage(items);

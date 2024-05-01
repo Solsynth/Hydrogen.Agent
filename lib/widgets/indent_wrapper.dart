@@ -22,10 +22,12 @@ class IndentWrapper extends LayoutWrapper {
 
     return Scaffold(
       appBar: AppBar(
-        leading: hideDrawer ? IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => router.pop(),
-        ) : null,
+        leading: hideDrawer
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => router.pop(),
+              )
+            : null,
         title: Text(title),
         actions: appBarActions,
       ),

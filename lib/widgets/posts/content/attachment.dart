@@ -37,6 +37,17 @@ class _AttachmentItemState extends State<AttachmentItem> {
   late final _videoController = VideoController(_videoPlayer);
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.type != 1) {
+      _videoPlayer.open(
+        Media(widget.url),
+        play: false,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     const borderRadius = Radius.circular(8);
     final tag = getTag();
@@ -53,6 +64,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
               children: [
                 Image.network(
                   widget.url,
+                  key: Key(getTag()),
                   width: double.infinity,
                   height: double.infinity,
                   fit: BoxFit.cover,
@@ -63,6 +75,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
                         right: 12,
                         bottom: 8,
                         child: Material(
+                          color: Colors.transparent,
                           child: Chip(label: Text(widget.badge!)),
                         ),
                       )
@@ -83,11 +96,6 @@ class _AttachmentItemState extends State<AttachmentItem> {
         },
       );
     } else {
-      _videoPlayer.open(
-        Media(widget.url),
-        play: false,
-      );
-
       content = ClipRRect(
         borderRadius: const BorderRadius.all(borderRadius),
         child: Video(
@@ -121,9 +129,11 @@ class AttachmentList extends StatelessWidget {
   final List<Attachment> items;
   final String provider;
 
-  const AttachmentList({super.key, required this.items, required this.provider});
+  const AttachmentList(
+      {super.key, required this.items, required this.provider});
 
-  Uri getFileUri(String fileId) => getRequestUri(provider, '/api/attachments/o/$fileId');
+  Uri getFileUri(String fileId) =>
+      getRequestUri(provider, '/api/attachments/o/$fileId');
 
   @override
   Widget build(BuildContext context) {

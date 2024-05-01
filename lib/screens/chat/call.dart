@@ -92,14 +92,16 @@ class _ChatCallState extends State<ChatCall> {
                     itemCount: math.max(0, _call.participantTracks.length),
                     itemBuilder: (BuildContext context, int index) {
                       final track = _call.participantTracks[index];
-                      if (track.participant.sid == _call.focusTrack?.participant.sid) {
+                      if (track.participant.sid ==
+                          _call.focusTrack?.participant.sid) {
                         return Container();
                       }
 
                       return Padding(
                         padding: const EdgeInsets.only(top: 8, left: 8),
                         child: ClipRRect(
-                          borderRadius: const BorderRadius.all(Radius.circular(8)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
                           child: InteractiveParticipantWidget(
                             isFixed: true,
                             width: 120,
@@ -107,7 +109,8 @@ class _ChatCallState extends State<ChatCall> {
                             color: Theme.of(context).cardColor,
                             participant: track,
                             onTap: () {
-                              if (track.participant.sid != _call.focusTrack?.participant.sid) {
+                              if (track.participant.sid !=
+                                  _call.focusTrack?.participant.sid) {
                                 _call.changeFocusTrack(track);
                               }
                             },

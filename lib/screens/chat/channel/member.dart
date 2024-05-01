@@ -36,7 +36,8 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
 
     _selfId = prof['id'];
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/members');
+    var uri = getRequestUri(
+        'messaging', '/api/channels/${widget.channel.alias}/members');
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
@@ -59,7 +60,8 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/kick');
+    var uri = getRequestUri(
+        'messaging', '/api/channels/${widget.channel.alias}/kick');
 
     var res = await auth.client!.post(
       uri,
@@ -89,7 +91,8 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/invite');
+    var uri = getRequestUri(
+        'messaging', '/api/channels/${widget.channel.alias}/invite');
 
     var res = await auth.client!.post(
       uri,
@@ -153,7 +156,9 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+              child: _isSubmitting
+                  ? const LinearProgressIndicator().animate().scaleX()
+                  : Container(),
             ),
             SliverList.builder(
               itemCount: _members.length,
@@ -164,7 +169,9 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
 
                 return Dismissible(
                   key: Key(randomId.toString()),
-                  direction: getKickable(element) ? DismissDirection.startToEnd : DismissDirection.none,
+                  direction: getKickable(element)
+                      ? DismissDirection.startToEnd
+                      : DismissDirection.none,
                   background: Container(
                     color: Colors.red,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -172,7 +179,8 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
                     child: const Icon(Icons.remove, color: Colors.white),
                   ),
                   child: ListTile(
-                    leading: AccountAvatar(source: element.account.avatar, direct: true),
+                    leading: AccountAvatar(
+                        source: element.account.avatar, direct: true),
                     title: Text(element.account.nick),
                     subtitle: Text(element.account.name),
                   ),

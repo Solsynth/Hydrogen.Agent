@@ -20,7 +20,8 @@ class NoContentWidget extends StatefulWidget {
   State<NoContentWidget> createState() => _NoContentWidgetState();
 }
 
-class _NoContentWidgetState extends State<NoContentWidget> with SingleTickerProviderStateMixin {
+class _NoContentWidgetState extends State<NoContentWidget>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
 
   @override
@@ -35,7 +36,9 @@ class _NoContentWidgetState extends State<NoContentWidget> with SingleTickerProv
     if (widget.isSpeaking) {
       _animationController.repeat(reverse: true);
     } else {
-      _animationController.animateTo(0, duration: 300.ms).then((_) => _animationController.reset());
+      _animationController
+          .animateTo(0, duration: 300.ms)
+          .then((_) => _animationController.reset());
     }
   }
 
@@ -63,7 +66,9 @@ class _NoContentWidgetState extends State<NoContentWidget> with SingleTickerProv
               builder: (context, value, child) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(radius + 8)),
-                  border: value > 0 ? Border.all(color: Colors.green, width: value) : null,
+                  border: value > 0
+                      ? Border.all(color: Colors.green, width: value)
+                      : null,
                 ),
                 child: child,
               ),

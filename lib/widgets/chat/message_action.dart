@@ -79,7 +79,9 @@ class ChatMessageAction extends StatelessWidget {
 
                   return ListView(
                     children: [
-                      ...(snapshot.data['id'] == item.sender.account.externalId ? authorizedItems : List.empty()),
+                      ...(snapshot.data['id'] == item.sender.account.externalId
+                          ? authorizedItems
+                          : List.empty()),
                       ListTile(
                         leading: const Icon(Icons.reply),
                         title: Text(AppLocalizations.of(context)!.reply),

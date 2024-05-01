@@ -41,7 +41,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       child: ListTile(
                         leading: const Icon(Icons.check),
                         title: Text(AppLocalizations.of(context)!.notifyDone),
-                        subtitle: Text(AppLocalizations.of(context)!.notifyDoneCaption),
+                        subtitle: Text(
+                            AppLocalizations.of(context)!.notifyDoneCaption),
                       ),
                     ),
                   )
@@ -78,7 +79,8 @@ class NotificationItem extends StatelessWidget {
   final model.Notification item;
   final void Function()? onDismiss;
 
-  const NotificationItem({super.key, required this.index, required this.item, this.onDismiss});
+  const NotificationItem(
+      {super.key, required this.index, required this.item, this.onDismiss});
 
   bool hasLinks() => item.links != null && item.links!.isNotEmpty;
 
@@ -92,7 +94,8 @@ class NotificationItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 34, bottom: 12),
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 34, bottom: 12),
               child: Text(
                 "Links",
                 style: Theme.of(context).textTheme.headlineSmall,
@@ -121,7 +124,8 @@ class NotificationItem extends StatelessWidget {
     );
   }
 
-  Future<void> markAsRead(model.Notification element, BuildContext context) async {
+  Future<void> markAsRead(
+      model.Notification element, BuildContext context) async {
     if (element.isRealtime) return;
 
     final auth = context.read<AuthProvider>();

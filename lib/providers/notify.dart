@@ -17,7 +17,8 @@ class NotifyProvider extends ChangeNotifier {
 
   List<model.Notification> notifications = List.empty(growable: true);
 
-  final FlutterLocalNotificationsPlugin localNotify = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin localNotify =
+      FlutterLocalNotificationsPlugin();
 
   NotifyProvider() {
     initNotify();
@@ -31,8 +32,10 @@ class NotifyProvider extends ChangeNotifier {
         DarwinNotificationCategory("general"),
       ],
     );
-    const linuxSettings = LinuxInitializationSettings(defaultActionName: 'Open notification');
-    const InitializationSettings initializationSettings = InitializationSettings(
+    const linuxSettings =
+        LinuxInitializationSettings(defaultActionName: 'Open notification');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
       android: androidSettings,
       iOS: darwinSettings,
       macOS: darwinSettings,
@@ -43,7 +46,8 @@ class NotifyProvider extends ChangeNotifier {
   }
 
   Future<void> requestPermissions() async {
-    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) return;
+    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux))
+      return;
     await Permission.notification.request();
   }
 
@@ -53,8 +57,11 @@ class NotifyProvider extends ChangeNotifier {
     var uri = getRequestUri('passport', '/api/notifications?skip=0&take=25');
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
-      final result = PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
-      notifications = result.data?.map((x) => model.Notification.fromJson(x)).toList() ?? List.empty(growable: true);
+      final result =
+          PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      notifications =
+          result.data?.map((x) => model.Notification.fromJson(x)).toList() ??
+              List.empty(growable: true);
     }
 
     notifyListeners();
@@ -71,7 +78,9 @@ class NotifyProvider extends ChangeNotifier {
       scheme: ori.scheme.replaceFirst('http', 'ws'),
       host: ori.host,
       path: ori.path,
-      queryParameters: {'tk': Uri.encodeComponent(auth.client!.credentials.accessToken)},
+      queryParameters: {
+        'tk': Uri.encodeComponent(auth.client!.credentials.accessToken)
+      },
     );
 
     final channel = WebSocketChannel.connect(uri);

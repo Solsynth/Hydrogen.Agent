@@ -37,7 +37,8 @@ class _FriendPickerState extends State<FriendPicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 32, bottom: 12),
+          padding:
+              const EdgeInsets.only(left: 16, right: 16, top: 32, bottom: 12),
           child: Text(
             AppLocalizations.of(context)!.friend,
             style: Theme.of(context).textTheme.headlineSmall,

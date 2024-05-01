@@ -113,10 +113,13 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
           constraints: const BoxConstraints(maxWidth: 640),
           child: Column(
             children: [
-              _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+              _isSubmitting
+                  ? const LinearProgressIndicator().animate().scaleX()
+                  : Container(),
               ListTile(
                 title: Text(AppLocalizations.of(context)!.chatChannelUsage),
-                subtitle: Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
+                subtitle:
+                    Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
                 leading: const CircleAvatar(
                   backgroundColor: Colors.teal,
                   child: Icon(Icons.tag, color: Colors.white),
@@ -124,7 +127,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
               ),
               const Divider(thickness: 0.3),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                 child: Row(
                   children: [
                     Expanded(
@@ -132,15 +136,18 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
                         autofocus: true,
                         controller: _aliasController,
                         decoration: InputDecoration.collapsed(
-                          hintText: AppLocalizations.of(context)!.chatChannelAliasLabel,
+                          hintText: AppLocalizations.of(context)!
+                              .chatChannelAliasLabel,
                         ),
-                        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                        onTapOutside: (_) =>
+                            FocusManager.instance.primaryFocus?.unfocus(),
                       ),
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
                         shape: const CircleBorder(),
-                        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+                        visualDensity:
+                            const VisualDensity(horizontal: -2, vertical: -2),
                       ),
                       onPressed: () => randomizeAlias(),
                       child: const Icon(Icons.refresh),
@@ -150,20 +157,24 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
               ),
               const Divider(thickness: 0.3),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: TextField(
                   autocorrect: true,
                   controller: _nameController,
                   decoration: InputDecoration.collapsed(
-                    hintText: AppLocalizations.of(context)!.chatChannelNameLabel,
+                    hintText:
+                        AppLocalizations.of(context)!.chatChannelNameLabel,
                   ),
-                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                  onTapOutside: (_) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
                 ),
               ),
               const Divider(thickness: 0.3),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: TextField(
                     minLines: 5,
                     maxLines: null,
@@ -171,9 +182,11 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
                     keyboardType: TextInputType.multiline,
                     controller: _descriptionController,
                     decoration: InputDecoration.collapsed(
-                      hintText: AppLocalizations.of(context)!.chatChannelDescriptionLabel,
+                      hintText: AppLocalizations.of(context)!
+                          .chatChannelDescriptionLabel,
                     ),
-                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
                   ),
                 ),
               ),

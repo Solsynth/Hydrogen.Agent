@@ -16,6 +16,8 @@
   "confirmation": "Confirmation",
   "confirmCancel": "Not sure",
   "confirmOkay": "OK",
+  "email": "Email Address",
+  "nickname": "Nickname",
   "username": "Username",
   "password": "Password",
   "next": "Next",

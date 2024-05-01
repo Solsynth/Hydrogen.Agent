@@ -105,7 +105,7 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
                           'channel': element.alias,
                         },
                       );
-                      switch(result) {
+                      switch (result) {
                         case 'refresh':
                           fetchChannels();
                       }

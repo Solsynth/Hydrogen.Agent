@@ -49,7 +49,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     );
   }
 
-  Future<void> pickImageToUpload(BuildContext context, ImageSource source) async {
+  Future<void> pickImageToUpload(
+      BuildContext context, ImageSource source) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
@@ -74,7 +75,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     }
   }
 
-  Future<void> pickVideoToUpload(BuildContext context, ImageSource source) async {
+  Future<void> pickVideoToUpload(
+      BuildContext context, ImageSource source) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
@@ -102,7 +104,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
   Future<void> uploadAttachment(File file, String hashcode) async {
     final auth = context.read<AuthProvider>();
 
-    final req = MultipartRequest('POST', getRequestUri(widget.provider, '/api/attachments'));
+    final req = MultipartRequest(
+        'POST', getRequestUri(widget.provider, '/api/attachments'));
     req.files.add(await MultipartFile.fromPath('attachment', file.path));
     req.fields['hashcode'] = hashcode;
 
@@ -118,10 +121,12 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     }
   }
 
-  Future<void> disposeAttachment(BuildContext context, Attachment item, int index) async {
+  Future<void> disposeAttachment(
+      BuildContext context, Attachment item, int index) async {
     final auth = context.read<AuthProvider>();
 
-    final req = MultipartRequest('DELETE', getRequestUri(widget.provider, '/api/attachments/${item.id}'));
+    final req = MultipartRequest('DELETE',
+        getRequestUri(widget.provider, '/api/attachments/${item.id}'));
 
     setState(() => _isSubmitting = true);
     var res = await auth.client!.send(req);
@@ -162,7 +167,17 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     if (bytes == 0) return '0 Bytes';
     const k = 1024;
     final dm = decimals < 0 ? 0 : decimals;
-    final sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+    final sizes = [
+      'Bytes',
+      'KiB',
+      'MiB',
+      'GiB',
+      'TiB',
+      'PiB',
+      'EiB',
+      'ZiB',
+      'YiB'
+    ];
     final i = (math.log(bytes) / math.log(k)).floor().toInt();
     return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
   }
@@ -180,7 +195,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
+          padding:
+              const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -199,7 +215,9 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data == true) {
                     return TextButton(
-                      onPressed: _isSubmitting ? null : () => viewAttachMethods(context),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => viewAttachMethods(context),
                       style: TextButton.styleFrom(shape: const CircleBorder()),
                       child: const Icon(Icons.add_circle),
                     );
@@ -211,7 +229,9 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
             ],
           ),
         ),
-        _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+        _isSubmitting
+            ? const LinearProgressIndicator().animate().scaleX()
+            : Container(),
         Expanded(
           child: ListView.separated(
             itemCount: _attachments.length,
@@ -243,7 +263,8 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                         foregroundColor: Colors.red,
                       ),
                       child: const Icon(Icons.delete),
-                      onPressed: () => disposeAttachment(context, element, index),
+                      onPressed: () =>
+                          disposeAttachment(context, element, index),
                     ),
                   ],
                 ),
@@ -303,7 +324,8 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.add_photo_alternate, color: Colors.indigo),
+                        const Icon(Icons.add_photo_alternate,
+                            color: Colors.indigo),
                         const SizedBox(height: 8),
                         Text(AppLocalizations.of(context)!.pickPhoto),
                       ],

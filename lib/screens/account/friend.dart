@@ -120,14 +120,16 @@ class _FriendScreenState extends State<FriendScreen> {
                   border: const OutlineInputBorder(),
                   labelText: AppLocalizations.of(context)!.username,
                 ),
-                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                onTapOutside: (_) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                foregroundColor:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
               ),
               onPressed: () => Navigator.pop(context),
               child: Text(AppLocalizations.of(context)!.cancel),
@@ -155,7 +157,8 @@ class _FriendScreenState extends State<FriendScreen> {
   DismissDirection getDismissDirection(Friendship relation) {
     if (relation.status == 2) return DismissDirection.endToStart;
     if (relation.status == 1) return DismissDirection.startToEnd;
-    if (relation.status == 0 && relation.relatedId != _selfId) return DismissDirection.startToEnd;
+    if (relation.status == 0 && relation.relatedId != _selfId)
+      return DismissDirection.startToEnd;
     return DismissDirection.horizontal;
   }
 
@@ -220,12 +223,18 @@ class _FriendScreenState extends State<FriendScreen> {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+              child: _isSubmitting
+                  ? const LinearProgressIndicator().animate().scaleX()
+                  : Container(),
             ),
             SliverToBoxAdapter(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceVariant
+                    .withOpacity(0.8),
                 child: Text(AppLocalizations.of(context)!.friendPending),
               ),
             ),
@@ -235,8 +244,12 @@ class _FriendScreenState extends State<FriendScreen> {
             ),
             SliverToBoxAdapter(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceVariant
+                    .withOpacity(0.8),
                 child: Text(AppLocalizations.of(context)!.friendActive),
               ),
             ),
@@ -246,8 +259,12 @@ class _FriendScreenState extends State<FriendScreen> {
             ),
             SliverToBoxAdapter(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceVariant
+                    .withOpacity(0.8),
                 child: Text(AppLocalizations.of(context)!.friendBlocked),
               ),
             ),
@@ -260,7 +277,10 @@ class _FriendScreenState extends State<FriendScreen> {
                 decoration: BoxDecoration(
                   border: Border(
                       top: BorderSide(
-                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceVariant
+                        .withOpacity(0.8),
                     width: 0.3,
                   )),
                 ),

@@ -41,7 +41,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   void initState() {
     super.initState();
     participant.addListener(onChange);
-    _subscription = Hardware.instance.onDeviceChange.stream.listen((List<MediaDevice> devices) {
+    _subscription = Hardware.instance.onDeviceChange.stream
+        .listen((List<MediaDevice> devices) {
       revertDevices(devices);
     });
     Hardware.instance.enumerateDevices().then(revertDevices);
@@ -161,18 +162,23 @@ class _ControlsWidgetState extends State<ControlsWidget> {
           if (!isRetry) {
             const androidConfig = FlutterBackgroundAndroidConfig(
               notificationTitle: 'Screen Sharing',
-              notificationText: 'A Solar Messager\'s Call is sharing your screen',
+              notificationText:
+                  'A Solar Messager\'s Call is sharing your screen',
               notificationImportance: AndroidNotificationImportance.Default,
-              notificationIcon: AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+              notificationIcon:
+                  AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
             );
-            hasPermissions = await FlutterBackground.initialize(androidConfig: androidConfig);
+            hasPermissions = await FlutterBackground.initialize(
+                androidConfig: androidConfig);
           }
-          if (hasPermissions && !FlutterBackground.isBackgroundExecutionEnabled) {
+          if (hasPermissions &&
+              !FlutterBackground.isBackgroundExecutionEnabled) {
             await FlutterBackground.enableBackgroundExecution();
           }
         } catch (e) {
           if (!isRetry) {
-            return await Future<void>.delayed(const Duration(seconds: 1), () => requestBackgroundPermission(true));
+            return await Future<void>.delayed(const Duration(seconds: 1),
+                () => requestBackgroundPermission(true));
           }
         }
       }
@@ -223,7 +229,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         runSpacing: 5,
         children: [
           IconButton(
-            icon: Transform.flip(flipX: true, child: const Icon(Icons.exit_to_app)),
+            icon: Transform.flip(
+                flipX: true, child: const Icon(Icons.exit_to_app)),
             color: Theme.of(context).colorScheme.onSurface,
             onPressed: disconnect,
           ),
@@ -253,7 +260,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                         return PopupMenuItem<MediaDevice>(
                           value: device,
                           child: ListTile(
-                            leading: (device.deviceId == widget.room.selectedAudioInputDeviceId)
+                            leading: (device.deviceId ==
+                                    widget.room.selectedAudioInputDeviceId)
                                 ? const Icon(Icons.check_box_outlined)
                                 : const Icon(Icons.check_box_outline_blank),
                             title: Text(device.label),
@@ -281,7 +289,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                     onTap: disableVideo,
                     child: ListTile(
                       leading: const Icon(Icons.videocam_off),
-                      title: Text(AppLocalizations.of(context)!.chatCallVideoOff),
+                      title:
+                          Text(AppLocalizations.of(context)!.chatCallVideoOff),
                     ),
                   ),
                   if (_videoInputs != null)
@@ -289,7 +298,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                       return PopupMenuItem<MediaDevice>(
                         value: device,
                         child: ListTile(
-                          leading: (device.deviceId == widget.room.selectedVideoInputDeviceId)
+                          leading: (device.deviceId ==
+                                  widget.room.selectedVideoInputDeviceId)
                               ? const Icon(Icons.check_box_outlined)
                               : const Icon(Icons.check_box_outline_blank),
                           title: Text(device.label),
@@ -308,7 +318,9 @@ class _ControlsWidgetState extends State<ControlsWidget> {
               tooltip: AppLocalizations.of(context)!.chatCallVideoOn,
             ),
           IconButton(
-            icon: Icon(position == CameraPosition.back ? Icons.video_camera_back : Icons.video_camera_front),
+            icon: Icon(position == CameraPosition.back
+                ? Icons.video_camera_back
+                : Icons.video_camera_front),
             color: Theme.of(context).colorScheme.onSurface,
             onPressed: () => toggleCamera(),
             tooltip: AppLocalizations.of(context)!.chatCallVideoFlip,
@@ -330,7 +342,8 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                       return PopupMenuItem<MediaDevice>(
                         value: device,
                         child: ListTile(
-                          leading: (device.deviceId == widget.room.selectedAudioOutputDeviceId)
+                          leading: (device.deviceId ==
+                                  widget.room.selectedAudioOutputDeviceId)
                               ? const Icon(Icons.check_box_outlined)
                               : const Icon(Icons.check_box_outline_blank),
                           title: Text(device.label),
@@ -343,9 +356,12 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             ),
           if (!kIsWeb && lkPlatformIs(PlatformType.iOS))
             IconButton(
-              onPressed: Hardware.instance.canSwitchSpeakerphone ? setSpeakerphoneOn : null,
+              onPressed: Hardware.instance.canSwitchSpeakerphone
+                  ? setSpeakerphoneOn
+                  : null,
               color: Theme.of(context).colorScheme.onSurface,
-              icon: Icon(_speakerphoneOn ? Icons.speaker_phone : Icons.phone_android),
+              icon: Icon(
+                  _speakerphoneOn ? Icons.speaker_phone : Icons.phone_android),
               tooltip: AppLocalizations.of(context)!.chatCallChangeSpeaker,
             ),
           if (participant.isScreenShareEnabled())

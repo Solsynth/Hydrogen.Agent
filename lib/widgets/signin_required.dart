@@ -36,5 +36,4 @@ class SignInRequiredScreen extends StatelessWidget {
       },
     );
   }
-
 }

@@ -95,7 +95,8 @@ class RemoteParticipantWidget extends ParticipantWidget {
   State<StatefulWidget> createState() => _RemoteParticipantWidgetState();
 }
 
-abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends State<T> {
+abstract class _ParticipantWidgetState<T extends ParticipantWidget>
+    extends State<T> {
   VideoTrack? get _activeVideoTrack;
 
   TrackPublication? get _firstAudioPublication;
@@ -126,7 +127,8 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
   void onParticipantChanged() {
     setState(() {
       if (widget.participant.metadata != null) {
-        _userinfoMetadata = Account.fromJson(jsonDecode(widget.participant.metadata!));
+        _userinfoMetadata =
+            Account.fromJson(jsonDecode(widget.participant.metadata!));
       }
     });
   }
@@ -158,8 +160,11 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
             mainAxisSize: MainAxisSize.min,
             children: [
               ParticipantInfoWidget(
-                title: widget.participant.name.isNotEmpty ? widget.participant.name : widget.participant.identity,
-                audioAvailable: _firstAudioPublication?.muted == false && _firstAudioPublication?.subscribed == true,
+                title: widget.participant.name.isNotEmpty
+                    ? widget.participant.name
+                    : widget.participant.identity,
+                audioAvailable: _firstAudioPublication?.muted == false &&
+                    _firstAudioPublication?.subscribed == true,
                 connectionQuality: widget.participant.connectionQuality,
                 isScreenShare: widget.isScreenShare,
               ),
@@ -171,7 +176,8 @@ abstract class _ParticipantWidgetState<T extends ParticipantWidget> extends Stat
   }
 }
 
-class _LocalParticipantWidgetState extends _ParticipantWidgetState<LocalParticipantWidget> {
+class _LocalParticipantWidgetState
+    extends _ParticipantWidgetState<LocalParticipantWidget> {
   @override
   LocalTrackPublication<LocalAudioTrack>? get _firstAudioPublication =>
       widget.participant.audioTrackPublications.firstOrNull;
@@ -180,7 +186,8 @@ class _LocalParticipantWidgetState extends _ParticipantWidgetState<LocalParticip
   VideoTrack? get _activeVideoTrack => widget.videoTrack;
 }
 
-class _RemoteParticipantWidgetState extends _ParticipantWidgetState<RemoteParticipantWidget> {
+class _RemoteParticipantWidgetState
+    extends _ParticipantWidgetState<RemoteParticipantWidget> {
   @override
   RemoteTrackPublication<RemoteAudioTrack>? get _firstAudioPublication =>
       widget.participant.audioTrackPublications.firstOrNull;

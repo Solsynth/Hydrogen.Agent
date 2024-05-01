@@ -129,69 +129,68 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
           child: Text(AppLocalizations.of(context)!.postVerb.toUpperCase()),
         ),
       ],
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: Column(
-            children: [
-              _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
-              FutureBuilder(
-                future: auth.getProfiles(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    var userinfo = snapshot.data;
-                    return ListTile(
-                      title: Text(userinfo["nick"]),
-                      subtitle: Text(
-                        AppLocalizations.of(context)!.postIdentityNotify,
-                      ),
-                      leading: AccountAvatar(
-                        source: userinfo["picture"],
-                        direct: true,
-                      ),
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
-              const Divider(thickness: 0.3),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TextField(
-                    maxLines: null,
-                    autofocus: true,
-                    autocorrect: true,
-                    keyboardType: TextInputType.multiline,
-                    controller: _textController,
-                    decoration: InputDecoration.collapsed(
-                      hintText: AppLocalizations.of(context)!.postContentPlaceholder,
-                    ),
-                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Column(
+        children: [
+          _isSubmitting
+              ? const LinearProgressIndicator().animate().scaleX()
+              : Container(),
+          FutureBuilder(
+            future: auth.getProfiles(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var userinfo = snapshot.data;
+                return ListTile(
+                  title: Text(userinfo["nick"]),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.postIdentityNotify,
                   ),
-                ),
-              ),
-              widget.editing != null ? editingBanner : Container(),
-              Container(
-                decoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(width: 0.3, color: Color(0xffdedede)),
+                  leading: AccountAvatar(
+                    source: userinfo["picture"],
+                    direct: true,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    TextButton(
-                      style: TextButton.styleFrom(shape: const CircleBorder()),
-                      child: const Icon(Icons.camera_alt),
-                      onPressed: () => viewAttachments(context),
-                    )
-                  ],
-                ),
-              ),
-            ],
+                );
+              } else {
+                return Container();
+              }
+            },
           ),
-        ),
+          const Divider(thickness: 0.3),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextField(
+                maxLines: null,
+                autofocus: true,
+                autocorrect: true,
+                keyboardType: TextInputType.multiline,
+                controller: _textController,
+                decoration: InputDecoration.collapsed(
+                  hintText:
+                      AppLocalizations.of(context)!.postContentPlaceholder,
+                ),
+                onTapOutside: (_) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
+              ),
+            ),
+          ),
+          widget.editing != null ? editingBanner : Container(),
+          Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 0.3, color: Color(0xffdedede)),
+              ),
+            ),
+            child: Row(
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(shape: const CircleBorder()),
+                  child: const Icon(Icons.camera_alt),
+                  onPressed: () => viewAttachments(context),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

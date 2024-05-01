@@ -14,7 +14,8 @@ class ChannelCallAction extends StatefulWidget {
   final Channel channel;
   final Function onUpdate;
 
-  const ChannelCallAction({super.key, this.call, required this.channel, required this.onUpdate});
+  const ChannelCallAction(
+      {super.key, this.call, required this.channel, required this.onUpdate});
 
   @override
   State<ChannelCallAction> createState() => _ChannelCallActionState();
@@ -32,7 +33,8 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/calls');
+    var uri = getRequestUri(
+        'messaging', '/api/channels/${widget.channel.alias}/calls');
 
     var res = await auth.client!.post(uri);
     if (res.statusCode != 200) {
@@ -52,7 +54,8 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/calls/ongoing');
+    var uri = getRequestUri(
+        'messaging', '/api/channels/${widget.channel.alias}/calls/ongoing');
 
     var res = await auth.client!.delete(uri);
     if (res.statusCode != 200) {
@@ -75,7 +78,9 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
                 endsCall();
               }
             },
-      icon: widget.call == null ? const Icon(Icons.call) : const Icon(Icons.call_end),
+      icon: widget.call == null
+          ? const Icon(Icons.call)
+          : const Icon(Icons.call_end),
     );
   }
 }
@@ -84,7 +89,8 @@ class ChannelManageAction extends StatelessWidget {
   final Channel channel;
   final Function onUpdate;
 
-  const ChannelManageAction({super.key, required this.channel, required this.onUpdate});
+  const ChannelManageAction(
+      {super.key, required this.channel, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {

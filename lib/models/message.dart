@@ -43,11 +43,15 @@ class Message {
         content: json["content"],
         metadata: json["metadata"],
         type: json["type"],
-        attachments: List<Attachment>.from(json["attachments"]?.map((x) => Attachment.fromJson(x)) ?? List.empty()),
+        attachments: List<Attachment>.from(
+            json["attachments"]?.map((x) => Attachment.fromJson(x)) ??
+                List.empty()),
         channel: Channel.fromJson(json["channel"]),
         sender: Sender.fromJson(json["sender"]),
         replyId: json["reply_id"],
-        replyTo: json["reply_to"] != null ? Message.fromJson(json["reply_to"]) : null,
+        replyTo: json["reply_to"] != null
+            ? Message.fromJson(json["reply_to"])
+            : null,
         channelId: json["channel_id"],
         senderId: json["sender_id"],
       );
@@ -60,7 +64,8 @@ class Message {
         "content": content,
         "metadata": metadata,
         "type": type,
-        "attachments": List<dynamic>.from(attachments?.map((x) => x.toJson()) ?? List.empty()),
+        "attachments": List<dynamic>.from(
+            attachments?.map((x) => x.toJson()) ?? List.empty()),
         "channel": channel?.toJson(),
         "sender": sender.toJson(),
         "reply_id": replyId,

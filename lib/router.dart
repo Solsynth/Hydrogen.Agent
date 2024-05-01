@@ -4,6 +4,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
+import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/chat/call.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/screens/chat/index.dart';
@@ -15,7 +16,7 @@ import 'package:solian/screens/notification.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
-import 'package:solian/screens/signin.dart';
+import 'package:solian/screens/auth/signin.dart';
 
 final router = GoRouter(
   routes: [
@@ -37,12 +38,14 @@ final router = GoRouter(
     GoRoute(
       path: '/chat/create',
       name: 'chat.channel.editor',
-      builder: (context, state) => ChannelEditorScreen(editing: state.extra as Channel?),
+      builder: (context, state) =>
+          ChannelEditorScreen(editing: state.extra as Channel?),
     ),
     GoRoute(
       path: '/chat/c/:channel',
       name: 'chat.channel',
-      builder: (context, state) => ChatScreen(alias: state.pathParameters['channel'] as String),
+      builder: (context, state) =>
+          ChatScreen(alias: state.pathParameters['channel'] as String),
     ),
     GoRoute(
       path: '/chat/c/:channel/call',
@@ -52,12 +55,14 @@ final router = GoRouter(
     GoRoute(
       path: '/chat/c/:channel/manage',
       name: 'chat.channel.manage',
-      builder: (context, state) => ChatManageScreen(channel: state.extra as Channel),
+      builder: (context, state) =>
+          ChatManageScreen(channel: state.extra as Channel),
     ),
     GoRoute(
       path: '/chat/c/:channel/member',
       name: 'chat.channel.member',
-      builder: (context, state) => ChatMemberScreen(channel: state.extra as Channel),
+      builder: (context, state) =>
+          ChatMemberScreen(channel: state.extra as Channel),
     ),
     GoRoute(
       path: '/account',
@@ -67,14 +72,16 @@ final router = GoRouter(
     GoRoute(
       path: '/posts/publish/moments',
       name: 'posts.moments.editor',
-      builder: (context, state) => MomentEditorScreen(editing: state.extra as Post?),
+      builder: (context, state) =>
+          MomentEditorScreen(editing: state.extra as Post?),
     ),
     GoRoute(
       path: '/posts/publish/comments',
       name: 'posts.comments.editor',
       builder: (context, state) {
         final args = state.extra as CommentPostArguments;
-        return CommentEditorScreen(editing: args.editing, related: args.related);
+        return CommentEditorScreen(
+            editing: args.editing, related: args.related);
       },
     ),
     GoRoute(
@@ -89,6 +96,11 @@ final router = GoRouter(
       path: '/auth/sign-in',
       name: 'auth.sign-in',
       builder: (context, state) => SignInScreen(),
+    ),
+    GoRoute(
+      path: '/auth/sign-up',
+      name: 'auth.sign-up',
+      builder: (context, state) => SignUpScreen(),
     ),
     GoRoute(
       path: '/account/friend',

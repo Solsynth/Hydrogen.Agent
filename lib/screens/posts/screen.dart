@@ -24,10 +24,12 @@ class PostScreen extends StatefulWidget {
 class _PostScreenState extends State<PostScreen> {
   final _client = http.Client();
 
-  final PagingController<int, Post> _commentPagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, Post> _commentPagingController =
+      PagingController(firstPageKey: 0);
 
   Future<Post?> fetchPost(BuildContext context) async {
-    final uri = getRequestUri('interactive', '/api/p/${widget.dataset}/${widget.alias}');
+    final uri = getRequestUri(
+        'interactive', '/api/p/${widget.dataset}/${widget.alias}');
     final res = await _client.get(uri);
     if (res.statusCode != 200) {
       final err = utf8.decode(res.bodyBytes);

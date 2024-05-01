@@ -12,7 +12,8 @@ class ChannelDeletion extends StatefulWidget {
   final Channel channel;
   final bool isOwned;
 
-  const ChannelDeletion({super.key, required this.channel, required this.isOwned});
+  const ChannelDeletion(
+      {super.key, required this.channel, required this.isOwned});
 
   @override
   State<ChannelDeletion> createState() => _ChannelDeletionState();

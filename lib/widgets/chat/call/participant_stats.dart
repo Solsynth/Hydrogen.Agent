@@ -28,11 +28,14 @@ class _ParticipantStatsWidgetState extends State<ParticipantStatsWidget> {
             stats['layer-$key'] =
                 '${value.frameWidth ?? 0}x${value.frameHeight ?? 0} ${value.framesPerSecond?.toDouble() ?? 0} fps, ${event.bitrateForLayers[key] ?? 0} kbps';
           });
-          var firstStats = event.stats['f'] ?? event.stats['h'] ?? event.stats['q'];
+          var firstStats =
+              event.stats['f'] ?? event.stats['h'] ?? event.stats['q'];
           if (firstStats != null) {
             stats['encoder'] = firstStats.encoderImplementation ?? '';
-            stats['video codec'] = '${firstStats.mimeType}, ${firstStats.clockRate}hz, pt: ${firstStats.payloadType}';
-            stats['qualityLimitationReason'] = firstStats.qualityLimitationReason ?? '';
+            stats['video codec'] =
+                '${firstStats.mimeType}, ${firstStats.clockRate}hz, pt: ${firstStats.payloadType}';
+            stats['qualityLimitationReason'] =
+                firstStats.qualityLimitationReason ?? '';
           }
         });
       });
@@ -41,7 +44,8 @@ class _ParticipantStatsWidgetState extends State<ParticipantStatsWidget> {
       listener.on<VideoReceiverStatsEvent>((event) {
         setState(() {
           stats['video rx'] = '${event.currentBitrate.toInt()} kpbs';
-          stats['video codec'] = '${event.stats.mimeType}, ${event.stats.clockRate}hz, pt: ${event.stats.payloadType}';
+          stats['video codec'] =
+              '${event.stats.mimeType}, ${event.stats.clockRate}hz, pt: ${event.stats.payloadType}';
           stats['video size'] =
               '${event.stats.frameWidth}x${event.stats.frameHeight} ${event.stats.framesPerSecond?.toDouble()}fps';
           stats['video jitter'] = '${event.stats.jitter} s';
@@ -70,7 +74,8 @@ class _ParticipantStatsWidgetState extends State<ParticipantStatsWidget> {
           stats['audio codec'] =
               '${event.stats.mimeType}, ${event.stats.clockRate}hz, ${event.stats.channels}ch, pt: ${event.stats.payloadType}';
           stats['audio jitter'] = '${event.stats.jitter} s';
-          stats['audio concealed samples'] = '${event.stats.concealedSamples} / ${event.stats.concealmentEvents}';
+          stats['audio concealed samples'] =
+              '${event.stats.concealedSamples} / ${event.stats.concealmentEvents}';
           stats['audio packets lost'] = '${event.stats.packetsLost}';
           stats['audio packets received'] = '${event.stats.packetsReceived}';
         });
@@ -83,7 +88,10 @@ class _ParticipantStatsWidgetState extends State<ParticipantStatsWidget> {
       element.dispose();
     }
     listeners.clear();
-    for (var track in [...widget.participant.videoTrackPublications, ...widget.participant.audioTrackPublications]) {
+    for (var track in [
+      ...widget.participant.videoTrackPublications,
+      ...widget.participant.audioTrackPublications
+    ]) {
       if (track.track != null) {
         _setUpListener(track.track!);
       }
@@ -117,7 +125,8 @@ class _ParticipantStatsWidgetState extends State<ParticipantStatsWidget> {
         horizontal: 8,
       ),
       child: Column(
-        children: stats.entries.map((e) => Text('${e.key}: ${e.value}')).toList(),
+        children:
+            stats.entries.map((e) => Text('${e.key}: ${e.value}')).toList(),
       ),
     );
   }

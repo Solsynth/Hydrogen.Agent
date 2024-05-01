@@ -19,7 +19,8 @@ class ChatMessageDeletionDialog extends StatefulWidget {
   });
 
   @override
-  State<ChatMessageDeletionDialog> createState() => _ChatMessageDeletionDialogState();
+  State<ChatMessageDeletionDialog> createState() =>
+      _ChatMessageDeletionDialogState();
 }
 
 class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
@@ -29,7 +30,8 @@ class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final uri = getRequestUri('messaging', '/api/channels/${widget.channel}/messages/${widget.item.id}');
+    final uri = getRequestUri('messaging',
+        '/api/channels/${widget.channel}/messages/${widget.item.id}');
 
     setState(() => _isSubmitting = true);
     final res = await auth.client!.delete(uri);

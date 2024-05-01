@@ -34,7 +34,9 @@ class Notification {
         deletedAt: json["deleted_at"],
         subject: json["subject"],
         content: json["content"],
-        links: json["links"] != null ? List<Link>.from(json["links"].map((x) => Link.fromJson(x))) : List.empty(),
+        links: json["links"] != null
+            ? List<Link>.from(json["links"].map((x) => Link.fromJson(x)))
+            : List.empty(),
         isImportant: json["is_important"],
         isRealtime: json["is_realtime"],
         readAt: json["read_at"],
@@ -49,7 +51,9 @@ class Notification {
         "deleted_at": deletedAt,
         "subject": subject,
         "content": content,
-        "links": links != null ? List<dynamic>.from(links!.map((x) => x.toJson())) : List.empty(),
+        "links": links != null
+            ? List<dynamic>.from(links!.map((x) => x.toJson()))
+            : List.empty(),
         "is_important": isImportant,
         "is_realtime": isRealtime,
         "read_at": readAt,

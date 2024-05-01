@@ -16,6 +16,8 @@
   "confirmation": "确认",
   "confirmCancel": "不太确定",
   "confirmOkay": "确定",
+  "email": "邮箱地址",
+  "nickname": "显示名",
   "username": "用户名",
   "password": "密码",
   "next": "下一步",

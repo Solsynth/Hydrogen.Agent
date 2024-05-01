@@ -106,7 +106,8 @@ class _ReactionActionPopupState extends State<ReactionActionPopup> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
+          padding:
+              const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -118,7 +119,9 @@ class _ReactionActionPopupState extends State<ReactionActionPopup> {
             ),
           ),
         ),
-        _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+        _isSubmitting
+            ? const LinearProgressIndicator().animate().scaleX()
+            : Container(),
         Expanded(
           child: ListView.builder(
             itemCount: reactions.length,

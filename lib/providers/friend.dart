@@ -16,8 +16,8 @@ class FriendProvider extends ChangeNotifier {
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
       final result = jsonDecode(utf8.decode(res.bodyBytes)) as List<dynamic>;
-     friends = result.map((x) => Friendship.fromJson(x)).toList();
-     notifyListeners();
+      friends = result.map((x) => Friendship.fromJson(x)).toList();
+      notifyListeners();
     } else {
       var message = utf8.decode(res.bodyBytes);
       throw Exception(message);

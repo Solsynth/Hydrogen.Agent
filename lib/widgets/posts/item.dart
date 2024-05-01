@@ -47,7 +47,8 @@ class _PostItemState extends State<PostItem> {
   }
 
   void viewComments() {
-    final PagingController<int, Post> commentPaging = PagingController(firstPageKey: 0);
+    final PagingController<int, Post> commentPaging =
+        PagingController(firstPageKey: 0);
 
     showModalBottomSheet(
       context: context,
@@ -87,10 +88,12 @@ class _PostItemState extends State<PostItem> {
   Widget renderAttachments() {
     if (widget.item.modelType == 'article') return Container();
 
-    if (widget.item.attachments != null && widget.item.attachments!.isNotEmpty) {
+    if (widget.item.attachments != null &&
+        widget.item.attachments!.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: 8),
-        child: AttachmentList(items: widget.item.attachments!, provider: 'interactive'),
+        child: AttachmentList(
+            items: widget.item.attachments!, provider: 'interactive'),
       );
     } else {
       return Container();
@@ -130,8 +133,9 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
-  String getAuthorDescribe() =>
-      widget.item.author.description.isNotEmpty ? widget.item.author.description : 'No description yet.';
+  String getAuthorDescribe() => widget.item.author.description.isNotEmpty
+      ? widget.item.author.description
+      : 'No description yet.';
 
   @override
   void initState() {
@@ -177,7 +181,8 @@ class _PostItemState extends State<PostItem> {
                     children: [
                       ...headingParts,
                       Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12, top: 4),
+                        padding:
+                            const EdgeInsets.only(left: 12, right: 12, top: 4),
                         child: renderContent(),
                       ),
                       renderAttachments(),

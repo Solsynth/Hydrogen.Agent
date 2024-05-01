@@ -8,7 +8,8 @@ import 'package:solian/utils/service_url.dart';
 class AuthProvider extends ChangeNotifier {
   AuthProvider();
 
-  final deviceEndpoint = getRequestUri('passport', '/api/notifications/subscribe');
+  final deviceEndpoint =
+      getRequestUri('passport', '/api/notifications/subscribe');
   final tokenEndpoint = getRequestUri('passport', '/api/auth/token');
   final userinfoEndpoint = getRequestUri('passport', '/api/users/me');
   final redirectUrl = Uri.parse('solian://auth');
@@ -29,8 +30,10 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> loadClient() async {
     if (await storage.containsKey(key: storageKey)) {
       try {
-        final credentials = oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
-        client = oauth2.Client(credentials, identifier: clientId, secret: clientSecret);
+        final credentials =
+            oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
+        client = oauth2.Client(credentials,
+            identifier: clientId, secret: clientSecret);
         await fetchProfiles();
         return true;
       } catch (e) {
@@ -42,7 +45,8 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<oauth2.Client> createClient(BuildContext context, String username, String password) async {
+  Future<oauth2.Client> createClient(
+      BuildContext context, String username, String password) async {
     if (await loadClient()) {
       return client!;
     }
@@ -68,15 +72,17 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> refreshToken() async {
     if (client != null) {
-      final credentials =
-          await client!.credentials.refresh(identifier: clientId, secret: clientSecret, basicAuth: false);
-      client = oauth2.Client(credentials, identifier: clientId, secret: clientSecret);
+      final credentials = await client!.credentials.refresh(
+          identifier: clientId, secret: clientSecret, basicAuth: false);
+      client = oauth2.Client(credentials,
+          identifier: clientId, secret: clientSecret);
       storage.write(key: storageKey, value: credentials.toJson());
     }
     notifyListeners();
   }
 
-  Future<void> signin(BuildContext context, String username, String password) async {
+  Future<void> signin(
+      BuildContext context, String username, String password) async {
     client = await createClient(context, username, password);
     storage.write(key: storageKey, value: client!.credentials.toJson());
 
@@ -94,7 +100,10 @@ class AuthProvider extends ChangeNotifier {
       if (client == null) {
         await loadClient();
       }
-      if (lastRefreshedAt == null || DateTime.now().subtract(const Duration(minutes: 3)).isAfter(lastRefreshedAt!)) {
+      if (lastRefreshedAt == null ||
+          DateTime.now()
+              .subtract(const Duration(minutes: 3))
+              .isAfter(lastRefreshedAt!)) {
         await refreshToken();
         lastRefreshedAt = DateTime.now();
       }
