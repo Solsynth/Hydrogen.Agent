@@ -34,8 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Call? _ongoingCall;
   Channel? _channelMeta;
 
-  final PagingController<int, Message> _pagingController =
-      PagingController(firstPageKey: 0);
+  final PagingController<int, Message> _pagingController = PagingController(firstPageKey: 0);
 
   final http.Client _client = http.Client();
 
@@ -54,8 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<Call?> fetchCall() async {
-    var uri = getRequestUri(
-        'messaging', '/api/channels/${widget.alias}/calls/ongoing');
+    var uri = getRequestUri('messaging', '/api/channels/${widget.alias}/calls/ongoing');
     var res = await _client.get(uri);
     if (res.statusCode == 200) {
       final result = jsonDecode(utf8.decode(res.bodyBytes));
@@ -84,10 +82,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
-      final result =
-          PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
-      final items =
-          result.data?.map((x) => Message.fromJson(x)).toList() ?? List.empty();
+      final result = PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      final items = result.data?.map((x) => Message.fromJson(x)).toList() ?? List.empty();
       final isLastPage = (result.count - pageKey) < take;
       if (isLastPage || result.data == null) {
         _pagingController.appendLastPage(items);
@@ -115,16 +111,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void updateMessage(Message item) {
     setState(() {
-      _pagingController.itemList = _pagingController.itemList
-          ?.map((x) => x.id == item.id ? item : x)
-          .toList();
+      _pagingController.itemList = _pagingController.itemList?.map((x) => x.id == item.id ? item : x).toList();
     });
   }
 
   void deleteMessage(Message item) {
     setState(() {
-      _pagingController.itemList =
-          _pagingController.itemList?.where((x) => x.id != item.id).toList();
+      _pagingController.itemList = _pagingController.itemList?.where((x) => x.id != item.id).toList();
     });
   }
 
@@ -154,8 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
       fetchCall();
     });
 
-    _pagingController
-        .addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
+    _pagingController.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
 
     super.initState();
   }
@@ -165,12 +157,10 @@ class _ChatScreenState extends State<ChatScreen> {
     Widget chatHistoryBuilder(context, item, index) {
       bool isMerged = false, hasMerged = false;
       if (index > 0) {
-        hasMerged =
-            getMessageMergeable(_pagingController.itemList?[index - 1], item);
+        hasMerged = getMessageMergeable(_pagingController.itemList?[index - 1], item);
       }
       if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
-        isMerged =
-            getMessageMergeable(item, _pagingController.itemList?[index + 1]);
+        isMerged = getMessageMergeable(item, _pagingController.itemList?[index + 1]);
       }
       return InkWell(
         child: Container(
@@ -193,8 +183,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final callBanner = MaterialBanner(
       padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.call_received),
-      backgroundColor:
-          Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),
       content: Text(AppLocalizations.of(context)!.chatCallOngoing),
       actions: [
@@ -213,15 +202,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return IndentWrapper(
       hideDrawer: true,
-      title: _channelMeta?.name ?? "Loading...",
+      title: _channelMeta?.name ?? 'Loading...',
       appBarActions: _channelMeta != null
           ? [
               ChannelCallAction(
-                  call: _ongoingCall,
-                  channel: _channelMeta!,
-                  onUpdate: () => fetchMetadata()),
+                call: _ongoingCall,
+                channel: _channelMeta!,
+                onUpdate: () => fetchMetadata(),
+              ),
               ChannelManageAction(
-                  channel: _channelMeta!, onUpdate: () => fetchMetadata()),
+                channel: _channelMeta!,
+                onUpdate: () => fetchMetadata(),
+              ),
             ]
           : [],
       child: FutureBuilder(
@@ -242,8 +234,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         reverse: true,
                         pagingController: _pagingController,
                         builderDelegate: PagedChildBuilderDelegate<Message>(
-                          noItemsFoundIndicatorBuilder: (_) => Container(),
+                          animateTransitions: true,
+                          transitionDuration: 500.ms,
                           itemBuilder: chatHistoryBuilder,
+                          noItemsFoundIndicatorBuilder: (_) => Container(),
                         ),
                       ),
                     ),
@@ -258,9 +252,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ],
                 ),
-                _ongoingCall != null
-                    ? callBanner.animate().slideY()
-                    : Container(),
+                _ongoingCall != null ? callBanner.animate().slideY() : Container(),
               ],
             ),
             onInsertMessage: (message) => addMessage(message),

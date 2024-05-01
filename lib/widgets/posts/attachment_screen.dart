@@ -14,7 +14,9 @@ class AttachmentScreen extends StatelessWidget {
       child: InteractiveViewer(
         boundaryMargin: const EdgeInsets.all(128),
         minScale: 0.1,
-        maxScale: 16.0,
+        maxScale: 16,
+        panEnabled: true,
+        scaleEnabled: true,
         child: Image.network(url, fit: BoxFit.contain),
       ),
     );

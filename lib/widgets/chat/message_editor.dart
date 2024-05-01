@@ -18,12 +18,7 @@ class ChatMessageEditor extends StatefulWidget {
   final Message? replying;
   final Function? onReset;
 
-  const ChatMessageEditor(
-      {super.key,
-      required this.channel,
-      this.editing,
-      this.replying,
-      this.onReset});
+  const ChatMessageEditor({super.key, required this.channel, this.editing, this.replying, this.onReset});
 
   @override
   State<ChatMessageEditor> createState() => _ChatMessageEditorState();
@@ -31,6 +26,7 @@ class ChatMessageEditor extends StatefulWidget {
 
 class _ChatMessageEditorState extends State<ChatMessageEditor> {
   final _textController = TextEditingController();
+  final _focusNode = FocusNode();
 
   bool _isSubmitting = false;
   int? _prevEditingId;
@@ -51,13 +47,14 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   Future<void> sendMessage(BuildContext context) async {
     if (_isSubmitting) return;
 
+    _focusNode.requestFocus();
+
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
     final uri = widget.editing == null
         ? getRequestUri('messaging', '/api/channels/${widget.channel}/messages')
-        : getRequestUri('messaging',
-            '/api/channels/${widget.channel}/messages/${widget.editing!.id}');
+        : getRequestUri('messaging', '/api/channels/${widget.channel}/messages/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? "POST" : "PUT", uri);
     req.headers['Content-Type'] = 'application/json';
@@ -90,8 +87,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
       setState(() {
         _prevEditingId = widget.editing!.id;
         _textController.text = widget.editing!.content;
-        _attachments =
-            widget.editing!.attachments ?? List.empty(growable: true);
+        _attachments = widget.editing!.attachments ?? List.empty(growable: true);
       });
     }
   }
@@ -154,38 +150,31 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
             children: [
               badge.Badge(
                 showBadge: _attachments.isNotEmpty,
-                badgeContent: Text(_attachments.length.toString(),
-                    style: const TextStyle(color: Colors.white)),
+                badgeContent: Text(_attachments.length.toString(), style: const TextStyle(color: Colors.white)),
                 position: badge.BadgePosition.custom(top: -2, end: 8),
                 child: TextButton(
-                  style: TextButton.styleFrom(
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(4)),
-                  onPressed:
-                      !_isSubmitting ? () => viewAttachments(context) : null,
+                  style: TextButton.styleFrom(shape: const CircleBorder(), padding: const EdgeInsets.all(4)),
+                  onPressed: !_isSubmitting ? () => viewAttachments(context) : null,
                   child: const Icon(Icons.attach_file),
                 ),
               ),
               Expanded(
                 child: TextField(
+                  focusNode: _focusNode,
                   controller: _textController,
                   maxLines: null,
                   autofocus: true,
                   autocorrect: true,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration.collapsed(
-                    hintText:
-                        AppLocalizations.of(context)!.chatMessagePlaceholder,
+                    hintText: AppLocalizations.of(context)!.chatMessagePlaceholder,
                   ),
                   onSubmitted: (_) => sendMessage(context),
-                  onTapOutside: (_) =>
-                      FocusManager.instance.primaryFocus?.unfocus(),
+                  onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                 ),
               ),
               TextButton(
-                style: TextButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(4)),
+                style: TextButton.styleFrom(shape: const CircleBorder(), padding: const EdgeInsets.all(4)),
                 onPressed: !_isSubmitting ? () => sendMessage(context) : null,
                 child: const Icon(Icons.send),
               )

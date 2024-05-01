@@ -13,6 +13,7 @@ class ChatMessageContent extends StatelessWidget {
     return Markdown(
       data: item.content,
       shrinkWrap: true,
+      selectable: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(0),
       onTapLink: (text, href, title) async {
