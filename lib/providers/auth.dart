@@ -26,7 +26,7 @@ class AuthProvider extends ChangeNotifier {
 
   DateTime? lastRefreshedAt;
 
-  Future<bool> pickClient() async {
+  Future<bool> loadClient() async {
     if (await storage.containsKey(key: storageKey)) {
       try {
         final credentials = oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
@@ -43,7 +43,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<oauth2.Client> createClient(BuildContext context, String username, String password) async {
-    if (await pickClient()) {
+    if (await loadClient()) {
       return client!;
     }
 
@@ -92,7 +92,7 @@ class AuthProvider extends ChangeNotifier {
     const storage = FlutterSecureStorage();
     if (await storage.containsKey(key: storageKey)) {
       if (client == null) {
-        await pickClient();
+        await loadClient();
       }
       if (lastRefreshedAt == null || DateTime.now().subtract(const Duration(minutes: 3)).isAfter(lastRefreshedAt!)) {
         await refreshToken();

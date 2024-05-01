@@ -22,7 +22,7 @@ class ChatProvider extends ChangeNotifier {
   ChatCallInstance? call;
 
   Future<WebSocketChannel?> connect(AuthProvider auth) async {
-    if (auth.client == null) await auth.pickClient();
+    if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
 
     await auth.refreshToken();

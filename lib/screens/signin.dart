@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -63,6 +64,11 @@ class SignInScreen extends StatelessWidget {
                   }).catchError((e) {
                     List<String> messages = e.toString().split('\n');
                     if (messages.last.contains("risk")) {
+                      final ticketId = RegExp(r"ticketId=(\d+)").firstMatch(messages.last);
+                      if (ticketId == null) {
+                        context
+                            .showErrorDialog("requested to multi-factor authenticate, but the ticket id was not found");
+                      }
                       showDialog(
                         context: context,
                         builder: (context) {
@@ -73,7 +79,9 @@ class SignInScreen extends StatelessWidget {
                               TextButton(
                                 child: Text(AppLocalizations.of(context)!.next),
                                 onPressed: () {
-                                  launchUrlString(getRequestUri('passport', '/sign-in').toString());
+                                  launchUrlString(
+                                    getRequestUri('passport', '/mfa?ticket=${ticketId!.group(1)}').toString(),
+                                  );
                                   if (Navigator.canPop(context)) {
                                     Navigator.pop(context);
                                   }
