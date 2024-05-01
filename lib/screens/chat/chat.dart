@@ -10,6 +10,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/chat/channel_action.dart';
 import 'package:solian/widgets/chat/maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
@@ -24,10 +25,25 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chat = context.watch<ChatProvider>();
+
     return IndentWrapper(
-      title: AppLocalizations.of(context)!.post,
+      title: chat.focusChannel?.name ?? 'Loading...',
       noSafeArea: true,
       hideDrawer: true,
+      appBarActions: chat.focusChannel != null
+          ? [
+              ChannelCallAction(
+                call: chat.ongoingCall,
+                channel: chat.focusChannel!,
+                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
+              ),
+              ChannelManageAction(
+                channel: chat.focusChannel!,
+                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
+              ),
+            ]
+          : [],
       child: ChatScreenWidget(
         alias: alias,
       ),

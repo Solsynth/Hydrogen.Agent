@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/chat/channel_action.dart';
 import 'package:solian/widgets/chat/chat_new.dart';
 import 'package:solian/widgets/empty.dart';
 import 'package:solian/widgets/exts.dart';
@@ -27,12 +29,26 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final chat = context.watch<ChatProvider>();
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isLargeScreen = screenWidth >= 600;
 
     return IndentWrapper(
       title: AppLocalizations.of(context)!.chat,
-      appBarActions: const [NotificationButton()],
+      appBarActions: chat.focusChannel != null
+          ? [
+              ChannelCallAction(
+                call: chat.ongoingCall,
+                channel: chat.focusChannel!,
+                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
+              ),
+              ChannelManageAction(
+                channel: chat.focusChannel!,
+                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
+              ),
+            ]
+          : [const NotificationButton()],
       fixedAppBarColor: isLargeScreen,
       child: isLargeScreen
           ? Row(

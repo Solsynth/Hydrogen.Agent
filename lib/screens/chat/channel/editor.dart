@@ -108,92 +108,74 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
           child: Text(AppLocalizations.of(context)!.apply.toUpperCase()),
         ),
       ],
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: Column(
-            children: [
-              _isSubmitting
-                  ? const LinearProgressIndicator().animate().scaleX()
-                  : Container(),
-              ListTile(
-                title: Text(AppLocalizations.of(context)!.chatChannelUsage),
-                subtitle:
-                    Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.teal,
-                  child: Icon(Icons.tag, color: Colors.white),
-                ),
-              ),
-              const Divider(thickness: 0.3),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        autofocus: true,
-                        controller: _aliasController,
-                        decoration: InputDecoration.collapsed(
-                          hintText: AppLocalizations.of(context)!
-                              .chatChannelAliasLabel,
-                        ),
-                        onTapOutside: (_) =>
-                            FocusManager.instance.primaryFocus?.unfocus(),
-                      ),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        shape: const CircleBorder(),
-                        visualDensity:
-                            const VisualDensity(horizontal: -2, vertical: -2),
-                      ),
-                      onPressed: () => randomizeAlias(),
-                      child: const Icon(Icons.refresh),
-                    )
-                  ],
-                ),
-              ),
-              const Divider(thickness: 0.3),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TextField(
-                  autocorrect: true,
-                  controller: _nameController,
-                  decoration: InputDecoration.collapsed(
-                    hintText:
-                        AppLocalizations.of(context)!.chatChannelNameLabel,
-                  ),
-                  onTapOutside: (_) =>
-                      FocusManager.instance.primaryFocus?.unfocus(),
-                ),
-              ),
-              const Divider(thickness: 0.3),
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: TextField(
-                    minLines: 5,
-                    maxLines: null,
-                    autocorrect: true,
-                    keyboardType: TextInputType.multiline,
-                    controller: _descriptionController,
-                    decoration: InputDecoration.collapsed(
-                      hintText: AppLocalizations.of(context)!
-                          .chatChannelDescriptionLabel,
-                    ),
-                    onTapOutside: (_) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
-                  ),
-                ),
-              ),
-              widget.editing != null ? editingBanner : Container(),
-            ],
+      child: Column(
+        children: [
+          _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.chatChannelUsage),
+            subtitle: Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
+            leading: const CircleAvatar(
+              backgroundColor: Colors.teal,
+              child: Icon(Icons.tag, color: Colors.white),
+            ),
           ),
-        ),
+          const Divider(thickness: 0.3),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    autofocus: true,
+                    controller: _aliasController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: AppLocalizations.of(context)!.chatChannelAliasLabel,
+                    ),
+                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    shape: const CircleBorder(),
+                    visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+                  ),
+                  onPressed: () => randomizeAlias(),
+                  child: const Icon(Icons.refresh),
+                )
+              ],
+            ),
+          ),
+          const Divider(thickness: 0.3),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              autocorrect: true,
+              controller: _nameController,
+              decoration: InputDecoration.collapsed(
+                hintText: AppLocalizations.of(context)!.chatChannelNameLabel,
+              ),
+              onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+            ),
+          ),
+          const Divider(thickness: 0.3),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: TextField(
+                minLines: 5,
+                maxLines: null,
+                autocorrect: true,
+                keyboardType: TextInputType.multiline,
+                controller: _descriptionController,
+                decoration: InputDecoration.collapsed(
+                  hintText: AppLocalizations.of(context)!.chatChannelDescriptionLabel,
+                ),
+                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+              ),
+            ),
+          ),
+          widget.editing != null ? editingBanner : Container(),
+        ],
       ),
     );
   }

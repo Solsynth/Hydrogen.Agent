@@ -35,9 +35,7 @@ class ChatProvider extends ChangeNotifier {
       scheme: ori.scheme.replaceFirst('http', 'ws'),
       host: ori.host,
       path: ori.path,
-      queryParameters: {
-        'tk': Uri.encodeComponent(auth.client!.credentials.accessToken)
-      },
+      queryParameters: {'tk': Uri.encodeComponent(auth.client!.credentials.accessToken)},
     );
 
     final channel = WebSocketChannel.connect(uri);
@@ -80,8 +78,7 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  bool handleCallJoin(Call call, Channel channel,
-      {Function? onUpdate, Function? onDispose}) {
+  bool handleCallJoin(Call call, Channel channel, {Function? onUpdate, Function? onDispose}) {
     if (currentCall != null) return false;
 
     currentCall = ChatCallInstance(
@@ -151,8 +148,7 @@ class ChatCallInstance {
   });
 
   void init() {
-    subscription =
-        Hardware.instance.onDeviceChange.stream.listen(revertDevices);
+    subscription = Hardware.instance.onDeviceChange.stream.listen(revertDevices);
     room = Room();
     listener = room.createListener();
     Hardware.instance.enumerateDevices().then(revertDevices);
@@ -179,8 +175,7 @@ class ChatCallInstance {
       throw Exception('unauthorized');
     }
 
-    var uri = getRequestUri(
-        'messaging', '/api/channels/${channel.alias}/calls/ongoing/token');
+    var uri = getRequestUri('messaging', '/api/channels/${channel.alias}/calls/ongoing/token');
 
     var res = await auth.client!.post(uri);
     if (res.statusCode == 200) {
@@ -233,12 +228,10 @@ class ChatCallInstance {
             useiOSBroadcastExtension: true,
             params: VideoParameters(
               dimensions: VideoDimensionsPresets.h1080_169,
-              encoding:
-                  VideoEncoding(maxBitrate: 3 * 1000 * 1000, maxFramerate: 30),
+              encoding: VideoEncoding(maxBitrate: 3 * 1000 * 1000, maxFramerate: 30),
             ),
           ),
-          defaultCameraCaptureOptions:
-              CameraCaptureOptions(maxFrameRate: 30, params: videoParameters),
+          defaultCameraCaptureOptions: CameraCaptureOptions(maxFrameRate: 30, params: videoParameters),
         ),
         fastConnectOptions: FastConnectOptions(
           microphone: TrackOption(track: audioTrack),
@@ -271,8 +264,7 @@ class ChatCallInstance {
     room.addListener(onRoomDidUpdate);
     setupRoomListeners(context);
     sortParticipants();
-    WidgetsBindingCompatible.instance
-        ?.addPostFrameCallback((_) => autoPublish(context));
+    WidgetsBindingCompatible.instance?.addPostFrameCallback((_) => autoPublish(context));
 
     if (lkPlatformIsMobile()) {
       Hardware.instance.setSpeakerphoneOn(true);
@@ -347,8 +339,7 @@ class ChatCallInstance {
       }
 
       // First joined people first
-      return a.participant.joinedAt.millisecondsSinceEpoch -
-          b.participant.joinedAt.millisecondsSinceEpoch;
+      return a.participant.joinedAt.millisecondsSinceEpoch - b.participant.joinedAt.millisecondsSinceEpoch;
     });
 
     ParticipantTrack localTrack = ParticipantTrack(
@@ -357,8 +348,7 @@ class ChatCallInstance {
       isScreenShare: false,
     );
     if (room.localParticipant != null) {
-      final localParticipantTracks =
-          room.localParticipant?.videoTrackPublications;
+      final localParticipantTracks = room.localParticipant?.videoTrackPublications;
       if (localParticipantTracks != null) {
         for (var t in localParticipantTracks) {
           localTrack.videoTrack = t.track;
@@ -371,8 +361,7 @@ class ChatCallInstance {
     if (focusTrack == null) {
       focusTrack = participantTracks.first;
     } else {
-      final idx = participantTracks
-          .indexWhere((x) => focusTrack!.participant.sid == x.participant.sid);
+      final idx = participantTracks.indexWhere((x) => focusTrack!.participant.sid == x.participant.sid);
       focusTrack = participantTracks[idx];
     }
 
