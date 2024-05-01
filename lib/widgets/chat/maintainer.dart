@@ -55,23 +55,19 @@ class _ChatMaintainerState extends State<ChatMaintainer> {
           switch (result.method) {
             case 'messages.new':
               final payload = Message.fromJson(result.payload!);
-              if (payload.channelId == widget.channel.id)
-                widget.onInsertMessage(payload);
+              if (payload.channelId == widget.channel.id) widget.onInsertMessage(payload);
               break;
             case 'messages.update':
               final payload = Message.fromJson(result.payload!);
-              if (payload.channelId == widget.channel.id)
-                widget.onUpdateMessage(payload);
+              if (payload.channelId == widget.channel.id) widget.onUpdateMessage(payload);
               break;
             case 'messages.burnt':
               final payload = Message.fromJson(result.payload!);
-              if (payload.channelId == widget.channel.id)
-                widget.onDeleteMessage(payload);
+              if (payload.channelId == widget.channel.id) widget.onDeleteMessage(payload);
               break;
             case 'calls.new':
               final payload = Call.fromJson(result.payload!);
-              if (payload.channelId == widget.channel.id)
-                widget.onCallStarted(payload);
+              if (payload.channelId == widget.channel.id) widget.onCallStarted(payload);
               break;
             case 'calls.end':
               final payload = Call.fromJson(result.payload!);

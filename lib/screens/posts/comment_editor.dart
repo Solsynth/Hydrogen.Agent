@@ -65,7 +65,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
         ? getRequestUri('interactive', '/api/p/$relatedDataset/$alias/comments')
         : getRequestUri('interactive', '/api/p/comments/${widget.editing!.id}');
 
-    final req = Request(widget.editing == null ? "POST" : "PUT", uri);
+    final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
     req.body = jsonEncode(<String, dynamic>{
       'alias': _alias,
@@ -140,12 +140,12 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
               if (snapshot.hasData) {
                 var userinfo = snapshot.data;
                 return ListTile(
-                  title: Text(userinfo["nick"]),
+                  title: Text(userinfo['nick']),
                   subtitle: Text(
                     AppLocalizations.of(context)!.postIdentityNotify,
                   ),
                   leading: AccountAvatar(
-                    source: userinfo["picture"],
+                    source: userinfo['picture'],
                     direct: true,
                   ),
                 );

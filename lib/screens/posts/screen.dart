@@ -11,25 +11,43 @@ import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/item.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class PostScreen extends StatefulWidget {
+class PostScreen extends StatelessWidget {
   final String dataset;
   final String alias;
 
   const PostScreen({super.key, required this.alias, required this.dataset});
 
   @override
-  State<PostScreen> createState() => _PostScreenState();
+  Widget build(BuildContext context) {
+    return IndentWrapper(
+      title: AppLocalizations.of(context)!.post,
+      noSafeArea: true,
+      hideDrawer: true,
+      child: PostScreenWidget(
+        dataset: dataset,
+        alias: alias,
+      ),
+    );
+  }
 }
 
-class _PostScreenState extends State<PostScreen> {
+class PostScreenWidget extends StatefulWidget {
+  final String dataset;
+  final String alias;
+
+  const PostScreenWidget({super.key, required this.dataset, required this.alias});
+
+  @override
+  State<PostScreenWidget> createState() => _PostScreenWidgetState();
+}
+
+class _PostScreenWidgetState extends State<PostScreenWidget> {
   final _client = http.Client();
 
-  final PagingController<int, Post> _commentPagingController =
-      PagingController(firstPageKey: 0);
+  final PagingController<int, Post> _commentPagingController = PagingController(firstPageKey: 0);
 
   Future<Post?> fetchPost(BuildContext context) async {
-    final uri = getRequestUri(
-        'interactive', '/api/p/${widget.dataset}/${widget.alias}');
+    final uri = getRequestUri('interactive', '/api/p/${widget.dataset}/${widget.alias}');
     final res = await _client.get(uri);
     if (res.statusCode != 200) {
       final err = utf8.decode(res.bodyBytes);
@@ -42,43 +60,38 @@ class _PostScreenState extends State<PostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
-      noSafeArea: true,
-      hideDrawer: true,
-      title: AppLocalizations.of(context)!.post,
-      child: FutureBuilder(
-        future: fetchPost(context),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: PostItem(
-                    item: snapshot.data!,
-                    brief: false,
-                    ripple: false,
-                  ),
+    return FutureBuilder(
+      future: fetchPost(context),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: PostItem(
+                  item: snapshot.data!,
+                  brief: false,
+                  ripple: false,
                 ),
-                SliverToBoxAdapter(
-                  child: CommentListHeader(
-                    related: snapshot.data!,
-                    paging: _commentPagingController,
-                  ),
-                ),
-                CommentList(
+              ),
+              SliverToBoxAdapter(
+                child: CommentListHeader(
                   related: snapshot.data!,
-                  dataset: widget.dataset,
                   paging: _commentPagingController,
                 ),
-              ],
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+              ),
+              CommentList(
+                related: snapshot.data!,
+                dataset: widget.dataset,
+                paging: _commentPagingController,
+              ),
+            ],
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 

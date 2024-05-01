@@ -73,9 +73,9 @@ class _ControlsWidgetState extends State<ControlsWidget> {
     if (await context.showDisconnectDialog() != true) return;
 
     final chat = context.read<ChatProvider>();
-    if (chat.call != null) {
-      chat.call!.deactivate();
-      chat.call!.dispose();
+    if (chat.currentCall != null) {
+      chat.currentCall!.deactivate();
+      chat.currentCall!.dispose();
       router.pop();
     }
   }

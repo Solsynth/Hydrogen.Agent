@@ -14,7 +14,7 @@ class CallOverlay extends StatelessWidget {
 
     final chat = context.watch<ChatProvider>();
 
-    if (chat.isShown || chat.call == null) {
+    if (chat.isCallShown || chat.currentCall == null) {
       return Container();
     }
 
@@ -54,8 +54,8 @@ class CallOverlay extends StatelessWidget {
       onTap: () {
         router.pushNamed(
           'chat.channel.call',
-          extra: chat.call!.info,
-          pathParameters: {'channel': chat.call!.channel.alias},
+          extra: chat.currentCall!.info,
+          pathParameters: {'channel': chat.currentCall!.channel.alias},
         );
       },
     );

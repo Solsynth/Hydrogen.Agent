@@ -14,12 +14,12 @@ class AuthProvider extends ChangeNotifier {
   final userinfoEndpoint = getRequestUri('passport', '/api/users/me');
   final redirectUrl = Uri.parse('solian://auth');
 
-  static const clientId = "solian";
-  static const clientSecret = "_F4%q2Eea3";
+  static const clientId = 'solian';
+  static const clientSecret = '_F4%q2Eea3';
 
   static const storage = FlutterSecureStorage();
-  static const storageKey = "identity";
-  static const profileKey = "profiles";
+  static const storageKey = 'identity';
+  static const profileKey = 'profiles';
 
   /// Before use this variable to make request
   /// **MAKE SURE YOU HAVE CALL THE isAuthorized() METHOD**
@@ -57,7 +57,7 @@ class AuthProvider extends ChangeNotifier {
       password,
       identifier: clientId,
       secret: clientSecret,
-      scopes: ["openid"],
+      scopes: ['openid'],
       basicAuth: false,
     );
   }
@@ -115,6 +115,6 @@ class AuthProvider extends ChangeNotifier {
 
   Future<dynamic> getProfiles() async {
     const storage = FlutterSecureStorage();
-    return jsonDecode(await storage.read(key: profileKey) ?? "{}");
+    return jsonDecode(await storage.read(key: profileKey) ?? '{}');
   }
 }

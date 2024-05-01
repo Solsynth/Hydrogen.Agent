@@ -13,8 +13,8 @@ import 'package:timeago/timeago.dart' as timeago;
 
 class PostItem extends StatefulWidget {
   final Post item;
-  final bool? brief;
-  final bool? ripple;
+  final bool brief;
+  final bool ripple;
   final Function? onUpdate;
   final Function? onDelete;
   final Function? onTap;
@@ -22,8 +22,8 @@ class PostItem extends StatefulWidget {
   const PostItem({
     super.key,
     required this.item,
-    this.brief,
-    this.ripple,
+    this.brief = true,
+    this.ripple = true,
     this.onUpdate,
     this.onDelete,
     this.onTap,
@@ -79,9 +79,9 @@ class _PostItemState extends State<PostItem> {
   Widget renderContent() {
     switch (widget.item.modelType) {
       case 'article':
-        return ArticleContent(item: widget.item, brief: widget.brief ?? true);
+        return ArticleContent(item: widget.item, brief: widget.brief);
       default:
-        return MomentContent(item: widget.item, brief: widget.brief ?? true);
+        return MomentContent(item: widget.item, brief: widget.brief);
     }
   }
 
@@ -163,7 +163,7 @@ class _PostItemState extends State<PostItem> {
 
     Widget content;
 
-    if (widget.brief ?? true) {
+    if (widget.brief) {
       content = Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Column(
@@ -199,7 +199,7 @@ class _PostItemState extends State<PostItem> {
       content = Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12, top: 16),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -230,17 +230,17 @@ class _PostItemState extends State<PostItem> {
             child: Divider(thickness: 0.3),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: renderContent(),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: renderAttachments(),
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
               child: renderReactions(),
             ),
           ),
@@ -248,9 +248,7 @@ class _PostItemState extends State<PostItem> {
       );
     }
 
-    final ripple = widget.ripple ?? true;
-
-    if (ripple) {
+    if (widget.ripple) {
       return InkWell(
         child: content,
         onTap: () {

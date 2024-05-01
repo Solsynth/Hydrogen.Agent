@@ -29,7 +29,7 @@ class NotifyProvider extends ChangeNotifier {
     const androidSettings = AndroidInitializationSettings('app_icon');
     const darwinSettings = DarwinInitializationSettings(
       notificationCategories: [
-        DarwinNotificationCategory("general"),
+        DarwinNotificationCategory('general'),
       ],
     );
     const linuxSettings =
@@ -46,8 +46,9 @@ class NotifyProvider extends ChangeNotifier {
   }
 
   Future<void> requestPermissions() async {
-    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux))
+    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) {
       return;
+    }
     await Permission.notification.request();
   }
 

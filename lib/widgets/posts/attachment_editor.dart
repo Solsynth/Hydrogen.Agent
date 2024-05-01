@@ -112,7 +112,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     var res = await auth.client!.send(req);
     if (res.statusCode == 200) {
       var result = Attachment.fromJson(
-        jsonDecode(utf8.decode(await res.stream.toBytes()))["info"],
+        jsonDecode(utf8.decode(await res.stream.toBytes()))['info'],
       );
       setState(() => _attachments.add(result));
       widget.onUpdate(_attachments);
@@ -252,7 +252,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           Text(
-                            "${getFileType(element)} · ${formatBytes(element.filesize)}",
+                            '${getFileType(element)} · ${formatBytes(element.filesize)}',
                           ),
                         ],
                       ),

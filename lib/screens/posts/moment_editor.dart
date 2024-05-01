@@ -55,7 +55,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
         ? getRequestUri('interactive', '/api/p/moments')
         : getRequestUri('interactive', '/api/p/moments/${widget.editing!.id}');
 
-    final req = Request(widget.editing == null ? "POST" : "PUT", uri);
+    final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
     req.body = jsonEncode(<String, dynamic>{
       'alias': _alias,
@@ -130,12 +130,12 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
               if (snapshot.hasData) {
                 var userinfo = snapshot.data;
                 return ListTile(
-                  title: Text(userinfo["nick"]),
+                  title: Text(userinfo['nick']),
                   subtitle: Text(
                     AppLocalizations.of(context)!.postIdentityNotify,
                   ),
                   leading: AccountAvatar(
-                    source: userinfo["picture"],
+                    source: userinfo['picture'],
                     direct: true,
                   ),
                 );

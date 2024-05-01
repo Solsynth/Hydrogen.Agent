@@ -56,7 +56,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
         ? getRequestUri('messaging', '/api/channels/${widget.channel}/messages')
         : getRequestUri('messaging', '/api/channels/${widget.channel}/messages/${widget.editing!.id}');
 
-    final req = Request(widget.editing == null ? "POST" : "PUT", uri);
+    final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
     req.body = jsonEncode(<String, dynamic>{
       'content': _textController.value.text,
@@ -163,7 +163,6 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
                   focusNode: _focusNode,
                   controller: _textController,
                   maxLines: null,
-                  autofocus: true,
                   autocorrect: true,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration.collapsed(

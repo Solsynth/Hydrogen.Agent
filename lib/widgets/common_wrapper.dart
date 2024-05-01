@@ -22,7 +22,11 @@ class LayoutWrapper extends StatelessWidget {
     final content = child ?? Container();
 
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: appBarActions),
+      appBar: AppBar(
+        title: Text(title),
+        actions: appBarActions,
+        centerTitle: false,
+      ),
       floatingActionButton: floatingActionButton,
       drawer: const SolianNavigationDrawer(),
       body: noSafeArea ? content : SafeArea(child: content),

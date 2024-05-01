@@ -26,29 +26,29 @@ class Friendship {
   });
 
   factory Friendship.fromJson(Map<String, dynamic> json) => Friendship(
-        id: json["id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"],
-        accountId: json["account_id"],
-        relatedId: json["related_id"],
-        blockedBy: json["blocked_by"],
-        account: Account.fromJson(json["account"]),
-        related: Account.fromJson(json["related"]),
-        status: json["status"],
+        id: json['id'],
+        createdAt: DateTime.parse(json['created_at']),
+        updatedAt: DateTime.parse(json['updated_at']),
+        deletedAt: json['deleted_at'],
+        accountId: json['account_id'],
+        relatedId: json['related_id'],
+        blockedBy: json['blocked_by'],
+        account: Account.fromJson(json['account']),
+        related: Account.fromJson(json['related']),
+        status: json['status'],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
-        "deleted_at": deletedAt,
-        "account_id": accountId,
-        "related_id": relatedId,
-        "blocked_by": blockedBy,
-        "account": account.toJson(),
-        "related": related.toJson(),
-        "status": status,
+        'id': id,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'deleted_at': deletedAt,
+        'account_id': accountId,
+        'related_id': relatedId,
+        'blocked_by': blockedBy,
+        'account': account.toJson(),
+        'related': related.toJson(),
+        'status': status,
       };
 
   Account getOtherside(int selfId) {

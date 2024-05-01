@@ -24,14 +24,14 @@ class _ChatCallState extends State<ChatCall> {
 
   late ChatProvider _chat;
 
-  ChatCallInstance get _call => _chat.call!;
+  ChatCallInstance get _call => _chat.currentCall!;
 
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _chat.setShown(true);
+      _chat.setCallShown(true);
     });
   }
 
@@ -40,13 +40,13 @@ class _ChatCallState extends State<ChatCall> {
     _chat = context.watch<ChatProvider>();
     if (!_isHandled) {
       _isHandled = true;
-      if (_chat.handleCall(widget.call, widget.call.channel)) {
-        _chat.call?.init();
+      if (_chat.handleCallJoin(widget.call, widget.call.channel)) {
+        _chat.currentCall?.init();
       }
     }
 
     Widget content;
-    if (_chat.call == null) {
+    if (_chat.currentCall == null) {
       content = const Center(
         child: CircularProgressIndicator(),
       );
@@ -136,7 +136,7 @@ class _ChatCallState extends State<ChatCall> {
 
   @override
   void deactivate() {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _chat.setShown(false));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _chat.setCallShown(false));
     super.deactivate();
   }
 }

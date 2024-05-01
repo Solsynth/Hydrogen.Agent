@@ -36,42 +36,42 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-        id: json["id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"],
-        content: json["content"],
-        metadata: json["metadata"],
-        type: json["type"],
+        id: json['id'],
+        createdAt: DateTime.parse(json['created_at']),
+        updatedAt: DateTime.parse(json['updated_at']),
+        deletedAt: json['deleted_at'],
+        content: json['content'],
+        metadata: json['metadata'],
+        type: json['type'],
         attachments: List<Attachment>.from(
-            json["attachments"]?.map((x) => Attachment.fromJson(x)) ??
+            json['attachments']?.map((x) => Attachment.fromJson(x)) ??
                 List.empty()),
-        channel: Channel.fromJson(json["channel"]),
-        sender: Sender.fromJson(json["sender"]),
-        replyId: json["reply_id"],
-        replyTo: json["reply_to"] != null
-            ? Message.fromJson(json["reply_to"])
+        channel: Channel.fromJson(json['channel']),
+        sender: Sender.fromJson(json['sender']),
+        replyId: json['reply_id'],
+        replyTo: json['reply_to'] != null
+            ? Message.fromJson(json['reply_to'])
             : null,
-        channelId: json["channel_id"],
-        senderId: json["sender_id"],
+        channelId: json['channel_id'],
+        senderId: json['sender_id'],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
-        "deleted_at": deletedAt,
-        "content": content,
-        "metadata": metadata,
-        "type": type,
-        "attachments": List<dynamic>.from(
+        'id': id,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'deleted_at': deletedAt,
+        'content': content,
+        'metadata': metadata,
+        'type': type,
+        'attachments': List<dynamic>.from(
             attachments?.map((x) => x.toJson()) ?? List.empty()),
-        "channel": channel?.toJson(),
-        "sender": sender.toJson(),
-        "reply_id": replyId,
-        "reply_to": replyTo?.toJson(),
-        "channel_id": channelId,
-        "sender_id": senderId,
+        'channel': channel?.toJson(),
+        'sender': sender.toJson(),
+        'reply_id': replyId,
+        'reply_to': replyTo?.toJson(),
+        'channel_id': channelId,
+        'sender_id': senderId,
       };
 }
 
@@ -97,24 +97,24 @@ class Sender {
   });
 
   factory Sender.fromJson(Map<String, dynamic> json) => Sender(
-        id: json["id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"],
-        account: Account.fromJson(json["account"]),
-        channelId: json["channel_id"],
-        accountId: json["account_id"],
-        notify: json["notify"],
+        id: json['id'],
+        createdAt: DateTime.parse(json['created_at']),
+        updatedAt: DateTime.parse(json['updated_at']),
+        deletedAt: json['deleted_at'],
+        account: Account.fromJson(json['account']),
+        channelId: json['channel_id'],
+        accountId: json['account_id'],
+        notify: json['notify'],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
-        "deleted_at": deletedAt,
-        "account": account.toJson(),
-        "channel_id": channelId,
-        "account_id": accountId,
-        "notify": notify,
+        'id': id,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'deleted_at': deletedAt,
+        'account': account.toJson(),
+        'channel_id': channelId,
+        'account_id': accountId,
+        'notify': notify,
       };
 }

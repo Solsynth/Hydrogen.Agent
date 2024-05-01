@@ -42,7 +42,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
         ? getRequestUri('messaging', '/api/channels')
         : getRequestUri('messaging', '/api/channels/${widget.editing!.id}');
 
-    final req = Request(widget.editing == null ? "POST" : "PUT", uri);
+    final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
     req.body = jsonEncode(<String, dynamic>{
       'alias': _aliasController.value.text.toLowerCase(),

@@ -121,7 +121,7 @@ class CommentListHeader extends StatelessWidget {
                 return TextButton(
                   onPressed: () async {
                     final did = await router.pushNamed(
-                      "posts.comments.editor",
+                      'posts.comments.editor',
                       extra: CommentPostArguments(related: related),
                     );
                     if (did == true) paging.refresh();

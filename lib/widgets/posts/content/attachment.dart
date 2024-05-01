@@ -30,7 +30,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
 
   late final _videoPlayer = Player(
     configuration: PlayerConfiguration(
-      title: "Attachment #${getTag()}",
+      title: 'Attachment #${getTag()}',
       logLevel: MPVLogLevel.error,
     ),
   );

@@ -28,37 +28,37 @@ class Notification {
   });
 
   factory Notification.fromJson(Map<String, dynamic> json) => Notification(
-        id: json["id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"],
-        subject: json["subject"],
-        content: json["content"],
-        links: json["links"] != null
-            ? List<Link>.from(json["links"].map((x) => Link.fromJson(x)))
+        id: json['id'],
+        createdAt: DateTime.parse(json['created_at']),
+        updatedAt: DateTime.parse(json['updated_at']),
+        deletedAt: json['deleted_at'],
+        subject: json['subject'],
+        content: json['content'],
+        links: json['links'] != null
+            ? List<Link>.from(json['links'].map((x) => Link.fromJson(x)))
             : List.empty(),
-        isImportant: json["is_important"],
-        isRealtime: json["is_realtime"],
-        readAt: json["read_at"],
-        senderId: json["sender_id"],
-        recipientId: json["recipient_id"],
+        isImportant: json['is_important'],
+        isRealtime: json['is_realtime'],
+        readAt: json['read_at'],
+        senderId: json['sender_id'],
+        recipientId: json['recipient_id'],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
-        "deleted_at": deletedAt,
-        "subject": subject,
-        "content": content,
-        "links": links != null
+        'id': id,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'deleted_at': deletedAt,
+        'subject': subject,
+        'content': content,
+        'links': links != null
             ? List<dynamic>.from(links!.map((x) => x.toJson()))
             : List.empty(),
-        "is_important": isImportant,
-        "is_realtime": isRealtime,
-        "read_at": readAt,
-        "sender_id": senderId,
-        "recipient_id": recipientId,
+        'is_important': isImportant,
+        'is_realtime': isRealtime,
+        'read_at': readAt,
+        'sender_id': senderId,
+        'recipient_id': recipientId,
       };
 }
 
@@ -72,12 +72,12 @@ class Link {
   });
 
   factory Link.fromJson(Map<String, dynamic> json) => Link(
-        label: json["label"],
-        url: json["url"],
+        label: json['label'],
+        url: json['url'],
       );
 
   Map<String, dynamic> toJson() => {
-        "label": label,
-        "url": url,
+        'label': label,
+        'url': url,
       };
 }

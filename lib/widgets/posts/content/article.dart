@@ -55,7 +55,7 @@ class ArticleContent extends StatelessWidget {
                 },
                 imageBuilder: (url, _, __) {
                   Uri uri;
-                  if (url.toString().startsWith("/api/attachments")) {
+                  if (url.toString().startsWith('/api/attachments')) {
                     uri = getRequestUri('interactive', url.toString());
                   } else {
                     uri = url;

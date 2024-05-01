@@ -157,8 +157,9 @@ class _FriendScreenState extends State<FriendScreen> {
   DismissDirection getDismissDirection(Friendship relation) {
     if (relation.status == 2) return DismissDirection.endToStart;
     if (relation.status == 1) return DismissDirection.startToEnd;
-    if (relation.status == 0 && relation.relatedId != _selfId)
+    if (relation.status == 0 && relation.relatedId != _selfId) {
       return DismissDirection.startToEnd;
+    }
     return DismissDirection.horizontal;
   }
 

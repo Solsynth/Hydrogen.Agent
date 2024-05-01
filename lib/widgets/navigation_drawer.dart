@@ -39,21 +39,21 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
           icon: const Icon(Icons.explore),
           label: Text(AppLocalizations.of(context)!.explore),
         ),
-        "explore",
+        'explore',
       ),
       (
         NavigationDrawerDestination(
           icon: const Icon(Icons.send),
           label: Text(AppLocalizations.of(context)!.chat),
         ),
-        "chat",
+        'chat',
       ),
       (
         NavigationDrawerDestination(
           icon: const Icon(Icons.account_circle),
           label: Text(AppLocalizations.of(context)!.account),
         ),
-        "account",
+        'account',
       ),
     ];
 
@@ -69,7 +69,7 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.asset("assets/logo.png", width: 26, height: 26),
+              Image.asset('assets/logo.png', width: 26, height: 26),
               const SizedBox(width: 10),
               Text(
                 AppLocalizations.of(context)!.appName,

@@ -5,6 +5,7 @@ import 'package:solian/widgets/navigation_drawer.dart';
 
 class IndentWrapper extends LayoutWrapper {
   final bool hideDrawer;
+  final bool fixedAppBarColor;
 
   const IndentWrapper({
     super.key,
@@ -13,6 +14,7 @@ class IndentWrapper extends LayoutWrapper {
     super.floatingActionButton,
     super.appBarActions,
     this.hideDrawer = false,
+    this.fixedAppBarColor = false,
     super.noSafeArea = false,
   }) : super();
 
@@ -30,6 +32,8 @@ class IndentWrapper extends LayoutWrapper {
             : null,
         title: Text(title),
         actions: appBarActions,
+        centerTitle: false,
+        elevation: fixedAppBarColor ? 4 : null,
       ),
       floatingActionButton: floatingActionButton,
       drawer: const SolianNavigationDrawer(),

@@ -10,14 +10,14 @@ class NetworkPackage {
   });
 
   factory NetworkPackage.fromJson(Map<String, dynamic> json) => NetworkPackage(
-        method: json["w"],
-        message: json["m"],
-        payload: json["p"],
+        method: json['w'],
+        message: json['m'],
+        payload: json['p'],
       );
 
   Map<String, dynamic> toJson() => {
-        "w": method,
-        "m": message,
-        "p": payload,
+        'w': method,
+        'm': message,
+        'p': payload,
       };
 }

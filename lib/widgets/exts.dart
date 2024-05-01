@@ -9,8 +9,8 @@ extension SolianCommonExtensions on BuildContext {
       return message
           .split(' ')
           .map((element) =>
-              "${element[0].toUpperCase()}${element.substring(1).toLowerCase()}")
-          .join(" ");
+              '${element[0].toUpperCase()}${element.substring(1).toLowerCase()}')
+          .join(' ');
     }
 
     return showDialog<void>(

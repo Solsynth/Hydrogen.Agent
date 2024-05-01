@@ -97,7 +97,7 @@ class NotificationItem extends StatelessWidget {
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 34, bottom: 12),
               child: Text(
-                "Links",
+                'Links',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             ),
@@ -151,7 +151,7 @@ class NotificationItem extends StatelessWidget {
                       text: item.subject,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    const TextSpan(text: " is marked as read")
+                    const TextSpan(text: ' is marked as read')
                   ],
                 ),
               ),

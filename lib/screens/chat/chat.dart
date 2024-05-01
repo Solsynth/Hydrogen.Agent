@@ -4,69 +4,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
-import 'package:solian/models/call.dart';
-import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/chat/channel_action.dart';
 import 'package:solian/widgets/chat/maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
 import 'package:solian/widgets/chat/message_editor.dart';
-import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:http/http.dart' as http;
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatelessWidget {
   final String alias;
 
   const ChatScreen({super.key, required this.alias});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  Widget build(BuildContext context) {
+    return IndentWrapper(
+      title: AppLocalizations.of(context)!.post,
+      noSafeArea: true,
+      hideDrawer: true,
+      child: ChatScreenWidget(
+        alias: alias,
+      ),
+    );
+  }
 }
 
-class _ChatScreenState extends State<ChatScreen> {
-  Call? _ongoingCall;
-  Channel? _channelMeta;
+class ChatScreenWidget extends StatefulWidget {
+  final String alias;
+
+  const ChatScreenWidget({super.key, required this.alias});
+
+  @override
+  State<ChatScreenWidget> createState() => _ChatScreenWidgetState();
+}
+
+class _ChatScreenWidgetState extends State<ChatScreenWidget> {
+  bool _isReady = false;
 
   final PagingController<int, Message> _pagingController = PagingController(firstPageKey: 0);
 
-  final http.Client _client = http.Client();
-
-  Future<Channel> fetchMetadata() async {
-    var uri = getRequestUri('messaging', '/api/channels/${widget.alias}');
-    var res = await _client.get(uri);
-    if (res.statusCode == 200) {
-      final result = jsonDecode(utf8.decode(res.bodyBytes));
-      setState(() => _channelMeta = Channel.fromJson(result));
-      return _channelMeta!;
-    } else {
-      var message = utf8.decode(res.bodyBytes);
-      context.showErrorDialog(message);
-      throw Exception(message);
-    }
-  }
-
-  Future<Call?> fetchCall() async {
-    var uri = getRequestUri('messaging', '/api/channels/${widget.alias}/calls/ongoing');
-    var res = await _client.get(uri);
-    if (res.statusCode == 200) {
-      final result = jsonDecode(utf8.decode(res.bodyBytes));
-      setState(() => _ongoingCall = Call.fromJson(result));
-      return _ongoingCall;
-    } else if (res.statusCode != 404) {
-      var message = utf8.decode(res.bodyBytes);
-      context.showErrorDialog(message);
-      throw Exception(message);
-    } else {
-      return null;
-    }
-  }
+  late final ChatProvider _chat;
 
   Future<void> fetchMessages(int pageKey, BuildContext context) async {
     final auth = context.read<AuthProvider>();
@@ -142,11 +125,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () {
-      fetchMetadata();
-      fetchCall();
-    });
-
     _pagingController.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
 
     super.initState();
@@ -180,6 +158,11 @@ class _ChatScreenState extends State<ChatScreen> {
       );
     }
 
+    if (!_isReady) {
+      _isReady = true;
+      _chat = context.watch<ChatProvider>();
+    }
+
     final callBanner = MaterialBanner(
       padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.call_received),
@@ -192,7 +175,7 @@ class _ChatScreenState extends State<ChatScreen> {
           onPressed: () {
             router.pushNamed(
               'chat.channel.call',
-              extra: _ongoingCall,
+              extra: _chat.ongoingCall,
               pathParameters: {'channel': widget.alias},
             );
           },
@@ -200,69 +183,52 @@ class _ChatScreenState extends State<ChatScreen> {
       ],
     );
 
-    return IndentWrapper(
-      hideDrawer: true,
-      title: _channelMeta?.name ?? 'Loading...',
-      appBarActions: _channelMeta != null
-          ? [
-              ChannelCallAction(
-                call: _ongoingCall,
-                channel: _channelMeta!,
-                onUpdate: () => fetchMetadata(),
-              ),
-              ChannelManageAction(
-                channel: _channelMeta!,
-                onUpdate: () => fetchMetadata(),
-              ),
-            ]
-          : [],
-      child: FutureBuilder(
-        future: fetchMetadata(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return FutureBuilder(
+      future: _chat.fetchChannel(widget.alias),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          return ChatMaintainer(
-            channel: snapshot.data!,
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: PagedListView<int, Message>(
-                        reverse: true,
-                        pagingController: _pagingController,
-                        builderDelegate: PagedChildBuilderDelegate<Message>(
-                          animateTransitions: true,
-                          transitionDuration: 500.ms,
-                          itemBuilder: chatHistoryBuilder,
-                          noItemsFoundIndicatorBuilder: (_) => Container(),
-                        ),
+        return ChatMaintainer(
+          channel: snapshot.data!,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: PagedListView<int, Message>(
+                      reverse: true,
+                      pagingController: _pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<Message>(
+                        animateTransitions: true,
+                        transitionDuration: 500.ms,
+                        itemBuilder: chatHistoryBuilder,
+                        noItemsFoundIndicatorBuilder: (_) => Container(),
                       ),
                     ),
-                    ChatMessageEditor(
-                      channel: widget.alias,
-                      editing: _editingItem,
-                      replying: _replyingItem,
-                      onReset: () => setState(() {
-                        _editingItem = null;
-                        _replyingItem = null;
-                      }),
-                    ),
-                  ],
-                ),
-                _ongoingCall != null ? callBanner.animate().slideY() : Container(),
-              ],
-            ),
-            onInsertMessage: (message) => addMessage(message),
-            onUpdateMessage: (message) => updateMessage(message),
-            onDeleteMessage: (message) => deleteMessage(message),
-            onCallStarted: (call) => setState(() => _ongoingCall = call),
-            onCallEnded: () => setState(() => _ongoingCall = null),
-          );
-        },
-      ),
+                  ),
+                  ChatMessageEditor(
+                    channel: widget.alias,
+                    editing: _editingItem,
+                    replying: _replyingItem,
+                    onReset: () => setState(() {
+                      _editingItem = null;
+                      _replyingItem = null;
+                    }),
+                  ),
+                ],
+              ),
+              _chat.ongoingCall != null ? callBanner.animate().slideY() : Container(),
+            ],
+          ),
+          onInsertMessage: (message) => addMessage(message),
+          onUpdateMessage: (message) => updateMessage(message),
+          onDeleteMessage: (message) => deleteMessage(message),
+          onCallStarted: (call) => _chat.setOngoingCall(call),
+          onCallEnded: () => _chat.setOngoingCall(null),
+        );
+      },
     );
   }
 }

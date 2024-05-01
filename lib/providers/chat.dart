@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +18,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatProvider extends ChangeNotifier {
   bool isOpened = false;
-  bool isShown = false;
+  bool isCallShown = false;
 
-  ChatCallInstance? call;
+  Call? ongoingCall;
+  Channel? focusChannel;
+  ChatCallInstance? currentCall;
 
   Future<WebSocketChannel?> connect(AuthProvider auth) async {
     if (auth.client == null) await auth.loadClient();
@@ -43,17 +46,51 @@ class ChatProvider extends ChangeNotifier {
     return channel;
   }
 
-  bool handleCall(Call call, Channel channel,
-      {Function? onUpdate, Function? onDispose}) {
-    if (this.call != null) return false;
+  Future<Channel> fetchChannel(String alias) async {
+    final Client client = Client();
 
-    this.call = ChatCallInstance(
+    var uri = getRequestUri('messaging', '/api/channels/$alias');
+    var res = await client.get(uri);
+    if (res.statusCode == 200) {
+      final result = jsonDecode(utf8.decode(res.bodyBytes));
+      focusChannel = Channel.fromJson(result);
+      notifyListeners();
+      return focusChannel!;
+    } else {
+      var message = utf8.decode(res.bodyBytes);
+      throw Exception(message);
+    }
+  }
+
+  Future<Call?> fetchOngoingCall(String alias) async {
+    final Client client = Client();
+
+    var uri = getRequestUri('messaging', '/api/channels/$alias/calls/ongoing');
+    var res = await client.get(uri);
+    if (res.statusCode == 200) {
+      final result = jsonDecode(utf8.decode(res.bodyBytes));
+      ongoingCall = Call.fromJson(result);
+      notifyListeners();
+      return ongoingCall;
+    } else if (res.statusCode != 404) {
+      var message = utf8.decode(res.bodyBytes);
+      throw Exception(message);
+    } else {
+      return null;
+    }
+  }
+
+  bool handleCallJoin(Call call, Channel channel,
+      {Function? onUpdate, Function? onDispose}) {
+    if (currentCall != null) return false;
+
+    currentCall = ChatCallInstance(
       onUpdate: () {
         notifyListeners();
         if (onUpdate != null) onUpdate();
       },
       onDispose: () {
-        this.call = null;
+        currentCall = null;
         notifyListeners();
         if (onDispose != null) onDispose();
       },
@@ -64,8 +101,13 @@ class ChatProvider extends ChangeNotifier {
     return true;
   }
 
-  void setShown(bool state) {
-    isShown = state;
+  void setOngoingCall(Call? item) {
+    ongoingCall = item;
+    notifyListeners();
+  }
+
+  void setCallShown(bool state) {
+    isCallShown = state;
     notifyListeners();
   }
 }
@@ -118,8 +160,9 @@ class ChatCallInstance {
   }
 
   Future<void> checkPermissions() async {
-    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux))
+    if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) {
       return;
+    }
 
     await Permission.camera.request();
     await Permission.microphone.request();
@@ -133,7 +176,7 @@ class ChatCallInstance {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) {
       onDispose();
-      throw Exception("unauthorized");
+      throw Exception('unauthorized');
     }
 
     var uri = getRequestUri(

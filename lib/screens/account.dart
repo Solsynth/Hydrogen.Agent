@@ -97,7 +97,7 @@ class NameCard extends StatelessWidget {
   Future<Widget> renderAvatar(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     final profiles = await auth.getProfiles();
-    return AccountAvatar(source: profiles["picture"], direct: true);
+    return AccountAvatar(source: profiles['picture'], direct: true);
   }
 
   Future<Column> renderLabel(BuildContext context) async {
@@ -107,13 +107,13 @@ class NameCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          profiles["nick"],
+          profiles['nick'],
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        Text(profiles["email"])
+        Text(profiles['email'])
       ],
     );
   }

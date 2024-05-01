@@ -134,8 +134,8 @@ class _ReactionActionPopupState extends State<ReactionActionPopup> {
                 child: ListTile(
                   title: Text(info.value.icon),
                   subtitle: Text(
-                    ":${info.key}:",
-                    style: const TextStyle(fontFamily: "monospace"),
+                    ':${info.key}:',
+                    style: const TextStyle(fontFamily: 'monospace'),
                   ),
                 ),
               );
