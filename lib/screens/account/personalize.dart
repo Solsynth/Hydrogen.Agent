@@ -84,7 +84,6 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
       getRequestUri('passport', '/api/users/me'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        'name': _usernameController.value.text,
         'nick': _nicknameController.value.text,
         'description': _descriptionController.value.text,
         'first_name': _firstNameController.value.text,
@@ -117,7 +116,7 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 32),
       child: Column(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
@@ -126,6 +125,7 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
               Flexible(
                 flex: 1,
                 child: TextField(
+                  readOnly: true,
                   controller: _usernameController,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),

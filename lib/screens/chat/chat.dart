@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
@@ -200,7 +201,13 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
     );
 
     return FutureBuilder(
-      future: _chat.fetchChannel(widget.alias),
+      future: (() async {
+        final res = await Future.wait([
+          _chat.fetchOngoingCall(widget.alias),
+          _chat.fetchChannel(widget.alias),
+        ]);
+        return res[0] as Channel;
+      })(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
           return const Center(child: CircularProgressIndicator());
