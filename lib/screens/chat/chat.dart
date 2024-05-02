@@ -30,7 +30,6 @@ class ChatScreen extends StatelessWidget {
 
     return IndentWrapper(
       title: chat.focusChannel?.name ?? 'Loading...',
-      noSafeArea: true,
       hideDrawer: true,
       appBarActions: chat.focusChannel != null
           ? [
@@ -206,7 +205,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
           _chat.fetchOngoingCall(widget.alias),
           _chat.fetchChannel(widget.alias),
         ]);
-        return res[0] as Channel;
+        return res[1] as Channel;
       })(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
