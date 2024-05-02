@@ -12,6 +12,7 @@ class AttachmentItem extends StatefulWidget {
   final String url;
   final String? tag;
   final String? badge;
+  final bool noTag;
 
   const AttachmentItem({
     super.key,
@@ -19,6 +20,7 @@ class AttachmentItem extends StatefulWidget {
     required this.url,
     this.tag,
     this.badge,
+    this.noTag = false,
   });
 
   @override
@@ -50,7 +52,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
   @override
   Widget build(BuildContext context) {
     const borderRadius = Radius.circular(8);
-    final tag = getTag();
+    final tag = widget.noTag ? const Uuid().v4() : getTag();
 
     Widget content;
 
@@ -128,12 +130,16 @@ class _AttachmentItemState extends State<AttachmentItem> {
 class AttachmentList extends StatelessWidget {
   final List<Attachment> items;
   final String provider;
+  final bool noTag;
 
-  const AttachmentList(
-      {super.key, required this.items, required this.provider});
+  const AttachmentList({
+    super.key,
+    required this.items,
+    required this.provider,
+    this.noTag = false,
+  });
 
-  Uri getFileUri(String fileId) =>
-      getRequestUri(provider, '/api/attachments/o/$fileId');
+  Uri getFileUri(String fileId) => getRequestUri(provider, '/api/attachments/o/$fileId');
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +162,7 @@ class AttachmentList extends StatelessWidget {
                 tag: item.fileId,
                 url: getFileUri(item.fileId).toString(),
                 badge: items.length <= 1 ? null : badge,
+                noTag: noTag,
               ),
             );
           },

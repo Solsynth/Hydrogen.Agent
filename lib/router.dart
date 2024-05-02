@@ -4,6 +4,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
+import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/chat/call.dart';
 import 'package:solian/screens/chat/chat.dart';
@@ -106,6 +107,11 @@ final router = GoRouter(
       path: '/account/friend',
       name: 'account.friend',
       builder: (context, state) => const FriendScreen(),
+    ),
+    GoRoute(
+      path: '/account/personalize',
+      name: 'account.personalize',
+      builder: (context, state) => const PersonalizeScreen(),
     ),
   ],
 );

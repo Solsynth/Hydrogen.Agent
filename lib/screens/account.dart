@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/friend.dart';
+import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/widgets/account/avatar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/empty.dart';
@@ -28,6 +29,8 @@ class _AccountScreenState extends State<AccountScreen> {
       switch (_selectedTab) {
         case 'account.friend':
           return const FriendScreenWidget();
+        case 'account.personalize':
+          return const PersonalizeScreenWidget();
         default:
           return const SelectionEmptyWidget();
       }
@@ -94,8 +97,16 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
       return Column(
         children: [
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+            padding: EdgeInsets.only(top: 16, bottom: 8, left: 24, right: 24),
             child: NameCard(),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+            leading: const Icon(Icons.color_lens),
+            title: Text(AppLocalizations.of(context)!.personalize),
+            onTap: () {
+              widget.onSelect('account.personalize', AppLocalizations.of(context)!.personalize);
+            },
           ),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 34),
@@ -167,12 +178,18 @@ class NameCard extends StatelessWidget {
       children: [
         Text(
           profiles['nick'],
+          maxLines: 1,
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        Text(profiles['email'])
+        Text(
+          profiles['email'],
+          maxLines: 1,
+          style: const TextStyle(overflow: TextOverflow.ellipsis),
+        )
       ],
     );
   }
@@ -201,7 +218,7 @@ class NameCard extends StatelessWidget {
                 future: renderLabel(context),
                 builder: (BuildContext context, AsyncSnapshot<Column> snapshot) {
                   if (snapshot.hasData) {
-                    return snapshot.data!;
+                    return Expanded(child: snapshot.data!);
                   } else {
                     return const Column();
                   }
@@ -221,7 +238,13 @@ class ActionCard extends StatelessWidget {
   final String caption;
   final Function onTap;
 
-  const ActionCard({super.key, required this.onTap, required this.title, required this.caption, required this.icon});
+  const ActionCard({
+    super.key,
+    required this.onTap,
+    required this.title,
+    required this.caption,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -248,9 +271,13 @@ class ActionCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
+                  overflow: TextOverflow.clip,
                 ),
               ),
-              Text(caption),
+              Text(
+                caption,
+                style: const TextStyle(overflow: TextOverflow.clip),
+              ),
             ],
           ),
         ),

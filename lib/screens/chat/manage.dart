@@ -53,9 +53,7 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
         leading: const Icon(Icons.settings),
         title: Text(AppLocalizations.of(context)!.settings),
         onTap: () async {
-          router
-              .pushNamed('chat.channel.editor', extra: widget.channel)
-              .then((did) {
+          router.pushNamed('chat.channel.editor', extra: widget.channel).then((did) {
             if (did == true) {
               if (router.canPop()) router.pop('refresh');
             }
@@ -81,14 +79,10 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.channel.name,
-                            style: Theme.of(context).textTheme.bodyLarge),
-                        Text(widget.channel.description,
-                            style: Theme.of(context).textTheme.bodySmall),
-                      ]),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(widget.channel.name, style: Theme.of(context).textTheme.bodyLarge),
+                    Text(widget.channel.description, style: Theme.of(context).textTheme.bodySmall),
+                  ]),
                 )
               ],
             ),
@@ -116,12 +110,8 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
                 ...(_isOwned ? authorizedItems : List.empty()),
                 const Divider(thickness: 0.3),
                 ListTile(
-                  leading: _isOwned
-                      ? const Icon(Icons.delete)
-                      : const Icon(Icons.exit_to_app),
-                  title: Text(_isOwned
-                      ? AppLocalizations.of(context)!.delete
-                      : AppLocalizations.of(context)!.exit),
+                  leading: _isOwned ? const Icon(Icons.delete) : const Icon(Icons.exit_to_app),
+                  title: Text(_isOwned ? AppLocalizations.of(context)!.delete : AppLocalizations.of(context)!.exit),
                   onTap: () => promptLeaveChannel(),
                 ),
               ],

@@ -58,8 +58,27 @@ class HttpClient extends http.BaseClient {
         throw Exception(utf8.decode(result.bodyBytes));
       }
 
-      request.headers['Authorization'] = 'Bearer $currentToken';
-      return await _client.send(request);
+      http.BaseRequest newRequest;
+      if (request is http.Request) {
+        newRequest = http.Request(request.method, request.url)
+          ..encoding = request.encoding
+          ..bodyBytes = request.bodyBytes;
+      } else if (request is http.MultipartRequest) {
+        newRequest = http.MultipartRequest(request.method, request.url)
+          ..fields.addAll(request.fields)
+          ..files.addAll(request.files);
+      } else {
+        throw Exception('unsupported request type to auto retry');
+      }
+
+      newRequest
+        ..persistentConnection = request.persistentConnection
+        ..followRedirects = request.followRedirects
+        ..maxRedirects = request.maxRedirects
+        ..headers.addAll(request.headers)
+        ..headers['Authorization'] = 'Bearer $currentToken';
+
+      return await _client.send(newRequest);
     }
 
     return res;
