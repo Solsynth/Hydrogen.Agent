@@ -169,13 +169,17 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
             right: 12,
           ),
           child: ChatMessage(
-            key: Key('m${item.id}'),
             item: item,
             underMerged: isMerged,
           ),
         ),
         onLongPress: () => viewActions(item),
-      );
+      ).animate(key: Key('m${item.id}'), autoPlay: true).slideY(
+            curve: Curves.fastEaseInToSlowEaseOut,
+            duration: 350.ms,
+            begin: 0.25,
+            end: 0,
+          );
     }
 
     if (!_isReady) {
@@ -219,7 +223,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<Message>(
                     animateTransitions: true,
-                    transitionDuration: 500.ms,
+                    transitionDuration: 350.ms,
                     itemBuilder: chatHistoryBuilder,
                     noItemsFoundIndicatorBuilder: (_) => Container(),
                   ),
