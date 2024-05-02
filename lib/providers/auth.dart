@@ -7,7 +7,9 @@ import 'package:solian/utils/http.dart';
 import 'package:solian/utils/service_url.dart';
 
 class AuthProvider extends ChangeNotifier {
-  AuthProvider();
+  AuthProvider() {
+    loadClient();
+  }
 
   final deviceEndpoint = getRequestUri('passport', '/api/notifications/subscribe');
   final tokenEndpoint = getRequestUri('passport', '/api/auth/token');
@@ -39,6 +41,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } else {
+      client = HttpClient(onTokenRefreshed: setToken);
       return false;
     }
   }

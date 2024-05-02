@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/screens/account/friend.dart';
 import 'package:solian/widgets/account/avatar.dart';
-import 'package:solian/widgets/common_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/empty.dart';
+import 'package:solian/widgets/indent_wrapper.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -14,13 +16,71 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  bool isAuthorized = false;
+  String? _title;
+  String? _selectedTab;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth >= 600;
+
+    Widget renderContent() {
+      switch (_selectedTab) {
+        case 'account.friend':
+          return const FriendScreenWidget();
+        default:
+          return const SelectionEmptyWidget();
+      }
+    }
+
+    return IndentWrapper(
+      title: _title ?? AppLocalizations.of(context)!.account,
+      noSafeArea: true,
+      fixedAppBarColor: true,
+      child: isLargeScreen
+          ? Row(
+              children: [
+                Flexible(
+                  flex: 2,
+                  child: AccountScreenWidget(
+                    onSelect: (item, title) {
+                      setState(() {
+                        _selectedTab = item;
+                        _title = title;
+                      });
+                    },
+                  ),
+                ),
+                const VerticalDivider(thickness: 0.3, width: 0.3),
+                Flexible(flex: 4, child: renderContent()),
+              ],
+            )
+          : AccountScreenWidget(
+              onSelect: (item, _) {
+                router.pushNamed(item);
+              },
+            ),
+    );
+  }
+}
+
+class AccountScreenWidget extends StatefulWidget {
+  final Function(String item, String title) onSelect;
+
+  const AccountScreenWidget({super.key, required this.onSelect});
+
+  @override
+  State<AccountScreenWidget> createState() => _AccountScreenWidgetState();
+}
+
+class _AccountScreenWidgetState extends State<AccountScreenWidget> {
+  bool _isAuthorized = false;
 
   @override
   void initState() {
     Future.delayed(Duration.zero, () async {
       var authorized = await context.read<AuthProvider>().isAuthorized();
-      setState(() => isAuthorized = authorized);
+      setState(() => _isAuthorized = authorized);
     });
 
     super.initState();
@@ -30,64 +90,63 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
 
-    return LayoutWrapper(
-      title: AppLocalizations.of(context)!.account,
-      child: isAuthorized
-          ? Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  child: NameCard(),
-                ),
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                  leading: const Icon(Icons.diversity_1),
-                  title: Text(AppLocalizations.of(context)!.friend),
-                  onTap: () {
-                    router.goNamed('account.friend');
-                  },
-                ),
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                  leading: const Icon(Icons.logout),
-                  title: Text(AppLocalizations.of(context)!.signOut),
-                  onTap: () {
-                    auth.signoff();
-                    setState(() {
-                      isAuthorized = false;
-                    });
-                  },
-                ),
-              ],
-            )
-          : Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ActionCard(
-                    icon: const Icon(Icons.login, color: Colors.white),
-                    title: AppLocalizations.of(context)!.signIn,
-                    caption: AppLocalizations.of(context)!.signInCaption,
-                    onTap: () {
-                      router.pushNamed('auth.sign-in').then((did) {
-                        auth.isAuthorized().then((value) {
-                          setState(() => isAuthorized = value);
-                        });
-                      });
-                    },
-                  ),
-                  ActionCard(
-                    icon: const Icon(Icons.add, color: Colors.white),
-                    title: AppLocalizations.of(context)!.signUp,
-                    caption: AppLocalizations.of(context)!.signUpCaption,
-                    onTap: () {
-                      router.pushNamed('auth.sign-up');
-                    },
-                  ),
-                ],
-              ),
+    if (_isAuthorized) {
+      return Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+            child: NameCard(),
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+            leading: const Icon(Icons.diversity_1),
+            title: Text(AppLocalizations.of(context)!.friend),
+            onTap: () {
+              widget.onSelect('account.friend', AppLocalizations.of(context)!.friend);
+            },
+          ),
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+            leading: const Icon(Icons.logout),
+            title: Text(AppLocalizations.of(context)!.signOut),
+            onTap: () {
+              auth.signoff();
+              setState(() {
+                _isAuthorized = false;
+              });
+            },
+          ),
+        ],
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ActionCard(
+              icon: const Icon(Icons.login, color: Colors.white),
+              title: AppLocalizations.of(context)!.signIn,
+              caption: AppLocalizations.of(context)!.signInCaption,
+              onTap: () {
+                router.pushNamed('auth.sign-in').then((did) {
+                  auth.isAuthorized().then((value) {
+                    setState(() => _isAuthorized = value);
+                  });
+                });
+              },
             ),
-    );
+            ActionCard(
+              icon: const Icon(Icons.add, color: Colors.white),
+              title: AppLocalizations.of(context)!.signUp,
+              caption: AppLocalizations.of(context)!.signUpCaption,
+              onTap: () {
+                router.pushNamed('auth.sign-up');
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 
@@ -129,8 +188,7 @@ class NameCard extends StatelessWidget {
             children: [
               FutureBuilder(
                 future: renderAvatar(context),
-                builder:
-                    (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                   if (snapshot.hasData) {
                     return snapshot.data!;
                   } else {
@@ -141,8 +199,7 @@ class NameCard extends StatelessWidget {
               const SizedBox(width: 20),
               FutureBuilder(
                 future: renderLabel(context),
-                builder:
-                    (BuildContext context, AsyncSnapshot<Column> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<Column> snapshot) {
                   if (snapshot.hasData) {
                     return snapshot.data!;
                   } else {
@@ -164,12 +221,7 @@ class ActionCard extends StatelessWidget {
   final String caption;
   final Function onTap;
 
-  const ActionCard(
-      {super.key,
-      required this.onTap,
-      required this.title,
-      required this.caption,
-      required this.icon});
+  const ActionCard({super.key, required this.onTap, required this.title, required this.caption, required this.icon});
 
   @override
   Widget build(BuildContext context) {

@@ -48,7 +48,7 @@ class HttpClient extends http.BaseClient {
     request.headers['Authorization'] = 'Bearer $currentToken';
 
     final res = await _client.send(request);
-    if (res.statusCode == 401 && isUnauthorizedRetry) {
+    if (res.statusCode == 401 && currentToken != null && isUnauthorizedRetry) {
       if (onUnauthorizedRetry != null) {
         currentToken = await onUnauthorizedRetry!();
       } else if (currentRefreshToken != null) {

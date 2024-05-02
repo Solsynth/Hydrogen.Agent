@@ -11,17 +11,32 @@ import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/indent_wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class FriendScreen extends StatefulWidget {
+class FriendScreen extends StatelessWidget {
   const FriendScreen({super.key});
 
   @override
-  State<FriendScreen> createState() => _FriendScreenState();
+  Widget build(BuildContext context) {
+    return IndentWrapper(
+      title: AppLocalizations.of(context)!.friend,
+      noSafeArea: true,
+      hideDrawer: true,
+      child: const FriendScreenWidget(),
+    );
+  }
 }
 
-class _FriendScreenState extends State<FriendScreen> {
+class FriendScreenWidget extends StatefulWidget {
+  const FriendScreenWidget({super.key});
+
+  @override
+  State<FriendScreenWidget> createState() => _FriendScreenWidgetState();
+}
+
+class _FriendScreenWidgetState extends State<FriendScreenWidget> {
   bool _isSubmitting = false;
 
   int _selfId = 0;
+
   List<Friendship> _friendships = List.empty();
 
   Future<void> fetchFriendships() async {
@@ -120,16 +135,14 @@ class _FriendScreenState extends State<FriendScreen> {
                   border: const OutlineInputBorder(),
                   labelText: AppLocalizations.of(context)!.username,
                 ),
-                onTapOutside: (_) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
+                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                foregroundColor:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                foregroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
               ),
               onPressed: () => Navigator.pop(context),
               child: Text(AppLocalizations.of(context)!.cancel),
@@ -211,31 +224,22 @@ class _FriendScreenState extends State<FriendScreen> {
       );
     }
 
-    return IndentWrapper(
-      title: AppLocalizations.of(context)!.friend,
-      appBarActions: [
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () => promptAddFriend(),
-        ),
-      ],
-      child: RefreshIndicator(
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => promptAddFriend(),
+      ),
+      body: RefreshIndicator(
         onRefresh: () => fetchFriendships(),
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
-              child: _isSubmitting
-                  ? const LinearProgressIndicator().animate().scaleX()
-                  : Container(),
+              child: _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
             ),
             SliverToBoxAdapter(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceVariant
-                    .withOpacity(0.8),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
                 child: Text(AppLocalizations.of(context)!.friendPending),
               ),
             ),
@@ -245,12 +249,8 @@ class _FriendScreenState extends State<FriendScreen> {
             ),
             SliverToBoxAdapter(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceVariant
-                    .withOpacity(0.8),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
                 child: Text(AppLocalizations.of(context)!.friendActive),
               ),
             ),
@@ -260,12 +260,8 @@ class _FriendScreenState extends State<FriendScreen> {
             ),
             SliverToBoxAdapter(
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceVariant
-                    .withOpacity(0.8),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
                 child: Text(AppLocalizations.of(context)!.friendBlocked),
               ),
             ),
@@ -278,10 +274,7 @@ class _FriendScreenState extends State<FriendScreen> {
                 decoration: BoxDecoration(
                   border: Border(
                       top: BorderSide(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceVariant
-                        .withOpacity(0.8),
+                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.8),
                     width: 0.3,
                   )),
                 ),
