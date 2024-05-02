@@ -106,7 +106,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   @override
   Widget build(BuildContext context) {
     final editingBanner = MaterialBanner(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.edit_note),
       backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),
@@ -120,7 +120,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     );
 
     final replyingBanner = MaterialBanner(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.reply),
       backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),

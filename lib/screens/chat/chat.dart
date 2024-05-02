@@ -249,8 +249,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
 
   @override
   void deactivate() {
-    _chat.focusChannel = null;
-    _chat.ongoingCall = null;
+    _chat.unFocus();
     super.deactivate();
   }
 }

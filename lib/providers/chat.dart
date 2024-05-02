@@ -107,6 +107,12 @@ class ChatProvider extends ChangeNotifier {
     isCallShown = state;
     notifyListeners();
   }
+
+  void unFocus() {
+    currentCall = null;
+    focusChannel = null;
+    notifyListeners();
+  }
 }
 
 class ChatCallInstance {

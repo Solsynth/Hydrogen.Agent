@@ -97,7 +97,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
     final auth = context.read<AuthProvider>();
 
     final editingBanner = MaterialBanner(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.edit_note),
       backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),
@@ -121,9 +121,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
       ],
       child: Column(
         children: [
-          _isSubmitting
-              ? const LinearProgressIndicator().animate().scaleX()
-              : Container(),
+          _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
           FutureBuilder(
             future: auth.getProfiles(),
             builder: (context, snapshot) {
@@ -155,16 +153,15 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
                 keyboardType: TextInputType.multiline,
                 controller: _textController,
                 decoration: InputDecoration.collapsed(
-                  hintText:
-                      AppLocalizations.of(context)!.postContentPlaceholder,
+                  hintText: AppLocalizations.of(context)!.postContentPlaceholder,
                 ),
-                onTapOutside: (_) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
+                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
               ),
             ),
           ),
           widget.editing != null ? editingBanner : Container(),
           Container(
+            constraints: const BoxConstraints(minHeight: 56),
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(width: 0.3, color: Theme.of(context).dividerColor),

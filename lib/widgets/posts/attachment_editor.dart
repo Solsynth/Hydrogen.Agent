@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:crypto/crypto.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:http/http.dart';
@@ -41,51 +42,84 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditorMethodPopup(
-        pickImage: () => pickImageToUpload(context, ImageSource.gallery),
-        takeImage: () => pickImageToUpload(context, ImageSource.camera),
-        pickVideo: () => pickVideoToUpload(context, ImageSource.gallery),
-        takeVideo: () => pickVideoToUpload(context, ImageSource.camera),
+        pickMedia: () => pickMediaToUpload(context),
+        pickFile: () => pickFileToUpload(context),
+        takeImage: () => takeMediaToUpload(context, false),
+        takeVideo: () => takeMediaToUpload(context, true),
       ),
     );
   }
 
-  Future<void> pickImageToUpload(
-      BuildContext context, ImageSource source) async {
+  Future<void> pickMediaToUpload(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final image = await _imagePicker.pickImage(source: source);
-    if (image == null) return;
+    final medias = await _imagePicker.pickMultipleMedia();
+    if (medias.isEmpty) return;
 
     setState(() => _isSubmitting = true);
 
-    final file = File(image.path);
-    final hashcode = await calculateSha256(file);
-
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
+    bool isPopped = false;
+    for (final media in medias) {
+      final file = File(media.path);
+      final hashcode = await calculateSha256(file);
+      try {
+        await uploadAttachment(file, hashcode);
+      } catch (err) {
+        context.showErrorDialog(err);
+      }
+      if (!isPopped && Navigator.canPop(context)) {
+        Navigator.pop(context);
+        isPopped = true;
+      }
     }
 
-    try {
-      await uploadAttachment(file, hashcode);
-    } catch (err) {
-      context.showErrorDialog(err);
-    } finally {
-      setState(() => _isSubmitting = false);
-    }
+    setState(() => _isSubmitting = false);
   }
 
-  Future<void> pickVideoToUpload(
-      BuildContext context, ImageSource source) async {
+  Future<void> pickFileToUpload(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final image = await _imagePicker.pickVideo(source: source);
-    if (image == null) return;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (result == null) return;
+
+    List<File> files = result.paths.map((path) => File(path!)).toList();
 
     setState(() => _isSubmitting = true);
 
-    final file = File(image.path);
+    bool isPopped = false;
+    for (final file in files) {
+      final hashcode = await calculateSha256(file);
+      try {
+        await uploadAttachment(file, hashcode);
+      } catch (err) {
+        context.showErrorDialog(err);
+      }
+      if (!isPopped && Navigator.canPop(context)) {
+        Navigator.pop(context);
+        isPopped = true;
+      }
+    }
+
+    setState(() => _isSubmitting = false);
+  }
+
+  Future<void> takeMediaToUpload(BuildContext context, bool isVideo) async {
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) return;
+
+    XFile? media;
+    if (isVideo) {
+      media = await _imagePicker.pickVideo(source: ImageSource.camera);
+    } else {
+      media = await _imagePicker.pickImage(source: ImageSource.camera);
+    }
+    if (media == null) return;
+
+    setState(() => _isSubmitting = true);
+
+    final file = File(media.path);
     final hashcode = await calculateSha256(file);
 
     if (Navigator.canPop(context)) {
@@ -96,16 +130,15 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
       await uploadAttachment(file, hashcode);
     } catch (err) {
       context.showErrorDialog(err);
-    } finally {
-      setState(() => _isSubmitting = false);
     }
+
+    setState(() => _isSubmitting = false);
   }
 
   Future<void> uploadAttachment(File file, String hashcode) async {
     final auth = context.read<AuthProvider>();
 
-    final req = MultipartRequest(
-        'POST', getRequestUri(widget.provider, '/api/attachments'));
+    final req = MultipartRequest('POST', getRequestUri(widget.provider, '/api/attachments'));
     req.files.add(await MultipartFile.fromPath('attachment', file.path));
     req.fields['hashcode'] = hashcode;
 
@@ -121,12 +154,10 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     }
   }
 
-  Future<void> disposeAttachment(
-      BuildContext context, Attachment item, int index) async {
+  Future<void> disposeAttachment(BuildContext context, Attachment item, int index) async {
     final auth = context.read<AuthProvider>();
 
-    final req = MultipartRequest('DELETE',
-        getRequestUri(widget.provider, '/api/attachments/${item.id}'));
+    final req = MultipartRequest('DELETE', getRequestUri(widget.provider, '/api/attachments/${item.id}'));
 
     setState(() => _isSubmitting = true);
     var res = await auth.client!.send(req);
@@ -167,17 +198,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     if (bytes == 0) return '0 Bytes';
     const k = 1024;
     final dm = decimals < 0 ? 0 : decimals;
-    final sizes = [
-      'Bytes',
-      'KiB',
-      'MiB',
-      'GiB',
-      'TiB',
-      'PiB',
-      'EiB',
-      'ZiB',
-      'YiB'
-    ];
+    final sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
     final i = (math.log(bytes) / math.log(k)).floor().toInt();
     return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
   }
@@ -195,8 +216,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     return Column(
       children: [
         Container(
-          padding:
-              const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 20, bottom: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -215,9 +235,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data == true) {
                     return TextButton(
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => viewAttachMethods(context),
+                      onPressed: _isSubmitting ? null : () => viewAttachMethods(context),
                       style: TextButton.styleFrom(shape: const CircleBorder()),
                       child: const Icon(Icons.add_circle),
                     );
@@ -229,16 +247,14 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
             ],
           ),
         ),
-        _isSubmitting
-            ? const LinearProgressIndicator().animate().scaleX()
-            : Container(),
+        _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
         Expanded(
-          child: ListView.separated(
+          child: ListView.builder(
             itemCount: _attachments.length,
             itemBuilder: (context, index) {
               var element = _attachments[index];
               return Container(
-                padding: const EdgeInsets.only(left: 16, right: 8),
+                padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
                 child: Row(
                   children: [
                     Expanded(
@@ -263,14 +279,12 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
                         foregroundColor: Colors.red,
                       ),
                       child: const Icon(Icons.delete),
-                      onPressed: () =>
-                          disposeAttachment(context, element, index),
+                      onPressed: () => disposeAttachment(context, element, index),
                     ),
                   ],
                 ),
               );
             },
-            separatorBuilder: (context, index) => const Divider(thickness: 0.3),
           ),
         ),
       ],
@@ -279,16 +293,16 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
 }
 
 class AttachmentEditorMethodPopup extends StatelessWidget {
-  final Function pickImage;
+  final Function pickMedia;
+  final Function pickFile;
   final Function takeImage;
-  final Function pickVideo;
   final Function takeVideo;
 
   const AttachmentEditorMethodPopup({
     super.key,
-    required this.pickImage,
+    required this.pickMedia,
+    required this.pickFile,
     required this.takeImage,
-    required this.pickVideo,
     required this.takeVideo,
   });
 
@@ -319,15 +333,28 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
               children: [
                 InkWell(
                   borderRadius: BorderRadius.circular(8),
-                  onTap: () => pickImage(),
+                  onTap: () => pickMedia(),
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.add_photo_alternate,
-                            color: Colors.indigo),
+                        const Icon(Icons.photo_library, color: Colors.indigo),
                         const SizedBox(height: 8),
-                        Text(AppLocalizations.of(context)!.pickPhoto),
+                        Text(AppLocalizations.of(context)!.pickMedia),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => pickFile(),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.file_present, color: Colors.amber),
+                        const SizedBox(height: 8),
+                        Text(AppLocalizations.of(context)!.pickFile),
                       ],
                     ),
                   ),
@@ -339,23 +366,9 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.camera_alt, color: Colors.indigo),
+                        const Icon(Icons.camera_alt, color: Colors.teal),
                         const SizedBox(height: 8),
                         Text(AppLocalizations.of(context)!.takePhoto),
-                      ],
-                    ),
-                  ),
-                ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => pickVideo(),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.camera, color: Colors.teal),
-                        const SizedBox(height: 8),
-                        Text(AppLocalizations.of(context)!.pickVideo),
                       ],
                     ),
                   ),
@@ -367,7 +380,7 @@ class AttachmentEditorMethodPopup extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.video_call, color: Colors.teal),
+                        const Icon(Icons.movie, color: Colors.blue),
                         const SizedBox(height: 8),
                         Text(AppLocalizations.of(context)!.takeVideo),
                       ],

@@ -86,7 +86,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final editingBanner = MaterialBanner(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.edit_note),
       backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),
@@ -111,6 +111,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       child: Column(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+          widget.editing != null ? editingBanner : Container(),
           ListTile(
             title: Text(AppLocalizations.of(context)!.chatChannelUsage),
             subtitle: Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
@@ -174,7 +175,6 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
               ),
             ),
           ),
-          widget.editing != null ? editingBanner : Container(),
         ],
       ),
     );
