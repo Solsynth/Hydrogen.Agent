@@ -73,28 +73,15 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
                 ),
               ],
             )
-          : ChatIndexScreenWidget(
-              onSelect: (item) async {
-                final result = await router.pushNamed(
-                  'chat.channel',
-                  pathParameters: {
-                    'channel': item.alias,
-                  },
-                );
-                switch (result) {
-                  case 'refresh':
-                  // fetchChannels();
-                }
-              },
-            ),
+          : const ChatIndexScreenWidget(),
     );
   }
 }
 
 class ChatIndexScreenWidget extends StatefulWidget {
-  final Function(Channel item) onSelect;
+  final Function(Channel item)? onSelect;
 
-  const ChatIndexScreenWidget({super.key, required this.onSelect});
+  const ChatIndexScreenWidget({super.key, this.onSelect});
 
   @override
   State<ChatIndexScreenWidget> createState() => _ChatIndexScreenWidgetState();
@@ -176,7 +163,23 @@ class _ChatIndexScreenWidgetState extends State<ChatIndexScreenWidget> {
                   ),
                   title: Text(element.name),
                   subtitle: Text(element.description),
-                  onTap: () => widget.onSelect(element),
+                  onTap: () async {
+                    if (widget.onSelect != null) {
+                      widget.onSelect!(element);
+                      return;
+                    }
+
+                    final result = await router.pushNamed(
+                      'chat.channel',
+                      pathParameters: {
+                        'channel': element.alias,
+                      },
+                    );
+                    switch (result) {
+                      case 'refresh':
+                        fetchChannels();
+                    }
+                  },
                 );
               },
             ),

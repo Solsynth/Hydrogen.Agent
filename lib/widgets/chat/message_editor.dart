@@ -140,9 +140,9 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
         Container(
           height: 56,
           padding: const EdgeInsets.only(top: 4, bottom: 4, right: 8),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(
-              top: BorderSide(width: 0.3, color: Color(0xffdedede)),
+              top: BorderSide(width: 0.3, color: Theme.of(context).dividerColor),
             ),
           ),
           child: Row(

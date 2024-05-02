@@ -72,7 +72,7 @@ class NotifyProvider extends ChangeNotifier {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
 
-    await auth.refreshToken();
+    await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
 
     var ori = getRequestUri('passport', '/api/notifications/listen');
     var uri = Uri(
@@ -80,7 +80,7 @@ class NotifyProvider extends ChangeNotifier {
       host: ori.host,
       path: ori.path,
       queryParameters: {
-        'tk': Uri.encodeComponent(auth.client!.credentials.accessToken)
+        'tk': Uri.encodeComponent(auth.client!.currentToken!)
       },
     );
 

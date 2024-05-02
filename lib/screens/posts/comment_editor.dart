@@ -175,9 +175,9 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
           ),
           widget.editing != null ? editingBanner : Container(),
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(width: 0.3, color: Color(0xffdedede)),
+                top: BorderSide(width: 0.3, color: Theme.of(context).dividerColor),
               ),
             ),
             child: Row(

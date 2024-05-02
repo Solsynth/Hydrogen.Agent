@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:solian/utils/http.dart';
 import 'package:solian/utils/service_url.dart';
 
 class AuthProvider extends ChangeNotifier {
   AuthProvider();
 
-  final deviceEndpoint =
-      getRequestUri('passport', '/api/notifications/subscribe');
+  final deviceEndpoint = getRequestUri('passport', '/api/notifications/subscribe');
   final tokenEndpoint = getRequestUri('passport', '/api/auth/token');
   final userinfoEndpoint = getRequestUri('passport', '/api/users/me');
   final redirectUrl = Uri.parse('solian://auth');
@@ -21,19 +21,17 @@ class AuthProvider extends ChangeNotifier {
   static const storageKey = 'identity';
   static const profileKey = 'profiles';
 
-  /// Before use this variable to make request
-  /// **MAKE SURE YOU HAVE CALL THE isAuthorized() METHOD**
-  oauth2.Client? client;
-
-  DateTime? lastRefreshedAt;
+  HttpClient? client;
 
   Future<bool> loadClient() async {
     if (await storage.containsKey(key: storageKey)) {
       try {
-        final credentials =
-            oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
-        client = oauth2.Client(credentials,
-            identifier: clientId, secret: clientSecret);
+        final credentials = oauth2.Credentials.fromJson((await storage.read(key: storageKey))!);
+        client = HttpClient(
+          defaultToken: credentials.accessToken,
+          defaultRefreshToken: credentials.refreshToken,
+          onTokenRefreshed: setToken,
+        );
         await fetchProfiles();
         return true;
       } catch (e) {
@@ -45,13 +43,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<oauth2.Client> createClient(
-      BuildContext context, String username, String password) async {
+  Future<HttpClient> createClient(BuildContext context, String username, String password) async {
     if (await loadClient()) {
       return client!;
     }
 
-    return await oauth2.resourceOwnerPasswordGrant(
+    final credentials = (await oauth2.resourceOwnerPasswordGrant(
       tokenEndpoint,
       username,
       password,
@@ -59,6 +56,15 @@ class AuthProvider extends ChangeNotifier {
       secret: clientSecret,
       scopes: ['openid'],
       basicAuth: false,
+    ))
+        .credentials;
+
+    setToken(credentials.accessToken, credentials.refreshToken!);
+
+    return HttpClient(
+      defaultToken: credentials.accessToken,
+      defaultRefreshToken: credentials.refreshToken,
+      onTokenRefreshed: setToken,
     );
   }
 
@@ -70,21 +76,16 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> refreshToken() async {
+  Future<void> setToken(String atk, String rtk) async {
     if (client != null) {
-      final credentials = await client!.credentials.refresh(
-          identifier: clientId, secret: clientSecret, basicAuth: false);
-      client = oauth2.Client(credentials,
-          identifier: clientId, secret: clientSecret);
+      final credentials = oauth2.Credentials(atk, refreshToken: rtk, idToken: atk, scopes: ['openid']);
       storage.write(key: storageKey, value: credentials.toJson());
     }
     notifyListeners();
   }
 
-  Future<void> signin(
-      BuildContext context, String username, String password) async {
+  Future<void> signin(BuildContext context, String username, String password) async {
     client = await createClient(context, username, password);
-    storage.write(key: storageKey, value: client!.credentials.toJson());
 
     await fetchProfiles();
   }
@@ -96,21 +97,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<bool> isAuthorized() async {
     const storage = FlutterSecureStorage();
-    if (await storage.containsKey(key: storageKey)) {
-      if (client == null) {
-        await loadClient();
-      }
-      if (lastRefreshedAt == null ||
-          DateTime.now()
-              .subtract(const Duration(minutes: 3))
-              .isAfter(lastRefreshedAt!)) {
-        await refreshToken();
-        lastRefreshedAt = DateTime.now();
-      }
-      return true;
-    } else {
-      return false;
-    }
+    return await storage.containsKey(key: storageKey);
   }
 
   Future<dynamic> getProfiles() async {

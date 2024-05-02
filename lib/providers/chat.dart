@@ -28,14 +28,14 @@ class ChatProvider extends ChangeNotifier {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
 
-    await auth.refreshToken();
+    await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
 
     var ori = getRequestUri('messaging', '/api/ws');
     var uri = Uri(
       scheme: ori.scheme.replaceFirst('http', 'ws'),
       host: ori.host,
       path: ori.path,
-      queryParameters: {'tk': Uri.encodeComponent(auth.client!.credentials.accessToken)},
+      queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );
 
     final channel = WebSocketChannel.connect(uri);
