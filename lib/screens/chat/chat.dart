@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
-import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
@@ -144,6 +143,11 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
     _pagingController.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
 
     super.initState();
+
+    Future.delayed(Duration.zero, () {
+      _chat.fetchOngoingCall(widget.alias);
+      _chat.fetchChannel(widget.alias);
+    });
   }
 
   @override
@@ -199,58 +203,54 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
       ],
     );
 
-    return FutureBuilder(
-      future: (() async {
-        final res = await Future.wait([
-          _chat.fetchOngoingCall(widget.alias),
-          _chat.fetchChannel(widget.alias),
-        ]);
-        return res[1] as Channel;
-      })(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    if (_chat.focusChannel == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-        return ChatMaintainer(
-          channel: snapshot.data!,
-          child: Stack(
+    return ChatMaintainer(
+      channel: _chat.focusChannel!,
+      child: Stack(
+        children: [
+          Column(
             children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: PagedListView<int, Message>(
-                      reverse: true,
-                      pagingController: _pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<Message>(
-                        animateTransitions: true,
-                        transitionDuration: 500.ms,
-                        itemBuilder: chatHistoryBuilder,
-                        noItemsFoundIndicatorBuilder: (_) => Container(),
-                      ),
-                    ),
+              Expanded(
+                child: PagedListView<int, Message>(
+                  reverse: true,
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<Message>(
+                    animateTransitions: true,
+                    transitionDuration: 500.ms,
+                    itemBuilder: chatHistoryBuilder,
+                    noItemsFoundIndicatorBuilder: (_) => Container(),
                   ),
-                  ChatMessageEditor(
-                    channel: widget.alias,
-                    editing: _editingItem,
-                    replying: _replyingItem,
-                    onReset: () => setState(() {
-                      _editingItem = null;
-                      _replyingItem = null;
-                    }),
-                  ),
-                ],
+                ),
               ),
-              _chat.ongoingCall != null ? callBanner.animate().slideY() : Container(),
+              ChatMessageEditor(
+                channel: widget.alias,
+                editing: _editingItem,
+                replying: _replyingItem,
+                onReset: () => setState(() {
+                  _editingItem = null;
+                  _replyingItem = null;
+                }),
+              ),
             ],
           ),
-          onInsertMessage: (message) => addMessage(message),
-          onUpdateMessage: (message) => updateMessage(message),
-          onDeleteMessage: (message) => deleteMessage(message),
-          onCallStarted: (call) => _chat.setOngoingCall(call),
-          onCallEnded: () => _chat.setOngoingCall(null),
-        );
-      },
+          _chat.ongoingCall != null ? callBanner.animate().slideY() : Container(),
+        ],
+      ),
+      onInsertMessage: (message) => addMessage(message),
+      onUpdateMessage: (message) => updateMessage(message),
+      onDeleteMessage: (message) => deleteMessage(message),
+      onCallStarted: (call) => _chat.setOngoingCall(call),
+      onCallEnded: () => _chat.setOngoingCall(null),
     );
+  }
+
+  @override
+  void deactivate() {
+    _chat.focusChannel = null;
+    _chat.ongoingCall = null;
+    super.deactivate();
   }
 }
