@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -31,6 +35,8 @@ class PersonalizeScreenWidget extends StatefulWidget {
 }
 
 class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
+  final _imagePicker = ImagePicker();
+
   final _usernameController = TextEditingController();
   final _nicknameController = TextEditingController();
   final _firstNameController = TextEditingController();
@@ -38,6 +44,8 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
   final _descriptionController = TextEditingController();
   final _birthdayController = TextEditingController();
 
+  String? _avatar;
+  String? _banner;
   DateTime? _birthday;
 
   bool _isSubmitting = false;
@@ -65,6 +73,12 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
     _descriptionController.text = prof['description'];
     _firstNameController.text = prof['profile']['first_name'];
     _lastNameController.text = prof['profile']['last_name'];
+    if (prof['avatar'] != null && prof['avatar'].isNotEmpty) {
+      _avatar = getRequestUri('passport', '/api/avatar/${prof['avatar']}').toString();
+    }
+    if (prof['banner'] != null && prof['banner'].isNotEmpty) {
+      _banner = getRequestUri('passport', '/api/avatar/${prof['banner']}').toString();
+    }
     if (prof['profile']['birthday'] != null) {
       _birthday = DateTime.parse(prof['profile']['birthday']);
       _birthdayController.text = DateFormat('yyyy-MM-dd hh:mm').format(_birthday!);
@@ -93,7 +107,9 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
     );
     if (res.statusCode == 200) {
       await auth.fetchProfiles();
-      resetInputs();
+      setState(() {
+        resetInputs();
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.personalizeApplied),
@@ -106,20 +122,115 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
     setState(() => _isSubmitting = false);
   }
 
+  Future<void> applyAvatar(String position) async {
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) return;
+
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    setState(() => _isSubmitting = true);
+
+    final file = File(image.path);
+    try {
+      final req = MultipartRequest('PUT', getRequestUri('passport', '/api/users/me/$position'));
+      req.files.add(await MultipartFile.fromPath(position, file.path));
+
+      var res = await auth.client!.send(req);
+      if (res.statusCode == 200) {
+        await auth.fetchProfiles();
+        setState(() {
+          resetInputs();
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.personalizeApplied),
+        ));
+      } else {
+        throw Exception(utf8.decode(await res.stream.toBytes()));
+      }
+    } catch (err) {
+      context.showErrorDialog(err);
+    }
+
+    setState(() => _isSubmitting = false);
+  }
+
   @override
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () => resetInputs());
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        resetInputs();
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 32),
-      child: Column(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: ListView(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+          const SizedBox(height: 24),
+          Stack(
+            children: [
+              AccountAvatar(source: _avatar ?? '', radius: 40, direct: true),
+              Positioned(
+                bottom: 0,
+                left: 40,
+                child: FloatingActionButton.small(
+                  onPressed: () => applyAvatar('avatar'),
+                  child: const Icon(
+                    Icons.camera,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Container(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    child: _banner != null
+                        ? Image.network(
+                            _banner!,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                          )
+                        : Container(),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: FloatingActionButton(
+                  onPressed: () => applyAvatar('banner'),
+                  child: const Icon(
+                    Icons.camera_alt,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
           Row(
             children: [
               Flexible(

@@ -75,7 +75,7 @@
   "chatNew": "New Chat",
   "chatNewCreate": "Create a channel",
   "chatNewJoin": "Join a exists channel",
-  "chatManage": "Manage Chat",
+  "chatDetail": "Chat Details",
   "chatMember": "Member",
   "chatNotifySetting": "Notify Settings",
   "chatChannelUsage": "Channel",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/scaffold.dart';
@@ -14,7 +15,7 @@ class AccountScreen extends StatelessWidget {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.account,
       noSafeArea: true,
-      fixedAppBarColor: true,
+      fixedAppBarColor: SolianTheme.isLargeScreen(context),
       child: AccountScreenWidget(
         onSelect: (item) {
           SolianRouter.router.pushNamed(item);

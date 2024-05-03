@@ -63,7 +63,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     ];
 
     return IndentScaffold(
-      title: AppLocalizations.of(context)!.chatManage,
+      title: AppLocalizations.of(context)!.chatDetail,
       hideDrawer: true,
       noSafeArea: true,
       child: Column(

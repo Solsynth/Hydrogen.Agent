@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -11,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/utils/file.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/exts.dart';
@@ -62,7 +62,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     bool isPopped = false;
     for (final media in medias) {
       final file = File(media.path);
-      final hashcode = await calculateSha256(file);
+      final hashcode = await calculateFileSha256(file);
       try {
         await uploadAttachment(file, hashcode);
       } catch (err) {
@@ -90,7 +90,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
 
     bool isPopped = false;
     for (final file in files) {
-      final hashcode = await calculateSha256(file);
+      final hashcode = await calculateFileSha256(file);
       try {
         await uploadAttachment(file, hashcode);
       } catch (err) {
@@ -120,7 +120,7 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
     setState(() => _isSubmitting = true);
 
     final file = File(media.path);
-    final hashcode = await calculateSha256(file);
+    final hashcode = await calculateFileSha256(file);
 
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
@@ -169,12 +169,6 @@ class _AttachmentEditorState extends State<AttachmentEditor> {
       context.showErrorDialog(err);
     }
     setState(() => _isSubmitting = false);
-  }
-
-  Future<String> calculateSha256(File file) async {
-    final bytes = await file.readAsBytes();
-    final digest = sha256.convert(bytes);
-    return digest.toString();
   }
 
   String getFileName(Attachment item) {
