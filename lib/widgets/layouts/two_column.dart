@@ -13,19 +13,15 @@ class TwoColumnLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldMessenger(
-      child: Scaffold(
-        body: Row(
-          children: [
-            SizedBox(
-              width: 400,
-              child: sideChild,
-            ),
-            const VerticalDivider(width: 0.3, thickness: 0.3),
-            Expanded(child: mainChild ?? const PageEmptyWidget()),
-          ],
+    return Row(
+      children: [
+        SizedBox(
+          width: 400,
+          child: sideChild,
         ),
-      ),
+        const VerticalDivider(width: 0.3, thickness: 0.3),
+        Expanded(child: mainChild ?? const PageEmptyWidget()),
+      ],
     );
   }
 }

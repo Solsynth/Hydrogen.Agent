@@ -25,10 +25,17 @@ class ChatListScreen extends StatelessWidget {
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       child: ChatListWidget(
         onSelect: (item) {
-          SolianRouter.router.pushReplacementNamed(
-            'chat.channel',
-            pathParameters: {'channel': item.alias},
-          );
+          if (SolianRouter.currentRoute.name == 'chat.channel') {
+            SolianRouter.router.pushReplacementNamed(
+              'chat.channel',
+              pathParameters: {'channel': item.alias},
+            );
+          } else {
+            SolianRouter.router.pushNamed(
+              'chat.channel',
+              pathParameters: {'channel': item.alias},
+            );
+          }
         },
       ),
     );

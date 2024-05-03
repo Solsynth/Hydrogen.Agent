@@ -9,9 +9,6 @@ abstract class SolianTheme {
       brightness: brightness,
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(brightness: brightness, seedColor: Colors.indigo),
-      snackBarTheme: const SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-      ),
     );
   }
 }

@@ -32,7 +32,6 @@ class ChatScreen extends StatelessWidget {
       title: chat.focusChannel?.name ?? 'Loading...',
       hideDrawer: true,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
-      appBarLeading: IconButton(icon: const Icon(Icons.tag), onPressed: () {}),
       appBarActions: chat.focusChannel != null
           ? [
               ChannelCallAction(

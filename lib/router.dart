@@ -159,6 +159,8 @@ abstract class SolianRouter {
     ],
   );
 
+  static GoRoute get currentRoute => SolianRouter.router.routerDelegate.currentConfiguration.last.route;
+
   static Page defaultPageBuilder(
     BuildContext context,
     GoRouterState state,

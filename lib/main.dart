@@ -47,7 +47,11 @@ class SolianApp extends StatelessWidget {
           child: Overlay(
             initialEntries: [
               OverlayEntry(builder: (context) {
-                return NotificationNotifier(child: child ?? Container());
+                return ScaffoldMessenger(
+                  child: Scaffold(
+                    body: NotificationNotifier(child: child ?? Container()),
+                  ),
+                );
               }),
               OverlayEntry(builder: (context) => const CallOverlay()),
             ],
