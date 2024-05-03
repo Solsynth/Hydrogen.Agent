@@ -68,21 +68,23 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
   void resetInputs() async {
     final auth = context.read<AuthProvider>();
     final prof = await auth.getProfiles();
-    _usernameController.text = prof['name'];
-    _nicknameController.text = prof['nick'];
-    _descriptionController.text = prof['description'];
-    _firstNameController.text = prof['profile']['first_name'];
-    _lastNameController.text = prof['profile']['last_name'];
-    if (prof['avatar'] != null && prof['avatar'].isNotEmpty) {
-      _avatar = getRequestUri('passport', '/api/avatar/${prof['avatar']}').toString();
-    }
-    if (prof['banner'] != null && prof['banner'].isNotEmpty) {
-      _banner = getRequestUri('passport', '/api/avatar/${prof['banner']}').toString();
-    }
-    if (prof['profile']['birthday'] != null) {
-      _birthday = DateTime.parse(prof['profile']['birthday']);
-      _birthdayController.text = DateFormat('yyyy-MM-dd hh:mm').format(_birthday!);
-    }
+    setState(() {
+      _usernameController.text = prof['name'];
+      _nicknameController.text = prof['nick'];
+      _descriptionController.text = prof['description'];
+      _firstNameController.text = prof['profile']['first_name'];
+      _lastNameController.text = prof['profile']['last_name'];
+      if (prof['avatar'] != null && prof['avatar'].isNotEmpty) {
+        _avatar = getRequestUri('passport', '/api/avatar/${prof['avatar']}').toString();
+      }
+      if (prof['banner'] != null && prof['banner'].isNotEmpty) {
+        _banner = getRequestUri('passport', '/api/avatar/${prof['banner']}').toString();
+      }
+      if (prof['profile']['birthday'] != null) {
+        _birthday = DateTime.parse(prof['profile']['birthday']);
+        _birthdayController.text = DateFormat('yyyy-MM-dd hh:mm').format(_birthday!);
+      }
+    });
   }
 
   void applyChanges() async {
@@ -107,9 +109,7 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
     );
     if (res.statusCode == 200) {
       await auth.fetchProfiles();
-      setState(() {
-        resetInputs();
-      });
+      resetInputs();
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.personalizeApplied),
@@ -122,7 +122,7 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
     setState(() => _isSubmitting = false);
   }
 
-  Future<void> applyAvatar(String position) async {
+  Future<void> applyImage(String position) async {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
@@ -139,9 +139,7 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
       var res = await auth.client!.send(req);
       if (res.statusCode == 200) {
         await auth.fetchProfiles();
-        setState(() {
-          resetInputs();
-        });
+        resetInputs();
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(AppLocalizations.of(context)!.personalizeApplied),
@@ -161,9 +159,7 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      setState(() {
-        resetInputs();
-      });
+      resetInputs();
     });
   }
 
@@ -182,7 +178,8 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
                 bottom: 0,
                 left: 40,
                 child: FloatingActionButton.small(
-                  onPressed: () => applyAvatar('avatar'),
+                  heroTag: const Key('avatar-editor'),
+                  onPressed: () => applyImage('avatar'),
                   child: const Icon(
                     Icons.camera,
                   ),
@@ -222,7 +219,8 @@ class _PersonalizeScreenWidgetState extends State<PersonalizeScreenWidget> {
                 bottom: 16,
                 right: 16,
                 child: FloatingActionButton(
-                  onPressed: () => applyAvatar('banner'),
+                  heroTag: const Key('banner-editor'),
+                  onPressed: () => applyImage('banner'),
                   child: const Icon(
                     Icons.camera_alt,
                   ),

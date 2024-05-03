@@ -32,17 +32,26 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       _client.get(getRequestUri('passport', '/api/users/${widget.name}')),
       _client.get(getRequestUri('passport', '/api/users/${widget.name}/page'))
     ], eagerError: true);
-    final mistakeRes = res.indexWhere((x) => x.statusCode != 200);
+    final mistakeRes = res.indexWhere((x) => x.statusCode != 200 && x.statusCode != 400);
     if (mistakeRes > -1) {
-      var message = utf8.decode(res[0].bodyBytes);
+      var message = utf8.decode(res[mistakeRes].bodyBytes);
       context.showErrorDialog(message);
       throw Exception(message);
     } else {
       final info = Account.fromJson(jsonDecode(utf8.decode(res[0].bodyBytes)));
-      final page = PersonalPage.fromJson(jsonDecode(utf8.decode(res[1].bodyBytes)));
+      final page = res[1].statusCode == 200 ? PersonalPage.fromJson(jsonDecode(utf8.decode(res[1].bodyBytes))) : null;
       setState(() {
         _userinfo = info;
-        _page = page;
+        _page = page ??
+            PersonalPage(
+              id: 0,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+              content: '',
+              script: '',
+              style: '',
+              accountId: info.id,
+            );
       });
       return info;
     }
