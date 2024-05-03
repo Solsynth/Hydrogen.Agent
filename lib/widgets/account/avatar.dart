@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:solian/utils/platform.dart';
 import 'package:solian/utils/service_url.dart';
 
 class AccountAvatar extends StatelessWidget {
@@ -27,17 +29,19 @@ class AccountAvatar extends StatelessWidget {
       );
     }
     if (direct == true) {
+      final image = PlatformInfo.canCacheImage ? CachedNetworkImageProvider(source) : NetworkImage(source);
       return CircleAvatar(
         radius: radius,
         backgroundColor: backgroundColor,
-        backgroundImage: NetworkImage(source),
+        backgroundImage: image as ImageProvider,
       );
     } else {
       final url = getRequestUri('passport', '/api/avatar/$source').toString();
+      final image = PlatformInfo.canCacheImage ? CachedNetworkImageProvider(url) : NetworkImage(url);
       return CircleAvatar(
         radius: radius,
         backgroundColor: backgroundColor,
-        backgroundImage: NetworkImage(url),
+        backgroundImage: image as ImageProvider,
       );
     }
   }

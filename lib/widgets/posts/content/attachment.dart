@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/utils/platform.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:solian/widgets/posts/attachment_screen.dart';
@@ -57,6 +59,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
     Widget content;
 
     if (widget.type == 1) {
+      final image = PlatformInfo.canCacheImage ? CachedNetworkImageProvider(widget.url) : NetworkImage(widget.url);
       content = GestureDetector(
         child: ClipRRect(
           borderRadius: const BorderRadius.all(borderRadius),
@@ -64,8 +67,8 @@ class _AttachmentItemState extends State<AttachmentItem> {
             tag: tag,
             child: Stack(
               children: [
-                Image.network(
-                  widget.url,
+                Image(
+                  image: image as ImageProvider,
                   key: Key(getTag()),
                   width: double.infinity,
                   height: double.infinity,

@@ -6,6 +6,7 @@ import 'package:solian/providers/friend.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/utils/timeago.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/utils/video_player.dart';
@@ -24,21 +25,12 @@ void main() {
 class SolianApp extends StatelessWidget {
   const SolianApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Solian',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(brightness: Brightness.light, seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(brightness: Brightness.dark, seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
+      theme: SolianTheme.build(Brightness.light),
+      darkTheme: SolianTheme.build(Brightness.dark),
       themeMode: ThemeMode.system,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

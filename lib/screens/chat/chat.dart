@@ -250,10 +250,4 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
       onCallEnded: () => _chat.setOngoingCall(null),
     );
   }
-
-  @override
-  void deactivate() {
-    _chat.unFocus();
-    super.deactivate();
-  }
 }

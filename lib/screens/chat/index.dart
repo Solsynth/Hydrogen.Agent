@@ -36,7 +36,7 @@ class _ChatIndexScreenState extends State<ChatIndexScreen> {
 
     return IndentWrapper(
       title: AppLocalizations.of(context)!.chat,
-      appBarActions: chat.focusChannel != null
+      appBarActions: isLargeScreen && chat.focusChannel != null
           ? [
               ChannelCallAction(
                 call: chat.ongoingCall,
