@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/router.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
@@ -172,9 +175,17 @@ class _PostItemState extends State<PostItem> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AccountAvatar(
-                  source: widget.item.author.avatar,
-                  direct: true,
+                GestureDetector(
+                  child: AccountAvatar(
+                    source: widget.item.author.avatar,
+                    direct: true,
+                  ),
+                  onTap: () {
+                    SolianRouter.router.pushNamed(
+                      'users.info',
+                      pathParameters: {'user': widget.item.author.name},
+                    );
+                  },
                 ),
                 Expanded(
                   child: Column(
@@ -203,9 +214,17 @@ class _PostItemState extends State<PostItem> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AccountAvatar(
-                  source: widget.item.author.avatar,
-                  direct: true,
+                GestureDetector(
+                  child: AccountAvatar(
+                    source: widget.item.author.avatar,
+                    direct: true,
+                  ),
+                  onTap: () {
+                    SolianRouter.router.pushNamed(
+                      'users.info',
+                      pathParameters: {'user': widget.item.author.name},
+                    );
+                  },
                 ),
                 Expanded(
                   child: Column(
