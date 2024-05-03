@@ -42,6 +42,8 @@
   "notifyDone": "所有通知已读！",
   "notifyDoneCaption": "这里没有什么东西可以给你看的了～",
   "notifyListHint": "下拉以刷新，左滑来已读",
+  "notifyMarkAllRead": "将所有标记为已读",
+  "notifyMarkAllReadDone": "已将所有通知标记为已读",
   "friend": "好友",
   "friendPending": "请求中",
   "friendActive": "活跃的好友",

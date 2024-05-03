@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/notify.dart';
@@ -16,14 +19,54 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  bool _isSubmitting = false;
+
+  Future<void> markAllRead() async {
+    setState(() => _isSubmitting = true);
+
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) {
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    final nty = context.read<NotifyProvider>();
+    List<int> markList = List.empty(growable: true);
+    for (final element in nty.notifications) {
+      if (element.isRealtime) continue;
+      markList.add(element.id);
+    }
+
+    var uri = getRequestUri('passport', '/api/notifications/batch/read');
+    await auth.client!.put(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'messages': markList}),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context)!.notifyMarkAllReadDone),
+    ));
+
+    await nty.fetch(auth);
+
+    setState(() => _isSubmitting = false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, () {
+      final nty = context.read<NotifyProvider>();
+      nty.allRead();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
     final nty = context.watch<NotifyProvider>();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      nty.allRead();
-    });
 
     return IndentScaffold(
       noSafeArea: true,
@@ -33,6 +76,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
         onRefresh: () => nty.fetch(auth),
         child: CustomScrollView(
           slivers: [
+            SliverToBoxAdapter(
+              child: _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+            ),
+            if (nty.notifications.isNotEmpty)
+              SliverToBoxAdapter(
+                child: ListTile(
+                  tileColor: Theme.of(context).colorScheme.secondaryContainer,
+                  leading: const Icon(Icons.checklist),
+                  title: Text(AppLocalizations.of(context)!.notifyMarkAllRead),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+                  onTap: _isSubmitting ? null : markAllRead,
+                ),
+              ),
             nty.notifications.isEmpty
                 ? SliverToBoxAdapter(
                     child: Container(
@@ -41,8 +97,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       child: ListTile(
                         leading: const Icon(Icons.check),
                         title: Text(AppLocalizations.of(context)!.notifyDone),
-                        subtitle: Text(
-                            AppLocalizations.of(context)!.notifyDoneCaption),
+                        subtitle: Text(AppLocalizations.of(context)!.notifyDoneCaption),
                       ),
                     ),
                   )
@@ -79,8 +134,7 @@ class NotificationItem extends StatelessWidget {
   final model.Notification item;
   final void Function()? onDismiss;
 
-  const NotificationItem(
-      {super.key, required this.index, required this.item, this.onDismiss});
+  const NotificationItem({super.key, required this.index, required this.item, this.onDismiss});
 
   bool get hasLinks => item.links != null && item.links!.isNotEmpty;
 
@@ -94,8 +148,7 @@ class NotificationItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 16, right: 16, top: 34, bottom: 12),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 34, bottom: 12),
               child: Text(
                 'Links',
                 style: Theme.of(context).textTheme.headlineSmall,
@@ -124,8 +177,7 @@ class NotificationItem extends StatelessWidget {
     );
   }
 
-  Future<void> markAsRead(
-      model.Notification element, BuildContext context) async {
+  Future<void> markAsRead(model.Notification element, BuildContext context) async {
     if (element.isRealtime) return;
 
     final auth = context.read<AuthProvider>();
@@ -139,7 +191,7 @@ class NotificationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key((DateTime.now().millisecondsSinceEpoch << 10).toString()),
+      key: Key('n${item.id}'),
       onDismissed: (direction) {
         markAsRead(item, context).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -42,6 +42,8 @@
   "notifyDone": "You're done!",
   "notifyDoneCaption": "There are no notifications unread for you.",
   "notifyListHint": "Pull to refresh, swipe to dismiss",
+  "notifyMarkAllRead": "Mark all as read",
+  "notifyMarkAllReadDone": "Marked all notifications as read",
   "friend": "Friend",
   "friendPending": "Pending",
   "friendActive": "Active",
