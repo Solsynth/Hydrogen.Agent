@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 
 class FriendPicker extends StatefulWidget {
   const FriendPicker({super.key});

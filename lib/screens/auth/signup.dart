@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatelessWidget {
@@ -58,7 +58,7 @@ class SignUpScreen extends StatelessWidget {
           );
         },
       ).then((_) {
-        router.replaceNamed('auth.sign-in');
+        SolianRouter.router.replaceNamed('auth.sign-in');
       });
     } else {
       var message = utf8.decode(res.bodyBytes);
@@ -68,7 +68,7 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.signUp,
       hideDrawer: true,
       child: Center(

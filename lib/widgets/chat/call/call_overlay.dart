@@ -52,7 +52,7 @@ class CallOverlay extends StatelessWidget {
         ),
       ),
       onTap: () {
-        router.pushNamed(
+        SolianRouter.router.pushNamed(
           'chat.channel.call',
           extra: chat.currentCall!.info,
           pathParameters: {'channel': chat.currentCall!.channel.alias},

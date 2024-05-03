@@ -70,6 +70,7 @@ dependencies:
   file_picker: ^8.0.3
   package_info_plus: ^7.0.0
   cached_network_image: ^3.3.1
+  desktop_drop: ^0.4.4
 
 dev_dependencies:
   flutter_test:

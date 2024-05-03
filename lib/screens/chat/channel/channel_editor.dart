@@ -9,7 +9,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
@@ -55,8 +55,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       var message = utf8.decode(res.bodyBytes);
       context.showErrorDialog(message);
     } else {
-      if (router.canPop()) {
-        router.pop(true);
+      if (SolianRouter.router.canPop()) {
+        SolianRouter.router.pop(true);
       }
     }
     setState(() => _isSubmitting = false);
@@ -67,8 +67,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
   }
 
   void cancelEditing() {
-    if (router.canPop()) {
-      router.pop(false);
+    if (SolianRouter.router.canPop()) {
+      SolianRouter.router.pop(false);
     }
   }
 
@@ -99,7 +99,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       ],
     );
 
-    return IndentWrapper(
+    return IndentScaffold(
       hideDrawer: true,
       title: AppLocalizations.of(context)!.chatChannelOrganize,
       appBarActions: <Widget>[

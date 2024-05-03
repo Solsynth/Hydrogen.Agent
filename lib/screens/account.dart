@@ -4,10 +4,10 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
-import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/empty.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -32,11 +32,11 @@ class _AccountScreenState extends State<AccountScreen> {
         case 'account.personalize':
           return const PersonalizeScreenWidget();
         default:
-          return const SelectionEmptyWidget();
+          return const PageEmptyWidget();
       }
     }
 
-    return IndentWrapper(
+    return IndentScaffold(
       title: _title ?? AppLocalizations.of(context)!.account,
       noSafeArea: true,
       fixedAppBarColor: true,
@@ -60,7 +60,7 @@ class _AccountScreenState extends State<AccountScreen> {
             )
           : AccountScreenWidget(
               onSelect: (item, _) {
-                router.pushNamed(item);
+                SolianRouter.router.pushNamed(item);
               },
             ),
     );
@@ -139,7 +139,7 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
               title: AppLocalizations.of(context)!.signIn,
               caption: AppLocalizations.of(context)!.signInCaption,
               onTap: () {
-                router.pushNamed('auth.sign-in').then((did) {
+                SolianRouter.router.pushNamed('auth.sign-in').then((did) {
                   auth.isAuthorized().then((value) {
                     setState(() => _isAuthorized = value);
                   });
@@ -151,7 +151,7 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
               title: AppLocalizations.of(context)!.signUp,
               caption: AppLocalizations.of(context)!.signUpCaption,
               onTap: () {
-                router.pushNamed('auth.sign-up');
+                SolianRouter.router.pushNamed('auth.sign-up');
               },
             ),
           ],

@@ -5,7 +5,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -21,7 +21,7 @@ class SignInScreen extends StatelessWidget {
     final password = _passwordController.value.text;
     if (username.isEmpty || password.isEmpty) return;
     auth.signin(context, username, password).then((_) {
-      router.pop(true);
+      SolianRouter.router.pop(true);
     }).catchError((e) {
       List<String> messages = e.toString().split('\n');
       if (messages.last.contains('risk')) {
@@ -61,7 +61,7 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.signIn,
       hideDrawer: true,
       child: Center(

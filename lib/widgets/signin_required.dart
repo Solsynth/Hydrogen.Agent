@@ -32,7 +32,7 @@ class SignInRequiredScreen extends StatelessWidget {
         ),
       ),
       onTap: () {
-        router.goNamed('account');
+        SolianRouter.router.goNamed('account');
       },
     );
   }

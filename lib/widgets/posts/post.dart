@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/content/article.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:solian/widgets/posts/content/moment.dart';
-import 'package:solian/widgets/posts/item_action.dart';
+import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/reaction_list.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timeago/timeago.dart' as timeago;

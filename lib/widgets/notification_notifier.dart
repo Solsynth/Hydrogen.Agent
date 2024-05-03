@@ -85,7 +85,7 @@ class _NotificationButtonState extends State<NotificationButton> {
       child: IconButton(
         icon: const Icon(Icons.notifications),
         onPressed: () {
-          router.pushNamed('notification');
+          SolianRouter.router.pushNamed('notification');
         },
       ),
     );

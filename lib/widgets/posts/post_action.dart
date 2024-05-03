@@ -5,7 +5,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
-import 'package:solian/widgets/posts/item_deletion.dart';
+import 'package:solian/widgets/posts/post_deletion.dart';
 
 class PostItemAction extends StatelessWidget {
   final Post item;
@@ -23,17 +23,17 @@ class PostItemAction extends StatelessWidget {
     bool ok = false;
     switch (item.modelType) {
       case 'article':
-        ok = await router.pushNamed(
+        ok = await SolianRouter.router.pushNamed(
           'posts.articles.editor',
           extra: item,
         ) as bool;
       case 'moment':
-        ok = await router.pushNamed(
+        ok = await SolianRouter.router.pushNamed(
           'posts.moments.editor',
           extra: item,
         ) as bool;
       case 'comment':
-        ok = await router.pushNamed(
+        ok = await SolianRouter.router.pushNamed(
           'posts.comments.editor',
           extra: CommentPostArguments(editing: item),
         ) as bool;

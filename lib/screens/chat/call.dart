@@ -3,10 +3,11 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/providers/chat.dart';
-import 'package:solian/widgets/chat/call/controls.dart';
+import 'package:solian/utils/theme.dart';
+import 'package:solian/widgets/chat/call/call_controls.dart';
 import 'package:solian/widgets/chat/call/participant.dart';
 import 'package:solian/widgets/chat/call/participant_menu.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:math' as math;
 
@@ -127,8 +128,9 @@ class _ChatCallState extends State<ChatCall> {
       );
     }
 
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.chatCall,
+      fixedAppBarColor: SolianTheme.isLargeScreen(context),
       hideDrawer: true,
       child: content,
     );

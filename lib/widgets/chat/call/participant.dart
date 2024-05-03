@@ -5,7 +5,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/call.dart';
-import 'package:solian/widgets/chat/call/no_content.dart';
+import 'package:solian/widgets/chat/call/participant_no_content.dart';
 import 'package:solian/widgets/chat/call/participant_info.dart';
 import 'package:solian/widgets/chat/call/participant_stats.dart';
 

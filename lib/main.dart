@@ -34,7 +34,7 @@ class SolianApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: router,
+      routerConfig: SolianRouter.router,
       builder: (context, child) {
         return MultiProvider(
           providers: [

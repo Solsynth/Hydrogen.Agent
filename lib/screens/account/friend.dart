@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/friendship.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FriendScreen extends StatelessWidget {
@@ -16,7 +16,7 @@ class FriendScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.friend,
       noSafeArea: true,
       hideDrawer: true,

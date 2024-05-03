@@ -29,7 +29,7 @@ class ChatNewAction extends StatelessWidget {
                   leading: const Icon(Icons.add),
                   title: Text(AppLocalizations.of(context)!.chatNewCreate),
                   onTap: () {
-                    router.pushNamed('chat.channel.editor').then((did) {
+                    SolianRouter.router.pushNamed('chat.channel.editor').then((did) {
                       if (did == true) {
                         onUpdate();
                         if (Navigator.canPop(context)) {

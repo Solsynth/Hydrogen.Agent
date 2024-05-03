@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/utils/theme.dart';
 
 class SolianNavigationDrawer extends StatefulWidget {
   const SolianNavigationDrawer({super.key});
@@ -17,7 +18,7 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
   void _onSelect(String name, int idx) {
     setState(() => _selectedIndex = idx);
     context.read<NavigationProvider>().selectedIndex = idx;
-    router.goNamed(name);
+    SolianRouter.router.goNamed(name);
   }
 
   @override
@@ -59,6 +60,9 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
 
     return NavigationDrawer(
       selectedIndex: _selectedIndex,
+      elevation: SolianTheme.isLargeScreen(context) ? 20 : 0,
+      shadowColor: SolianTheme.isLargeScreen(context) ? Theme.of(context).shadowColor : null,
+      surfaceTintColor: Theme.of(context).colorScheme.background,
       onDestinationSelected: (int idx) {
         final element = navigationItems[idx];
         _onSelect(element.$2, idx);

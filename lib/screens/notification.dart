@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:solian/models/notification.dart' as model;
@@ -25,7 +25,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       nty.allRead();
     });
 
-    return IndentWrapper(
+    return IndentScaffold(
       noSafeArea: true,
       hideDrawer: true,
       title: AppLocalizations.of(context)!.notification,
@@ -82,10 +82,10 @@ class NotificationItem extends StatelessWidget {
   const NotificationItem(
       {super.key, required this.index, required this.item, this.onDismiss});
 
-  bool hasLinks() => item.links != null && item.links!.isNotEmpty;
+  bool get hasLinks => item.links != null && item.links!.isNotEmpty;
 
   void showLinks(BuildContext context) {
-    if (!hasLinks()) return;
+    if (!hasLinks) return;
 
     showModalBottomSheet<void>(
       context: context,
@@ -170,7 +170,7 @@ class NotificationItem extends StatelessWidget {
         child: ListTile(
           title: Text(item.subject),
           subtitle: Text(item.content),
-          trailing: hasLinks()
+          trailing: hasLinks
               ? TextButton(
                   onPressed: () => showLinks(context),
                   style: TextButton.styleFrom(shape: const CircleBorder()),

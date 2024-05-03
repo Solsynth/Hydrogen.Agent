@@ -4,90 +4,47 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
-import 'package:solian/screens/chat/chat.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/chat/channel_action.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/chat/chat_new.dart';
-import 'package:solian/widgets/empty.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/notification_notifier.dart';
 import 'package:solian/widgets/signin_required.dart';
 
-class ChatIndexScreen extends StatefulWidget {
-  const ChatIndexScreen({super.key});
-
-  @override
-  State<ChatIndexScreen> createState() => _ChatIndexScreenState();
-}
-
-class _ChatIndexScreenState extends State<ChatIndexScreen> {
-  Channel? _selectedChannel;
+class ChatListScreen extends StatelessWidget {
+  const ChatListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final chat = context.watch<ChatProvider>();
-
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth >= 600;
-
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.chat,
-      appBarActions: isLargeScreen && chat.focusChannel != null
-          ? [
-              ChannelCallAction(
-                call: chat.ongoingCall,
-                channel: chat.focusChannel!,
-                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
-              ),
-              ChannelManageAction(
-                channel: chat.focusChannel!,
-                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
-              ),
-            ]
-          : [const NotificationButton()],
-      fixedAppBarColor: isLargeScreen,
-      child: isLargeScreen
-          ? Row(
-              children: [
-                Flexible(
-                  flex: 2,
-                  child: ChatIndexScreenWidget(
-                    onSelect: (item) {
-                      setState(() => _selectedChannel = item);
-                    },
-                  ),
-                ),
-                const VerticalDivider(thickness: 0.3, width: 0.3),
-                Flexible(
-                  flex: 4,
-                  child: _selectedChannel == null
-                      ? const SelectionEmptyWidget()
-                      : ChatScreenWidget(
-                          key: Key('c${_selectedChannel!.id}'),
-                          alias: _selectedChannel!.alias,
-                        ),
-                ),
-              ],
-            )
-          : const ChatIndexScreenWidget(),
+      appBarActions: const [NotificationButton()],
+      fixedAppBarColor: SolianTheme.isLargeScreen(context),
+      child: ChatListWidget(
+        onSelect: (item) {
+          SolianRouter.router.pushReplacementNamed(
+            'chat.channel',
+            pathParameters: {'channel': item.alias},
+          );
+        },
+      ),
     );
   }
 }
 
-class ChatIndexScreenWidget extends StatefulWidget {
+class ChatListWidget extends StatefulWidget {
   final Function(Channel item)? onSelect;
 
-  const ChatIndexScreenWidget({super.key, this.onSelect});
+  const ChatListWidget({super.key, this.onSelect});
 
   @override
-  State<ChatIndexScreenWidget> createState() => _ChatIndexScreenWidgetState();
+  State<ChatListWidget> createState() => _ChatListWidgetState();
 }
 
-class _ChatIndexScreenWidgetState extends State<ChatIndexScreenWidget> {
+class _ChatListWidgetState extends State<ChatListWidget> {
   List<Channel> _channels = List.empty();
 
   Future<void> fetchChannels() async {
@@ -169,7 +126,7 @@ class _ChatIndexScreenWidgetState extends State<ChatIndexScreenWidget> {
                       return;
                     }
 
-                    final result = await router.pushNamed(
+                    final result = await SolianRouter.router.pushNamed(
                       'chat.channel',
                       pathParameters: {
                         'channel': element.alias,

@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PersonalizeScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class PersonalizeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.personalize,
       hideDrawer: true,
       child: const PersonalizeScreenWidget(),

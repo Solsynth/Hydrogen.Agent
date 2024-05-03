@@ -76,7 +76,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
     if (chat.currentCall != null) {
       chat.currentCall!.deactivate();
       chat.currentCall!.dispose();
-      router.pop();
+      SolianRouter.router.pop();
     }
   }
 

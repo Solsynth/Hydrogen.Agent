@@ -7,10 +7,10 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/account/avatar.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/friend_picker.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatMemberScreen extends StatefulWidget {
@@ -141,7 +141,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.chatMember,
       noSafeArea: true,
       hideDrawer: true,

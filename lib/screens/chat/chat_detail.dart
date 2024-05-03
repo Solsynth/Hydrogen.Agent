@@ -4,19 +4,19 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/chat/channel_deletion.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ChatManageScreen extends StatefulWidget {
+class ChatDetailScreen extends StatefulWidget {
   final Channel channel;
 
-  const ChatManageScreen({super.key, required this.channel});
+  const ChatDetailScreen({super.key, required this.channel});
 
   @override
-  State<ChatManageScreen> createState() => _ChatManageScreenState();
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _ChatManageScreenState extends State<ChatManageScreen> {
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
   bool _isOwned = false;
 
   void promptLeaveChannel() async {
@@ -27,8 +27,8 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
         isOwned: _isOwned,
       ),
     );
-    if (did == true && router.canPop()) {
-      router.pop('disposed');
+    if (did == true && SolianRouter.router.canPop()) {
+      SolianRouter.router.pop('disposed');
     }
   }
 
@@ -53,16 +53,16 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
         leading: const Icon(Icons.settings),
         title: Text(AppLocalizations.of(context)!.settings),
         onTap: () async {
-          router.pushNamed('chat.channel.editor', extra: widget.channel).then((did) {
+          SolianRouter.router.pushNamed('chat.channel.editor', extra: widget.channel).then((did) {
             if (did == true) {
-              if (router.canPop()) router.pop('refresh');
+              if (SolianRouter.router.canPop()) SolianRouter.router.pop('refresh');
             }
           });
         },
       ),
     ];
 
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.chatManage,
       hideDrawer: true,
       noSafeArea: true,
@@ -100,7 +100,7 @@ class _ChatManageScreenState extends State<ChatManageScreen> {
                   leading: const Icon(Icons.supervisor_account),
                   title: Text(AppLocalizations.of(context)!.chatMember),
                   onTap: () {
-                    router.pushNamed(
+                    SolianRouter.router.pushNamed(
                       'chat.channel.member',
                       extra: widget.channel,
                       pathParameters: {'channel': widget.channel.alias},

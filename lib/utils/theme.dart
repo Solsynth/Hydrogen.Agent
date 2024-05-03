@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class SolianTheme {
-  static bool isColumnMode(BuildContext context) =>
+  static bool isLargeScreen(BuildContext context) =>
       MediaQuery.of(context).size.width > 640;
 
   static ThemeData build(Brightness brightness) {

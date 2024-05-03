@@ -97,14 +97,14 @@ class ChannelManageAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
-        final result = await router.pushNamed(
+        final result = await SolianRouter.router.pushNamed(
           'chat.channel.manage',
           extra: channel,
           pathParameters: {'channel': channel.alias},
         );
         switch (result) {
           case 'disposed':
-            if (router.canPop()) router.pop('refresh');
+            if (SolianRouter.router.canPop()) SolianRouter.router.pop('refresh');
           case 'refresh':
             onUpdate();
         }

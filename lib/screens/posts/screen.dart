@@ -6,9 +6,9 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
-import 'package:solian/widgets/posts/item.dart';
+import 'package:solian/widgets/posts/post.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PostScreen extends StatelessWidget {
@@ -19,7 +19,7 @@ class PostScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IndentWrapper(
+    return IndentScaffold(
       title: AppLocalizations.of(context)!.post,
       noSafeArea: true,
       hideDrawer: true,

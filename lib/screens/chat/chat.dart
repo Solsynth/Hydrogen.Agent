@@ -10,12 +10,13 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/chat/channel_action.dart';
-import 'package:solian/widgets/chat/maintainer.dart';
+import 'package:solian/widgets/chat/chat_maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
 import 'package:solian/widgets/chat/message_editor.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -27,9 +28,11 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final chat = context.watch<ChatProvider>();
 
-    return IndentWrapper(
+    return IndentScaffold(
       title: chat.focusChannel?.name ?? 'Loading...',
       hideDrawer: true,
+      fixedAppBarColor: SolianTheme.isLargeScreen(context),
+      appBarLeading: IconButton(icon: const Icon(Icons.tag), onPressed: () {}),
       appBarActions: chat.focusChannel != null
           ? [
               ChannelCallAction(
@@ -197,7 +200,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
         TextButton(
           child: Text(AppLocalizations.of(context)!.chatCallJoin),
           onPressed: () {
-            router.pushNamed(
+            SolianRouter.router.pushNamed(
               'chat.channel.call',
               extra: _chat.ongoingCall,
               pathParameters: {'channel': widget.alias},

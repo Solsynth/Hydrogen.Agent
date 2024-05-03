@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:solian/models/message.dart';
-import 'package:solian/widgets/account/avatar.dart';
-import 'package:solian/widgets/chat/content.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/chat/message_content.dart';
 import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;

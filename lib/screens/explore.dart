@@ -12,9 +12,9 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:solian/widgets/empty.dart';
-import 'package:solian/widgets/indent_wrapper.dart';
+import 'package:solian/widgets/scaffold.dart';
 import 'package:solian/widgets/notification_notifier.dart';
-import 'package:solian/widgets/posts/item.dart';
+import 'package:solian/widgets/posts/post.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -31,7 +31,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isLargeScreen = screenWidth >= 600;
 
-    return IndentWrapper(
+    return IndentScaffold(
       noSafeArea: true,
       fixedAppBarColor: isLargeScreen,
       appBarActions: const [NotificationButton()],
@@ -51,7 +51,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 Flexible(
                   flex: 4,
                   child: _selectedPost == null
-                      ? const SelectionEmptyWidget()
+                      ? const PageEmptyWidget()
                       : PostScreenWidget(
                           key: Key('p${_selectedPost!.id}'),
                           dataset: _selectedPost!.dataset,
@@ -62,7 +62,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             )
           : ExploreScreenWidget(
               onSelect: (item) {
-                router.pushNamed(
+                SolianRouter.router.pushNamed(
                   'posts.screen',
                   pathParameters: {
                     'alias': item.alias,
@@ -130,7 +130,7 @@ class _ExploreScreenWidgetState extends State<ExploreScreenWidget> {
             return FloatingActionButton(
               child: const Icon(Icons.edit),
               onPressed: () async {
-                final did = await router.pushNamed('posts.moments.editor');
+                final did = await SolianRouter.router.pushNamed('posts.moments.editor');
                 if (did == true) _pagingController.refresh();
               },
             );
