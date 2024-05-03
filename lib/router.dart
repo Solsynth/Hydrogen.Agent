@@ -27,14 +27,50 @@ abstract class SolianRouter {
   static final router = GoRouter(
     routes: [
       GoRoute(
-        path: '/',
-        name: 'explore',
-        builder: (context, state) => const ExploreScreen(),
-      ),
-      GoRoute(
         path: '/notification',
         name: 'notification',
         builder: (context, state) => const NotificationScreen(),
+      ),
+      ShellRoute(
+        pageBuilder: (context, state, child) => defaultPageBuilder(
+          context,
+          state,
+          SolianTheme.isLargeScreen(context)
+              ? TwoColumnLayout(
+                  sideChild: const ExplorePostScreen(),
+                  mainChild: child,
+                )
+              : child,
+        ),
+        routes: [
+          GoRoute(
+            path: '/',
+            name: 'explore',
+            builder: (context, state) =>
+                !SolianTheme.isLargeScreen(context) ? const ExplorePostScreen() : const PageEmptyWidget(),
+          ),
+          GoRoute(
+            path: '/posts/publish/moments',
+            name: 'posts.moments.editor',
+            builder: (context, state) => MomentEditorScreen(editing: state.extra as Post?),
+          ),
+          GoRoute(
+            path: '/posts/publish/comments',
+            name: 'posts.comments.editor',
+            builder: (context, state) {
+              final args = state.extra as CommentPostArguments;
+              return CommentEditorScreen(editing: args.editing, related: args.related);
+            },
+          ),
+          GoRoute(
+            path: '/posts/:dataset/:alias',
+            name: 'posts.screen',
+            builder: (context, state) => PostScreen(
+              alias: state.pathParameters['alias'] as String,
+              dataset: state.pathParameters['dataset'] as String,
+            ),
+          ),
+        ],
       ),
       ShellRoute(
         pageBuilder: (context, state, child) => defaultPageBuilder(
@@ -81,52 +117,45 @@ abstract class SolianRouter {
           ),
         ],
       ),
-      GoRoute(
-        path: '/account',
-        name: 'account',
-        builder: (context, state) => const AccountScreen(),
-      ),
-      GoRoute(
-        path: '/posts/publish/moments',
-        name: 'posts.moments.editor',
-        builder: (context, state) => MomentEditorScreen(editing: state.extra as Post?),
-      ),
-      GoRoute(
-        path: '/posts/publish/comments',
-        name: 'posts.comments.editor',
-        builder: (context, state) {
-          final args = state.extra as CommentPostArguments;
-          return CommentEditorScreen(editing: args.editing, related: args.related);
-        },
-      ),
-      GoRoute(
-        path: '/posts/:dataset/:alias',
-        name: 'posts.screen',
-        builder: (context, state) => PostScreen(
-          alias: state.pathParameters['alias'] as String,
-          dataset: state.pathParameters['dataset'] as String,
-        ),
-      ),
-      GoRoute(
-        path: '/auth/sign-in',
-        name: 'auth.sign-in',
-        builder: (context, state) => SignInScreen(),
-      ),
-      GoRoute(
-        path: '/auth/sign-up',
-        name: 'auth.sign-up',
-        builder: (context, state) => SignUpScreen(),
-      ),
-      GoRoute(
-        path: '/account/friend',
-        name: 'account.friend',
-        builder: (context, state) => const FriendScreen(),
-      ),
-      GoRoute(
-        path: '/account/personalize',
-        name: 'account.personalize',
-        builder: (context, state) => const PersonalizeScreen(),
-      ),
+      ShellRoute(
+          pageBuilder: (context, state, child) => defaultPageBuilder(
+                context,
+                state,
+                SolianTheme.isLargeScreen(context)
+                    ? TwoColumnLayout(
+                        sideChild: const AccountScreen(),
+                        mainChild: child,
+                      )
+                    : child,
+              ),
+          routes: [
+            GoRoute(
+              path: '/account',
+              name: 'account',
+              builder: (context, state) =>
+                  !SolianTheme.isLargeScreen(context) ? const AccountScreen() : const PageEmptyWidget(),
+            ),
+            GoRoute(
+              path: '/auth/sign-in',
+              name: 'auth.sign-in',
+              builder: (context, state) => SignInScreen(),
+            ),
+            GoRoute(
+              path: '/auth/sign-up',
+              name: 'auth.sign-up',
+              builder: (context, state) => SignUpScreen(),
+            ),
+            GoRoute(
+              path: '/account/friend',
+              name: 'account.friend',
+              builder: (context, state) => const FriendScreen(),
+            ),
+            GoRoute(
+              path: '/account/personalize',
+              name: 'account.personalize',
+              builder: (context, state) => const PersonalizeScreen(),
+            ),
+          ]),
     ],
   );
 

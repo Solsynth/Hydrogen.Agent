@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/posts/comment_list.dart';
 import 'package:solian/widgets/posts/content/article.dart';
@@ -87,16 +88,13 @@ class _PostItemState extends State<PostItem> {
   Widget renderAttachments() {
     if (widget.item.modelType == 'article') return Container();
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth >= 600;
-
     if (widget.item.attachments != null && widget.item.attachments!.isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(top: 8),
         child: AttachmentList(
           items: widget.item.attachments!,
           provider: 'interactive',
-          noTag: isLargeScreen && widget.brief,
+          noTag: SolianTheme.isLargeScreen(context) && widget.brief,
         ),
       );
     } else {

@@ -2,73 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/screens/account/friend.dart';
-import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:solian/widgets/empty.dart';
 import 'package:solian/widgets/scaffold.dart';
 
-class AccountScreen extends StatefulWidget {
+class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
   @override
-  State<AccountScreen> createState() => _AccountScreenState();
-}
-
-class _AccountScreenState extends State<AccountScreen> {
-  String? _title;
-  String? _selectedTab;
-
-  @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isLargeScreen = screenWidth >= 600;
-
-    Widget renderContent() {
-      switch (_selectedTab) {
-        case 'account.friend':
-          return const FriendScreenWidget();
-        case 'account.personalize':
-          return const PersonalizeScreenWidget();
-        default:
-          return const PageEmptyWidget();
-      }
-    }
-
     return IndentScaffold(
-      title: _title ?? AppLocalizations.of(context)!.account,
+      title: AppLocalizations.of(context)!.account,
       noSafeArea: true,
       fixedAppBarColor: true,
-      child: isLargeScreen
-          ? Row(
-              children: [
-                Flexible(
-                  flex: 2,
-                  child: AccountScreenWidget(
-                    onSelect: (item, title) {
-                      setState(() {
-                        _selectedTab = item;
-                        _title = title;
-                      });
-                    },
-                  ),
-                ),
-                const VerticalDivider(thickness: 0.3, width: 0.3),
-                Flexible(flex: 4, child: renderContent()),
-              ],
-            )
-          : AccountScreenWidget(
-              onSelect: (item, _) {
-                SolianRouter.router.pushNamed(item);
-              },
-            ),
+      child: AccountScreenWidget(
+        onSelect: (item) {
+          SolianRouter.router.pushNamed(item);
+        },
+      ),
     );
   }
 }
 
 class AccountScreenWidget extends StatefulWidget {
-  final Function(String item, String title) onSelect;
+  final Function(String item) onSelect;
 
   const AccountScreenWidget({super.key, required this.onSelect});
 
@@ -105,7 +62,7 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
             leading: const Icon(Icons.color_lens),
             title: Text(AppLocalizations.of(context)!.personalize),
             onTap: () {
-              widget.onSelect('account.personalize', AppLocalizations.of(context)!.personalize);
+              widget.onSelect('account.personalize');
             },
           ),
           ListTile(
@@ -113,7 +70,7 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
             leading: const Icon(Icons.diversity_1),
             title: Text(AppLocalizations.of(context)!.friend),
             onTap: () {
-              widget.onSelect('account.friend', AppLocalizations.of(context)!.friend);
+              widget.onSelect('account.friend');
             },
           ),
           ListTile(
