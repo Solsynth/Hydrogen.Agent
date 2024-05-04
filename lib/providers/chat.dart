@@ -47,7 +47,7 @@ class ChatProvider extends ChangeNotifier {
   Future<Channel> fetchChannel(String alias) async {
     final Client client = Client();
 
-    var uri = getRequestUri('messaging', '/api/channels/$alias');
+    var uri = getRequestUri('messaging', '/api/channels/global/$alias');
     var res = await client.get(uri);
     if (res.statusCode == 200) {
       final result = jsonDecode(utf8.decode(res.bodyBytes));
@@ -63,7 +63,7 @@ class ChatProvider extends ChangeNotifier {
   Future<Call?> fetchOngoingCall(String alias) async {
     final Client client = Client();
 
-    var uri = getRequestUri('messaging', '/api/channels/$alias/calls/ongoing');
+    var uri = getRequestUri('messaging', '/api/channels/global/$alias/calls/ongoing');
     var res = await client.get(uri);
     if (res.statusCode == 200) {
       final result = jsonDecode(utf8.decode(res.bodyBytes));
@@ -181,7 +181,7 @@ class ChatCallInstance {
       throw Exception('unauthorized');
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${channel.alias}/calls/ongoing/token');
+    var uri = getRequestUri('messaging', '/api/channels/global/${channel.alias}/calls/ongoing/token');
 
     var res = await auth.client!.post(uri);
     if (res.statusCode == 200) {

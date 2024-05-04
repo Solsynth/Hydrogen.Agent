@@ -53,8 +53,8 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     if (!await auth.isAuthorized()) return;
 
     final uri = widget.editing == null
-        ? getRequestUri('messaging', '/api/channels/${widget.channel}/messages')
-        : getRequestUri('messaging', '/api/channels/${widget.channel}/messages/${widget.editing!.id}');
+        ? getRequestUri('messaging', '/api/channels/global/${widget.channel}/messages')
+        : getRequestUri('messaging', '/api/channels/global/${widget.channel}/messages/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';

@@ -33,7 +33,7 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/calls');
+    var uri = getRequestUri('messaging', '/api/channels/global/${widget.channel.alias}/calls');
 
     var res = await auth.client!.post(uri);
     if (res.statusCode != 200) {
@@ -54,7 +54,7 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.channel.alias}/calls/ongoing');
+    var uri = getRequestUri('messaging', '/api/channels/global/${widget.channel.alias}/calls/ongoing');
 
     var res = await auth.client!.delete(uri);
     if (res.statusCode != 200) {

@@ -39,8 +39,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
     }
 
     final uri = widget.editing == null
-        ? getRequestUri('messaging', '/api/channels')
-        : getRequestUri('messaging', '/api/channels/${widget.editing!.id}');
+        ? getRequestUri('messaging', '/api/channels/global')
+        : getRequestUri('messaging', '/api/channels/global/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';

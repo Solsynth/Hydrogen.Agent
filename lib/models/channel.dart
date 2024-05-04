@@ -13,7 +13,7 @@ class Channel {
   int type;
   Account account;
   int accountId;
-  int realmId;
+  int? realmId;
 
   Channel({
     required this.id,
@@ -28,7 +28,7 @@ class Channel {
     required this.type,
     required this.account,
     required this.accountId,
-    required this.realmId,
+    this.realmId,
   });
 
   factory Channel.fromJson(Map<String, dynamic> json) => Channel(

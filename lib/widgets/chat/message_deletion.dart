@@ -31,7 +31,7 @@ class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
     if (!await auth.isAuthorized()) return;
 
     final uri = getRequestUri('messaging',
-        '/api/channels/${widget.channel}/messages/${widget.item.id}');
+        '/api/channels/global/${widget.channel}/messages/${widget.item.id}');
 
     setState(() => _isSubmitting = true);
     final res = await auth.client!.delete(uri);

@@ -32,7 +32,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
     }
 
     var res = await auth.client!.delete(
-      getRequestUri('messaging', '/api/channels/${widget.channel.id}'),
+      getRequestUri('messaging', '/api/channels/global/${widget.channel.id}'),
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
@@ -54,7 +54,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
     }
 
     var res = await auth.client!.post(
-      getRequestUri('messaging', '/api/channels/${widget.channel.alias}/leave'),
+      getRequestUri('messaging', '/api/channels/global/${widget.channel.alias}/leave'),
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);

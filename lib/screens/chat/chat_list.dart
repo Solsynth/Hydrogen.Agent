@@ -58,7 +58,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    var uri = getRequestUri('messaging', '/api/channels/me/available');
+    var uri = getRequestUri('messaging', '/api/channels/global/me/available');
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {

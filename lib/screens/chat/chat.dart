@@ -77,7 +77,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
 
     var uri = getRequestUri(
       'messaging',
-      '/api/channels/${widget.alias}/messages?take=$take&offset=$offset',
+      '/api/channels/global/${widget.alias}/messages?take=$take&offset=$offset',
     );
 
     var res = await auth.client!.get(uri);

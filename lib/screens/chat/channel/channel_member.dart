@@ -37,7 +37,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     _selfId = prof['id'];
 
     var uri = getRequestUri(
-        'messaging', '/api/channels/${widget.channel.alias}/members');
+        'messaging', '/api/channels/global/${widget.channel.alias}/members');
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
@@ -61,7 +61,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     }
 
     var uri = getRequestUri(
-        'messaging', '/api/channels/${widget.channel.alias}/kick');
+        'messaging', '/api/channels/global/${widget.channel.alias}/kick');
 
     var res = await auth.client!.post(
       uri,
@@ -92,7 +92,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     }
 
     var uri = getRequestUri(
-        'messaging', '/api/channels/${widget.channel.alias}/invite');
+        'messaging', '/api/channels/global/${widget.channel.alias}/invite');
 
     var res = await auth.client!.post(
       uri,
