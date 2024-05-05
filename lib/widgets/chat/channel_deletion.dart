@@ -59,7 +59,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
     }
 
     var res = await auth.client!.delete(
-      getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/me'),
+      getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/members/me'),
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);

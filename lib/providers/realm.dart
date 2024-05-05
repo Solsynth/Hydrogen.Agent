@@ -39,4 +39,9 @@ class RealmProvider with ChangeNotifier {
       throw Exception(message);
     }
   }
+
+  void clearFocus() {
+    focusRealm = null;
+    notifyListeners();
+  }
 }

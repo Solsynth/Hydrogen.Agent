@@ -4,29 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/account.dart';
-import 'package:solian/models/channel.dart';
+import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/friend_picker.dart';
 import 'package:solian/widgets/exts.dart';
-import 'package:solian/widgets/scaffold.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ChatMemberScreen extends StatefulWidget {
-  final Channel channel;
-  final String realm;
+class RealmMemberWidget extends StatefulWidget {
+  final Realm realm;
 
-  const ChatMemberScreen({super.key, required this.channel, this.realm = 'global'});
+  const RealmMemberWidget({super.key, required this.realm});
 
   @override
-  State<ChatMemberScreen> createState() => _ChatMemberScreenState();
+  State<RealmMemberWidget> createState() => _RealmMemberWidgetState();
 }
 
-class _ChatMemberScreenState extends State<ChatMemberScreen> {
+class _RealmMemberWidgetState extends State<RealmMemberWidget> {
   bool _isSubmitting = false;
 
-  List<ChannelMember> _members = List.empty();
+  List<RealmMember> _members = List.empty();
 
   int _selfId = 0;
 
@@ -37,13 +34,13 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
 
     _selfId = prof['id'];
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/members');
+    var uri = getRequestUri('passport', '/api/realms/${widget.realm.alias}/members');
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
       final result = jsonDecode(utf8.decode(res.bodyBytes)) as List<dynamic>;
       setState(() {
-        _members = result.map((x) => ChannelMember.fromJson(x)).toList();
+        _members = result.map((x) => RealmMember.fromJson(x)).toList();
       });
     } else {
       var message = utf8.decode(res.bodyBytes);
@@ -51,7 +48,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     }
   }
 
-  Future<void> removeMember(ChannelMember item) async {
+  Future<void> removeMember(RealmMember item) async {
     setState(() => _isSubmitting = true);
 
     final auth = context.read<AuthProvider>();
@@ -60,7 +57,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/members');
+    var uri = getRequestUri('passport', '/api/realms/${widget.realm.alias}/members');
 
     var res = await auth.client!.delete(
       uri,
@@ -90,7 +87,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/members');
+    var uri = getRequestUri('passport', '/api/realms/${widget.realm.alias}/members');
 
     var res = await auth.client!.post(
       uri,
@@ -123,10 +120,10 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     await addMember((input as Account).name);
   }
 
-  bool getRemovable(ChannelMember item) {
-    if (_selfId != widget.channel.account.externalId) return false;
-    if (item.accountId == widget.channel.accountId) return false;
-    if (item.account.externalId == _selfId) return false;
+  bool getRemovable(RealmMember item) {
+    if (_selfId != widget.realm.accountId) return false;
+    if (item.accountId == widget.realm.accountId) return false;
+    if (item.account.id == _selfId) return false;
     return true;
   }
 
@@ -139,17 +136,12 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return IndentScaffold(
-      title: AppLocalizations.of(context)!.chatMember,
-      noSafeArea: true,
-      hideDrawer: true,
-      appBarActions: [
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () => promptAddMember(),
-        ),
-      ],
-      child: RefreshIndicator(
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => promptAddMember(),
+      ),
+      body: RefreshIndicator(
         onRefresh: () => fetchMemberships(),
         child: CustomScrollView(
           slivers: [
@@ -173,7 +165,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
                     child: const Icon(Icons.remove, color: Colors.white),
                   ),
                   child: ListTile(
-                    leading: AccountAvatar(source: element.account.avatar, direct: true),
+                    leading: AccountAvatar(source: element.account.avatar),
                     title: Text(element.account.nick),
                     subtitle: Text(element.account.name),
                   ),
