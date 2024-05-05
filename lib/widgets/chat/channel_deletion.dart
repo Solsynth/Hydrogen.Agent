@@ -10,10 +10,15 @@ import 'package:solian/widgets/exts.dart';
 
 class ChannelDeletion extends StatefulWidget {
   final Channel channel;
+  final String realm;
   final bool isOwned;
 
-  const ChannelDeletion(
-      {super.key, required this.channel, required this.isOwned});
+  const ChannelDeletion({
+    super.key,
+    required this.channel,
+    required this.realm,
+    required this.isOwned,
+  });
 
   @override
   State<ChannelDeletion> createState() => _ChannelDeletionState();
@@ -32,7 +37,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
     }
 
     var res = await auth.client!.delete(
-      getRequestUri('messaging', '/api/channels/global/${widget.channel.id}'),
+      getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.id}'),
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
@@ -53,8 +58,8 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
       return;
     }
 
-    var res = await auth.client!.post(
-      getRequestUri('messaging', '/api/channels/global/${widget.channel.alias}/leave'),
+    var res = await auth.client!.delete(
+      getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/me'),
     );
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);

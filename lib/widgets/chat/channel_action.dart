@@ -13,9 +13,16 @@ import 'package:solian/widgets/exts.dart';
 class ChannelCallAction extends StatefulWidget {
   final Call? call;
   final Channel channel;
+  final String realm;
   final Function onUpdate;
 
-  const ChannelCallAction({super.key, this.call, required this.channel, required this.onUpdate});
+  const ChannelCallAction({
+    super.key,
+    this.call,
+    required this.channel,
+    required this.onUpdate,
+    this.realm = 'global',
+  });
 
   @override
   State<ChannelCallAction> createState() => _ChannelCallActionState();
@@ -33,7 +40,7 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/global/${widget.channel.alias}/calls');
+    var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/calls');
 
     var res = await auth.client!.post(uri);
     if (res.statusCode != 200) {
@@ -54,7 +61,7 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
       return;
     }
 
-    var uri = getRequestUri('messaging', '/api/channels/global/${widget.channel.alias}/calls/ongoing');
+    var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/calls/ongoing');
 
     var res = await auth.client!.delete(uri);
     if (res.statusCode != 200) {
@@ -90,17 +97,26 @@ class _ChannelCallActionState extends State<ChannelCallAction> {
 class ChannelManageAction extends StatelessWidget {
   final Channel channel;
   final Function onUpdate;
+  final String realm;
 
-  const ChannelManageAction({super.key, required this.channel, required this.onUpdate});
+  const ChannelManageAction({
+    super.key,
+    required this.channel,
+    required this.onUpdate,
+    this.realm = 'global',
+  });
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
         final result = await SolianRouter.router.pushNamed(
-          'chat.channel.manage',
+          realm == 'global' ? 'chat.channel.manage' : 'realms.chat.channel.manage',
           extra: channel,
-          pathParameters: {'channel': channel.alias},
+          pathParameters: {
+            'channel': channel.alias,
+            ...(realm == 'global' ? {} : {'realm': realm}),
+          },
         );
         switch (result) {
           case 'disposed':

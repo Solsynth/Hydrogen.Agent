@@ -25,25 +25,15 @@ class ExplorePostScreen extends StatelessWidget {
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       appBarActions: const [NotificationButton()],
       title: AppLocalizations.of(context)!.explore,
-      child: ExplorePostWidget(
-        onSelect: (item) {
-          SolianRouter.router.pushNamed(
-            'posts.screen',
-            pathParameters: {
-              'alias': item.alias,
-              'dataset': item.dataset,
-            },
-          );
-        },
-      ),
+      child: const ExplorePostWidget(),
     );
   }
 }
 
 class ExplorePostWidget extends StatefulWidget {
-  final Function(Post item) onSelect;
+  final String? realm;
 
-  const ExplorePostWidget({super.key, required this.onSelect});
+  const ExplorePostWidget({super.key, this.realm});
 
   @override
   State<ExplorePostWidget> createState() => _ExplorePostWidgetState();
@@ -58,7 +48,12 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
     final offset = pageKey;
     const take = 5;
 
-    var uri = getRequestUri('interactive', '/api/feed?take=$take&offset=$offset');
+    Uri uri;
+    if (widget.realm == null) {
+      uri = getRequestUri('interactive', '/api/feed?take=$take&offset=$offset');
+    } else {
+      uri = getRequestUri('interactive', '/api/feed?realm=${widget.realm}&take=$take&offset=$offset');
+    }
 
     var res = await _client.get(uri);
     if (res.statusCode == 200) {
@@ -95,7 +90,10 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
             return FloatingActionButton(
               child: const Icon(Icons.edit),
               onPressed: () async {
-                final did = await SolianRouter.router.pushNamed('posts.moments.editor');
+                final did = await SolianRouter.router.pushNamed(
+                  'posts.moments.editor',
+                  queryParameters: {'realm': widget.realm},
+                );
                 if (did == true) _pagingController.refresh();
               },
             );
@@ -114,7 +112,16 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
             itemBuilder: (context, item, index) => PostItem(
               item: item,
               onUpdate: () => _pagingController.refresh(),
-              onTap: () => widget.onSelect(item),
+              onTap: () {
+                SolianRouter.router.pushNamed(
+                  widget.realm == null ? 'posts.details' : 'realms.posts.details',
+                  pathParameters: {
+                    'alias': item.alias,
+                    'dataset': item.dataset,
+                    ...(widget.realm == null ? {} : {'realm': widget.realm!}),
+                  },
+                );
+              },
             ),
           ),
         ),

@@ -37,12 +37,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
       markList.add(element.id);
     }
 
-    var uri = getRequestUri('passport', '/api/notifications/batch/read');
-    await auth.client!.put(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'messages': markList}),
-    );
+    nty.clearRealtime();
+
+    if(markList.isNotEmpty) {
+      var uri = getRequestUri('passport', '/api/notifications/batch/read');
+      await auth.client!.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'messages': markList}),
+      );
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(AppLocalizations.of(context)!.notifyMarkAllReadDone),
@@ -195,19 +199,7 @@ class NotificationItem extends StatelessWidget {
       onDismissed: (direction) {
         markAsRead(item, context).then((value) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: item.subject,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const TextSpan(text: ' is marked as read')
-                  ],
-                ),
-              ),
-            ),
+            SnackBar(content: Text('${item.subject} is marked as read')),
           );
         });
         if (onDismiss != null) {

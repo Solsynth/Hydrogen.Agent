@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/models/realm.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
@@ -19,6 +20,9 @@ import 'package:solian/screens/posts/comment_editor.dart';
 import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
 import 'package:solian/screens/auth/signin.dart';
+import 'package:solian/screens/realms/realm.dart';
+import 'package:solian/screens/realms/realm_editor.dart';
+import 'package:solian/screens/realms/realm_list.dart';
 import 'package:solian/screens/users/userinfo.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/empty.dart';
@@ -65,10 +69,77 @@ abstract class SolianRouter {
           ),
           GoRoute(
             path: '/posts/:dataset/:alias',
-            name: 'posts.screen',
+            name: 'posts.details',
             builder: (context, state) => PostScreen(
               alias: state.pathParameters['alias'] as String,
               dataset: state.pathParameters['dataset'] as String,
+            ),
+          ),
+        ],
+      ),
+      ShellRoute(
+        pageBuilder: (context, state, child) => defaultPageBuilder(
+          context,
+          state,
+          SolianTheme.isLargeScreen(context)
+              ? TwoColumnLayout(
+                  sideChild: const RealmListScreen(),
+                  mainChild: child,
+                )
+              : child,
+        ),
+        routes: [
+          GoRoute(
+            path: '/realms',
+            name: 'realms',
+            builder: (context, state) =>
+                !SolianTheme.isLargeScreen(context) ? const RealmListScreen() : const PageEmptyWidget(),
+          ),
+          GoRoute(
+            path: '/realms/editor',
+            name: 'realms.editor',
+            builder: (context, state) => RealmEditorScreen(
+              editing: state.extra as Realm?,
+              realm: state.uri.queryParameters['realm'],
+            ),
+          ),
+          GoRoute(
+            path: '/realms/:realm/posts/:dataset/:alias',
+            name: 'realms.posts.details',
+            builder: (context, state) => PostScreen(
+              alias: state.pathParameters['alias'] as String,
+              dataset: state.pathParameters['dataset'] as String,
+            ),
+          ),
+          GoRoute(
+            path: '/realms/:realm',
+            name: 'realms.details',
+            builder: (context, state) => !SolianTheme.isLargeScreen(context)
+                ? RealmScreen(alias: state.pathParameters['realm'] as String)
+                : const PageEmptyWidget(),
+          ),
+          GoRoute(
+            path: '/realms/:realm/chat/:channel',
+            name: 'realms.chat.channel',
+            builder: (context, state) => ChatScreen(
+              alias: state.pathParameters['channel'] as String,
+              realm: state.pathParameters['realm'] as String,
+            ),
+          ),
+          GoRoute(
+            path: '/realms/:realm/chat/:channel/manage',
+            name: 'realms.chat.channel.manage',
+            builder: (context, state) => ChatDetailScreen(
+              channel: state.extra as Channel,
+              realm: state.pathParameters['realm'] as String,
+            ),
+          ),
+          GoRoute(
+            path: '/realms/:realm/chat/:channel/member',
+            name: 'realms.chat.channel.member',
+            builder: (context, state) => ChatMemberScreen(
+              channel: state.extra as Channel,
+              realm: state.pathParameters['realm'] as String,
             ),
           ),
         ],
@@ -92,31 +163,34 @@ abstract class SolianRouter {
                 !SolianTheme.isLargeScreen(context) ? const ChatListScreen() : const PageEmptyWidget(),
           ),
           GoRoute(
-            path: '/chat/create',
+            path: '/chat/editor',
             name: 'chat.channel.editor',
-            builder: (context, state) => ChannelEditorScreen(editing: state.extra as Channel?),
+            builder: (context, state) => ChannelEditorScreen(
+              editing: state.extra as Channel?,
+              realm: state.uri.queryParameters['realm'],
+            ),
           ),
           GoRoute(
-            path: '/chat/c/:channel',
+            path: '/chat/:channel',
             name: 'chat.channel',
             builder: (context, state) => ChatScreen(alias: state.pathParameters['channel'] as String),
           ),
           GoRoute(
-            path: '/chat/c/:channel/call',
-            name: 'chat.channel.call',
-            builder: (context, state) => ChatCall(call: state.extra as Call),
-          ),
-          GoRoute(
-            path: '/chat/c/:channel/manage',
+            path: '/chat/:channel/manage',
             name: 'chat.channel.manage',
             builder: (context, state) => ChatDetailScreen(channel: state.extra as Channel),
           ),
           GoRoute(
-            path: '/chat/c/:channel/member',
+            path: '/chat/:channel/member',
             name: 'chat.channel.member',
             builder: (context, state) => ChatMemberScreen(channel: state.extra as Channel),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/chat/:channel/call',
+        name: 'chat.channel.call',
+        builder: (context, state) => ChatCall(call: state.extra as Call),
       ),
       ShellRoute(
         pageBuilder: (context, state, child) => defaultPageBuilder(

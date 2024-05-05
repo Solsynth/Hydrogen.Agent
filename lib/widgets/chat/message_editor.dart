@@ -14,11 +14,19 @@ import 'package:badges/badges.dart' as badge;
 
 class ChatMessageEditor extends StatefulWidget {
   final String channel;
+  final String realm;
   final Message? editing;
   final Message? replying;
   final Function? onReset;
 
-  const ChatMessageEditor({super.key, required this.channel, this.editing, this.replying, this.onReset});
+  const ChatMessageEditor({
+    super.key,
+    required this.channel,
+    this.realm = 'global',
+    this.editing,
+    this.replying,
+    this.onReset,
+  });
 
   @override
   State<ChatMessageEditor> createState() => _ChatMessageEditorState();
@@ -53,8 +61,8 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     if (!await auth.isAuthorized()) return;
 
     final uri = widget.editing == null
-        ? getRequestUri('messaging', '/api/channels/global/${widget.channel}/messages')
-        : getRequestUri('messaging', '/api/channels/global/${widget.channel}/messages/${widget.editing!.id}');
+        ? getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel}/messages')
+        : getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel}/messages/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';

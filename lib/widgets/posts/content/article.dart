@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:solian/models/post.dart';
 import 'package:markdown/markdown.dart' as markdown;
+import 'package:solian/utils/platform.dart';
 import 'package:solian/utils/service_url.dart';
-import 'package:solian/widgets/posts/content/attachment.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class ArticleContent extends StatelessWidget {
@@ -61,10 +62,9 @@ class ArticleContent extends StatelessWidget {
                     uri = url;
                   }
 
-                  return AttachmentItem(
-                    type: 1,
-                    url: uri.toString(),
-                  );
+                  return PlatformInfo.canCacheImage
+                      ? CachedNetworkImage(imageUrl: uri.toString())
+                      : Image.network(uri.toString());
                 },
               ),
             ],

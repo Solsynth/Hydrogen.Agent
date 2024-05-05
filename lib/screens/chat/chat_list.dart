@@ -23,29 +23,15 @@ class ChatListScreen extends StatelessWidget {
       title: AppLocalizations.of(context)!.chat,
       appBarActions: const [NotificationButton()],
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
-      child: ChatListWidget(
-        onSelect: (item) {
-          if (SolianRouter.currentRoute.name == 'chat.channel') {
-            SolianRouter.router.pushReplacementNamed(
-              'chat.channel',
-              pathParameters: {'channel': item.alias},
-            );
-          } else {
-            SolianRouter.router.pushNamed(
-              'chat.channel',
-              pathParameters: {'channel': item.alias},
-            );
-          }
-        },
-      ),
+      child: const ChatListWidget(),
     );
   }
 }
 
 class ChatListWidget extends StatefulWidget {
-  final Function(Channel item)? onSelect;
+  final String? realm;
 
-  const ChatListWidget({super.key, this.onSelect});
+  const ChatListWidget({super.key, this.realm});
 
   @override
   State<ChatListWidget> createState() => _ChatListWidgetState();
@@ -58,7 +44,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    var uri = getRequestUri('messaging', '/api/channels/global/me/available');
+    Uri uri;
+    if (widget.realm == null) {
+      uri = getRequestUri('messaging', '/api/channels/global/me/available');
+    } else {
+      uri = getRequestUri('messaging', '/api/channels/${widget.realm}');
+    }
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
@@ -75,7 +66,10 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   void viewNewChatAction() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => ChatNewAction(onUpdate: () => fetchChannels()),
+      builder: (context) => ChatNewAction(
+        onUpdate: () => fetchChannels(),
+        realm: widget.realm,
+      ),
     );
   }
 
@@ -128,17 +122,24 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                   title: Text(element.name),
                   subtitle: Text(element.description),
                   onTap: () async {
-                    if (widget.onSelect != null) {
-                      widget.onSelect!(element);
-                      return;
+                    String? result;
+                    if (SolianRouter.currentRoute.name == 'chat.channel') {
+                      result = await SolianRouter.router.pushReplacementNamed(
+                        widget.realm == null ? 'chat.channel' : 'realms.chat.channel',
+                        pathParameters: {
+                          'channel': element.alias,
+                          ...(widget.realm == null ? {} : {'realm': widget.realm!}),
+                        },
+                      );
+                    } else {
+                      result = await SolianRouter.router.pushNamed(
+                        widget.realm == null ? 'chat.channel' : 'realms.chat.channel',
+                        pathParameters: {
+                          'channel': element.alias,
+                          ...(widget.realm == null ? {} : {'realm': widget.realm!}),
+                        },
+                      );
                     }
-
-                    final result = await SolianRouter.router.pushNamed(
-                      'chat.channel',
-                      pathParameters: {
-                        'channel': element.alias,
-                      },
-                    );
                     switch (result) {
                       case 'refresh':
                         fetchChannels();

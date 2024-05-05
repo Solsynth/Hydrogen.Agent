@@ -21,8 +21,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatScreen extends StatelessWidget {
   final String alias;
+  final String realm;
 
-  const ChatScreen({super.key, required this.alias});
+  const ChatScreen({super.key, required this.alias, this.realm = 'global'});
 
   @override
   Widget build(BuildContext context) {
@@ -37,31 +38,35 @@ class ChatScreen extends StatelessWidget {
               ChannelCallAction(
                 call: chat.ongoingCall,
                 channel: chat.focusChannel!,
-                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
+                realm: realm,
+                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias, realm),
               ),
               ChannelManageAction(
                 channel: chat.focusChannel!,
-                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias),
+                realm: realm,
+                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias, realm),
               ),
             ]
           : [],
-      child: ChatScreenWidget(
+      child: ChatWidget(
         alias: alias,
+        realm: realm,
       ),
     );
   }
 }
 
-class ChatScreenWidget extends StatefulWidget {
+class ChatWidget extends StatefulWidget {
   final String alias;
+  final String realm;
 
-  const ChatScreenWidget({super.key, required this.alias});
+  const ChatWidget({super.key, required this.alias, required this.realm});
 
   @override
-  State<ChatScreenWidget> createState() => _ChatScreenWidgetState();
+  State<ChatWidget> createState() => _ChatWidgetState();
 }
 
-class _ChatScreenWidgetState extends State<ChatScreenWidget> {
+class _ChatWidgetState extends State<ChatWidget> {
   bool _isReady = false;
 
   final PagingController<int, Message> _pagingController = PagingController(firstPageKey: 0);
@@ -77,7 +82,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
 
     var uri = getRequestUri(
       'messaging',
-      '/api/channels/global/${widget.alias}/messages?take=$take&offset=$offset',
+      '/api/channels/${widget.realm}/${widget.alias}/messages?take=$take&offset=$offset',
     );
 
     var res = await auth.client!.get(uri);
@@ -147,8 +152,8 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
     super.initState();
 
     Future.delayed(Duration.zero, () {
-      _chat.fetchOngoingCall(widget.alias);
-      _chat.fetchChannel(widget.alias);
+      _chat.fetchOngoingCall(widget.alias, widget.realm);
+      _chat.fetchChannel(widget.alias, widget.realm);
     });
   }
 
@@ -232,6 +237,7 @@ class _ChatScreenWidgetState extends State<ChatScreenWidget> {
                 ),
               ),
               ChatMessageEditor(
+                realm: widget.realm,
                 channel: widget.alias,
                 editing: _editingItem,
                 replying: _replyingItem,

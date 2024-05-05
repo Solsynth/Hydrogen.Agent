@@ -44,6 +44,13 @@ class _SolianNavigationDrawerState extends State<SolianNavigationDrawer> {
       ),
       (
         NavigationDrawerDestination(
+          icon: const Icon(Icons.supervised_user_circle),
+          label: Text(AppLocalizations.of(context)!.realm),
+        ),
+        'realms',
+      ),
+      (
+        NavigationDrawerDestination(
           icon: const Icon(Icons.send),
           label: Text(AppLocalizations.of(context)!.chat),
         ),

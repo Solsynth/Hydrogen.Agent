@@ -4,29 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
-import 'package:solian/models/channel.dart';
+import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/scaffold.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ChannelEditorScreen extends StatefulWidget {
-  final Channel? editing;
+class RealmEditorScreen extends StatefulWidget {
+  final Realm? editing;
   final String? realm;
 
-  const ChannelEditorScreen({super.key, this.editing, this.realm});
+  const RealmEditorScreen({super.key, this.editing, this.realm});
 
   @override
-  State<ChannelEditorScreen> createState() => _ChannelEditorScreenState();
+  State<RealmEditorScreen> createState() => _RealmEditorScreenState();
 }
 
-class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
+class _RealmEditorScreenState extends State<RealmEditorScreen> {
   final _aliasController = TextEditingController();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  bool _isPublic = false;
+  bool _isCommunity = false;
 
   bool _isSubmitting = false;
 
@@ -40,8 +43,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
     }
 
     final uri = widget.editing == null
-        ? getRequestUri('messaging', '/api/channels/${widget.realm ?? 'global'}')
-        : getRequestUri('messaging', '/api/channels/${widget.realm ?? 'global'}/${widget.editing!.id}');
+        ? getRequestUri('passport', '/api/realms')
+        : getRequestUri('passport', '/api/realms/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
@@ -49,6 +52,9 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       'alias': _aliasController.value.text.toLowerCase(),
       'name': _nameController.value.text,
       'description': _descriptionController.value.text,
+      'is_public': _isPublic,
+      'is_community': _isCommunity,
+      'realm': widget.realm,
     });
 
     var res = await Response.fromStream(await auth.client!.send(req));
@@ -64,7 +70,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
   }
 
   void randomizeAlias() {
-    _aliasController.text = const Uuid().v4().replaceAll('-', '');
+    _aliasController.text = const Uuid().v4().replaceAll('-', '').substring(0, 16);
   }
 
   void cancelEditing() {
@@ -79,6 +85,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       _aliasController.text = widget.editing!.alias;
       _nameController.text = widget.editing!.name;
       _descriptionController.text = widget.editing!.description;
+      _isPublic = widget.editing!.isPublic;
+      _isCommunity = widget.editing!.isCommunity;
     }
 
     super.initState();
@@ -91,7 +99,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       leading: const Icon(Icons.edit_note),
       backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
       dividerColor: const Color.fromARGB(1, 0, 0, 0),
-      content: Text(AppLocalizations.of(context)!.chatChannelEditNotify),
+      content: Text(AppLocalizations.of(context)!.realmEditNotify),
       actions: [
         TextButton(
           child: Text(AppLocalizations.of(context)!.cancel),
@@ -102,7 +110,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
 
     return IndentScaffold(
       hideDrawer: true,
-      title: AppLocalizations.of(context)!.chatChannelOrganize,
+      title: AppLocalizations.of(context)!.realmEstablish,
       appBarActions: <Widget>[
         TextButton(
           onPressed: !_isSubmitting ? () => applyChannel(context) : null,
@@ -114,11 +122,11 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
           widget.editing != null ? editingBanner : Container(),
           ListTile(
-            title: Text(AppLocalizations.of(context)!.chatChannelUsage),
-            subtitle: Text(AppLocalizations.of(context)!.chatChannelUsageCaption),
+            title: Text(AppLocalizations.of(context)!.realmUsage),
+            subtitle: Text(AppLocalizations.of(context)!.realmUsageCaption),
             leading: const CircleAvatar(
               backgroundColor: Colors.teal,
-              child: Icon(Icons.tag, color: Colors.white),
+              child: Icon(Icons.supervised_user_circle, color: Colors.white),
             ),
           ),
           const Divider(thickness: 0.3),
@@ -131,7 +139,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
                     autofocus: true,
                     controller: _aliasController,
                     decoration: InputDecoration.collapsed(
-                      hintText: AppLocalizations.of(context)!.chatChannelAliasLabel,
+                      hintText: AppLocalizations.of(context)!.realmAliasLabel,
                     ),
                     onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
                   ),
@@ -154,7 +162,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
               autocorrect: true,
               controller: _nameController,
               decoration: InputDecoration.collapsed(
-                hintText: AppLocalizations.of(context)!.chatChannelNameLabel,
+                hintText: AppLocalizations.of(context)!.realmNameLabel,
               ),
               onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
             ),
@@ -170,12 +178,29 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
                 keyboardType: TextInputType.multiline,
                 controller: _descriptionController,
                 decoration: InputDecoration.collapsed(
-                  hintText: AppLocalizations.of(context)!.chatChannelDescriptionLabel,
+                  hintText: AppLocalizations.of(context)!.realmDescriptionLabel,
                 ),
                 onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
               ),
             ),
           ),
+          const Divider(thickness: 0.3),
+          CheckboxListTile(
+            title: Text(AppLocalizations.of(context)!.realmPublicLabel),
+            value: _isPublic,
+            onChanged: (newValue) {
+              setState(() => _isPublic = newValue ?? false);
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+          CheckboxListTile(
+            title: Text(AppLocalizations.of(context)!.realmCommunityLabel),
+            value: _isCommunity,
+            onChanged: (newValue) {
+              setState(() => _isCommunity = newValue ?? false);
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+          )
         ],
       ),
     );

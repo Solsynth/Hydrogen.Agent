@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/router.dart';
 
-class ChatNewAction extends StatelessWidget {
+class RealmNewAction extends StatelessWidget {
   final Function onUpdate;
-  final String? realm;
 
-  const ChatNewAction({super.key, required this.onUpdate, this.realm});
+  const RealmNewAction({super.key, required this.onUpdate});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +18,7 @@ class ChatNewAction extends StatelessWidget {
           Container(
             padding: const EdgeInsets.only(left: 20, top: 20, bottom: 8),
             child: Text(
-              AppLocalizations.of(context)!.chatNew,
+              AppLocalizations.of(context)!.realmNew,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
@@ -28,12 +27,9 @@ class ChatNewAction extends StatelessWidget {
               children: [
                 ListTile(
                   leading: const Icon(Icons.add),
-                  title: Text(AppLocalizations.of(context)!.chatNewCreate),
+                  title: Text(AppLocalizations.of(context)!.realmNewCreate),
                   onTap: () {
-                    SolianRouter.router.pushNamed(
-                      'chat.channel.editor',
-                      queryParameters: {'realm': realm},
-                    ).then((did) {
+                    SolianRouter.router.pushNamed('realms.editor').then((did) {
                       if (did == true) {
                         onUpdate();
                         if (Navigator.canPop(context)) {
@@ -45,7 +41,7 @@ class ChatNewAction extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.travel_explore),
-                  title: Text(AppLocalizations.of(context)!.chatNewJoin),
+                  title: Text(AppLocalizations.of(context)!.realmNewJoin),
                 ),
               ],
             ),

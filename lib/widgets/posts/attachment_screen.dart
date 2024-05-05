@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:solian/utils/platform.dart';
 
 class AttachmentScreen extends StatelessWidget {
   final String url;
@@ -17,7 +19,7 @@ class AttachmentScreen extends StatelessWidget {
         maxScale: 16,
         panEnabled: true,
         scaleEnabled: true,
-        child: Image.network(url, fit: BoxFit.contain),
+        child: PlatformInfo.canCacheImage ? CachedNetworkImage(imageUrl: url, fit: BoxFit.contain) : Image.network(url),
       ),
     );
 

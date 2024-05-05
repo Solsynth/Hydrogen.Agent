@@ -9,8 +9,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final Channel channel;
+  final String realm;
 
-  const ChatDetailScreen({super.key, required this.channel});
+  const ChatDetailScreen({super.key, required this.channel, this.realm = 'global'});
 
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
@@ -24,6 +25,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       context: context,
       builder: (context) => ChannelDeletion(
         channel: widget.channel,
+        realm: widget.realm,
         isOwned: _isOwned,
       ),
     );

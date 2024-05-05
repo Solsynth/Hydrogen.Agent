@@ -5,6 +5,7 @@ import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/providers/notify.dart';
+import 'package:solian/providers/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/utils/timeago.dart';
@@ -43,6 +44,7 @@ class SolianApp extends StatelessWidget {
             ChangeNotifierProvider(create: (_) => ChatProvider()),
             ChangeNotifierProvider(create: (_) => NotifyProvider()),
             ChangeNotifierProvider(create: (_) => FriendProvider()),
+            ChangeNotifierProvider(create: (_) => RealmProvider()),
           ],
           child: Overlay(
             initialEntries: [
