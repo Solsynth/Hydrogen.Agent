@@ -16,6 +16,7 @@ import 'package:solian/widgets/chat/chat_maintainer.dart';
 import 'package:solian/widgets/chat/message.dart';
 import 'package:solian/widgets/chat/message_action.dart';
 import 'package:solian/widgets/chat/message_editor.dart';
+import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/scaffold.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -27,6 +28,7 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.read<AuthProvider>();
     final chat = context.watch<ChatProvider>();
 
     return IndentScaffold(
@@ -39,12 +41,12 @@ class ChatScreen extends StatelessWidget {
                 call: chat.ongoingCall,
                 channel: chat.focusChannel!,
                 realm: realm,
-                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias, realm),
+                onUpdate: () => chat.fetchChannel(auth, chat.focusChannel!.alias, realm),
               ),
               ChannelManageAction(
                 channel: chat.focusChannel!,
                 realm: realm,
-                onUpdate: () => chat.fetchChannel(chat.focusChannel!.alias, realm),
+                onUpdate: () => chat.fetchChannel(auth, chat.focusChannel!.alias, realm),
               ),
             ]
           : [],
@@ -96,8 +98,31 @@ class _ChatWidgetState extends State<ChatWidget> {
         final nextPageKey = pageKey + items.length;
         _pagingController.appendPage(items, nextPageKey);
       }
+    } else if (res.statusCode == 403) {
+      _pagingController.appendLastPage([]);
     } else {
       _pagingController.error = utf8.decode(res.bodyBytes);
+    }
+  }
+
+  Future<void> joinChannel() async {
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) return;
+
+    var uri = getRequestUri(
+      'messaging',
+      '/api/channels/${widget.realm}/${widget.alias}/members/me',
+    );
+
+    var res = await auth.client!.post(uri);
+    if (res.statusCode == 200) {
+      setState(() {});
+      _pagingController.refresh();
+    } else {
+      var message = utf8.decode(res.bodyBytes);
+      context.showErrorDialog(message).then((_) {
+        SolianRouter.router.pop();
+      });
     }
   }
 
@@ -145,15 +170,55 @@ class _ChatWidgetState extends State<ChatWidget> {
     );
   }
 
+  void showUnavailableDialog() {
+    final content = widget.realm == 'global'
+        ? AppLocalizations.of(context)!.chatChannelUnavailableCaption
+        : AppLocalizations.of(context)!.chatChannelUnavailableCaptionWithRealm;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.chatChannelUnavailable),
+        content: Text(content),
+        actions: <Widget>[
+          TextButton(
+            child: Text(AppLocalizations.of(context)!.cancel),
+            onPressed: () {
+              Navigator.of(context).pop();
+              SolianRouter.router.pop();
+            },
+          ),
+          ...(widget.realm != 'global'
+              ? [
+                  TextButton(
+                    child: Text(AppLocalizations.of(context)!.join),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      joinChannel();
+                    },
+                  ),
+                ]
+              : [])
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     _pagingController.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
 
     super.initState();
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
+      final auth = context.read<AuthProvider>();
       _chat.fetchOngoingCall(widget.alias, widget.realm);
-      _chat.fetchChannel(widget.alias, widget.realm);
+      _chat.fetchChannel(auth, widget.alias, widget.realm).then((result) {
+        if (result.isAvailable == false) {
+          showUnavailableDialog();
+        }
+      });
     });
   }
 

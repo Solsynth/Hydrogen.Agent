@@ -29,8 +29,7 @@ class _ItemDeletionDialogState extends State<ItemDeletionDialog> {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final uri =
-        getRequestUri('interactive', '/api/p/moments/${widget.item.id}');
+    final uri = getRequestUri('interactive', '/api/p/${widget.item.modelType}s/${widget.item.id}');
 
     setState(() => _isSubmitting = true);
     final res = await auth.client!.delete(uri);

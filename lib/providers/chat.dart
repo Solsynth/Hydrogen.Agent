@@ -44,14 +44,13 @@ class ChatProvider extends ChangeNotifier {
     return channel;
   }
 
-  Future<Channel> fetchChannel(String alias, String realm) async {
-    final Client client = Client();
-
-    var uri = getRequestUri('messaging', '/api/channels/$realm/$alias');
-    var res = await client.get(uri);
-    if (res.statusCode == 200) {
+  Future<Channel> fetchChannel(AuthProvider auth, String alias, String realm) async {
+    var uri = getRequestUri('messaging', '/api/channels/$realm/$alias/availability');
+    var res = await auth.client!.get(uri);
+    if (res.statusCode == 200 || res.statusCode == 403) {
       final result = jsonDecode(utf8.decode(res.bodyBytes));
       focusChannel = Channel.fromJson(result);
+      focusChannel?.isAvailable = res.statusCode == 200;
       notifyListeners();
       return focusChannel!;
     } else {

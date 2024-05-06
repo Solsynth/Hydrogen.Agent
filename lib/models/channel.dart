@@ -15,6 +15,8 @@ class Channel {
   int accountId;
   int? realmId;
 
+  bool isAvailable = false;
+
   Channel({
     required this.id,
     required this.createdAt,
