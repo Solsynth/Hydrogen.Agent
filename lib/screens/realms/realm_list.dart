@@ -18,7 +18,7 @@ class RealmListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final realm = context.watch<RealmProvider>();
 
-    return realm.focusRealm == null
+    return realm.focusRealm == null || !SolianTheme.isLargeScreen(context)
         ? IndentScaffold(
             title: AppLocalizations.of(context)!.realm,
             appBarActions: const [NotificationButton()],

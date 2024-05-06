@@ -21,8 +21,8 @@ class RealmScreen extends StatelessWidget {
 
     return IndentScaffold(
       title: realm.focusRealm?.name ?? 'Loading...',
-      hideDrawer: true,
       noSafeArea: true,
+      hideDrawer: true,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       appBarActions: realm.focusRealm != null
           ? [
