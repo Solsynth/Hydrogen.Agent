@@ -87,6 +87,8 @@
   "realmDescriptionLabel": "Realm Description",
   "realmPublicLabel": "It's public",
   "realmCommunityLabel": "It's community realm",
+  "realmMember": "Member",
+  "realmManage": "Realm Manage",
   "chatNew": "New Chat",
   "chatNewCreate": "Create a channel",
   "chatNewJoin": "Join a exists channel",

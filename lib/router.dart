@@ -21,8 +21,10 @@ import 'package:solian/screens/posts/moment_editor.dart';
 import 'package:solian/screens/posts/screen.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/realms/realm.dart';
+import 'package:solian/screens/realms/realm_manage.dart';
 import 'package:solian/screens/realms/realm_editor.dart';
 import 'package:solian/screens/realms/realm_list.dart';
+import 'package:solian/screens/realms/realm_member.dart';
 import 'package:solian/screens/users/userinfo.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/empty.dart';
@@ -102,6 +104,16 @@ abstract class SolianRouter {
               editing: state.extra as Realm?,
               realm: state.uri.queryParameters['realm'],
             ),
+          ),
+          GoRoute(
+            path: '/realms/:realm/manage',
+            name: 'realms.manage',
+            builder: (context, state) => RealmManageScreen(realm: state.extra as Realm),
+          ),
+          GoRoute(
+            path: '/realms/:realm/member',
+            name: 'realms.member',
+            builder: (context, state) => RealmMemberScreen(realm: state.extra as Realm),
           ),
           GoRoute(
             path: '/realms/:realm/posts/:dataset/:alias',

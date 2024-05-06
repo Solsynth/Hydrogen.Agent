@@ -8,6 +8,7 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/scaffold.dart';
 import 'package:uuid/uuid.dart';
@@ -117,6 +118,7 @@ class _RealmEditorScreenState extends State<RealmEditorScreen> {
           child: Text(AppLocalizations.of(context)!.apply.toUpperCase()),
         ),
       ],
+      fixedAppBarColor: SolianTheme.isLargeScreen(context),
       child: Column(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),

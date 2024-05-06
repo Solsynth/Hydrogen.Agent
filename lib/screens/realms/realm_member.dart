@@ -7,20 +7,23 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/friend_picker.dart';
 import 'package:solian/widgets/exts.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/scaffold.dart';
 
-class RealmMemberWidget extends StatefulWidget {
+class RealmMemberScreen extends StatefulWidget {
   final Realm realm;
 
-  const RealmMemberWidget({super.key, required this.realm});
+  const RealmMemberScreen({super.key, required this.realm});
 
   @override
-  State<RealmMemberWidget> createState() => _RealmMemberWidgetState();
+  State<RealmMemberScreen> createState() => _RealmMemberScreenState();
 }
 
-class _RealmMemberWidgetState extends State<RealmMemberWidget> {
+class _RealmMemberScreenState extends State<RealmMemberScreen> {
   bool _isSubmitting = false;
 
   List<RealmMember> _members = List.empty();
@@ -136,12 +139,18 @@ class _RealmMemberWidgetState extends State<RealmMemberWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => promptAddMember(),
-      ),
-      body: RefreshIndicator(
+    return IndentScaffold(
+      title: AppLocalizations.of(context)!.realmMember,
+      fixedAppBarColor: SolianTheme.isLargeScreen(context),
+      noSafeArea: true,
+      hideDrawer: true,
+      appBarActions: [
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => promptAddMember(),
+        ),
+      ],
+      child: RefreshIndicator(
         onRefresh: () => fetchMemberships(),
         child: CustomScrollView(
           slivers: [

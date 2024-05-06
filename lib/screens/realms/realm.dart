@@ -6,7 +6,6 @@ import 'package:solian/providers/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/chat/chat_list.dart';
 import 'package:solian/screens/explore.dart';
-import 'package:solian/screens/realms/realm_member.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/scaffold.dart';
 
@@ -82,7 +81,7 @@ class _RealmWidgetState extends State<RealmWidget> {
     }
 
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Column(
         children: [
           TabBar(
@@ -90,7 +89,6 @@ class _RealmWidgetState extends State<RealmWidget> {
             tabs: const [
               Tab(icon: Icon(Icons.newspaper)),
               Tab(icon: Icon(Icons.message)),
-              Tab(icon: Icon(Icons.supervisor_account))
             ],
           ),
           Expanded(
@@ -98,11 +96,6 @@ class _RealmWidgetState extends State<RealmWidget> {
               children: [
                 ExplorePostWidget(realm: widget.alias),
                 ChatListWidget(realm: widget.alias),
-                _realm.focusRealm != null
-                    ? RealmMemberWidget(realm: _realm.focusRealm!)
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      ),
               ],
             ),
           )
@@ -127,8 +120,9 @@ class RealmManageAction extends StatelessWidget {
     return IconButton(
       onPressed: () async {
         final did = await SolianRouter.router.pushNamed(
-          'realms.editor',
+          'realms.manage',
           extra: realm,
+          pathParameters: {'realm': realm.alias},
         );
         if (did == true) onUpdate();
       },
