@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/utils/theme.dart';
@@ -85,6 +86,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   Widget build(BuildContext context) {
     final auth = context.read<AuthProvider>();
+    final chat = context.watch<ChatProvider>();
 
     return Scaffold(
       floatingActionButton: FutureBuilder(
@@ -123,14 +125,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                   subtitle: Text(element.description),
                   onTap: () async {
                     String? result;
-                    if (SolianRouter.currentRoute.name == 'chat.channel') {
-                      result = await SolianRouter.router.pushReplacementNamed(
-                        widget.realm == null ? 'chat.channel' : 'realms.chat.channel',
-                        pathParameters: {
-                          'channel': element.alias,
-                          ...(widget.realm == null ? {} : {'realm': widget.realm!}),
-                        },
-                      );
+                    if (['chat.channel', 'realms.chat.channel'].contains(SolianRouter.currentRoute.name)) {
+                      chat.fetchChannel(context, auth, element.alias, widget.realm!);
                     } else {
                       result = await SolianRouter.router.pushNamed(
                         widget.realm == null ? 'chat.channel' : 'realms.chat.channel',

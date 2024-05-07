@@ -3,11 +3,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
+import 'package:solian/models/message.dart';
+import 'package:solian/models/packet.dart';
+import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:solian/widgets/chat/call/exts.dart';
@@ -22,7 +26,10 @@ class ChatProvider extends ChangeNotifier {
 
   Call? ongoingCall;
   Channel? focusChannel;
+  String? focusChannelRealm;
   ChatCallInstance? currentCall;
+
+  PagingController<int, Message>? historyPagingController;
 
   Future<WebSocketChannel?> connect(AuthProvider auth) async {
     if (auth.client == null) await auth.loadClient();
@@ -39,19 +46,107 @@ class ChatProvider extends ChangeNotifier {
     );
 
     final channel = WebSocketChannel.connect(uri);
-    await channel.ready;
+
+    isOpened = true;
+
+    channel.stream.listen(
+      (event) {
+        final result = NetworkPackage.fromJson(jsonDecode(event));
+        if (focusChannel == null || historyPagingController == null) return;
+        switch (result.method) {
+          case 'messages.new':
+            final payload = Message.fromJson(result.payload!);
+            if (payload.channelId == focusChannel?.id) {
+              historyPagingController?.itemList?.insert(0, payload);
+            }
+            break;
+          case 'messages.update':
+            final payload = Message.fromJson(result.payload!);
+            if (payload.channelId == focusChannel?.id) {
+              historyPagingController?.itemList =
+                  historyPagingController?.itemList?.map((x) => x.id == payload.id ? payload : x).toList();
+            }
+            break;
+          case 'messages.burnt':
+            final payload = Message.fromJson(result.payload!);
+            if (payload.channelId == focusChannel?.id) {
+              historyPagingController?.itemList =
+                  historyPagingController?.itemList?.where((x) => x.id != payload.id).toList();
+            }
+            break;
+          case 'calls.new':
+            final payload = Call.fromJson(result.payload!);
+            if (payload.channelId == focusChannel?.id) {
+              setOngoingCall(payload);
+            }
+            break;
+          case 'calls.end':
+            final payload = Call.fromJson(result.payload!);
+            if (payload.channelId == focusChannel?.id) {
+              setOngoingCall(null);
+            }
+            break;
+        }
+        notifyListeners();
+      },
+      onError: (_, __) => connect(auth),
+      onDone: () => connect(auth),
+    );
 
     return channel;
   }
 
-  Future<Channel> fetchChannel(AuthProvider auth, String alias, String realm) async {
+  Future<void> fetchMessages(int pageKey, BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+    if (!await auth.isAuthorized()) return;
+    if (focusChannel == null || focusChannelRealm == null) return;
+
+    final offset = pageKey;
+    const take = 10;
+
+    var uri = getRequestUri(
+      'messaging',
+      '/api/channels/$focusChannelRealm/${focusChannel!.alias}/messages?take=$take&offset=$offset',
+    );
+
+    var res = await auth.client!.get(uri);
+    if (res.statusCode == 200) {
+      final result = PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      final items = result.data?.map((x) => Message.fromJson(x)).toList() ?? List.empty();
+      final isLastPage = (result.count - pageKey) < take;
+      if (isLastPage || result.data == null) {
+        historyPagingController!.appendLastPage(items);
+      } else {
+        final nextPageKey = pageKey + items.length;
+        historyPagingController!.appendPage(items, nextPageKey);
+      }
+    } else if (res.statusCode == 403) {
+      historyPagingController!.appendLastPage([]);
+    } else {
+      historyPagingController!.error = utf8.decode(res.bodyBytes);
+    }
+  }
+
+  Future<Channel> fetchChannel(BuildContext context, AuthProvider auth, String alias, String realm) async {
+    if (focusChannel != null) {
+      unFocus();
+    }
+
     var uri = getRequestUri('messaging', '/api/channels/$realm/$alias/availability');
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200 || res.statusCode == 403) {
       final result = jsonDecode(utf8.decode(res.bodyBytes));
       focusChannel = Channel.fromJson(result);
       focusChannel?.isAvailable = res.statusCode == 200;
+      focusChannelRealm = realm;
+
+      if (historyPagingController == null) {
+        historyPagingController = PagingController(firstPageKey: 0);
+        historyPagingController?.addPageRequestListener((pageKey) => fetchMessages(pageKey, context));
+      }
+
       notifyListeners();
+
       return focusChannel!;
     } else {
       var message = utf8.decode(res.bodyBytes);
@@ -110,6 +205,7 @@ class ChatProvider extends ChangeNotifier {
   void unFocus() {
     currentCall = null;
     focusChannel = null;
+    historyPagingController = null;
     notifyListeners();
   }
 }

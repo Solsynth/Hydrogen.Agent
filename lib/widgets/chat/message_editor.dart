@@ -38,7 +38,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
 
-  List<int> _pendingMessages = List.empty(growable: true);
+  final List<int> _pendingMessages = List.empty(growable: true);
 
   int? _prevEditingId;
 
