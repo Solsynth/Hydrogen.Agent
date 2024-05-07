@@ -123,6 +123,7 @@
   "chatCallDisconnectConfirm": "Are you sure you want to disconnect? You can reconnect after this if you want.",
   "chatCallChangeSpeaker": "Change Speaker",
   "chatMessagePlaceholder": "Write a message...",
+  "chatMessageSending": "Now delivering your messages...",
   "chatMessageEditNotify": "You are about editing a message.",
   "chatMessageReplyNotify": "You are about replying a message.",
   "chatMessageDeleteConfirm": "Are you sure you want to delete this message? This operation cannot be revert and no local history is saved!"

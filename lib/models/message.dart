@@ -8,7 +8,7 @@ class Message {
   DateTime updatedAt;
   DateTime? deletedAt;
   String content;
-  dynamic metadata;
+  Map<String, dynamic>? metadata;
   int type;
   List<Attachment>? attachments;
   Channel? channel;
@@ -17,6 +17,8 @@ class Message {
   Message? replyTo;
   int channelId;
   int senderId;
+
+  bool isSending = false;
 
   Message({
     required this.id,

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +38,8 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
 
-  bool _isSubmitting = false;
+  List<int> _pendingMessages = List.empty(growable: true);
+
   int? _prevEditingId;
 
   List<Attachment> _attachments = List.empty(growable: true);
@@ -53,8 +56,6 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
   }
 
   Future<void> sendMessage(BuildContext context) async {
-    if (_isSubmitting) return;
-
     _focusNode.requestFocus();
 
     final auth = context.read<AuthProvider>();
@@ -72,15 +73,25 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
       'reply_to': widget.replying?.id,
     });
 
-    setState(() => _isSubmitting = true);
+    reset();
+
+    final messageMarkId = DateTime.now().microsecondsSinceEpoch >> 10;
+    final messageDebounceId = 'm-pending$messageMarkId';
+
+    EasyDebounce.debounce(messageDebounceId, 350.ms, () {
+      setState(() => _pendingMessages.add(messageMarkId));
+    });
+
     var res = await Response.fromStream(await auth.client!.send(req));
     if (res.statusCode != 200) {
       var message = utf8.decode(res.bodyBytes);
       context.showErrorDialog(message);
-    } else {
-      reset();
     }
-    setState(() => _isSubmitting = false);
+
+    EasyDebounce.cancel(messageDebounceId);
+    if (_pendingMessages.isNotEmpty) {
+      setState(() => _pendingMessages.remove(messageMarkId));
+    }
   }
 
   void reset() {
@@ -94,8 +105,8 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     if (widget.editing != null && _prevEditingId != widget.editing!.id) {
       setState(() {
         _prevEditingId = widget.editing!.id;
-        _textController.text = widget.editing!.content;
         _attachments = widget.editing!.attachments ?? List.empty(growable: true);
+        _textController.text = widget.editing!.content;
       });
     }
   }
@@ -113,6 +124,15 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final sendingBanner = MaterialBanner(
+      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
+      leading: const Icon(Icons.schedule_send),
+      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.9),
+      dividerColor: const Color.fromARGB(1, 0, 0, 0),
+      content: Text('${AppLocalizations.of(context)!.chatMessageSending} (${_pendingMessages.length})'),
+      actions: const [SizedBox()],
+    );
+
     final editingBanner = MaterialBanner(
       padding: const EdgeInsets.only(top: 4, bottom: 4, left: 20),
       leading: const Icon(Icons.edit_note),
@@ -143,6 +163,18 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
 
     return Column(
       children: [
+        _pendingMessages.isNotEmpty
+            ? sendingBanner
+                .animate()
+                .scaleY(
+                  begin: 0,
+                  curve: Curves.fastEaseInToSlowEaseOut,
+                )
+                .slideY(
+                  begin: 1,
+                  curve: Curves.fastEaseInToSlowEaseOut,
+                )
+            : Container(),
         widget.editing != null ? editingBanner : Container(),
         widget.replying != null ? replyingBanner : Container(),
         Container(
@@ -162,7 +194,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
                 position: badge.BadgePosition.custom(top: -2, end: 8),
                 child: TextButton(
                   style: TextButton.styleFrom(shape: const CircleBorder(), padding: const EdgeInsets.all(4)),
-                  onPressed: !_isSubmitting ? () => viewAttachments(context) : null,
+                  onPressed: () => viewAttachments(context),
                   child: const Icon(Icons.attach_file),
                 ),
               ),
@@ -182,7 +214,7 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
               ),
               TextButton(
                 style: TextButton.styleFrom(shape: const CircleBorder(), padding: const EdgeInsets.all(4)),
-                onPressed: !_isSubmitting ? () => sendMessage(context) : null,
+                onPressed: () => sendMessage(context),
                 child: const Icon(Icons.send),
               )
             ],

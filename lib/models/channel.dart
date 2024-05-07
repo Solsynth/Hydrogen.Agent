@@ -8,8 +8,6 @@ class Channel {
   String alias;
   String name;
   String description;
-  dynamic members;
-  dynamic calls;
   int type;
   Account account;
   int accountId;
@@ -25,8 +23,6 @@ class Channel {
     required this.alias,
     required this.name,
     required this.description,
-    this.members,
-    this.calls,
     required this.type,
     required this.account,
     required this.accountId,
@@ -41,8 +37,6 @@ class Channel {
         alias: json['alias'],
         name: json['name'],
         description: json['description'],
-        members: json['members'],
-        calls: json['calls'],
         type: json['type'],
         account: Account.fromJson(json['account']),
         accountId: json['account_id'],
@@ -57,8 +51,6 @@ class Channel {
         'alias': alias,
         'name': name,
         'description': description,
-        'members': members,
-        'calls': calls,
         'type': type,
         'account': account,
         'account_id': accountId,
