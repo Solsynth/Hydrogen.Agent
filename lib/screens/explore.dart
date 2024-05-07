@@ -5,12 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/service_url.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:solian/utils/theme.dart';
+import 'package:solian/widgets/realms/realm_shortcuts.dart';
 import 'package:solian/widgets/scaffold.dart';
 import 'package:solian/widgets/notification_notifier.dart';
 import 'package:solian/widgets/posts/post.dart';
@@ -25,15 +27,20 @@ class ExplorePostScreen extends StatelessWidget {
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       appBarActions: const [NotificationButton()],
       title: AppLocalizations.of(context)!.explore,
-      child: const ExplorePostWidget(),
+      child: const ExplorePostWidget(showRealmShortcuts: true),
     );
   }
 }
 
 class ExplorePostWidget extends StatefulWidget {
   final String? realm;
+  final bool showRealmShortcuts;
 
-  const ExplorePostWidget({super.key, this.realm});
+  const ExplorePostWidget({
+    super.key,
+    this.realm,
+    this.showRealmShortcuts = false,
+  });
 
   @override
   State<ExplorePostWidget> createState() => _ExplorePostWidgetState();
@@ -75,6 +82,16 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
   void initState() {
     super.initState();
 
+    Future.delayed(Duration.zero, () async {
+      if (widget.showRealmShortcuts) {
+        final auth = context.read<AuthProvider>();
+        if (auth.client == null) {
+          await auth.loadClient();
+        }
+        context.read<RealmProvider>().fetch(auth);
+      }
+    });
+
     _pagingController.addPageRequestListener((pageKey) => fetchFeed(pageKey));
   }
 
@@ -106,24 +123,50 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
         onRefresh: () => Future.sync(
           () => _pagingController.refresh(),
         ),
-        child: PagedListView<int, Post>(
-          pagingController: _pagingController,
-          builderDelegate: PagedChildBuilderDelegate<Post>(
-            itemBuilder: (context, item, index) => PostItem(
-              item: item,
-              onUpdate: () => _pagingController.refresh(),
-              onTap: () {
-                SolianRouter.router.pushNamed(
-                  widget.realm == null ? 'posts.details' : 'realms.posts.details',
-                  pathParameters: {
-                    'alias': item.alias,
-                    'dataset': item.dataset,
-                    ...(widget.realm == null ? {} : {'realm': widget.realm!}),
+        child: CustomScrollView(
+          slivers: [
+            widget.showRealmShortcuts
+                ? SliverToBoxAdapter(
+                    child: FutureBuilder(
+                      future: auth.isAuthorized(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData || snapshot.data != true) {
+                          return Container();
+                        }
+
+                        return Container(
+                          height: 120,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(width: 0.3, color: Theme.of(context).dividerColor),
+                            ),
+                          ),
+                          child: const RealmShortcuts(),
+                        );
+                      },
+                    ),
+                  )
+                : SliverToBoxAdapter(child: Container()),
+            PagedSliverList<int, Post>(
+              pagingController: _pagingController,
+              builderDelegate: PagedChildBuilderDelegate<Post>(
+                itemBuilder: (context, item, index) => PostItem(
+                  item: item,
+                  onUpdate: () => _pagingController.refresh(),
+                  onTap: () {
+                    SolianRouter.router.pushNamed(
+                      widget.realm == null ? 'posts.details' : 'realms.posts.details',
+                      pathParameters: {
+                        'alias': item.alias,
+                        'dataset': item.dataset,
+                        ...(widget.realm == null ? {} : {'realm': widget.realm!}),
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -32,14 +32,16 @@ class RealmScreen extends StatelessWidget {
               ),
             ]
           : [],
-      appBarLeading: SolianTheme.isLargeScreen(context)
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                realm.clearFocus();
-              },
-            )
-          : null,
+      appBarLeading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          if (SolianTheme.isLargeScreen(context)) {
+            realm.clearFocus();
+          } else if (SolianRouter.router.canPop()) {
+            SolianRouter.router.pop();
+          }
+        },
+      ),
       child: RealmWidget(
         alias: alias,
       ),

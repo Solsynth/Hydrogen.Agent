@@ -76,6 +76,7 @@
   "postEditNotify": "你正在修改一个已经发布了的帖子。",
   "reactionAdded": "你的反应已被添加。",
   "reactionRemoved": "你的反应已被移除。",
+  "shortcutsEmpty": "快捷方式空空如也，看起来最近你没去哪里呀～",
   "realmNew": "新领域",
   "realmNewCreate": "创建新领域",
   "realmNewJoin": "加入现有领域",
