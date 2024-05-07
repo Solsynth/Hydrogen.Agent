@@ -91,8 +91,8 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
               child: const Icon(Icons.edit),
               onPressed: () async {
                 final did = await SolianRouter.router.pushNamed(
-                  'posts.moments.editor',
-                  queryParameters: {'realm': widget.realm},
+                  widget.realm == null ? 'posts.moments.editor' : 'realms.posts.moments.editor',
+                  pathParameters: widget.realm == null ? {} : {'realm': widget.realm!},
                 );
                 if (did == true) _pagingController.refresh();
               },

@@ -116,6 +116,14 @@ abstract class SolianRouter {
             builder: (context, state) => RealmMemberScreen(realm: state.extra as Realm),
           ),
           GoRoute(
+            path: '/realms/:realm/posts/publish/moments',
+            name: 'realms.posts.moments.editor',
+            builder: (context, state) => MomentEditorScreen(
+              editing: state.extra as Post?,
+              realm: state.pathParameters['realm']
+            ),
+          ),
+          GoRoute(
             path: '/realms/:realm/posts/:dataset/:alias',
             name: 'realms.posts.details',
             builder: (context, state) => PostScreen(

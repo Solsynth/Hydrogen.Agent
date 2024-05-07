@@ -16,8 +16,9 @@ import 'package:solian/widgets/posts/attachment_editor.dart';
 
 class MomentEditorScreen extends StatefulWidget {
   final Post? editing;
+  final String? realm;
 
-  const MomentEditorScreen({super.key, this.editing});
+  const MomentEditorScreen({super.key, this.editing, this.realm});
 
   @override
   State<MomentEditorScreen> createState() => _MomentEditorScreenState();
@@ -61,6 +62,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
       'alias': _alias,
       'content': _textController.value.text,
       'attachments': _attachments,
+      'realm': widget.realm,
     });
 
     var res = await Response.fromStream(await auth.client!.send(req));
