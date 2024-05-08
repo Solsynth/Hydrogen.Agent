@@ -14,9 +14,8 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.account,
-      noSafeArea: true,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
-      child: AccountScreenWidget(
+      body: AccountScreenWidget(
         onSelect: (item) {
           SolianRouter.router.pushNamed(item);
         },

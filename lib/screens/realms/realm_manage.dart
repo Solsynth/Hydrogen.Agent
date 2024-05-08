@@ -65,8 +65,7 @@ class _RealmManageScreenState extends State<RealmManageScreen> {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.realmManage,
       hideDrawer: true,
-      noSafeArea: true,
-      child: Column(
+      body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -23,7 +23,7 @@ class RealmListScreen extends StatelessWidget {
             title: AppLocalizations.of(context)!.realm,
             appBarActions: const [NotificationButton()],
             fixedAppBarColor: SolianTheme.isLargeScreen(context),
-            child: const RealmListWidget(),
+            body: const RealmListWidget(),
           )
         : RealmScreen(alias: realm.focusRealm!.alias);
   }

@@ -73,10 +73,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final nty = context.watch<NotifyProvider>();
 
     return IndentScaffold(
-      noSafeArea: true,
       hideDrawer: true,
       title: AppLocalizations.of(context)!.notification,
-      child: RefreshIndicator(
+      body: RefreshIndicator(
         onRefresh: () => nty.fetch(auth),
         child: CustomScrollView(
           slivers: [

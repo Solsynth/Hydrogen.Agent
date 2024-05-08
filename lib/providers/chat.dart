@@ -205,6 +205,7 @@ class ChatProvider extends ChangeNotifier {
   void unFocus() {
     currentCall = null;
     focusChannel = null;
+    historyPagingController?.dispose();
     historyPagingController = null;
     notifyListeners();
   }

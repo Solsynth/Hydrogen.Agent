@@ -24,7 +24,7 @@ class ChatListScreen extends StatelessWidget {
       title: AppLocalizations.of(context)!.chat,
       appBarActions: const [NotificationButton()],
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
-      child: const ChatListWidget(),
+      body: const ChatListWidget(),
     );
   }
 }

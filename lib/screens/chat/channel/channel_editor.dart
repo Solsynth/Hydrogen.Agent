@@ -102,6 +102,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
 
     return IndentScaffold(
       hideDrawer: true,
+      showSafeArea: true,
       title: AppLocalizations.of(context)!.chatChannelOrganize,
       appBarActions: <Widget>[
         TextButton(
@@ -109,7 +110,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
           child: Text(AppLocalizations.of(context)!.apply.toUpperCase()),
         ),
       ],
-      child: Column(
+      body: Column(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
           widget.editing != null ? editingBanner : Container(),

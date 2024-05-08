@@ -67,8 +67,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.chatDetail,
       hideDrawer: true,
-      noSafeArea: true,
-      child: Column(
+      body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -103,9 +102,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   title: Text(AppLocalizations.of(context)!.chatMember),
                   onTap: () {
                     SolianRouter.router.pushNamed(
-                      'chat.channel.member',
+                      widget.realm == 'global' ? 'chat.channel.member' : 'realms.chat.channel.member',
                       extra: widget.channel,
-                      pathParameters: {'channel': widget.channel.alias},
+                      pathParameters: {
+                        'channel': widget.channel.alias,
+                        ...(widget.realm == 'global' ? {} : {'realm': widget.realm}),
+                      },
                     );
                   },
                 ),

@@ -7,6 +7,7 @@ import 'package:solian/widgets/chat/message_deletion.dart';
 
 class ChatMessageAction extends StatelessWidget {
   final String channel;
+  final String realm;
   final Message item;
   final Function? onEdit;
   final Function? onReply;
@@ -15,6 +16,7 @@ class ChatMessageAction extends StatelessWidget {
     super.key,
     required this.channel,
     required this.item,
+    this.realm = 'global',
     this.onEdit,
     this.onReply,
   });
@@ -67,6 +69,7 @@ class ChatMessageAction extends StatelessWidget {
                           builder: (context) => ChatMessageDeletionDialog(
                             item: item,
                             channel: channel,
+                            realm: realm,
                           ),
                         ).then((did) {
                           if (did == true && Navigator.canPop(context)) {

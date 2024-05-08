@@ -65,8 +65,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       title: _userinfo?.nick ?? 'Loading...',
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       hideDrawer: true,
-      noSafeArea: true,
-      child: FutureBuilder(
+      body: FutureBuilder(
         future: fetchUserinfo(),
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data == null) {

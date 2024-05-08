@@ -55,6 +55,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
     final uri = widget.editing == null
         ? getRequestUri('interactive', '/api/p/moments')
         : getRequestUri('interactive', '/api/p/moments/${widget.editing!.id}');
+    print(uri);
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
@@ -113,6 +114,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
     );
 
     return IndentScaffold(
+      showSafeArea: true,
       hideDrawer: true,
       title: AppLocalizations.of(context)!.newMoment,
       appBarActions: <Widget>[
@@ -121,7 +123,7 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
           child: Text(AppLocalizations.of(context)!.postVerb.toUpperCase()),
         ),
       ],
-      child: Column(
+      body: Column(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
           FutureBuilder(

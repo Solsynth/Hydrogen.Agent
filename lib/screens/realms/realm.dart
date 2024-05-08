@@ -21,7 +21,6 @@ class RealmScreen extends StatelessWidget {
 
     return IndentScaffold(
       title: realm.focusRealm?.name ?? 'Loading...',
-      noSafeArea: true,
       hideDrawer: true,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       appBarActions: realm.focusRealm != null
@@ -32,17 +31,15 @@ class RealmScreen extends StatelessWidget {
               ),
             ]
           : [],
-      appBarLeading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          if (SolianTheme.isLargeScreen(context)) {
-            realm.clearFocus();
-          } else if (SolianRouter.router.canPop()) {
-            SolianRouter.router.pop();
-          }
-        },
-      ),
-      child: RealmWidget(
+      appBarLeading: SolianTheme.isLargeScreen(context)
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                realm.clearFocus();
+              },
+            )
+          : null,
+      body: RealmWidget(
         alias: alias,
       ),
     );

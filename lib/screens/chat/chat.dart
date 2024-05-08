@@ -32,6 +32,7 @@ class ChatScreen extends StatelessWidget {
     return IndentScaffold(
       title: chat.focusChannel?.name ?? 'Loading...',
       hideDrawer: true,
+      showSafeArea: true,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       appBarActions: chat.focusChannel != null
           ? [
@@ -48,7 +49,7 @@ class ChatScreen extends StatelessWidget {
               ),
             ]
           : [],
-      child: ChatWidget(
+      body: ChatWidget(
         alias: alias,
         realm: realm,
       ),
@@ -96,7 +97,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     if (a?.replyTo != null) return false;
     if (a == null || b == null) return false;
     if (a.senderId != b.senderId) return false;
-    return a.createdAt.difference(b.createdAt).inMinutes <= 5;
+    return a.createdAt.difference(b.createdAt).inMinutes <= 3;
   }
 
   Message? _editingItem;
@@ -107,6 +108,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       context: context,
       builder: (context) => ChatMessageAction(
         channel: widget.alias,
+        realm: widget.realm,
         item: item,
         onEdit: () => setState(() {
           _editingItem = item;

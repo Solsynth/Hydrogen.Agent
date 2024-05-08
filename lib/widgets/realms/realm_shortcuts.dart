@@ -57,11 +57,13 @@ class RealmShortcuts extends StatelessWidget {
           onTap: () async {
             if (SolianTheme.isLargeScreen(context)) {
               await realm.fetchSingle(auth, element.alias);
+              SolianRouter.router.pushNamed('realms');
+            } else {
+              SolianRouter.router.pushNamed(
+                'realms.details',
+                pathParameters: {'realm': element.alias},
+              );
             }
-            SolianRouter.router.pushNamed(
-              'realms.details',
-              pathParameters: {'realm': element.alias},
-            );
           },
         );
       },

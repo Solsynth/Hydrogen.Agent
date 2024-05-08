@@ -10,17 +10,18 @@ import 'package:solian/widgets/exts.dart';
 
 class ChatMessageDeletionDialog extends StatefulWidget {
   final String channel;
+  final String realm;
   final Message item;
 
   const ChatMessageDeletionDialog({
     super.key,
     required this.item,
     required this.channel,
+    this.realm = 'global'
   });
 
   @override
-  State<ChatMessageDeletionDialog> createState() =>
-      _ChatMessageDeletionDialogState();
+  State<ChatMessageDeletionDialog> createState() => _ChatMessageDeletionDialogState();
 }
 
 class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
@@ -30,8 +31,8 @@ class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
     final auth = context.read<AuthProvider>();
     if (!await auth.isAuthorized()) return;
 
-    final uri = getRequestUri('messaging',
-        '/api/channels/global/${widget.channel}/messages/${widget.item.id}');
+    final uri =
+        getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel}/messages/${widget.item.id}');
 
     setState(() => _isSubmitting = true);
     final res = await auth.client!.delete(uri);

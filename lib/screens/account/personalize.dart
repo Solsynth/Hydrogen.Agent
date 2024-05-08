@@ -22,7 +22,7 @@ class PersonalizeScreen extends StatelessWidget {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.personalize,
       hideDrawer: true,
-      child: const PersonalizeScreenWidget(),
+      body: const PersonalizeScreenWidget(),
     );
   }
 }

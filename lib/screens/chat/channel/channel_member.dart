@@ -38,6 +38,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     _selfId = prof['id'];
 
     var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/members');
+    print(uri);
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
@@ -141,7 +142,6 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
   Widget build(BuildContext context) {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.chatMember,
-      noSafeArea: true,
       hideDrawer: true,
       appBarActions: [
         IconButton(
@@ -149,7 +149,7 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
           onPressed: () => promptAddMember(),
         ),
       ],
-      child: RefreshIndicator(
+      body: RefreshIndicator(
         onRefresh: () => fetchMemberships(),
         child: CustomScrollView(
           slivers: [

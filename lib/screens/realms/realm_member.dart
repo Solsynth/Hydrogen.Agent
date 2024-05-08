@@ -142,7 +142,6 @@ class _RealmMemberScreenState extends State<RealmMemberScreen> {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.realmMember,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
-      noSafeArea: true,
       hideDrawer: true,
       appBarActions: [
         IconButton(
@@ -150,7 +149,7 @@ class _RealmMemberScreenState extends State<RealmMemberScreen> {
           onPressed: () => promptAddMember(),
         ),
       ],
-      child: RefreshIndicator(
+      body: RefreshIndicator(
         onRefresh: () => fetchMemberships(),
         child: CustomScrollView(
           slivers: [

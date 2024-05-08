@@ -18,9 +18,8 @@ class FriendScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.friend,
-      noSafeArea: true,
       hideDrawer: true,
-      child: const FriendScreenWidget(),
+      body: const FriendScreenWidget(),
     );
   }
 }

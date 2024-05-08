@@ -23,11 +23,10 @@ class ExplorePostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IndentScaffold(
-      noSafeArea: true,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       appBarActions: const [NotificationButton()],
       title: AppLocalizations.of(context)!.explore,
-      child: const ExplorePostWidget(showRealmShortcuts: true),
+      body: const ExplorePostWidget(showRealmShortcuts: true),
     );
   }
 }

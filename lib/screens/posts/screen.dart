@@ -21,9 +21,8 @@ class PostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.post,
-      noSafeArea: true,
       hideDrawer: true,
-      child: PostScreenWidget(
+      body: PostScreenWidget(
         dataset: dataset,
         alias: alias,
       ),

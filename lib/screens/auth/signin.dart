@@ -64,7 +64,7 @@ class SignInScreen extends StatelessWidget {
     return IndentScaffold(
       title: AppLocalizations.of(context)!.signIn,
       hideDrawer: true,
-      child: Center(
+      body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.6,
           constraints: const BoxConstraints(maxWidth: 360),

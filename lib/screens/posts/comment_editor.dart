@@ -122,6 +122,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
 
     return IndentScaffold(
       hideDrawer: true,
+      showSafeArea: true,
       title: AppLocalizations.of(context)!.newComment,
       appBarActions: <Widget>[
         TextButton(
@@ -129,7 +130,7 @@ class _CommentEditorScreenState extends State<CommentEditorScreen> {
           child: Text(AppLocalizations.of(context)!.postVerb.toUpperCase()),
         ),
       ],
-      child: Column(
+      body: Column(
         children: [
           _isSubmitting
               ? const LinearProgressIndicator().animate().scaleX()

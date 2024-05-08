@@ -111,6 +111,7 @@ class _RealmEditorScreenState extends State<RealmEditorScreen> {
 
     return IndentScaffold(
       hideDrawer: true,
+      showSafeArea: true,
       title: AppLocalizations.of(context)!.realmEstablish,
       appBarActions: <Widget>[
         TextButton(
@@ -119,7 +120,7 @@ class _RealmEditorScreenState extends State<RealmEditorScreen> {
         ),
       ],
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
-      child: Column(
+      body: Column(
         children: [
           _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
           widget.editing != null ? editingBanner : Container(),

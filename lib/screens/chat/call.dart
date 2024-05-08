@@ -132,7 +132,7 @@ class _ChatCallState extends State<ChatCall> {
       title: AppLocalizations.of(context)!.chatCall,
       fixedAppBarColor: SolianTheme.isLargeScreen(context),
       hideDrawer: true,
-      child: content,
+      body: content,
     );
   }
 
