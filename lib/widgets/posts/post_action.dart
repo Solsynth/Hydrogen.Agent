@@ -54,10 +54,19 @@ class PostItemAction extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 20, top: 20, bottom: 12),
-            child: Text(
-              AppLocalizations.of(context)!.action,
-              style: Theme.of(context).textTheme.headlineSmall,
+            padding: const EdgeInsets.only(left: 20, top: 20, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.action,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                Text(
+                  '#${item.id.toString().padLeft(8, '0')}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ),
           ),
           Expanded(

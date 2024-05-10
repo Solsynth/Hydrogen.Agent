@@ -73,6 +73,7 @@ dependencies:
   desktop_drop: ^0.4.4
   easy_debounce: ^2.0.3
   encrypt: ^5.0.3
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
