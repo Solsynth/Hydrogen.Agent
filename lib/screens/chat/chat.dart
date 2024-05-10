@@ -8,7 +8,7 @@ import 'package:solian/models/message.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/chat/channel_action.dart';
 import 'package:solian/widgets/chat/message.dart';

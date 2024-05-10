@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 
 class HttpClient extends http.BaseClient {
   final bool isUnauthorizedRetry;

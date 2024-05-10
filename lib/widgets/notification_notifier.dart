@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
@@ -35,9 +36,13 @@ class _NotificationNotifierState extends State<NotificationNotifier> {
       nty.connect(auth).then((snapshot) {
         snapshot!.stream.listen(
           (event) {
-            final result = model.Notification.fromJson(jsonDecode(event));
-            nty.onRemoteMessage(result);
-            nty.notifyMessage(result.subject, result.content);
+            final result = NetworkPackage.fromJson(jsonDecode(event));
+            switch (result.method) {
+              case 'notifications.new':
+                final result = model.Notification.fromJson(jsonDecode(event));
+                nty.onRemoteMessage(result);
+                nty.notifyMessage(result.subject, result.content);
+            }
           },
           onError: (_, __) => connect(),
           onDone: () => connect(),

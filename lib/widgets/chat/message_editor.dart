@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
 import 'package:badges/badges.dart' as badge;
@@ -55,6 +55,10 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     );
   }
 
+  Map<String, dynamic> buildContentBody(String content, {String algorithm = 'plain'}) {
+    return {'value': content, 'algorithm': algorithm};
+  }
+
   Future<void> sendMessage(BuildContext context) async {
     _focusNode.requestFocus();
 
@@ -68,7 +72,8 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
     req.body = jsonEncode(<String, dynamic>{
-      'content': _textController.value.text,
+      'type': 'm.text',
+      'content': buildContentBody(_textController.value.text),
       'attachments': _attachments,
       'reply_to': widget.replying?.id,
     });
@@ -106,7 +111,10 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
       setState(() {
         _prevEditingId = widget.editing!.id;
         _attachments = widget.editing!.attachments ?? List.empty(growable: true);
-        _textController.text = widget.editing!.content;
+
+        if (widget.editing!.type == 'm.text') {
+          _textController.text = widget.editing!.decodedContent['value'];
+        }
       });
     }
   }

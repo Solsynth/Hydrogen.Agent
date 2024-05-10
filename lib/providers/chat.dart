@@ -13,7 +13,7 @@ import 'package:solian/models/message.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/chat/call/exts.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -41,6 +41,7 @@ class ChatProvider extends ChangeNotifier {
     var uri = Uri(
       scheme: ori.scheme.replaceFirst('http', 'ws'),
       host: ori.host,
+      port: ori.port,
       path: ori.path,
       queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );

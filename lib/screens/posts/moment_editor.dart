@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/exts.dart';
@@ -55,7 +55,6 @@ class _MomentEditorScreenState extends State<MomentEditorScreen> {
     final uri = widget.editing == null
         ? getRequestUri('interactive', '/api/p/moments')
         : getRequestUri('interactive', '/api/p/moments/${widget.editing!.id}');
-    print(uri);
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';

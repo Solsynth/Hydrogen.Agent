@@ -6,7 +6,7 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/models/notification.dart' as model;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:math' as math;
@@ -74,10 +74,11 @@ class NotifyProvider extends ChangeNotifier {
 
     await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
 
-    var ori = getRequestUri('passport', '/api/notifications/listen');
+    var ori = getRequestUri('passport', '/api/ws');
     var uri = Uri(
       scheme: ori.scheme.replaceFirst('http', 'ws'),
       host: ori.host,
+      port: ori.port,
       path: ori.path,
       queryParameters: {
         'tk': Uri.encodeComponent(auth.client!.currentToken!)

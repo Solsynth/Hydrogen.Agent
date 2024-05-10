@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/personal_page.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/personal_page_content.dart';

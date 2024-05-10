@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 
 class RealmProvider with ChangeNotifier {
   List<Realm> realms = List.empty();

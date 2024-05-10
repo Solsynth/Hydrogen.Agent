@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/friend_picker.dart';
 import 'package:solian/widgets/exts.dart';

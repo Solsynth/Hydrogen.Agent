@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/comment_editor.dart';
-import 'package:solian/utils/service_url.dart';
+import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/posts/post.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

@@ -10,19 +10,23 @@ class ChatMessageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Markdown(
-      data: item.content,
-      shrinkWrap: true,
-      selectable: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(0),
-      onTapLink: (text, href, title) async {
-        if (href == null) return;
-        await launchUrlString(
-          href,
-          mode: LaunchMode.externalApplication,
-        );
-      },
-    );
+    if (item.type == 'm.text') {
+      return Markdown(
+        data: item.decodedContent['value'],
+        shrinkWrap: true,
+        selectable: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(0),
+        onTapLink: (text, href, title) async {
+          if (href == null) return;
+          await launchUrlString(
+            href,
+            mode: LaunchMode.externalApplication,
+          );
+        },
+      );
+    }
+
+    return Container();
   }
 }
