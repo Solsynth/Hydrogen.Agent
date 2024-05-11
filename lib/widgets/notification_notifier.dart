@@ -32,22 +32,12 @@ class _NotificationNotifierState extends State<NotificationNotifier> {
     final nty = context.read<NotifyProvider>();
 
     if (await auth.isAuthorized()) {
+      if (auth.client == null) {
+        await auth.loadClient();
+      }
+
       nty.fetch(auth);
-      nty.connect(auth).then((snapshot) {
-        snapshot!.stream.listen(
-          (event) {
-            final result = NetworkPackage.fromJson(jsonDecode(event));
-            switch (result.method) {
-              case 'notifications.new':
-                final result = model.Notification.fromJson(jsonDecode(event));
-                nty.onRemoteMessage(result);
-                nty.notifyMessage(result.subject, result.content);
-            }
-          },
-          onError: (_, __) => connect(),
-          onDone: () => connect(),
-        );
-      });
+      nty.connect(auth);
     }
 
     notify.close();

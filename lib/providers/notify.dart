@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/services_url.dart';
@@ -17,8 +18,7 @@ class NotifyProvider extends ChangeNotifier {
 
   List<model.Notification> notifications = List.empty(growable: true);
 
-  final FlutterLocalNotificationsPlugin localNotify =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin localNotify = FlutterLocalNotificationsPlugin();
 
   NotifyProvider() {
     initNotify();
@@ -32,10 +32,8 @@ class NotifyProvider extends ChangeNotifier {
         DarwinNotificationCategory('general'),
       ],
     );
-    const linuxSettings =
-        LinuxInitializationSettings(defaultActionName: 'Open notification');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
+    const linuxSettings = LinuxInitializationSettings(defaultActionName: 'Open notification');
+    const InitializationSettings initializationSettings = InitializationSettings(
       android: androidSettings,
       iOS: darwinSettings,
       macOS: darwinSettings,
@@ -58,19 +56,16 @@ class NotifyProvider extends ChangeNotifier {
     var uri = getRequestUri('passport', '/api/notifications?skip=0&take=25');
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {
-      final result =
-          PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
-      notifications =
-          result.data?.map((x) => model.Notification.fromJson(x)).toList() ??
-              List.empty(growable: true);
+      final result = PaginationResult.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      notifications = result.data?.map((x) => model.Notification.fromJson(x)).toList() ?? List.empty(growable: true);
     }
 
     notifyListeners();
   }
 
-  Future<WebSocketChannel?> connect(AuthProvider auth) async {
+  Future<void> connect(AuthProvider auth) async {
     if (auth.client == null) await auth.loadClient();
-    if (!await auth.isAuthorized()) return null;
+    if (!await auth.isAuthorized()) return;
 
     await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
 
@@ -80,15 +75,25 @@ class NotifyProvider extends ChangeNotifier {
       host: ori.host,
       port: ori.port,
       path: ori.path,
-      queryParameters: {
-        'tk': Uri.encodeComponent(auth.client!.currentToken!)
-      },
+      queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );
 
     final channel = WebSocketChannel.connect(uri);
     await channel.ready;
 
-    return channel;
+    channel.stream.listen(
+      (event) {
+        final result = NetworkPackage.fromJson(jsonDecode(event));
+        switch (result.method) {
+          case 'notifications.new':
+            final result = model.Notification.fromJson(jsonDecode(event));
+            onRemoteMessage(result);
+            notifyMessage(result.subject, result.content);
+        }
+      },
+      onError: (_, __) => connect(auth),
+      onDone: () => connect(auth),
+    );
   }
 
   void onRemoteMessage(model.Notification item) {
