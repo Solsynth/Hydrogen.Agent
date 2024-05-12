@@ -1,62 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/keypair.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:solian/models/notification.dart' as model;
 import 'package:badges/badges.dart' as badge;
-
-class NotificationNotifier extends StatefulWidget {
-  final Widget child;
-
-  const NotificationNotifier({super.key, required this.child});
-
-  @override
-  State<NotificationNotifier> createState() => _NotificationNotifierState();
-}
-
-class _NotificationNotifierState extends State<NotificationNotifier> {
-  void connect() async {
-    final notify = ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.connectingServer),
-        duration: const Duration(minutes: 1),
-      ),
-    );
-
-    final auth = context.read<AuthProvider>();
-    final nty = context.read<NotifyProvider>();
-
-    if (await auth.isAuthorized()) {
-      if (auth.client == null) {
-        await auth.loadClient();
-      }
-
-      nty.fetch(auth);
-      nty.connect(auth);
-    }
-
-    notify.close();
-  }
-
-  @override
-  void initState() {
-    Future.delayed(Duration.zero, () {
-      connect();
-    });
-
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.child;
-  }
-}
 
 class NotificationButton extends StatefulWidget {
   const NotificationButton({super.key});
@@ -66,6 +15,43 @@ class NotificationButton extends StatefulWidget {
 }
 
 class _NotificationButtonState extends State<NotificationButton> {
+  void connect() async {
+    final auth = context.read<AuthProvider>();
+    final nty = context.read<NotifyProvider>();
+    final keypair = context.read<KeypairProvider>();
+
+    if (nty.isOpened) return;
+
+    final notify = ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.connectingServer),
+        duration: const Duration(minutes: 1),
+      ),
+    );
+
+    if (await auth.isAuthorized()) {
+      if (auth.client == null) {
+        await auth.loadClient();
+      }
+
+      nty.fetch(auth);
+      keypair.channel = await nty.connect(
+        auth,
+        onKexRequest: keypair.provideKeypair,
+        onKexProvide: keypair.receiveKeypair,
+      );
+    }
+
+    notify.close();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, () => connect());
+  }
+
   @override
   Widget build(BuildContext context) {
     final nty = context.watch<NotifyProvider>();

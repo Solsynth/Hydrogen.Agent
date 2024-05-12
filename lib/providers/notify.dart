@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:solian/models/keypair.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
@@ -63,9 +64,13 @@ class NotifyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> connect(AuthProvider auth) async {
+  Future<WebSocketChannel?> connect(
+    AuthProvider auth, {
+    Keypair? Function(String id)? onKexRequest,
+    Function(Keypair kp)? onKexProvide,
+  }) async {
     if (auth.client == null) await auth.loadClient();
-    if (!await auth.isAuthorized()) return;
+    if (!await auth.isAuthorized()) return null;
 
     await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
 
@@ -87,19 +92,40 @@ class NotifyProvider extends ChangeNotifier {
         switch (result.method) {
           case 'notifications.new':
             final result = model.Notification.fromJson(jsonDecode(event));
-            onRemoteMessage(result);
+            unreadAmount++;
+            notifications.add(result);
+            notifyListeners();
             notifyMessage(result.subject, result.content);
+            break;
+          case 'kex.request':
+            if (onKexRequest == null || result.payload == null) break;
+            final resp = onKexRequest(result.payload!['keypair_id']);
+            if (resp == null) break;
+            channel.sink.add(jsonEncode(
+              NetworkPackage(method: 'kex.provide', payload: {
+                'request_id': result.payload!['request_id'],
+                'keypair_id': resp.id,
+                'public_key': resp.publicKey,
+                'algorithm': resp.algorithm,
+              }).toJson(),
+            ));
+            break;
+          case 'kex.provide':
+            if (onKexProvide == null || result.payload == null) break;
+            onKexProvide(Keypair(
+              id: result.payload!['keypair_id'],
+              algorithm: result.payload?['algorithm'] ?? 'aes',
+              publicKey: result.payload!['public_key'],
+              privateKey: result.payload?['private_key'],
+            ));
+            break;
         }
       },
       onError: (_, __) => connect(auth),
       onDone: () => connect(auth),
     );
-  }
 
-  void onRemoteMessage(model.Notification item) {
-    unreadAmount++;
-    notifications.add(item);
-    notifyListeners();
+    return channel;
   }
 
   void notifyMessage(String title, String body) {
@@ -136,7 +162,7 @@ class NotifyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearRealtime() {
+  void clearRealtimeNotifications() {
     notifications = notifications.where((x) => !x.isRealtime).toList();
     notifyListeners();
   }

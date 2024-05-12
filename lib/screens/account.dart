@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/keypair.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
@@ -49,6 +50,13 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final keypair = context.read<KeypairProvider>();
+
+    final actionItems = [
+      (const Icon(Icons.color_lens), AppLocalizations.of(context)!.personalize, 'account.personalize'),
+      (const Icon(Icons.diversity_1), AppLocalizations.of(context)!.friend, 'account.friend'),
+      (const Icon(Icons.key), AppLocalizations.of(context)!.keypair, 'account.keypair'),
+    ];
 
     if (_isAuthorized) {
       return Column(
@@ -57,28 +65,23 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
             padding: EdgeInsets.only(top: 16, bottom: 8, left: 24, right: 24),
             child: NameCard(),
           ),
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-            leading: const Icon(Icons.color_lens),
-            title: Text(AppLocalizations.of(context)!.personalize),
-            onTap: () {
-              widget.onSelect('account.personalize');
-            },
-          ),
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-            leading: const Icon(Icons.diversity_1),
-            title: Text(AppLocalizations.of(context)!.friend),
-            onTap: () {
-              widget.onSelect('account.friend');
-            },
-          ),
+          ...(actionItems.map(
+            (x) => ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+              leading: x.$1,
+              title: Text(x.$2),
+              onTap: () {
+                widget.onSelect(x.$3);
+              },
+            ),
+          )),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 34),
             leading: const Icon(Icons.logout),
             title: Text(AppLocalizations.of(context)!.signOut),
             onTap: () {
               auth.signoff();
+              keypair.clearKeys();
               setState(() {
                 _isAuthorized = false;
               });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/chat/channel_deletion.dart';
 import 'package:solian/widgets/scaffold.dart';
@@ -23,11 +24,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   void promptLeaveChannel() async {
     final did = await showDialog(
       context: context,
-      builder: (context) => ChannelDeletion(
-        channel: widget.channel,
-        realm: widget.realm,
-        isOwned: _isOwned,
-      ),
+      builder: (context) =>
+          ChannelDeletion(
+            channel: widget.channel,
+            realm: widget.realm,
+            isOwned: _isOwned,
+          ),
     );
     if (did == true && SolianRouter.router.canPop()) {
       SolianRouter.router.pop('disposed');
@@ -50,14 +52,23 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.read<AuthProvider>();
+    final chat = context.read<ChatProvider>();
+
     final authorizedItems = [
       ListTile(
         leading: const Icon(Icons.settings),
         title: Text(AppLocalizations.of(context)!.settings),
         onTap: () async {
-          SolianRouter.router.pushNamed('chat.channel.editor', extra: widget.channel).then((did) {
-            if (did == true) {
-              if (SolianRouter.router.canPop()) SolianRouter.router.pop('refresh');
+          SolianRouter.router
+              .pushNamed(
+            'chat.channel.editor',
+            extra: widget.channel,
+            queryParameters: widget.realm != 'global' ? {'realm': widget.realm} : {},
+          )
+              .then((resp) {
+            if (resp != null) {
+              chat.fetchChannel(context, auth, resp as String, widget.realm);
             }
           });
         },
@@ -81,8 +92,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(widget.channel.name, style: Theme.of(context).textTheme.bodyLarge),
-                    Text(widget.channel.description, style: Theme.of(context).textTheme.bodySmall),
+                    Text(widget.channel.name, style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodyLarge),
+                    Text(widget.channel.description, style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodySmall),
                   ]),
                 )
               ],

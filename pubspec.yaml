@@ -72,8 +72,9 @@ dependencies:
   cached_network_image: ^3.3.1
   desktop_drop: ^0.4.4
   easy_debounce: ^2.0.3
-  encrypt: ^5.0.3
   google_fonts: ^6.2.1
+  basic_utils: ^5.7.0
+  encrypt: ^5.0.3
 
 dev_dependencies:
   flutter_test:

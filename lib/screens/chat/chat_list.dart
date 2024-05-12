@@ -124,21 +124,16 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                   title: Text(element.name),
                   subtitle: Text(element.description),
                   onTap: () async {
-                    String? result;
                     if (['chat.channel', 'realms.chat.channel'].contains(SolianRouter.currentRoute.name)) {
                       chat.fetchChannel(context, auth, element.alias, widget.realm!);
                     } else {
-                      result = await SolianRouter.router.pushNamed(
+                      SolianRouter.router.pushNamed(
                         widget.realm == null ? 'chat.channel' : 'realms.chat.channel',
                         pathParameters: {
                           'channel': element.alias,
                           ...(widget.realm == null ? {} : {'realm': widget.realm!}),
                         },
                       );
-                    }
-                    switch (result) {
-                      case 'refresh':
-                        fetchChannels();
                     }
                   },
                 );

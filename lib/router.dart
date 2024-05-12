@@ -6,6 +6,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
+import 'package:solian/screens/account/keypair.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/chat/call.dart';
@@ -187,7 +188,7 @@ abstract class SolianRouter {
             name: 'chat.channel.editor',
             builder: (context, state) => ChannelEditorScreen(
               editing: state.extra as Channel?,
-              realm: state.uri.queryParameters['realm'],
+              realm: state.uri.queryParameters['realm'] ?? 'global',
             ),
           ),
           GoRoute(
@@ -249,6 +250,11 @@ abstract class SolianRouter {
             path: '/account/personalize',
             name: 'account.personalize',
             builder: (context, state) => const PersonalizeScreen(),
+          ),
+          GoRoute(
+            path: '/account/keypair',
+            name: 'account.keypair',
+            builder: (context, state) => const KeypairScreen(),
           ),
         ],
       ),

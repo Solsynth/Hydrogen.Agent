@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/friend.dart';
+import 'package:solian/providers/keypair.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:solian/providers/realm.dart';
@@ -12,7 +13,6 @@ import 'package:solian/utils/timeago.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/utils/video_player.dart';
 import 'package:solian/widgets/chat/call/call_overlay.dart';
-import 'package:solian/widgets/notification_notifier.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,13 +45,14 @@ class SolianApp extends StatelessWidget {
             ChangeNotifierProvider(create: (_) => NotifyProvider()),
             ChangeNotifierProvider(create: (_) => FriendProvider()),
             ChangeNotifierProvider(create: (_) => RealmProvider()),
+            ChangeNotifierProvider(create: (_) => KeypairProvider()),
           ],
           child: Overlay(
             initialEntries: [
               OverlayEntry(builder: (context) {
                 return ScaffoldMessenger(
                   child: Scaffold(
-                    body: NotificationNotifier(child: child ?? Container()),
+                    body: child ?? Container(),
                   ),
                 );
               }),

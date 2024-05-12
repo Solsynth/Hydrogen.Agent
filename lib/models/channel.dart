@@ -12,6 +12,7 @@ class Channel {
   Account account;
   int accountId;
   int? realmId;
+  bool isEncrypted;
 
   bool isAvailable = false;
 
@@ -26,6 +27,7 @@ class Channel {
     required this.type,
     required this.account,
     required this.accountId,
+    required this.isEncrypted,
     this.realmId,
   });
 
@@ -41,6 +43,7 @@ class Channel {
         account: Account.fromJson(json['account']),
         accountId: json['account_id'],
         realmId: json['realm_id'],
+        isEncrypted: json['is_encrypted'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -55,6 +58,7 @@ class Channel {
         'account': account,
         'account_id': accountId,
         'realm_id': realmId,
+        'is_encrypted': isEncrypted,
       };
 }
 

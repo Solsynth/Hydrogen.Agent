@@ -37,7 +37,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       markList.add(element.id);
     }
 
-    nty.clearRealtime();
+    nty.clearRealtimeNotifications();
 
     if(markList.isNotEmpty) {
       var uri = getRequestUri('passport', '/api/notifications/batch/read');

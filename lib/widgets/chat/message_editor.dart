@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/keypair.dart';
 import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:solian/widgets/posts/attachment_editor.dart';
@@ -19,11 +20,13 @@ class ChatMessageEditor extends StatefulWidget {
   final String realm;
   final Message? editing;
   final Message? replying;
+  final bool isEncrypted;
   final Function? onReset;
 
   const ChatMessageEditor({
     super.key,
     required this.channel,
+    required this.isEncrypted,
     this.realm = 'global',
     this.editing,
     this.replying,
@@ -55,8 +58,19 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
     );
   }
 
-  Map<String, dynamic> buildContentBody(String content, {String algorithm = 'plain'}) {
-    return {'value': content, 'algorithm': algorithm};
+  Map<String, dynamic> buildContentBody(String content) {
+    final keypair = context.read<KeypairProvider>();
+    if (keypair.activeKeyId == null || keypair.keys[keypair.activeKeyId] == null) {
+      final kp = keypair.generateAESKey();
+      keypair.setActiveKey(kp.id);
+      return buildContentBody(content);
+    }
+
+    return {
+      'value': widget.isEncrypted ? keypair.encodeViaAESKey(keypair.activeKeyId!, content) : content,
+      'keypair_id': widget.isEncrypted ? keypair.activeKeyId : null,
+      'algorithm': widget.isEncrypted ? 'aes' : 'plain',
+    };
   }
 
   Future<void> sendMessage(BuildContext context) async {
@@ -214,7 +228,9 @@ class _ChatMessageEditorState extends State<ChatMessageEditor> {
                   autocorrect: true,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration.collapsed(
-                    hintText: AppLocalizations.of(context)!.chatMessagePlaceholder,
+                    hintText: widget.isEncrypted
+                        ? AppLocalizations.of(context)!.chatMessageEncryptedPlaceholder
+                        : AppLocalizations.of(context)!.chatMessagePlaceholder,
                   ),
                   onSubmitted: (_) => sendMessage(context),
                   onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),

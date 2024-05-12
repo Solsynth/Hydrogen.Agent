@@ -15,9 +15,9 @@ import 'package:uuid/uuid.dart';
 
 class ChannelEditorScreen extends StatefulWidget {
   final Channel? editing;
-  final String? realm;
+  final String realm;
 
-  const ChannelEditorScreen({super.key, this.editing, this.realm});
+  const ChannelEditorScreen({super.key, this.editing, this.realm = 'global'});
 
   @override
   State<ChannelEditorScreen> createState() => _ChannelEditorScreenState();
@@ -27,6 +27,8 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
   final _aliasController = TextEditingController();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  bool _isEncrypted = false;
 
   bool _isSubmitting = false;
 
@@ -39,9 +41,10 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       return;
     }
 
+    final scope = widget.realm.isNotEmpty ? widget.realm : 'global';
     final uri = widget.editing == null
-        ? getRequestUri('messaging', '/api/channels/${widget.realm ?? 'global'}')
-        : getRequestUri('messaging', '/api/channels/${widget.realm ?? 'global'}/${widget.editing!.id}');
+        ? getRequestUri('messaging', '/api/channels/$scope')
+        : getRequestUri('messaging', '/api/channels/$scope/${widget.editing!.id}');
 
     final req = Request(widget.editing == null ? 'POST' : 'PUT', uri);
     req.headers['Content-Type'] = 'application/json';
@@ -49,6 +52,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       'alias': _aliasController.value.text.toLowerCase(),
       'name': _nameController.value.text,
       'description': _descriptionController.value.text,
+      'is_encrypted': _isEncrypted,
     });
 
     var res = await Response.fromStream(await auth.client!.send(req));
@@ -57,7 +61,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       context.showErrorDialog(message);
     } else {
       if (SolianRouter.router.canPop()) {
-        SolianRouter.router.pop(true);
+        SolianRouter.router.pop(_aliasController.value.text.toLowerCase());
       }
     }
     setState(() => _isSubmitting = false);
@@ -79,6 +83,7 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
       _aliasController.text = widget.editing!.alias;
       _nameController.text = widget.editing!.name;
       _descriptionController.text = widget.editing!.description;
+      _isEncrypted = widget.editing!.isEncrypted;
     }
 
     super.initState();
@@ -176,6 +181,15 @@ class _ChannelEditorScreenState extends State<ChannelEditorScreen> {
                 onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
               ),
             ),
+          ),
+          const Divider(thickness: 0.3),
+          CheckboxListTile(
+            title: Text(AppLocalizations.of(context)!.chatChannelEncryptedLabel),
+            value: _isEncrypted,
+            onChanged: (widget.editing?.isEncrypted ?? false) ? null : (newValue) {
+              setState(() => _isEncrypted = newValue ?? false);
+            },
+            controlAffinity: ListTileControlAffinity.leading,
           ),
         ],
       ),

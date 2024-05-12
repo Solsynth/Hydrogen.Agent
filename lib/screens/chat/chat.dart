@@ -255,6 +255,7 @@ class _ChatWidgetState extends State<ChatWidget> {
               channel: widget.alias,
               editing: _editingItem,
               replying: _replyingItem,
+              isEncrypted: _chat.focusChannel?.isEncrypted ?? false,
               onReset: () => setState(() {
                 _editingItem = null;
                 _replyingItem = null;
