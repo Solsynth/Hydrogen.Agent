@@ -95,6 +95,8 @@ class NotifyProvider extends ChangeNotifier {
       if (!noRetry) {
         await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
         connect(auth, noRetry: true);
+      } else {
+        rethrow;
       }
     }
 

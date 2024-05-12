@@ -5,6 +5,7 @@ import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/keypair.dart';
 import 'package:solian/providers/notify.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:solian/widgets/exts.dart';
 
 class ProviderInitializer extends StatefulWidget {
   final Widget child;
@@ -29,18 +30,22 @@ class _ProviderInitializerState extends State<ProviderInitializer> {
       ),
     );
 
-    if (await auth.isAuthorized()) {
-      if (auth.client == null) {
-        await auth.loadClient();
-      }
+    try {
+      if (await auth.isAuthorized()) {
+        if (auth.client == null) {
+          await auth.loadClient();
+        }
 
-      nty.fetch(auth);
-      chat.connect(auth);
-      keypair.channel = await nty.connect(
-        auth,
-        onKexRequest: keypair.provideKeypair,
-        onKexProvide: keypair.receiveKeypair,
-      );
+        nty.fetch(auth);
+        chat.connect(auth);
+        keypair.channel = await nty.connect(
+          auth,
+          onKexRequest: keypair.provideKeypair,
+          onKexProvide: keypair.receiveKeypair,
+        );
+      }
+    } catch (e) {
+      context.showErrorDialog(e);
     }
 
     notify.close();
