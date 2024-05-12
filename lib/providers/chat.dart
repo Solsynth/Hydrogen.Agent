@@ -33,11 +33,9 @@ class ChatProvider extends ChangeNotifier {
 
   WebSocketChannel? _channel;
 
-  Future<WebSocketChannel?> connect(AuthProvider auth) async {
+  Future<WebSocketChannel?> connect(AuthProvider auth, {noRetry = false}) async {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
-
-    await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
 
     var ori = getRequestUri('messaging', '/api/ws');
     var uri = Uri(
@@ -50,8 +48,15 @@ class ChatProvider extends ChangeNotifier {
 
     isOpened = true;
 
-    _channel = WebSocketChannel.connect(uri);
-    await _channel!.ready;
+    try {
+      _channel = WebSocketChannel.connect(uri);
+      await _channel!.ready;
+    } catch (e) {
+      if (!noRetry) {
+        await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
+        connect(auth, noRetry: true);
+      }
+    }
 
     _channel!.stream.listen(
       (event) {

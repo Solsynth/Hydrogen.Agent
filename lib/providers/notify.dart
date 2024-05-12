@@ -70,6 +70,7 @@ class NotifyProvider extends ChangeNotifier {
     AuthProvider auth, {
     Keypair? Function(String id)? onKexRequest,
     Function(Keypair kp)? onKexProvide,
+    bool noRetry = false,
   }) async {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
@@ -87,8 +88,15 @@ class NotifyProvider extends ChangeNotifier {
 
     isOpened = true;
 
-    _channel = WebSocketChannel.connect(uri);
-    await _channel!.ready;
+    try {
+      _channel = WebSocketChannel.connect(uri);
+      await _channel!.ready;
+    } catch (e) {
+      if (!noRetry) {
+        await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
+        connect(auth, noRetry: true);
+      }
+    }
 
     _channel!.stream.listen(
       (event) {
