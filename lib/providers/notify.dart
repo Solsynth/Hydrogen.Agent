@@ -64,6 +64,8 @@ class NotifyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  WebSocketChannel? _channel;
+
   Future<WebSocketChannel?> connect(
     AuthProvider auth, {
     Keypair? Function(String id)? onKexRequest,
@@ -83,10 +85,12 @@ class NotifyProvider extends ChangeNotifier {
       queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );
 
-    final channel = WebSocketChannel.connect(uri);
-    await channel.ready;
+    isOpened = true;
 
-    channel.stream.listen(
+    _channel = WebSocketChannel.connect(uri);
+    await _channel!.ready;
+
+    _channel!.stream.listen(
       (event) {
         final result = NetworkPackage.fromJson(jsonDecode(event));
         switch (result.method) {
@@ -101,7 +105,7 @@ class NotifyProvider extends ChangeNotifier {
             if (onKexRequest == null || result.payload == null) break;
             final resp = onKexRequest(result.payload!['keypair_id']);
             if (resp == null) break;
-            channel.sink.add(jsonEncode(
+            _channel!.sink.add(jsonEncode(
               NetworkPackage(method: 'kex.provide', payload: {
                 'request_id': result.payload!['request_id'],
                 'keypair_id': resp.id,
@@ -121,11 +125,16 @@ class NotifyProvider extends ChangeNotifier {
             break;
         }
       },
-      onError: (_, __) => connect(auth),
-      onDone: () => connect(auth),
+      onError: (_, __) => Future.delayed(const Duration(seconds: 3), () => connect(auth)),
+      onDone: () => Future.delayed(const Duration(seconds: 1), () => connect(auth)),
     );
 
-    return channel;
+    return _channel!;
+  }
+
+  void disconnect() {
+    _channel = null;
+    isOpened = false;
   }
 
   void notifyMessage(String title, String body) {

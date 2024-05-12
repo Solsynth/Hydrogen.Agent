@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
@@ -133,14 +134,12 @@ class _ExplorePostWidgetState extends State<ExplorePostWidget> {
                           return Container();
                         }
 
-                        return Container(
-                          height: 120,
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(width: 0.3, color: Theme.of(context).dividerColor),
-                            ),
-                          ),
-                          child: const RealmShortcuts(),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: const Material(
+                            elevation: 8,
+                            child: SizedBox(height: 120, child: RealmShortcuts()),
+                          ).animate().fade().slideY(begin: -1, end: 0, curve: Curves.fastEaseInToSlowEaseOut),
                         );
                       },
                     ),

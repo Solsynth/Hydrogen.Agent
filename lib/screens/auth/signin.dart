@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
+import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/exts.dart';
@@ -21,6 +23,8 @@ class SignInScreen extends StatelessWidget {
     final password = _passwordController.value.text;
     if (username.isEmpty || password.isEmpty) return;
     auth.signin(context, username, password).then((_) {
+      context.read<ChatProvider>().connect(auth);
+      context.read<NotifyProvider>().connect(auth);
       SolianRouter.router.pop(true);
     }).catchError((e) {
       List<String> messages = e.toString().split('\n');

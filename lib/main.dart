@@ -13,6 +13,7 @@ import 'package:solian/utils/timeago.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:solian/utils/video_player.dart';
 import 'package:solian/widgets/chat/call/call_overlay.dart';
+import 'package:solian/widgets/provider_init.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +53,9 @@ class SolianApp extends StatelessWidget {
               OverlayEntry(builder: (context) {
                 return ScaffoldMessenger(
                   child: Scaffold(
-                    body: child ?? Container(),
+                    body: ProviderInitializer(
+                      child: child ?? Container(),
+                    ),
                   ),
                 );
               }),

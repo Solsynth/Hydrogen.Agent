@@ -31,6 +31,8 @@ class ChatProvider extends ChangeNotifier {
 
   PagingController<int, Message>? historyPagingController;
 
+  WebSocketChannel? _channel;
+
   Future<WebSocketChannel?> connect(AuthProvider auth) async {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
@@ -46,11 +48,12 @@ class ChatProvider extends ChangeNotifier {
       queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );
 
-    final channel = WebSocketChannel.connect(uri);
-
     isOpened = true;
 
-    channel.stream.listen(
+    _channel = WebSocketChannel.connect(uri);
+    await _channel!.ready;
+
+    _channel!.stream.listen(
       (event) {
         final result = NetworkPackage.fromJson(jsonDecode(event));
         if (focusChannel == null || historyPagingController == null) return;
@@ -90,11 +93,16 @@ class ChatProvider extends ChangeNotifier {
         }
         notifyListeners();
       },
-      onError: (_, __) => connect(auth),
-      onDone: () => connect(auth),
+      onError: (_, __) => Future.delayed(const Duration(seconds: 3), () => connect(auth)),
+      onDone: () => Future.delayed(const Duration(seconds: 1), () => connect(auth)),
     );
 
-    return channel;
+    return _channel!;
+  }
+
+  void disconnect() {
+    _channel = null;
+    isOpened = false;
   }
 
   Future<void> fetchMessages(int pageKey, BuildContext context) async {

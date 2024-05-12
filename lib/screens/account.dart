@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/keypair.dart';
+import 'package:solian/providers/notify.dart';
 import 'package:solian/router.dart';
 import 'package:solian/utils/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
@@ -82,6 +84,8 @@ class _AccountScreenWidgetState extends State<AccountScreenWidget> {
             onTap: () {
               auth.signoff();
               keypair.clearKeys();
+              context.read<NotifyProvider>().disconnect();
+              context.read<ChatProvider>().disconnect();
               setState(() {
                 _isAuthorized = false;
               });
