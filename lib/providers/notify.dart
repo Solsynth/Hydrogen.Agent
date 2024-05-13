@@ -66,9 +66,11 @@ class NotifyProvider extends ChangeNotifier {
 
   IOWebSocketChannel? _channel;
 
-  Future<IOWebSocketChannel?> connect(AuthProvider auth, {
+  Future<IOWebSocketChannel?> connect(
+    AuthProvider auth, {
     Keypair? Function(String id)? onKexRequest,
     Function(Keypair kp)? onKexProvide,
+    Function(bool status)? onStateUpdated,
     bool noRetry = false,
   }) async {
     if (auth.client == null) await auth.loadClient();
@@ -88,7 +90,9 @@ class NotifyProvider extends ChangeNotifier {
 
     try {
       _channel = IOWebSocketChannel.connect(uri);
+      if (onStateUpdated != null) onStateUpdated(true);
       await _channel!.ready;
+      if (onStateUpdated != null) onStateUpdated(false);
     } catch (e) {
       if (!noRetry) {
         await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
@@ -99,15 +103,16 @@ class NotifyProvider extends ChangeNotifier {
     }
 
     _channel!.stream.listen(
-          (event) {
+      (event) {
         final result = NetworkPackage.fromJson(jsonDecode(event));
         switch (result.method) {
           case 'notifications.new':
-            final result = model.Notification.fromJson(jsonDecode(event));
+            if (result.payload == null) break;
+            final notification = model.Notification.fromJson(result.payload!);
             unreadAmount++;
-            notifications.add(result);
+            notifications.add(notification);
             notifyListeners();
-            notifyMessage(result.subject, result.content);
+            notifyMessage(notification.subject, notification.content);
             break;
           case 'kex.request':
             if (onKexRequest == null || result.payload == null) break;

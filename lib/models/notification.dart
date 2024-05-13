@@ -28,9 +28,9 @@ class Notification {
   });
 
   factory Notification.fromJson(Map<String, dynamic> json) => Notification(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
+        id: json['id'] ?? 0,
+        createdAt: json['created_at'] == null ? DateTime.now() : DateTime.parse(json['created_at']),
+        updatedAt: json['updated_at'] == null ? DateTime.now() : DateTime.parse(json['updated_at']),
         deletedAt: json['deleted_at'],
         subject: json['subject'],
         content: json['content'],

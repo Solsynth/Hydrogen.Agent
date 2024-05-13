@@ -33,7 +33,11 @@ class ChatProvider extends ChangeNotifier {
 
   IOWebSocketChannel? _channel;
 
-  Future<IOWebSocketChannel?> connect(AuthProvider auth, {noRetry = false}) async {
+  Future<IOWebSocketChannel?> connect(
+    AuthProvider auth, {
+    Function(bool status)? onStateUpdated,
+    noRetry = false,
+  }) async {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
 
@@ -52,7 +56,9 @@ class ChatProvider extends ChangeNotifier {
 
     try {
       _channel = IOWebSocketChannel.connect(uri);
+      if (onStateUpdated != null) onStateUpdated(true);
       await _channel!.ready;
+      if (onStateUpdated != null) onStateUpdated(false);
     } catch (e) {
       if (!noRetry) {
         await auth.client!.refreshToken(auth.client!.currentRefreshToken!);

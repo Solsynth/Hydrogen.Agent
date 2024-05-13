@@ -43,6 +43,7 @@ class KeypairProvider extends ChangeNotifier {
   }
 
   void receiveKeypair(Keypair kp) {
+    print('received ${kp.id}');
     keys[kp.id] = kp;
     requestingKeys.remove(kp.id);
     notifyListeners();
@@ -94,6 +95,11 @@ class KeypairProvider extends ChangeNotifier {
     ));
 
     requestingKeys.add(id);
+    Future.delayed(const Duration(seconds: 3), () {
+      requestingKeys.remove(id);
+      notifyListeners();
+    });
+
     notifyListeners();
   }
 

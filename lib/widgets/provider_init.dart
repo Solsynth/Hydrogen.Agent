@@ -19,6 +19,21 @@ class ProviderInitializer extends StatefulWidget {
 }
 
 class _ProviderInitializerState extends State<ProviderInitializer> {
+  void showConnectionStatus(bool status) {
+    if (status) {
+      showConnectionSnackbar();
+    } else {
+      ScaffoldMessenger.of(context).clearSnackBars();
+    }
+  }
+
+  void showConnectionSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(AppLocalizations.of(context)!.connectingServer),
+      duration: const Duration(minutes: 1),
+    ));
+  }
+
   void connect() async {
     final auth = context.read<AuthProvider>();
     final nty = context.read<NotifyProvider>();
@@ -28,7 +43,7 @@ class _ProviderInitializerState extends State<ProviderInitializer> {
     final notify = ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context)!.connectingServer),
-        duration: const Duration(minutes: 1),
+        duration: const Duration(seconds: 3),
       ),
     );
 
@@ -38,17 +53,21 @@ class _ProviderInitializerState extends State<ProviderInitializer> {
           await auth.loadClient();
         }
 
-        nty.fetch(auth);
-        chat.connect(auth);
-        keypair.channel = await nty.connect(
+        nty.connect(
           auth,
           onKexRequest: keypair.provideKeypair,
           onKexProvide: keypair.receiveKeypair,
-        );
+            onStateUpdated: showConnectionStatus
+        ).then((value) {
+          keypair.channel = value;
+        });
+        chat.connect(auth, onStateUpdated: showConnectionStatus);
+
+        nty.fetch(auth);
 
         Timer.periodic(const Duration(seconds: 1), (timer) {
-          nty.connect(auth);
-          chat.connect(auth);
+          nty.connect(auth, onStateUpdated: showConnectionStatus);
+          chat.connect(auth, onStateUpdated: showConnectionStatus);
         });
       }
     } catch (e) {
