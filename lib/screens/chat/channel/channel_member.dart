@@ -38,7 +38,6 @@ class _ChatMemberScreenState extends State<ChatMemberScreen> {
     _selfId = prof['id'];
 
     var uri = getRequestUri('messaging', '/api/channels/${widget.realm}/${widget.channel.alias}/members');
-    print(uri);
 
     var res = await auth.client!.get(uri);
     if (res.statusCode == 200) {

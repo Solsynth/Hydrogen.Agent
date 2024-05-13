@@ -17,11 +17,11 @@ import 'package:solian/utils/services_url.dart';
 import 'package:solian/widgets/chat/call/exts.dart';
 import 'package:solian/widgets/exts.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatProvider extends ChangeNotifier {
-  bool isOpened = false;
   bool isCallShown = false;
 
   Call? ongoingCall;
@@ -31,11 +31,15 @@ class ChatProvider extends ChangeNotifier {
 
   PagingController<int, Message>? historyPagingController;
 
-  WebSocketChannel? _channel;
+  IOWebSocketChannel? _channel;
 
-  Future<WebSocketChannel?> connect(AuthProvider auth, {noRetry = false}) async {
+  Future<IOWebSocketChannel?> connect(AuthProvider auth, {noRetry = false}) async {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
+
+    if (_channel != null && (_channel!.innerWebSocket?.readyState ?? 0) < 2) {
+      return _channel;
+    }
 
     var ori = getRequestUri('messaging', '/api/ws');
     var uri = Uri(
@@ -46,10 +50,8 @@ class ChatProvider extends ChangeNotifier {
       queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );
 
-    isOpened = true;
-
     try {
-      _channel = WebSocketChannel.connect(uri);
+      _channel = IOWebSocketChannel.connect(uri);
       await _channel!.ready;
     } catch (e) {
       if (!noRetry) {
@@ -108,8 +110,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void disconnect() {
-    _channel = null;
-    isOpened = false;
+    _channel?.sink.close(status.goingAway);
   }
 
   Future<void> fetchMessages(int pageKey, BuildContext context) async {

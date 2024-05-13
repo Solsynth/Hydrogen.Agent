@@ -162,7 +162,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     Future.delayed(Duration.zero, () async {
       final auth = context.read<AuthProvider>();
 
-      if (!_chat.isOpened) await _chat.connect(auth);
+      await _chat.connect(auth);
 
       _chat.fetchOngoingCall(widget.alias, widget.realm);
       _chat.fetchChannel(context, auth, widget.alias, widget.realm).then((result) {

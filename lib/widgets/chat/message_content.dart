@@ -55,12 +55,11 @@ class _ChatMessageContentState extends State<ChatMessageContent> {
           final keypair = context.watch<KeypairProvider>();
           if (keypair.keys[widget.item.decodedContent['keypair_id']] == null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (keypair.requestKey(
+              keypair.requestKey(
                 widget.item.decodedContent['keypair_id'],
                 widget.item.decodedContent['algorithm'],
                 widget.item.sender.account.externalId!,
-              )) {
-              }
+              );
             });
           } else {
             content = keypair.decodeViaAESKey(

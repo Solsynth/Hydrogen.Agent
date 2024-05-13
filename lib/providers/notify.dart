@@ -10,11 +10,11 @@ import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/utils/services_url.dart';
 import 'package:solian/models/notification.dart' as model;
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import 'dart:math' as math;
 
 class NotifyProvider extends ChangeNotifier {
-  bool isOpened = false;
   int unreadAmount = 0;
 
   List<model.Notification> notifications = List.empty(growable: true);
@@ -64,10 +64,9 @@ class NotifyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  WebSocketChannel? _channel;
+  IOWebSocketChannel? _channel;
 
-  Future<WebSocketChannel?> connect(
-    AuthProvider auth, {
+  Future<IOWebSocketChannel?> connect(AuthProvider auth, {
     Keypair? Function(String id)? onKexRequest,
     Function(Keypair kp)? onKexProvide,
     bool noRetry = false,
@@ -75,8 +74,9 @@ class NotifyProvider extends ChangeNotifier {
     if (auth.client == null) await auth.loadClient();
     if (!await auth.isAuthorized()) return null;
 
-    await auth.client!.refreshToken(auth.client!.currentRefreshToken!);
-
+    if (_channel != null && (_channel!.innerWebSocket?.readyState ?? 0) < 2) {
+      return _channel;
+    }
     var ori = getRequestUri('passport', '/api/ws');
     var uri = Uri(
       scheme: ori.scheme.replaceFirst('http', 'ws'),
@@ -86,10 +86,8 @@ class NotifyProvider extends ChangeNotifier {
       queryParameters: {'tk': Uri.encodeComponent(auth.client!.currentToken!)},
     );
 
-    isOpened = true;
-
     try {
-      _channel = WebSocketChannel.connect(uri);
+      _channel = IOWebSocketChannel.connect(uri);
       await _channel!.ready;
     } catch (e) {
       if (!noRetry) {
@@ -101,7 +99,7 @@ class NotifyProvider extends ChangeNotifier {
     }
 
     _channel!.stream.listen(
-      (event) {
+          (event) {
         final result = NetworkPackage.fromJson(jsonDecode(event));
         switch (result.method) {
           case 'notifications.new':
@@ -143,8 +141,7 @@ class NotifyProvider extends ChangeNotifier {
   }
 
   void disconnect() {
-    _channel = null;
-    isOpened = false;
+    _channel?.sink.close(status.goingAway);
   }
 
   void notifyMessage(String title, String body) {

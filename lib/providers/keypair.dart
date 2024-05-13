@@ -45,13 +45,11 @@ class KeypairProvider extends ChangeNotifier {
   void receiveKeypair(Keypair kp) {
     keys[kp.id] = kp;
     requestingKeys.remove(kp.id);
-    saveKeys();
     notifyListeners();
+    saveKeys();
   }
 
   Keypair? provideKeypair(String id) {
-    print(id);
-    print(keys[id]);
     return keys[id];
   }
 
@@ -79,9 +77,11 @@ class KeypairProvider extends ChangeNotifier {
     saveKeys();
   }
 
-  bool requestKey(String id, String algorithm, int uid) {
-    if (channel == null) return false;
-    if (requestingKeys.contains(id)) return false;
+  void requestKey(String id, String algorithm, int uid) {
+    if (channel == null) return;
+    if (requestingKeys.contains(id)) return;
+
+    print('requested $id');
 
     channel!.sink.add(jsonEncode(
       NetworkPackage(method: 'kex.request', payload: {
@@ -95,7 +95,6 @@ class KeypairProvider extends ChangeNotifier {
 
     requestingKeys.add(id);
     notifyListeners();
-    return true;
   }
 
   String? encodeViaAESKey(String keypairId, String content) {

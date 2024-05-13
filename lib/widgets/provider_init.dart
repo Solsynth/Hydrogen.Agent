@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/providers/auth.dart';
@@ -43,6 +45,11 @@ class _ProviderInitializerState extends State<ProviderInitializer> {
           onKexRequest: keypair.provideKeypair,
           onKexProvide: keypair.receiveKeypair,
         );
+
+        Timer.periodic(const Duration(seconds: 1), (timer) {
+          nty.connect(auth);
+          chat.connect(auth);
+        });
       }
     } catch (e) {
       context.showErrorDialog(e);
