@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:solian/screens/account.dart';
+import 'package:solian/screens/auth/signin.dart';
+import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/shells/nav_shell.dart';
 
-class AppRouter {
+abstract class AppRouter {
   static GoRouter instance = GoRouter(
     routes: [
       ShellRoute(
@@ -18,6 +20,16 @@ class AppRouter {
             path: "/account",
             name: "account",
             builder: (context, state) => const AccountScreen(),
+          ),
+          GoRoute(
+            path: "/auth/sign-in",
+            name: "signin",
+            builder: (context, state) => const SignInScreen(),
+          ),
+          GoRoute(
+            path: "/auth/sign-up",
+            name: "signup",
+            builder: (context, state) => const SignUpScreen(),
           ),
         ],
       ),

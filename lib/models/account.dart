@@ -9,7 +9,6 @@ class Account {
   String banner;
   String description;
   String? emailAddress;
-  int powerLevel;
   int? externalId;
 
   Account({
@@ -23,7 +22,6 @@ class Account {
     required this.banner,
     required this.description,
     this.emailAddress,
-    required this.powerLevel,
     this.externalId,
   });
 
@@ -38,7 +36,6 @@ class Account {
         banner: json['banner'],
         description: json['description'],
         emailAddress: json['email_address'],
-        powerLevel: json['power_level'],
         externalId: json['external_id'],
       );
 
@@ -53,7 +50,6 @@ class Account {
         'banner': banner,
         'description': description,
         'email_address': emailAddress,
-        'power_level': powerLevel,
         'external_id': externalId,
       };
 }

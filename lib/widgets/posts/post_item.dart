@@ -33,7 +33,7 @@ class _PostItemState extends State<PostItem> {
                       Text(
                         widget.item.author.nick,
                         style: const TextStyle(fontWeight: FontWeight.bold),
-                      ).paddingOnly(left: 8),
+                      ).paddingOnly(left: 12),
                       Text(format(widget.item.createdAt, locale: 'en_short')).paddingOnly(left: 4),
                     ],
                   ),
@@ -42,7 +42,7 @@ class _PostItemState extends State<PostItem> {
                     physics: const NeverScrollableScrollPhysics(),
                     data: widget.item.content,
                     padding: const EdgeInsets.all(0),
-                  ).paddingSymmetric(horizontal: 8),
+                  ).paddingOnly(left: 12, right: 8),
                 ],
               ),
             )

@@ -52,23 +52,26 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: () {
-        _data.clear();
-        _pageKey = 0;
-        _dataTotal = null;
-        return getPosts();
-      },
-      child: ListView.separated(
-        itemCount: _data.length,
-        itemBuilder: (BuildContext context, int index) {
-          final item = _data[index];
-          return GestureDetector(
-            child: PostItem(key: Key('p${item.alias}'), item: item),
-            onTap: () {},
-          );
+    return Material(
+      color: Theme.of(context).colorScheme.background,
+      child: RefreshIndicator(
+        onRefresh: () {
+          _data.clear();
+          _pageKey = 0;
+          _dataTotal = null;
+          return getPosts();
         },
-        separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
+        child: ListView.separated(
+          itemCount: _data.length,
+          itemBuilder: (BuildContext context, int index) {
+            final item = _data[index];
+            return GestureDetector(
+              child: PostItem(key: Key('p${item.alias}'), item: item),
+              onTap: () {},
+            );
+          },
+          separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
+        ),
       ),
     );
   }

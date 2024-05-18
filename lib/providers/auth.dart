@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
-import 'package:solian/models/account.dart';
 import 'package:solian/services.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
 class AuthProvider extends GetConnect {
-  final deviceEndpoint = Uri.parse('/api/notifications/subscribe');
-  final tokenEndpoint = Uri.parse('/api/auth/token');
-  final userinfoEndpoint = Uri.parse('/api/users/me');
+  final deviceEndpoint = Uri.parse('${ServiceFinder.services['passport']}/api/notifications/subscribe');
+  final tokenEndpoint = Uri.parse('${ServiceFinder.services['passport']}/api/auth/token');
+  final userinfoEndpoint = Uri.parse('${ServiceFinder.services['passport']}/api/users/me');
   final redirectUrl = Uri.parse('solian://auth');
 
   static const clientId = 'solian';
@@ -57,9 +56,9 @@ class AuthProvider extends GetConnect {
 
   void applyAuthenticator() {
     isAuthorized.then((status) async {
-      final content = await storage.read(key: 'auth_credentials');
-      credentials = oauth2.Credentials.fromJson(jsonDecode(content!));
       if (status) {
+        final content = await storage.read(key: 'auth_credentials');
+        credentials = oauth2.Credentials.fromJson(jsonDecode(content!));
         httpClient.addAuthenticator(reqAuthenticator);
       }
     });
@@ -96,5 +95,5 @@ class AuthProvider extends GetConnect {
 
   Future<bool> get isAuthorized => storage.containsKey(key: 'auth_credentials');
 
-  Future<Response<Account>> get profile => get('/api/users/me', decoder: (data) => Account.fromJson(data));
+  Future<Response> getProfile() => get('/api/users/me');
 }
