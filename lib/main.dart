@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
@@ -24,6 +25,9 @@ class SolianApp extends StatelessWidget {
       translations: SolianMessages(),
       locale: Get.deviceLocale,
       fallbackLocale: const Locale('en', 'US'),
+      onInit: () {
+        Get.lazyPut(() => AuthProvider());
+      },
       builder: (context, child) {
         return Overlay(
           initialEntries: [

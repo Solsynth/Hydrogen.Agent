@@ -63,7 +63,7 @@ class Post {
     categories: json["categories"],
     reactions: json["reactions"],
     replies: json["replies"],
-    attachments: json["attachments"],
+    attachments: json["attachments"] != null ? List<String>.from(json["attachments"]) : null,
     replyId: json["reply_id"],
     repostId: json["repost_id"],
     realmId: json["realm_id"],

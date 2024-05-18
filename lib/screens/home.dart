@@ -53,17 +53,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => getPosts(),
+      onRefresh: () {
+        _data.clear();
+        _pageKey = 0;
+        _dataTotal = null;
+        return getPosts();
+      },
       child: ListView.separated(
         itemCount: _data.length,
         itemBuilder: (BuildContext context, int index) {
           final item = _data[index];
-          return InkWell(
-            child: PostItem(item: item).paddingSymmetric(horizontal: 18, vertical: 8),
+          return GestureDetector(
+            child: PostItem(key: Key('p${item.alias}'), item: item),
             onTap: () {},
           );
         },
-        separatorBuilder: (_, __) => const Divider(thickness: 0.3),
+        separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
       ),
     );
   }
