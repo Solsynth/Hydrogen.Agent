@@ -34,10 +34,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
       'content': _contentController.value.text,
     });
     if (resp.statusCode != 200) {
-      Get.showSnackbar(GetSnackBar(
-        title: 'errorHappened'.tr,
-        message: resp.bodyString,
-      ));
+      Get.snackbar('errorHappened'.tr, resp.bodyString!);
     } else {
       AppRouter.instance.pop(resp.body);
     }

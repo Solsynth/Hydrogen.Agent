@@ -29,14 +29,8 @@ class SolianApp extends StatelessWidget {
         Get.lazyPut(() => AuthProvider());
       },
       builder: (context, child) {
-        return Overlay(
-          initialEntries: [
-            OverlayEntry(
-              builder: (context) => ScaffoldMessenger(
-                child: child ?? Container(),
-              ),
-            ),
-          ],
+        return ScaffoldMessenger(
+          child: child ?? Container(),
         );
       },
     );

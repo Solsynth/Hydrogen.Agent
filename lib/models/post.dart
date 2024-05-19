@@ -24,7 +24,7 @@ class Post {
   Account author;
   int replyCount;
   int reactionCount;
-  dynamic reactionList;
+  Map<String, int> reactionList;
 
   Post({
     required this.id,
@@ -53,54 +53,59 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
-    id: json["id"],
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
-    deletedAt: json["deleted_at"] != null ? DateTime.parse(json['deleted_at']) : null,
-    alias: json["alias"],
-    content: json["content"],
-    tags: json["tags"],
-    categories: json["categories"],
-    reactions: json["reactions"],
-    replies: json["replies"],
-    attachments: json["attachments"] != null ? List<String>.from(json["attachments"]) : null,
-    replyId: json["reply_id"],
-    repostId: json["repost_id"],
-    realmId: json["realm_id"],
-    replyTo: json["reply_to"] == null ? null : Post.fromJson(json["reply_to"]),
-    repostTo: json["repost_to"],
-    realm: json["realm"],
-    publishedAt: json["published_at"],
-    authorId: json["author_id"],
-    author: Account.fromJson(json["author"]),
-    replyCount: json["reply_count"],
-    reactionCount: json["reaction_count"],
-    reactionList: json["reaction_list"],
-  );
+        id: json["id"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+        deletedAt: json["deleted_at"] != null ? DateTime.parse(json['deleted_at']) : null,
+        alias: json["alias"],
+        content: json["content"],
+        tags: json["tags"],
+        categories: json["categories"],
+        reactions: json["reactions"],
+        replies: json["replies"],
+        attachments: json["attachments"] != null ? List<String>.from(json["attachments"]) : null,
+        replyId: json["reply_id"],
+        repostId: json["repost_id"],
+        realmId: json["realm_id"],
+        replyTo: json["reply_to"] == null ? null : Post.fromJson(json["reply_to"]),
+        repostTo: json["repost_to"],
+        realm: json["realm"],
+        publishedAt: json["published_at"],
+        authorId: json["author_id"],
+        author: Account.fromJson(json["author"]),
+        replyCount: json["reply_count"],
+        reactionCount: json["reaction_count"],
+        reactionList: json["reaction_list"] != null
+            ? json["reaction_list"]
+                .map((key, value) =>
+                    MapEntry(key, int.tryParse(value.toString()) ?? (value is double ? value.toInt() : null)))
+                .cast<String, int>()
+            : {},
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-    "deleted_at": deletedAt,
-    "alias": alias,
-    "content": content,
-    "tags": tags,
-    "categories": categories,
-    "reactions": reactions,
-    "replies": replies,
-    "attachments": attachments,
-    "reply_id": replyId,
-    "repost_id": repostId,
-    "realm_id": realmId,
-    "reply_to": replyTo?.toJson(),
-    "repost_to": repostTo,
-    "realm": realm,
-    "published_at": publishedAt,
-    "author_id": authorId,
-    "author": author.toJson(),
-    "reply_count": replyCount,
-    "reaction_count": reactionCount,
-    "reaction_list": reactionList,
-  };
+        "id": id,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+        "deleted_at": deletedAt,
+        "alias": alias,
+        "content": content,
+        "tags": tags,
+        "categories": categories,
+        "reactions": reactions,
+        "replies": replies,
+        "attachments": attachments,
+        "reply_id": replyId,
+        "repost_id": repostId,
+        "realm_id": realmId,
+        "reply_to": replyTo?.toJson(),
+        "repost_to": repostTo,
+        "realm": realm,
+        "published_at": publishedAt,
+        "author_id": authorId,
+        "author": author.toJson(),
+        "reply_count": replyCount,
+        "reaction_count": reactionCount,
+        "reaction_list": reactionList,
+      };
 }

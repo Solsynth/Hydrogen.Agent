@@ -29,6 +29,10 @@ class SolianMessages extends Translations {
           'postPublishing': 'Post a post',
           'postIdentityNotify': 'You will post this post as',
           'postContentPlaceholder': 'What\'s happened?!',
+          'postReaction': 'Reactions of the Post',
+          'reactAdd': 'React',
+          'reactCompleted': 'Your reaction has been added',
+          'reactUncompleted': 'Your reaction has been removed'
         },
         'zh_CN': {
           'next': '下一步',
@@ -55,6 +59,10 @@ class SolianMessages extends Translations {
           'postPublishing': '发表帖子',
           'postIdentityNotify': '你将会以本身份发表帖子',
           'postContentPlaceholder': '发生什么事了？！',
+          'postReaction': '帖子的反应',
+          'reactAdd': '作出反应',
+          'reactCompleted': '你的反应已被添加',
+          'reactUncompleted': '你的反应已被移除'
         }
       };
 }

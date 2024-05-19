@@ -29,10 +29,7 @@ class _SignInScreenState extends State<SignInScreen> {
       if (messages.last.contains('risk')) {
         final ticketId = RegExp(r'ticketId=(\d+)').firstMatch(messages.last);
         if (ticketId == null) {
-          Get.showSnackbar(GetSnackBar(
-            title: 'errorHappened'.tr,
-            message: 'requested to multi-factor authenticate, but the ticket id was not found',
-          ));
+          Get.snackbar('errorHappened'.tr, 'Requested to multi-factor authenticate, but the ticket id was not found');
         }
         showDialog(
           context: context,

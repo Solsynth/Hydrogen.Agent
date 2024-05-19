@@ -28,14 +28,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    final res = await client.post('/api/users', {
+    final resp = await client.post('/api/users', {
       'name': username,
       'nick': nickname,
       'email': email,
       'password': password,
     });
 
-    if (res.statusCode == 200) {
+    if (resp.statusCode == 200) {
       showDialog(
         context: context,
         builder: (context) {
@@ -54,10 +54,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppRouter.instance.replaceNamed('auth.sign-in');
       });
     } else {
-      Get.showSnackbar(GetSnackBar(
-        title: 'errorHappened'.tr,
-        message: res.bodyString,
-      ));
+      Get.snackbar('errorHappened'.tr, resp.bodyString!);
     }
   }
 
