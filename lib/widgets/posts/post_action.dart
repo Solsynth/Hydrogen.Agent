@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/reaction.dart';
 import 'package:solian/providers/auth.dart';
@@ -52,12 +53,12 @@ class _PostQuickActionState extends State<PostQuickAction> {
     });
     if (resp.statusCode == 201) {
       widget.onReact(symbol, 1);
-      Get.snackbar('', 'reactCompleted'.tr);
+      context.showSnackbar('reactCompleted'.tr);
     } else if (resp.statusCode == 204) {
       widget.onReact(symbol, -1);
-      Get.snackbar('', 'reactUncompleted'.tr);
+      context.showSnackbar('reactUncompleted'.tr);
     } else {
-      Get.snackbar('errorHappened'.tr, resp.bodyString!);
+      context.showErrorDialog(resp.bodyString);
     }
 
     setState(() => _isSubmitting = false);

@@ -4,6 +4,7 @@ class SolianMessages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': {
+          'okay': 'Okay',
           'next': 'Next',
           'page': 'Page',
           'home': 'Home',
@@ -32,9 +33,16 @@ class SolianMessages extends Translations {
           'postReaction': 'Reactions of the Post',
           'reactAdd': 'React',
           'reactCompleted': 'Your reaction has been added',
-          'reactUncompleted': 'Your reaction has been removed'
+          'reactUncompleted': 'Your reaction has been removed',
+          'attachmentAdd': 'Attach attachments',
+          'attachmentAddGalleryPhoto': 'Gallery photo',
+          'attachmentAddGalleryVideo': 'Gallery video',
+          'attachmentAddCameraPhoto': 'Capture photo',
+          'attachmentAddCameraVideo': 'Capture video',
+          'attachmentAddFile': 'Attach file',
         },
         'zh_CN': {
+          'okay': '确认',
           'next': '下一步',
           'page': '页面',
           'home': '首页',
@@ -62,7 +70,13 @@ class SolianMessages extends Translations {
           'postReaction': '帖子的反应',
           'reactAdd': '作出反应',
           'reactCompleted': '你的反应已被添加',
-          'reactUncompleted': '你的反应已被移除'
+          'reactUncompleted': '你的反应已被移除',
+          'attachmentAdd': '附加附件',
+          'attachmentAddGalleryPhoto': '相册照片',
+          'attachmentAddGalleryVideo': '相册视频',
+          'attachmentAddCameraPhoto': '拍摄图片',
+          'attachmentAddCameraVideo': '拍摄视频',
+          'attachmentAddFile': '附加文件',
         }
       };
 }

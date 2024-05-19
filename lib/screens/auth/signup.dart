@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exts.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 
@@ -54,7 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         AppRouter.instance.replaceNamed('auth.sign-in');
       });
     } else {
-      Get.snackbar('errorHappened'.tr, resp.bodyString!);
+      context.showErrorDialog(resp.bodyString);
     }
   }
 

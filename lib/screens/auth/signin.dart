@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
@@ -29,7 +30,7 @@ class _SignInScreenState extends State<SignInScreen> {
       if (messages.last.contains('risk')) {
         final ticketId = RegExp(r'ticketId=(\d+)').firstMatch(messages.last);
         if (ticketId == null) {
-          Get.snackbar('errorHappened'.tr, 'Requested to multi-factor authenticate, but the ticket id was not found');
+          context.showErrorDialog('Requested to multi-factor authenticate, but the ticket id was not found');
         }
         showDialog(
           context: context,

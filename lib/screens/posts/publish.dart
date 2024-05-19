@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/shells/nav_shell.dart' as shell;
+import 'package:solian/widgets/attachments/attachment_publish.dart';
 
 class PostPublishingScreen extends StatefulWidget {
   const PostPublishingScreen({super.key});
@@ -18,6 +20,19 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
   final _contentController = TextEditingController();
 
   bool _isSubmitting = false;
+
+  List<String> _attachments = List.empty();
+
+  void showAttachments(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => AttachmentPublishingPopup(
+        usage: 'i.attachment',
+        current: _attachments,
+        onUpdate: (value) => _attachments = value,
+      ),
+    );
+  }
 
   void applyPost() async {
     final AuthProvider auth = Get.find();
@@ -32,9 +47,10 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
     final resp = await client.post('/api/posts', {
       'content': _contentController.value.text,
+      'attachments': _attachments,
     });
     if (resp.statusCode != 200) {
-      Get.snackbar('errorHappened'.tr, resp.bodyString!);
+      context.showErrorDialog(resp.bodyString);
     } else {
       AppRouter.instance.pop(resp.body);
     }
@@ -107,7 +123,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                     TextButton(
                       style: TextButton.styleFrom(shape: const CircleBorder()),
                       child: const Icon(Icons.camera_alt),
-                      onPressed: () {},
+                      onPressed: () => showAttachments(context),
                     )
                   ],
                 ),
