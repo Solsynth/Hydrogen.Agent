@@ -14,16 +14,6 @@ class NavShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backButton = IconButton(
-      icon: const Icon(Icons.arrow_back),
-      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-      onPressed: () {
-        if (AppRouter.instance.canPop()) {
-          AppRouter.instance.pop();
-        }
-      },
-    );
-
     final canPop = AppRouter.instance.canPop();
 
     return Scaffold(
@@ -32,7 +22,7 @@ class NavShell extends StatelessWidget {
         centerTitle: false,
         titleSpacing: canPop ? null : 24,
         elevation: SolianTheme.isLargeScreen(context) ? 1 : 0,
-        leading: canPop ? backButton : null,
+        leading: canPop ? BackButton() : null,
       ),
       bottomNavigationBar: SolianTheme.isLargeScreen(context) ? null : const AppNavigationBottomBar(),
       body: SolianTheme.isLargeScreen(context)
@@ -44,6 +34,23 @@ class NavShell extends StatelessWidget {
               ],
             )
           : child,
+    );
+  }
+}
+
+class BackButton extends StatelessWidget {
+  const BackButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      onPressed: () {
+        if (AppRouter.instance.canPop()) {
+          AppRouter.instance.pop();
+        }
+      },
     );
   }
 }

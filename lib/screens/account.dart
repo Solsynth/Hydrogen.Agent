@@ -106,7 +106,7 @@ class AccountNameCard extends StatelessWidget {
             contentPadding: const EdgeInsets.only(left: 22, right: 34, top: 4, bottom: 4),
             leading: AccountAvatar(content: snapshot.data!.body?['avatar'], radius: 24),
             title: Text(snapshot.data!.body?['nick']),
-            subtitle: Text(snapshot.data!.body?['name']),
+            subtitle: Text(snapshot.data!.body?['email']),
           ),
         );
       },

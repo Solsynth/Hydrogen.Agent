@@ -3,6 +3,7 @@ import 'package:solian/screens/account.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/home.dart';
+import 'package:solian/screens/posts/publish.dart';
 import 'package:solian/shells/nav_shell.dart';
 
 abstract class AppRouter {
@@ -32,6 +33,11 @@ abstract class AppRouter {
             builder: (context, state) => const SignUpScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: "/posts/publish",
+        name: "postPublishing",
+        builder: (context, state) => const PostPublishingScreen(),
       ),
     ],
   );

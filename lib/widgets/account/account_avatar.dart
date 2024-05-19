@@ -13,6 +13,7 @@ class AccountAvatar extends StatelessWidget {
     final direct = content.startsWith('http');
 
     return CircleAvatar(
+      key: Key('a$content'),
       radius: radius,
       backgroundColor: color,
       backgroundImage: NetworkImage(direct ? content : '${ServiceFinder.services['paperclip']}/api/attachments/$content'),

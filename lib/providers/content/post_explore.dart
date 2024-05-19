@@ -7,5 +7,5 @@ class PostExploreProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.services['interactive'];
   }
 
-  Future<Response> listPost(int page) => get('/api/feed?take=${10}&offset=${page * 10}');
+  Future<Response> listPost(int page) => get('/api/feed?take=${10}&offset=$page');
 }

@@ -17,13 +17,18 @@ class SolianMessages extends Translations {
           'friend': 'Friend',
           'signin': 'Sign in',
           'signinCaption': 'Sign in to create post, start a realm, message your friend and more!',
-          'signinRiskDetected': 'Risk detected, click Next to open a webpage and signin through it to pass security check.',
+          'signinRiskDetected':
+              'Risk detected, click Next to open a webpage and signin through it to pass security check.',
           'signup': 'Sign up',
           'signupCaption': 'Create an account on Solarpass and then get the access of entire Solar Network!',
           'signout': 'Sign out',
           'riskDetection': 'Risk Detected',
           'matureContent': 'Mature Content',
-          'matureContentCaption': 'The content is rated and may not suitable for everyone to view'
+          'matureContentCaption': 'The content is rated and may not suitable for everyone to view',
+          'postAction': 'Post',
+          'postPublishing': 'Post a post',
+          'postIdentityNotify': 'You will post this post as',
+          'postContentPlaceholder': 'What\'s happened?!',
         },
         'zh_CN': {
           'next': '下一步',
@@ -44,8 +49,12 @@ class SolianMessages extends Translations {
           'signupCaption': '在 Solarpass 注册一个账号以获得整个 Solar Network 的存取权！',
           'signout': '登出',
           'riskDetection': '检测到风险',
-          'matureContent': '成人内容',
-          'matureContentCaption': '该内容可能会对您的社会关系产生影响，请确认四下环境后再查看'
+          'matureContent': '评级内容',
+          'matureContentCaption': '该内容已被评级为家长指导级或以上，这可能说明内容包含一系列不友好的成分',
+          'postAction': '发表',
+          'postPublishing': '发表帖子',
+          'postIdentityNotify': '你将会以本身份发表帖子',
+          'postContentPlaceholder': '发生什么事了？！',
         }
       };
 }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/post_explore.dart';
+import 'package:solian/router.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,27 +16,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _pageKey = 0;
-  int? _dataTotal;
+  final PagingController<int, Post> _pagingController = PagingController(firstPageKey: 0);
 
-  bool _isFirstLoading = true;
-
-  final List<Post> _data = List.empty(growable: true);
-
-  getPosts() async {
-    if (_dataTotal != null && _pageKey * 10 > _dataTotal!) return;
-
+  getPosts(int pageKey) async {
     final PostExploreProvider provider = Get.find();
-    final resp = await provider.listPost(_pageKey);
-    final PaginationResult result = PaginationResult.fromJson(resp.body);
+    final resp = await provider.listPost(pageKey);
+    if (resp.statusCode != 200) {
+      _pagingController.error = resp.bodyString;
+      return;
+    }
 
-    setState(() {
-      final parsed = result.data?.map((e) => Post.fromJson(e));
-      if (parsed != null) _data.addAll(parsed);
-      _isFirstLoading = false;
-      _dataTotal = result.count;
-      _pageKey++;
-    });
+    final PaginationResult result = PaginationResult.fromJson(resp.body);
+    final parsed = result.data?.map((e) => Post.fromJson(e)).toList();
+    if (parsed != null && parsed.length >= 10) {
+      _pagingController.appendPage(parsed, pageKey + parsed.length);
+    } else if (parsed != null) {
+      _pagingController.appendLastPage(parsed);
+    }
   }
 
   @override
@@ -41,36 +40,46 @@ class _HomeScreenState extends State<HomeScreen> {
     Get.lazyPut(() => PostExploreProvider());
     super.initState();
 
-    Future.delayed(Duration.zero, () => getPosts());
+    _pagingController.addPageRequestListener(getPosts);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isFirstLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+    final AuthProvider auth = Get.find();
 
-    return Material(
-      color: Theme.of(context).colorScheme.background,
-      child: RefreshIndicator(
-        onRefresh: () {
-          _data.clear();
-          _pageKey = 0;
-          _dataTotal = null;
-          return getPosts();
-        },
-        child: ListView.separated(
-          itemCount: _data.length,
-          itemBuilder: (BuildContext context, int index) {
-            final item = _data[index];
-            return GestureDetector(
-              child: PostItem(key: Key('p${item.alias}'), item: item),
-              onTap: () {},
-            );
-          },
-          separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
+    return Scaffold(
+      floatingActionButton: FutureBuilder(
+          future: auth.isAuthorized,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data == true) {
+              return FloatingActionButton(
+                child: const Icon(Icons.add),
+                onPressed: () async {
+                  final value = await AppRouter.instance.pushNamed('postPublishing');
+                  if (value != null) {
+                    _pagingController.refresh();
+                  }
+                },
+              );
+            }
+            return Container();
+          }),
+      body: Material(
+        color: Theme.of(context).colorScheme.background,
+        child: RefreshIndicator(
+          onRefresh: () => Future.sync(() => _pagingController.refresh()),
+          child: PagedListView<int, Post>.separated(
+            pagingController: _pagingController,
+            builderDelegate: PagedChildBuilderDelegate<Post>(
+              itemBuilder: (context, item, index) {
+                return GestureDetector(
+                  child: PostItem(key: Key('p${item.alias}'), item: item),
+                  onTap: () {},
+                );
+              },
+            ),
+            separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
+          ),
         ),
       ),
     );
