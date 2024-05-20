@@ -22,7 +22,7 @@ class NavShell extends StatelessWidget {
         centerTitle: false,
         titleSpacing: canPop ? null : 24,
         elevation: SolianTheme.isLargeScreen(context) ? 1 : 0,
-        leading: canPop ? BackButton() : null,
+        leading: canPop ? const BackButton() : null,
       ),
       bottomNavigationBar: SolianTheme.isLargeScreen(context) ? null : const AppNavigationBottomBar(),
       body: SolianTheme.isLargeScreen(context)

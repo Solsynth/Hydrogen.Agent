@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/content/attachment_item.dart';
 import 'package:solian/providers/content/attachment_list.dart';
+import 'package:solian/widgets/attachments/attachment_list_fullscreen.dart';
 
 class AttachmentList extends StatefulWidget {
   final List<int> attachmentsId;
@@ -124,15 +125,15 @@ class _AttachmentListState extends State<AttachmentList> {
                 AttachmentItem(
                   key: Key('a${element!.uuid}'),
                   item: element,
-                  badge: _attachmentsMeta.length > 1 ? '${idx+1}/${_attachmentsMeta.length}' : null,
-                  show: !element.isMature || _showMature,
+                  badge: _attachmentsMeta.length > 1 ? '${idx + 1}/${_attachmentsMeta.length}' : null,
+                  showHideButton: !element.isMature || _showMature,
                   onHide: () {
                     setState(() => _showMature = false);
                   },
                 ),
                 if (element.isMature && !_showMature)
                   BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.5),
@@ -168,7 +169,13 @@ class _AttachmentListState extends State<AttachmentList> {
             if (!_showMature && _attachmentsMeta.any((e) => e!.isMature)) {
               setState(() => _showMature = true);
             } else {
-              // Open detail box
+              Navigator.of(context, rootNavigator: true).push(
+                MaterialPageRoute(
+                  builder: (context) => AttachmentListFullscreen(
+                    attachment: element,
+                  ),
+                ),
+              );
             }
           },
         );
