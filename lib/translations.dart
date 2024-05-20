@@ -4,6 +4,7 @@ class SolianMessages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': {
+          'hide': 'Hide',
           'okay': 'Okay',
           'next': 'Next',
           'page': 'Page',
@@ -52,6 +53,7 @@ class SolianMessages extends Translations {
           'attachmentAlt': 'Alternative text',
         },
         'zh_CN': {
+          'hide': '隐藏',
           'okay': '确认',
           'next': '下一步',
           'cancel': '取消',

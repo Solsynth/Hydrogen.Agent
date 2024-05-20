@@ -121,7 +121,15 @@ class _AttachmentListState extends State<AttachmentList> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                AttachmentItem(key: Key('a${element!.uuid}'), item: element),
+                AttachmentItem(
+                  key: Key('a${element!.uuid}'),
+                  item: element,
+                  badge: _attachmentsMeta.length > 1 ? '${idx+1}/${_attachmentsMeta.length}' : null,
+                  show: !element.isMature || _showMature,
+                  onHide: () {
+                    setState(() => _showMature = false);
+                  },
+                ),
                 if (element.isMature && !_showMature)
                   BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
