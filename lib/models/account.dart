@@ -5,8 +5,8 @@ class Account {
   DateTime? deletedAt;
   String name;
   String nick;
-  String avatar;
-  String banner;
+  dynamic avatar;
+  dynamic banner;
   String description;
   String? emailAddress;
   int? externalId;

@@ -12,7 +12,7 @@ class AttachmentItem extends StatelessWidget {
     return Hero(
       tag: Key('a${item.uuid}'),
       child: Image.network(
-        '${ServiceFinder.services['paperclip']}/api/attachments/${item.uuid}',
+        '${ServiceFinder.services['paperclip']}/api/attachments/${item.id}',
         fit: BoxFit.cover,
       ),
     );

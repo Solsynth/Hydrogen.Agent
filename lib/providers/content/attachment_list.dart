@@ -7,5 +7,5 @@ class AttachmentListProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.services['paperclip'];
   }
 
-  Future<Response> getMetadata(String uuid) => get('/api/attachments/$uuid/meta');
+  Future<Response> getMetadata(int id) => get('/api/attachments/$id/meta');
 }

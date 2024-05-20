@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
@@ -11,18 +13,19 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:crypto/crypto.dart';
+import 'package:solian/providers/content/attachment_list.dart';
 import 'package:solian/services.dart';
 
 Future<String> calculateFileSha256(File file) async {
   final bytes = await file.readAsBytes();
-  final digest = sha256.convert(bytes);
+  final digest = await Isolate.run(() => sha256.convert(bytes));
   return digest.toString();
 }
 
 class AttachmentPublishingPopup extends StatefulWidget {
   final String usage;
-  final List<String> current;
-  final void Function(List<String> data) onUpdate;
+  final List<int> current;
+  final void Function(List<int> data) onUpdate;
 
   const AttachmentPublishingPopup({
     super.key,
@@ -38,9 +41,10 @@ class AttachmentPublishingPopup extends StatefulWidget {
 class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
   final _imagePicker = ImagePicker();
 
-  bool _isSubmitting = false;
+  bool _isBusy = false;
+  bool _isFirstTimeBusy = true;
 
-  final List<Attachment> _attachments = List.empty(growable: true);
+  List<Attachment?> _attachments = List.empty(growable: true);
 
   Future<void> pickPhotoToUpload() async {
     final AuthProvider auth = Get.find();
@@ -49,7 +53,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     final medias = await _imagePicker.pickMultiImage();
     if (medias.isEmpty) return;
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isBusy = true);
 
     for (final media in medias) {
       final file = File(media.path);
@@ -64,7 +68,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
       }
     }
 
-    setState(() => _isSubmitting = false);
+    setState(() => _isBusy = false);
   }
 
   Future<void> pickVideoToUpload() async {
@@ -74,11 +78,11 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     final media = await _imagePicker.pickVideo(source: ImageSource.gallery);
     if (media == null) return;
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isBusy = true);
 
     final file = File(media.path);
     final hash = await calculateFileSha256(file);
-    const ratio = 16 / 9; // TODO Calculate ratio of video
+    const ratio = 16 / 9;
 
     try {
       await uploadAttachment(file, hash, ratio: ratio);
@@ -86,7 +90,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
       this.context.showErrorDialog(err);
     }
 
-    setState(() => _isSubmitting = false);
+    setState(() => _isBusy = false);
   }
 
   Future<void> pickFileToUpload() async {
@@ -98,7 +102,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
 
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isBusy = true);
 
     for (final file in files) {
       final hash = await calculateFileSha256(file);
@@ -109,7 +113,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
       }
     }
 
-    setState(() => _isSubmitting = false);
+    setState(() => _isBusy = false);
   }
 
   Future<void> takeMediaToUpload(bool isVideo) async {
@@ -124,14 +128,13 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     }
     if (media == null) return;
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isBusy = true);
 
     double? ratio;
     final file = File(media.path);
     final hash = await calculateFileSha256(file);
 
     if (isVideo) {
-      // TODO Calculate ratio of video
       ratio = 16 / 9;
     } else {
       final image = await decodeImageFromList(await file.readAsBytes());
@@ -144,7 +147,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
       this.context.showErrorDialog(err);
     }
 
-    setState(() => _isSubmitting = false);
+    setState(() => _isBusy = false);
   }
 
   Future<void> uploadAttachment(File file, String hash, {double? ratio}) async {
@@ -166,36 +169,18 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
         'file': filePayload,
         'hash': hash,
         'usage': widget.usage,
-        'metadata': {
+        'metadata': jsonEncode({
           if (ratio != null) 'ratio': ratio,
-        },
+        }),
       }),
     );
     if (resp.statusCode == 200) {
       var result = Attachment.fromJson(resp.body);
       setState(() => _attachments.add(result));
-      widget.onUpdate(_attachments.map((e) => e.uuid).toList());
+      widget.onUpdate(_attachments.map((e) => e!.id).toList());
     } else {
       throw Exception(resp.bodyString);
     }
-  }
-
-  Future<void> disposeAttachment(Attachment item, int index) async {
-    final AuthProvider auth = Get.find();
-
-    final client = GetConnect();
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
-
-    setState(() => _isSubmitting = true);
-    var resp = await client.delete('/api/attachments/${item.id}');
-    if (resp.statusCode == 200) {
-      setState(() => _attachments.removeAt(index));
-      widget.onUpdate(_attachments.map((e) => e.uuid).toList());
-    } else {
-      this.context.showErrorDialog(resp.bodyString);
-    }
-    setState(() => _isSubmitting = false);
   }
 
   String formatBytes(int bytes, {int decimals = 2}) {
@@ -205,6 +190,40 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     final sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
     final i = (math.log(bytes) / math.log(k)).floor().toInt();
     return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
+  }
+
+  void revertMetadataList() {
+    final AttachmentListProvider provider = Get.find();
+
+    if (widget.current.isEmpty) {
+      _isFirstTimeBusy = false;
+      return;
+    } else {
+      _attachments = List.filled(widget.current.length, null);
+    }
+
+    setState(() => _isBusy = true);
+
+    int progress = 0;
+    for (var idx = 0; idx < widget.current.length; idx++) {
+      provider.getMetadata(widget.current[idx]).then((resp) {
+        progress++;
+        _attachments[idx] = Attachment.fromJson(resp.body);
+        if (progress == widget.current.length) {
+          setState(() {
+            _isBusy = false;
+            _isFirstTimeBusy = false;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    revertMetadataList();
   }
 
   @override
@@ -221,46 +240,71 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
               'attachmentAdd'.tr,
               style: Theme.of(context).textTheme.headlineSmall,
             ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-            _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+            _isBusy ? const LinearProgressIndicator().animate().scaleX() : Container(),
             Expanded(
-              child: ListView.builder(
-                itemCount: _attachments.length,
-                itemBuilder: (context, index) {
-                  final element = _attachments[index];
-                  final fileType = element.mimetype.split('/').first;
-                  return Container(
-                    padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                element.alt,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
-                              ),
-                            ],
-                          ),
-                        ),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            shape: const CircleBorder(),
-                            foregroundColor: Colors.red,
-                          ),
-                          child: const Icon(Icons.delete),
-                          onPressed: () => disposeAttachment(element, index),
-                        ),
-                      ],
-                    ),
+              child: Builder(builder: (context) {
+                if (_isFirstTimeBusy && _isBusy) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                },
-              ),
+                }
+
+                return ListView.builder(
+                  itemCount: _attachments.length,
+                  itemBuilder: (context, index) {
+                    final element = _attachments[index];
+                    final fileType = element!.mimetype.split('/').first;
+                    return Container(
+                      padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  element.alt,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            style: TextButton.styleFrom(
+                              shape: const CircleBorder(),
+                              foregroundColor: Theme.of(context).primaryColor,
+                            ),
+                            icon: const Icon(Icons.more_horiz),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AttachmentEditingPopup(
+                                    item: element,
+                                    onDelete: () {
+                                      setState(() => _attachments.removeAt(index));
+                                      widget.onUpdate(_attachments.map((e) => e!.id).toList());
+                                    },
+                                    onUpdate: (item) {
+                                      setState(() => _attachments[index] = item);
+                                      widget.onUpdate(_attachments.map((e) => e!.id).toList());
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }),
             ),
             const Divider(thickness: 0.3, height: 0.3),
             SizedBox(
@@ -310,6 +354,212 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class AttachmentEditingPopup extends StatefulWidget {
+  final Attachment item;
+  final Function onDelete;
+  final Function(Attachment item) onUpdate;
+
+  const AttachmentEditingPopup({super.key, required this.item, required this.onDelete, required this.onUpdate});
+
+  @override
+  State<AttachmentEditingPopup> createState() => _AttachmentEditingPopupState();
+}
+
+class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
+  final _ratioController = TextEditingController();
+  final _altController = TextEditingController();
+
+  bool _isBusy = false;
+  bool _isMature = false;
+  bool _hasAspectRatio = false;
+
+  Future<Attachment?> applyAttachment() async {
+    final AuthProvider auth = Get.find();
+
+    final client = GetConnect();
+    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
+    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+
+    setState(() => _isBusy = true);
+    var resp = await client.put('/api/attachments/${widget.item.id}', {
+      'metadata': {
+        if (_hasAspectRatio) 'ratio': double.tryParse(_ratioController.value.text) ?? 1,
+      },
+      'alt': _altController.value.text,
+      'usage': widget.item.usage,
+      'is_mature': _isMature,
+    });
+
+    setState(() => _isBusy = false);
+
+    if (resp.statusCode != 200) {
+      this.context.showErrorDialog(resp.bodyString);
+      return null;
+    } else {
+      return Attachment.fromJson(resp.body);
+    }
+  }
+
+  Future<void> deleteAttachment() async {
+    final AuthProvider auth = Get.find();
+
+    final client = GetConnect();
+    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
+    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+
+    setState(() => _isBusy = true);
+    var resp = await client.delete('/api/attachments/${widget.item.id}');
+    if (resp.statusCode == 200) {
+      widget.onDelete();
+    } else {
+      this.context.showErrorDialog(resp.bodyString);
+    }
+    setState(() => _isBusy = false);
+  }
+
+  void syncWidget() {
+    _isMature = widget.item.isMature;
+    _altController.text = widget.item.alt;
+
+    if (['image', 'video'].contains(widget.item.mimetype.split('/').first)) {
+      _ratioController.text = widget.item.metadata?['ratio']?.toString() ?? 1.toString();
+      _hasAspectRatio = true;
+    }
+  }
+
+  @override
+  void initState() {
+    syncWidget();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('attachmentSetting'.tr),
+      content: Container(
+        constraints: const BoxConstraints(minWidth: 400),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _isBusy
+                ? ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child: const LinearProgressIndicator().animate().scaleX(),
+                  )
+                : Container(),
+            const SizedBox(height: 18),
+            TextField(
+              controller: _altController,
+              decoration: InputDecoration(
+                isDense: true,
+                prefixIcon: const Icon(Icons.image_not_supported),
+                border: const OutlineInputBorder(),
+                labelText: 'attachmentAlt'.tr,
+              ),
+              onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              readOnly: !_hasAspectRatio,
+              controller: _ratioController,
+              decoration: InputDecoration(
+                isDense: true,
+                prefixIcon: const Icon(Icons.aspect_ratio),
+                border: const OutlineInputBorder(),
+                labelText: 'aspectRatio'.tr,
+              ),
+              onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+            ),
+            const SizedBox(height: 5),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 0,
+                children: [
+                  ActionChip(
+                    avatar: Icon(Icons.square_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    label: Text('aspectRatioSquare'.tr),
+                    onPressed: () {
+                      if (_hasAspectRatio) {
+                        setState(() => _ratioController.text = '1');
+                      }
+                    },
+                  ),
+                  ActionChip(
+                    avatar: Icon(Icons.portrait, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    label: Text('aspectRatioPortrait'.tr),
+                    onPressed: () {
+                      if (_hasAspectRatio) {
+                        setState(() => _ratioController.text = (9 / 16).toString());
+                      }
+                    },
+                  ),
+                  ActionChip(
+                    avatar: Icon(Icons.landscape, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    label: Text('aspectRatioLandscape'.tr),
+                    onPressed: () {
+                      if (_hasAspectRatio) {
+                        setState(() => _ratioController.text = (16 / 9).toString());
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Card(
+              child: CheckboxListTile(
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                title: Text('matureContent'.tr),
+                secondary: const Icon(Icons.visibility_off),
+                value: _isMature,
+                onChanged: (newValue) {
+                  setState(() => _isMature = newValue ?? false);
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.spaceBetween,
+      actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+          onPressed: () {
+            deleteAttachment().then((_) {
+              Navigator.pop(context);
+            });
+          },
+          child: Text('delete'.tr),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant),
+              onPressed: () => Navigator.pop(context),
+              child: Text('cancel'.tr),
+            ),
+            TextButton(
+              child: Text('apply'.tr),
+              onPressed: () {
+                applyAttachment().then((value) {
+                  if (value != null) {
+                    widget.onUpdate(value);
+                    Navigator.pop(context);
+                  }
+                });
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

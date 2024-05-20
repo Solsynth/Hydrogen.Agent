@@ -35,7 +35,7 @@ class _PostItemState extends State<PostItem> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AccountAvatar(content: item.author.avatar),
+            AccountAvatar(content: item.author.avatar.toString()),
             Expanded(
               child: Column(
                 children: [

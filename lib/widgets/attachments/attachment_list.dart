@@ -8,7 +8,7 @@ import 'package:solian/providers/content/attachment_item.dart';
 import 'package:solian/providers/content/attachment_list.dart';
 
 class AttachmentList extends StatefulWidget {
-  final List<String> attachmentsId;
+  final List<int> attachmentsId;
 
   const AttachmentList({super.key, required this.attachmentsId});
 
@@ -49,9 +49,15 @@ class _AttachmentListState extends State<AttachmentList> {
   }
 
   void calculateAspectRatio() {
+    bool isConsistent = true;
+    double? consistentValue;
     int portrait = 0, square = 0, landscape = 0;
     for (var entry in _attachmentsMeta) {
       if (entry!.metadata?['ratio'] != null) {
+        consistentValue ??= entry.metadata?['ratio'];
+        if (isConsistent && entry.metadata?['ratio'] != consistentValue) {
+          isConsistent = false;
+        }
         if (entry.metadata!['ratio'] > 1) {
           landscape++;
         } else if (entry.metadata!['ratio'] == 1) {
@@ -61,21 +67,23 @@ class _AttachmentListState extends State<AttachmentList> {
         }
       }
     }
-    if (portrait > square && portrait > landscape) {
-      _aspectRatio = 9 / 16;
-    }
-    if (landscape > square && landscape > portrait) {
-      _aspectRatio = 16 / 9;
+    if (isConsistent && consistentValue != null) {
+      _aspectRatio = consistentValue;
     } else {
-      _aspectRatio = 1;
+      if (portrait > square && portrait > landscape) {
+        _aspectRatio = 9 / 16;
+      }
+      if (landscape > square && landscape > portrait) {
+        _aspectRatio = 16 / 9;
+      } else {
+        _aspectRatio = 1;
+      }
     }
   }
 
   @override
   void initState() {
-    Get.lazyPut(() => AttachmentListProvider());
     super.initState();
-
     getMetadataList();
   }
 

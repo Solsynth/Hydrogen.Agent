@@ -12,7 +12,7 @@ class Post {
   dynamic categories;
   dynamic reactions;
   List<Post>? replies;
-  List<String>? attachments;
+  List<int>? attachments;
   int? replyId;
   int? repostId;
   int? realmId;
@@ -63,7 +63,7 @@ class Post {
         categories: json["categories"],
         reactions: json["reactions"],
         replies: json["replies"],
-        attachments: json["attachments"] != null ? List<String>.from(json["attachments"]) : null,
+        attachments: json["attachments"] != null ? List<int>.from(json["attachments"]) : null,
         replyId: json["reply_id"],
         repostId: json["repost_id"],
         realmId: json["realm_id"],

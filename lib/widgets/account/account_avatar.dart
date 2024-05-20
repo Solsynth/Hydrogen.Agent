@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solian/services.dart';
 
 class AccountAvatar extends StatelessWidget {
-  final String content;
+  final dynamic content;
   final Color? color;
   final double? radius;
 
@@ -10,13 +10,21 @@ class AccountAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final direct = content.startsWith('http');
+    bool direct = false;
+    bool isEmpty = content == null;
+    if (content is String) {
+      direct = content.startsWith('http');
+      isEmpty = content.endsWith('/api/attachments/0');
+    }
 
     return CircleAvatar(
       key: Key('a$content'),
       radius: radius,
       backgroundColor: color,
-      backgroundImage: NetworkImage(direct ? content : '${ServiceFinder.services['paperclip']}/api/attachments/$content'),
+      backgroundImage: !isEmpty ? NetworkImage(
+        direct ? content : '${ServiceFinder.services['paperclip']}/api/attachments/$content',
+      ) : null,
+      child: isEmpty ? const Icon(Icons.account_circle) : null,
     );
   }
 }

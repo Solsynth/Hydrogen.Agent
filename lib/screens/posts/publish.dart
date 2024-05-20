@@ -21,7 +21,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
   bool _isSubmitting = false;
 
-  List<String> _attachments = List.empty();
+  List<int> _attachments = List.empty();
 
   void showAttachments(BuildContext context) {
     showModalBottomSheet(
