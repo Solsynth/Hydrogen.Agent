@@ -6,6 +6,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/post_explore.dart';
 import 'package:solian/router.dart';
+import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,7 +17,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PagingController<int, Post> _pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, Post> _pagingController =
+      PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
     final PostExploreProvider provider = Get.find();
@@ -55,7 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
               return FloatingActionButton(
                 child: const Icon(Icons.add),
                 onPressed: () async {
-                  final value = await AppRouter.instance.pushNamed('postPublishing');
+                  final value =
+                      await AppRouter.instance.pushNamed('postPublishing');
                   if (value != null) {
                     _pagingController.refresh();
                   }
@@ -65,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return Container();
           }),
       body: Material(
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: RefreshIndicator(
           onRefresh: () => Future.sync(() => _pagingController.refresh()),
           child: PagedListView<int, Post>.separated(
@@ -73,12 +76,25 @@ class _HomeScreenState extends State<HomeScreen> {
             builderDelegate: PagedChildBuilderDelegate<Post>(
               itemBuilder: (context, item, index) {
                 return GestureDetector(
-                  child: PostItem(key: Key('p${item.alias}'), item: item),
+                  child: PostItem(key: Key('p${item.alias}'), item: item)
+                      .paddingSymmetric(
+                    vertical: (item.attachments?.isEmpty ?? false) ? 8 : 0,
+                  ),
                   onTap: () {},
+                  onLongPress: () {
+                    showModalBottomSheet(
+                      useRootNavigator: true,
+                      context: context,
+                      builder: (context) => PostAction(item: item),
+                    ).then((value) {
+                      if (value == true) _pagingController.refresh();
+                    });
+                  },
                 );
               },
             ),
-            separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
+            separatorBuilder: (_, __) =>
+                const Divider(thickness: 0.3, height: 0.3),
           ),
         ),
       ),

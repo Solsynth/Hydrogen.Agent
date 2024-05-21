@@ -9,9 +9,12 @@ import 'package:solian/services.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
 class AuthProvider extends GetConnect {
-  final deviceEndpoint = Uri.parse('${ServiceFinder.services['passport']}/api/notifications/subscribe');
-  final tokenEndpoint = Uri.parse('${ServiceFinder.services['passport']}/api/auth/token');
-  final userinfoEndpoint = Uri.parse('${ServiceFinder.services['passport']}/api/users/me');
+  final deviceEndpoint = Uri.parse(
+      '${ServiceFinder.services['passport']}/api/notifications/subscribe');
+  final tokenEndpoint =
+      Uri.parse('${ServiceFinder.services['passport']}/api/auth/token');
+  final userinfoEndpoint =
+      Uri.parse('${ServiceFinder.services['passport']}/api/users/me');
   final redirectUrl = Uri.parse('solian://auth');
 
   static const clientId = 'solian';
@@ -44,7 +47,8 @@ class AuthProvider extends GetConnect {
         tokenEndpoint: tokenEndpoint,
         expiration: DateTime.now().add(const Duration(minutes: 3)),
       );
-      storage.write(key: 'auth_credentials', value: jsonEncode(credentials!.toJson()));
+      storage.write(
+          key: 'auth_credentials', value: jsonEncode(credentials!.toJson()));
     }
 
     if (credentials != null) {
@@ -64,7 +68,8 @@ class AuthProvider extends GetConnect {
     });
   }
 
-  Future<oauth2.Credentials> signin(BuildContext context, String username, String password) async {
+  Future<oauth2.Credentials> signin(
+      BuildContext context, String username, String password) async {
     final resp = await oauth2.resourceOwnerPasswordGrant(
       tokenEndpoint,
       username,
@@ -83,7 +88,8 @@ class AuthProvider extends GetConnect {
       expiration: DateTime.now().add(const Duration(minutes: 3)),
     );
 
-    storage.write(key: 'auth_credentials', value: jsonEncode(credentials!.toJson()));
+    storage.write(
+        key: 'auth_credentials', value: jsonEncode(credentials!.toJson()));
     applyAuthenticator();
 
     return credentials!;
@@ -93,7 +99,17 @@ class AuthProvider extends GetConnect {
     storage.deleteAll();
   }
 
+  Response? _cacheUserProfileResponse;
+
   Future<bool> get isAuthorized => storage.containsKey(key: 'auth_credentials');
 
-  Future<Response> getProfile() => get('/api/users/me');
+  Future<Response> getProfile({noCache = false}) async {
+    if (!noCache && _cacheUserProfileResponse != null) {
+      return _cacheUserProfileResponse!;
+    }
+
+    final resp = await get('/api/users/me');
+    _cacheUserProfileResponse = resp;
+    return resp;
+  }
 }

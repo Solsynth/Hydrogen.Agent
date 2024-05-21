@@ -30,7 +30,8 @@ class _SignInScreenState extends State<SignInScreen> {
       if (messages.last.contains('risk')) {
         final ticketId = RegExp(r'ticketId=(\d+)').firstMatch(messages.last);
         if (ticketId == null) {
-          context.showErrorDialog('Requested to multi-factor authenticate, but the ticket id was not found');
+          context.showErrorDialog(
+              'Requested to multi-factor authenticate, but the ticket id was not found');
         }
         showDialog(
           context: context,
@@ -65,7 +66,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.6,
@@ -87,7 +88,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   border: const OutlineInputBorder(),
                   labelText: 'username'.tr,
                 ),
-                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                onTapOutside: (_) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -101,7 +103,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   border: const OutlineInputBorder(),
                   labelText: 'password'.tr,
                 ),
-                onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                onTapOutside: (_) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 onSubmitted: (_) => performAction(context),
               ),
               const SizedBox(height: 16),

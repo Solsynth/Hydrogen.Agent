@@ -35,7 +35,8 @@ class AttachmentPublishingPopup extends StatefulWidget {
   });
 
   @override
-  State<AttachmentPublishingPopup> createState() => _AttachmentPublishingPopupState();
+  State<AttachmentPublishingPopup> createState() =>
+      _AttachmentPublishingPopupState();
 }
 
 class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
@@ -97,7 +98,8 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result == null) return;
 
     List<File> files = result.paths.map((path) => File(path!)).toList();
@@ -157,7 +159,8 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
     client.httpClient.addAuthenticator(auth.reqAuthenticator);
 
-    final filePayload = MultipartFile(await file.readAsBytes(), filename: basename(file.path));
+    final filePayload =
+        MultipartFile(await file.readAsBytes(), filename: basename(file.path));
     final fileAlt = basename(file.path).contains('.')
         ? basename(file.path).substring(0, basename(file.path).lastIndexOf('.'))
         : basename(file.path);
@@ -187,7 +190,17 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     if (bytes == 0) return '0 Bytes';
     const k = 1024;
     final dm = decimals < 0 ? 0 : decimals;
-    final sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+    final sizes = [
+      'Bytes',
+      'KiB',
+      'MiB',
+      'GiB',
+      'TiB',
+      'PiB',
+      'EiB',
+      'ZiB',
+      'YiB'
+    ];
     final i = (math.log(bytes) / math.log(k)).floor().toInt();
     return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
   }
@@ -240,7 +253,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
               'attachmentAdd'.tr,
               style: Theme.of(context).textTheme.headlineSmall,
             ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-            _isBusy ? const LinearProgressIndicator().animate().scaleX() : Container(),
+            if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
             Expanded(
               child: Builder(builder: (context) {
                 if (_isFirstTimeBusy && _isBusy) {
@@ -255,7 +268,8 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
                     final element = _attachments[index];
                     final fileType = element!.mimetype.split('/').first;
                     return Container(
-                      padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
+                      padding:
+                          const EdgeInsets.only(left: 16, right: 8, bottom: 16),
                       child: Row(
                         children: [
                           Expanded(
@@ -266,7 +280,8 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
                                   element.alt,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
@@ -287,12 +302,18 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
                                   return AttachmentEditingPopup(
                                     item: element,
                                     onDelete: () {
-                                      setState(() => _attachments.removeAt(index));
-                                      widget.onUpdate(_attachments.map((e) => e!.id).toList());
+                                      setState(
+                                          () => _attachments.removeAt(index));
+                                      widget.onUpdate(_attachments
+                                          .map((e) => e!.id)
+                                          .toList());
                                     },
                                     onUpdate: (item) {
-                                      setState(() => _attachments[index] = item);
-                                      widget.onUpdate(_attachments.map((e) => e!.id).toList());
+                                      setState(
+                                          () => _attachments[index] = item);
+                                      widget.onUpdate(_attachments
+                                          .map((e) => e!.id)
+                                          .toList());
                                     },
                                   );
                                 },
@@ -363,7 +384,11 @@ class AttachmentEditingPopup extends StatefulWidget {
   final Function onDelete;
   final Function(Attachment item) onUpdate;
 
-  const AttachmentEditingPopup({super.key, required this.item, required this.onDelete, required this.onUpdate});
+  const AttachmentEditingPopup(
+      {super.key,
+      required this.item,
+      required this.onDelete,
+      required this.onUpdate});
 
   @override
   State<AttachmentEditingPopup> createState() => _AttachmentEditingPopupState();
@@ -387,7 +412,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
     setState(() => _isBusy = true);
     var resp = await client.put('/api/attachments/${widget.item.id}', {
       'metadata': {
-        if (_hasAspectRatio) 'ratio': double.tryParse(_ratioController.value.text) ?? 1,
+        if (_hasAspectRatio)
+          'ratio': double.tryParse(_ratioController.value.text) ?? 1,
       },
       'alt': _altController.value.text,
       'usage': widget.item.usage,
@@ -426,7 +452,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
     _altController.text = widget.item.alt;
 
     if (['image', 'video'].contains(widget.item.mimetype.split('/').first)) {
-      _ratioController.text = widget.item.metadata?['ratio']?.toString() ?? 1.toString();
+      _ratioController.text =
+          widget.item.metadata?['ratio']?.toString() ?? 1.toString();
       _hasAspectRatio = true;
     }
   }
@@ -446,12 +473,11 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _isBusy
-                ? ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: const LinearProgressIndicator().animate().scaleX(),
-                  )
-                : Container(),
+            if (_isBusy)
+              ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: const LinearProgressIndicator().animate().scaleX(),
+              ),
             const SizedBox(height: 18),
             TextField(
               controller: _altController,
@@ -461,7 +487,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
                 border: const OutlineInputBorder(),
                 labelText: 'attachmentAlt'.tr,
               ),
-              onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+              onTapOutside: (_) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -473,7 +500,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
                 border: const OutlineInputBorder(),
                 labelText: 'aspectRatio'.tr,
               ),
-              onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+              onTapOutside: (_) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
             ),
             const SizedBox(height: 5),
             SingleChildScrollView(
@@ -483,7 +511,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
                 runSpacing: 0,
                 children: [
                   ActionChip(
-                    avatar: Icon(Icons.square_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    avatar: Icon(Icons.square_rounded,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                     label: Text('aspectRatioSquare'.tr),
                     onPressed: () {
                       if (_hasAspectRatio) {
@@ -492,20 +521,24 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
                     },
                   ),
                   ActionChip(
-                    avatar: Icon(Icons.portrait, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    avatar: Icon(Icons.portrait,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                     label: Text('aspectRatioPortrait'.tr),
                     onPressed: () {
                       if (_hasAspectRatio) {
-                        setState(() => _ratioController.text = (9 / 16).toString());
+                        setState(
+                            () => _ratioController.text = (9 / 16).toString());
                       }
                     },
                   ),
                   ActionChip(
-                    avatar: Icon(Icons.landscape, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    avatar: Icon(Icons.landscape,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                     label: Text('aspectRatioLandscape'.tr),
                     onPressed: () {
                       if (_hasAspectRatio) {
-                        setState(() => _ratioController.text = (16 / 9).toString());
+                        setState(
+                            () => _ratioController.text = (16 / 9).toString());
                       }
                     },
                   ),
@@ -514,7 +547,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
             ),
             Card(
               child: CheckboxListTile(
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
                 title: Text('matureContent'.tr),
                 secondary: const Icon(Icons.visibility_off),
                 value: _isMature,
@@ -530,7 +564,8 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: <Widget>[
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+          style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error),
           onPressed: () {
             deleteAttachment().then((_) {
               Navigator.pop(context);
@@ -542,7 +577,9 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: TextButton.styleFrom(
+                  foregroundColor:
+                      Theme.of(context).colorScheme.onSurfaceVariant),
               onPressed: () => Navigator.pop(context),
               child: Text('cancel'.tr),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/content/attachment_item.dart';
-import 'package:solian/services.dart';
 
 class AttachmentListFullscreen extends StatefulWidget {
   final Attachment attachment;
@@ -9,7 +8,8 @@ class AttachmentListFullscreen extends StatefulWidget {
   const AttachmentListFullscreen({super.key, required this.attachment});
 
   @override
-  State<AttachmentListFullscreen> createState() => _AttachmentListFullscreenState();
+  State<AttachmentListFullscreen> createState() =>
+      _AttachmentListFullscreenState();
 }
 
 class _AttachmentListFullscreenState extends State<AttachmentListFullscreen> {
@@ -21,7 +21,7 @@ class _AttachmentListFullscreenState extends State<AttachmentListFullscreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: GestureDetector(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,

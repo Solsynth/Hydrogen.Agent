@@ -10,7 +10,8 @@ abstract class AppRouter {
   static GoRouter instance = GoRouter(
     routes: [
       ShellRoute(
-        builder: (context, state, child) => NavShell(state: state, child: child),
+        builder: (context, state, child) =>
+            NavShell(state: state, child: child),
         routes: [
           GoRoute(
             path: "/",
@@ -37,7 +38,15 @@ abstract class AppRouter {
       GoRoute(
         path: "/posts/publish",
         name: "postPublishing",
-        builder: (context, state) => const PostPublishingScreen(),
+        builder: (context, state) {
+          final arguments = state.extra as PostPublishingArguments?;
+          return PostPublishingScreen(
+            edit: arguments?.edit,
+            reply: arguments?.reply,
+            repost: arguments?.repost,
+            realm: state.uri.queryParameters['realm'],
+          );
+        },
       ),
     ],
   );

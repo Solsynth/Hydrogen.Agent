@@ -98,7 +98,8 @@ class _AttachmentListState extends State<AttachmentList> {
       return AspectRatio(
         aspectRatio: _aspectRatio,
         child: Container(
-          decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant),
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh),
           child: const Center(
             child: CircularProgressIndicator(),
           ),
@@ -118,14 +119,18 @@ class _AttachmentListState extends State<AttachmentList> {
         return GestureDetector(
           child: Container(
             width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceVariant),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            ),
             child: Stack(
               fit: StackFit.expand,
               children: [
                 AttachmentItem(
                   key: Key('a${element!.uuid}'),
                   item: element,
-                  badge: _attachmentsMeta.length > 1 ? '${idx + 1}/${_attachmentsMeta.length}' : null,
+                  badge: _attachmentsMeta.length > 1
+                      ? '${idx + 1}/${_attachmentsMeta.length}'
+                      : null,
                   showHideButton: !element.isMature || _showMature,
                   onHide: () {
                     setState(() => _showMature = false);
@@ -147,11 +152,15 @@ class _AttachmentListState extends State<AttachmentList> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.visibility_off, color: Colors.white, size: 32),
+                          const Icon(Icons.visibility_off,
+                              color: Colors.white, size: 32),
                           const SizedBox(height: 8),
                           Text(
                             'matureContent'.tr,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
                           ),
                           Text(
                             'matureContentCaption'.tr,

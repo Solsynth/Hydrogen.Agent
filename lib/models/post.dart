@@ -56,19 +56,25 @@ class Post {
         id: json["id"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"] != null ? DateTime.parse(json['deleted_at']) : null,
+        deletedAt: json["deleted_at"] != null
+            ? DateTime.parse(json['deleted_at'])
+            : null,
         alias: json["alias"],
         content: json["content"],
         tags: json["tags"],
         categories: json["categories"],
         reactions: json["reactions"],
         replies: json["replies"],
-        attachments: json["attachments"] != null ? List<int>.from(json["attachments"]) : null,
+        attachments: json["attachments"] != null
+            ? List<int>.from(json["attachments"])
+            : null,
         replyId: json["reply_id"],
         repostId: json["repost_id"],
         realmId: json["realm_id"],
-        replyTo: json["reply_to"] == null ? null : Post.fromJson(json["reply_to"]),
-        repostTo: json["repost_to"],
+        replyTo:
+            json["reply_to"] != null ? Post.fromJson(json["reply_to"]) : null,
+        repostTo:
+            json["repost_to"] != null ? Post.fromJson(json["repost_to"]) : null,
         realm: json["realm"],
         publishedAt: json["published_at"],
         authorId: json["author_id"],
@@ -77,8 +83,10 @@ class Post {
         reactionCount: json["reaction_count"],
         reactionList: json["reaction_list"] != null
             ? json["reaction_list"]
-                .map((key, value) =>
-                    MapEntry(key, int.tryParse(value.toString()) ?? (value is double ? value.toInt() : null)))
+                .map((key, value) => MapEntry(
+                    key,
+                    int.tryParse(value.toString()) ??
+                        (value is double ? value.toInt() : null)))
                 .cast<String, int>()
             : {},
       );
@@ -99,7 +107,7 @@ class Post {
         "repost_id": repostId,
         "realm_id": realmId,
         "reply_to": replyTo?.toJson(),
-        "repost_to": repostTo,
+        "repost_to": repostTo?.toJson(),
         "realm": realm,
         "published_at": publishedAt,
         "author_id": authorId,

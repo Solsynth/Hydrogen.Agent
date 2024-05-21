@@ -5,13 +5,18 @@ import 'package:get/get_utils/get_utils.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
-import 'package:solian/widgets/posts/post_action.dart';
+import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:timeago/timeago.dart' show format;
 
 class PostItem extends StatefulWidget {
   final Post item;
+  final bool isReactable;
 
-  const PostItem({super.key, required this.item});
+  const PostItem({
+    super.key,
+    required this.item,
+    this.isReactable = true,
+  });
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -45,7 +50,8 @@ class _PostItemState extends State<PostItem> {
                         item.author.nick,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ).paddingOnly(left: 12),
-                      Text(format(item.createdAt, locale: 'en_short')).paddingOnly(left: 4),
+                      Text(format(item.createdAt, locale: 'en_short'))
+                          .paddingOnly(left: 4),
                     ],
                   ),
                   Markdown(
@@ -59,17 +65,19 @@ class _PostItemState extends State<PostItem> {
             )
           ],
         ).paddingOnly(
-          top: 18,
+          top: 10,
           bottom: hasAttachment ? 10 : 0,
           right: 16,
           left: 16,
         ),
         AttachmentList(attachmentsId: item.attachments ?? List.empty()),
         PostQuickAction(
+          isReactable: widget.isReactable,
           item: widget.item,
           onReact: (symbol, changes) {
             setState(() {
-              item.reactionList[symbol] = (item.reactionList[symbol] ?? 0) + changes;
+              item.reactionList[symbol] =
+                  (item.reactionList[symbol] ?? 0) + changes;
             });
           },
         ).paddingOnly(

@@ -22,7 +22,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final AuthProvider provider = Get.find();
 
     return Material(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: FutureBuilder(
         future: provider.isAuthorized,
         builder: (context, snapshot) {
@@ -103,8 +103,10 @@ class AccountNameCard extends StatelessWidget {
         return Material(
           elevation: 2,
           child: ListTile(
-            contentPadding: const EdgeInsets.only(left: 22, right: 34, top: 4, bottom: 4),
-            leading: AccountAvatar(content: snapshot.data!.body?['avatar'], radius: 24),
+            contentPadding:
+                const EdgeInsets.only(left: 22, right: 34, top: 4, bottom: 4),
+            leading: AccountAvatar(
+                content: snapshot.data!.body?['avatar'], radius: 24),
             title: Text(snapshot.data!.body?['nick']),
             subtitle: Text(snapshot.data!.body?['email']),
           ),

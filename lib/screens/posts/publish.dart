@@ -2,15 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/shells/nav_shell.dart' as shell;
 import 'package:solian/widgets/attachments/attachment_publish.dart';
+import 'package:solian/widgets/posts/post_item.dart';
+
+class PostPublishingArguments {
+  final Post? edit;
+  final Post? reply;
+  final Post? repost;
+
+  PostPublishingArguments({this.edit, this.reply, this.repost});
+}
 
 class PostPublishingScreen extends StatefulWidget {
-  const PostPublishingScreen({super.key});
+  final Post? edit;
+  final Post? reply;
+  final Post? repost;
+  final String? realm;
+
+  const PostPublishingScreen({
+    super.key,
+    this.edit,
+    this.reply,
+    this.repost,
+    this.realm,
+  });
 
   @override
   State<PostPublishingScreen> createState() => _PostPublishingScreenState();
@@ -45,10 +66,20 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
     client.httpClient.addAuthenticator(auth.reqAuthenticator);
 
-    final resp = await client.post('/api/posts', {
+    final payload = {
       'content': _contentController.value.text,
       'attachments': _attachments,
-    });
+      if (widget.edit != null) 'alias': widget.edit!.alias,
+      if (widget.reply != null) 'reply_to': widget.reply!.id,
+      if (widget.repost != null) 'repost_to': widget.repost!.id,
+    };
+
+    Response resp;
+    if (widget.edit != null) {
+      resp = await client.put('/api/posts/${widget.edit!.id}', payload);
+    } else {
+      resp = await client.post('/api/posts', payload);
+    }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else {
@@ -58,12 +89,36 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
     setState(() => _isSubmitting = false);
   }
 
+  void syncWidget() {
+    if (widget.edit != null) {
+      _contentController.text = widget.edit!.content;
+      _attachments = widget.edit!.attachments ?? List.empty();
+    }
+  }
+
+  void cancelAction() {
+    AppRouter.instance.pop();
+  }
+
+  @override
+  void initState() {
+    syncWidget();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
 
+    final notifyBannerActions = [
+      TextButton(
+        onPressed: cancelAction,
+        child: Text('cancel'.tr),
+      )
+    ];
+
     return Material(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
           title: Text('postPublishing'.tr),
@@ -79,13 +134,84 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
           top: false,
           child: Column(
             children: [
-              _isSubmitting ? const LinearProgressIndicator().animate().scaleX() : Container(),
+              if (_isSubmitting)
+                const LinearProgressIndicator().animate().scaleX(),
+              if (widget.edit != null)
+                MaterialBanner(
+                  leading: const Icon(Icons.edit),
+                  leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                  dividerColor: Colors.transparent,
+                  content: Text('postEditingNotify'.tr),
+                  actions: notifyBannerActions,
+                ),
+              if (widget.reply != null)
+                Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  child: Column(
+                    children: [
+                      MaterialBanner(
+                        leading: const Icon(Icons.reply),
+                        leadingPadding:
+                            const EdgeInsets.only(left: 10, right: 20),
+                        backgroundColor: Colors.transparent,
+                        dividerColor: Colors.transparent,
+                        content: Text(
+                          'postReplyingNotify'.trParams(
+                            {'username': '@${widget.reply!.author.name}'},
+                          ),
+                        ),
+                        actions: notifyBannerActions,
+                      ),
+                      const Divider(thickness: 0.3, height: 0.3),
+                      Container(
+                        constraints: const BoxConstraints(maxHeight: 280),
+                        child: SingleChildScrollView(
+                          child: PostItem(
+                            item: widget.reply!,
+                            isReactable: false,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (widget.repost != null)
+                Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  child: Column(
+                    children: [
+                      MaterialBanner(
+                        leading: const Icon(Icons.redo),
+                        leadingPadding:
+                            const EdgeInsets.only(left: 10, right: 20),
+                        dividerColor: Colors.transparent,
+                        content: Text(
+                          'postRepostingNotify'.trParams(
+                            {'username': '@${widget.repost!.author.name}'},
+                          ),
+                        ),
+                        actions: notifyBannerActions,
+                      ),
+                      const Divider(thickness: 0.3, height: 0.3),
+                      Container(
+                        constraints: const BoxConstraints(maxHeight: 280),
+                        child: SingleChildScrollView(
+                          child: PostItem(
+                            item: widget.repost!,
+                            isReactable: false,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               FutureBuilder(
                 future: auth.getProfile(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListTile(
-                      leading: AccountAvatar(content: snapshot.data?.body!['avatar'], radius: 22),
+                      leading: AccountAvatar(
+                          content: snapshot.data?.body!['avatar'], radius: 22),
                       title: Text(snapshot.data?.body!['nick']),
                       subtitle: Text('postIdentityNotify'.tr),
                     );
@@ -97,7 +223,8 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
               const Divider(thickness: 0.3),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: TextField(
                     maxLines: null,
                     autofocus: true,
@@ -107,7 +234,8 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                     decoration: InputDecoration.collapsed(
                       hintText: 'postContentPlaceholder'.tr,
                     ),
-                    onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
                   ),
                 ),
               ),
@@ -115,7 +243,8 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                 constraints: const BoxConstraints(minHeight: 56),
                 decoration: BoxDecoration(
                   border: Border(
-                    top: BorderSide(width: 0.3, color: Theme.of(context).dividerColor),
+                    top: BorderSide(
+                        width: 0.3, color: Theme.of(context).dividerColor),
                   ),
                 ),
                 child: Row(
