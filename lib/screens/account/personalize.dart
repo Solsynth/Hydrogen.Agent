@@ -37,15 +37,14 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   void selectBirthday() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _birthday,
+      initialDate: _birthday?.toLocal(),
       firstDate: DateTime(DateTime.now().year - 200),
-      lastDate: DateTime(DateTime.now().year + 200),
+      lastDate: DateTime(DateTime.now().year),
     );
     if (picked != null && picked != _birthday) {
       setState(() {
         _birthday = picked;
-        _birthdayController.text =
-            DateFormat('yyyy-MM-dd hh:mm').format(_birthday!);
+        _birthdayController.text = DateFormat('yyyy-MM-dd').format(_birthday!);
       });
     }
   }
@@ -66,7 +65,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       if (prof.body['profile']['birthday'] != null) {
         _birthday = DateTime.parse(prof.body['profile']['birthday']);
         _birthdayController.text =
-            DateFormat('yyyy-MM-dd hh:mm').format(_birthday!);
+            DateFormat('yyyy-MM-dd').format(_birthday!.toLocal());
       }
 
       _isBusy = false;
@@ -109,7 +108,37 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     );
     if (resp.statusCode == 200) {
       syncWidget();
+      context.showSnackbar('accountPersonalizeApplied'.tr);
+    } else {
+      context.showErrorDialog(resp.bodyString);
+    }
 
+    setState(() => _isBusy = false);
+  }
+
+  void updatePersonalize() async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) return;
+
+    setState(() => _isBusy = true);
+
+    final client = GetConnect();
+    client.httpClient.baseUrl = ServiceFinder.services['passport'];
+    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+
+    _birthday?.toIso8601String();
+    final resp = await client.put(
+      '/api/users/me',
+      {
+        'nick': _nicknameController.value.text,
+        'description': _descriptionController.value.text,
+        'first_name': _firstNameController.value.text,
+        'last_name': _lastNameController.value.text,
+        'birthday': _birthday?.toUtc().toIso8601String(),
+      },
+    );
+    if (resp.statusCode == 200) {
+      syncWidget();
       context.showSnackbar('accountPersonalizeApplied'.tr);
     } else {
       context.showErrorDialog(resp.bodyString);
@@ -277,11 +306,11 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: null,
+                  onPressed: _isBusy ? null : () => syncWidget(),
                   child: Text('reset'.tr),
                 ),
                 ElevatedButton(
-                  onPressed: null,
+                  onPressed: _isBusy ? null : () => updatePersonalize(),
                   child: Text('apply'.tr),
                 ),
               ],

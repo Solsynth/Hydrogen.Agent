@@ -109,6 +109,7 @@ class AuthProvider extends GetConnect {
     }
 
     final resp = await get('/api/users/me');
+    print(resp.body['picture']);
     _cacheUserProfileResponse = resp;
     return resp;
   }
