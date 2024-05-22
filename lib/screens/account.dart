@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -15,8 +16,12 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     final actionItems = [
-      // (const Icon(Icons.color_lens), 'personalize'.tr, 'account.personalize'),
-      // (const Icon(Icons.diversity_1), 'friend'.tr, 'account.friend'),
+      (
+        const Icon(Icons.color_lens),
+        'accountPersonalize'.tr,
+        'accountPersonalize'
+      ),
+      (const Icon(Icons.diversity_1), 'accountFriend'.tr, 'accountFriend'),
     ];
 
     final AuthProvider provider = Get.find();
@@ -101,14 +106,19 @@ class AccountNameCard extends StatelessWidget {
         }
 
         return Material(
-          elevation: 2,
-          child: ListTile(
-            contentPadding:
-                const EdgeInsets.only(left: 22, right: 34, top: 4, bottom: 4),
-            leading: AccountAvatar(
-                content: snapshot.data!.body?['avatar'], radius: 24),
-            title: Text(snapshot.data!.body?['nick']),
-            subtitle: Text(snapshot.data!.body?['email']),
+          child: Card(
+            child: ListTile(
+              contentPadding:
+                  const EdgeInsets.only(left: 22, right: 34, top: 4, bottom: 4),
+              leading: AccountAvatar(
+                  content: snapshot.data!.body?['avatar'], radius: 24),
+              title: Text(snapshot.data!.body?['nick']),
+              subtitle: Text(snapshot.data!.body?['email']),
+            ),
+          ).paddingOnly(
+            left: 16,
+            right: 16,
+            top: SolianTheme.isLargeScreen(context) ? 8 : 0,
           ),
         );
       },

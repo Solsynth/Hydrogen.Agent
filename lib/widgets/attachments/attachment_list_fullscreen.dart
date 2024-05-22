@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solian/models/attachment.dart';
-import 'package:solian/providers/content/attachment_item.dart';
+import 'package:solian/widgets/attachments/attachment_item.dart';
 
 class AttachmentListFullscreen extends StatefulWidget {
   final Attachment attachment;

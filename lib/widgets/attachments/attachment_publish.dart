@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
@@ -8,19 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:crypto/crypto.dart';
-import 'package:solian/providers/content/attachment_list.dart';
-import 'package:solian/services.dart';
-
-Future<String> calculateFileSha256(File file) async {
-  final bytes = await file.readAsBytes();
-  final digest = await Isolate.run(() => sha256.convert(bytes));
-  return digest.toString();
-}
+import 'package:solian/providers/content/attachment.dart';
 
 class AttachmentPublishingPopup extends StatefulWidget {
   final String usage;
@@ -59,11 +48,13 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     for (final media in medias) {
       final file = File(media.path);
       final hash = await calculateFileSha256(file);
-      final image = await decodeImageFromList(await file.readAsBytes());
-      final ratio = image.width / image.height;
 
       try {
-        await uploadAttachment(file, hash, ratio: ratio);
+        await uploadAttachment(
+          file,
+          hash,
+          ratio: await calculateFileAspectRatio(file),
+        );
       } catch (err) {
         this.context.showErrorDialog(err);
       }
@@ -102,9 +93,9 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
         await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result == null) return;
 
-    List<File> files = result.paths.map((path) => File(path!)).toList();
-
     setState(() => _isBusy = true);
+
+    List<File> files = result.paths.map((path) => File(path!)).toList();
 
     for (final file in files) {
       final hash = await calculateFileSha256(file);
@@ -139,8 +130,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     if (isVideo) {
       ratio = 16 / 9;
     } else {
-      final image = await decodeImageFromList(await file.readAsBytes());
-      ratio = image.width / image.height;
+      ratio = await calculateFileAspectRatio(file);
     }
 
     try {
@@ -153,36 +143,19 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
   }
 
   Future<void> uploadAttachment(File file, String hash, {double? ratio}) async {
-    final AuthProvider auth = Get.find();
-
-    final client = GetConnect();
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
-
-    final filePayload =
-        MultipartFile(await file.readAsBytes(), filename: basename(file.path));
-    final fileAlt = basename(file.path).contains('.')
-        ? basename(file.path).substring(0, basename(file.path).lastIndexOf('.'))
-        : basename(file.path);
-
-    final resp = await client.post(
-      '/api/attachments',
-      FormData({
-        'alt': fileAlt,
-        'file': filePayload,
-        'hash': hash,
-        'usage': widget.usage,
-        'metadata': jsonEncode({
-          if (ratio != null) 'ratio': ratio,
-        }),
-      }),
-    );
-    if (resp.statusCode == 200) {
+    final AttachmentProvider provider = Get.find();
+    try {
+      final resp = await provider.createAttachment(
+        file,
+        hash,
+        widget.usage,
+        ratio: ratio,
+      );
       var result = Attachment.fromJson(resp.body);
       setState(() => _attachments.add(result));
       widget.onUpdate(_attachments.map((e) => e!.id).toList());
-    } else {
-      throw Exception(resp.bodyString);
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -206,7 +179,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
   }
 
   void revertMetadataList() {
-    final AttachmentListProvider provider = Get.find();
+    final AttachmentProvider provider = Get.find();
 
     if (widget.current.isEmpty) {
       _isFirstTimeBusy = false;
@@ -299,7 +272,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
                               showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return AttachmentEditingPopup(
+                                  return AttachmentEditingDialog(
                                     item: element,
                                     onDelete: () {
                                       setState(
@@ -379,22 +352,23 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
   }
 }
 
-class AttachmentEditingPopup extends StatefulWidget {
+class AttachmentEditingDialog extends StatefulWidget {
   final Attachment item;
   final Function onDelete;
   final Function(Attachment item) onUpdate;
 
-  const AttachmentEditingPopup(
+  const AttachmentEditingDialog(
       {super.key,
       required this.item,
       required this.onDelete,
       required this.onUpdate});
 
   @override
-  State<AttachmentEditingPopup> createState() => _AttachmentEditingPopupState();
+  State<AttachmentEditingDialog> createState() =>
+      _AttachmentEditingDialogState();
 }
 
-class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
+class _AttachmentEditingDialogState extends State<AttachmentEditingDialog> {
   final _ratioController = TextEditingController();
   final _altController = TextEditingController();
 
@@ -402,49 +376,40 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
   bool _isMature = false;
   bool _hasAspectRatio = false;
 
-  Future<Attachment?> applyAttachment() async {
-    final AuthProvider auth = Get.find();
-
-    final client = GetConnect();
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+  Future<Attachment?> updateAttachment() async {
+    final AttachmentProvider provider = Get.find();
 
     setState(() => _isBusy = true);
-    var resp = await client.put('/api/attachments/${widget.item.id}', {
-      'metadata': {
-        if (_hasAspectRatio)
-          'ratio': double.tryParse(_ratioController.value.text) ?? 1,
-      },
-      'alt': _altController.value.text,
-      'usage': widget.item.usage,
-      'is_mature': _isMature,
-    });
-
-    setState(() => _isBusy = false);
-
-    if (resp.statusCode != 200) {
-      this.context.showErrorDialog(resp.bodyString);
-      return null;
-    } else {
+    try {
+      final resp = await provider.updateAttachment(
+        widget.item.id,
+        _altController.value.text,
+        widget.item.usage,
+        ratio: _hasAspectRatio
+            ? (double.tryParse(_ratioController.value.text) ?? 1)
+            : null,
+        isMature: _isMature,
+      );
       return Attachment.fromJson(resp.body);
+    } catch (e) {
+      this.context.showErrorDialog(e);
+      return null;
+    } finally {
+      setState(() => _isBusy = false);
     }
   }
 
   Future<void> deleteAttachment() async {
-    final AuthProvider auth = Get.find();
-
-    final client = GetConnect();
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
-
     setState(() => _isBusy = true);
-    var resp = await client.delete('/api/attachments/${widget.item.id}');
-    if (resp.statusCode == 200) {
+    try {
+      final AttachmentProvider provider = Get.find();
+      await provider.deleteAttachment(widget.item.id);
       widget.onDelete();
-    } else {
-      this.context.showErrorDialog(resp.bodyString);
+    } catch (e) {
+      this.context.showErrorDialog(e);
+    } finally {
+      setState(() => _isBusy = false);
     }
-    setState(() => _isBusy = false);
   }
 
   void syncWidget() {
@@ -586,7 +551,7 @@ class _AttachmentEditingPopupState extends State<AttachmentEditingPopup> {
             TextButton(
               child: Text('apply'.tr),
               onPressed: () {
-                applyAttachment().then((value) {
+                updateAttachment().then((value) {
                   if (value != null) {
                     widget.onUpdate(value);
                     Navigator.pop(context);

@@ -4,8 +4,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
-import 'package:solian/providers/content/attachment_item.dart';
-import 'package:solian/providers/content/attachment_list.dart';
+import 'package:solian/widgets/attachments/attachment_item.dart';
+import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_list_fullscreen.dart';
 
 class AttachmentList extends StatefulWidget {
@@ -26,7 +26,7 @@ class _AttachmentListState extends State<AttachmentList> {
   List<Attachment?> _attachmentsMeta = List.empty();
 
   void getMetadataList() {
-    final AttachmentListProvider provider = Get.find();
+    final AttachmentProvider provider = Get.find();
 
     if (widget.attachmentsId.isEmpty) {
       return;

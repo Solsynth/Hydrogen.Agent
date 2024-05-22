@@ -7,9 +7,9 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
-import 'package:solian/shells/nav_shell.dart' as shell;
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
+import 'package:solian/widgets/prev_page.dart';
 
 class PostPublishingArguments {
   final Post? edit;
@@ -122,7 +122,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('postPublishing'.tr),
-          leading: const shell.BackButton(),
+          leading: const PrevPageButton(),
           actions: [
             TextButton(
               child: Text('postAction'.tr.toUpperCase()),

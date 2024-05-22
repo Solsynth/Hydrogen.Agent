@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:solian/screens/account.dart';
+import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/screens/posts/publish.dart';
+import 'package:solian/shells/basic_shell.dart';
 import 'package:solian/shells/nav_shell.dart';
 
 abstract class AppRouter {
@@ -14,30 +16,41 @@ abstract class AppRouter {
             NavShell(state: state, child: child),
         routes: [
           GoRoute(
-            path: "/",
-            name: "home",
+            path: '/',
+            name: 'home',
             builder: (context, state) => const HomeScreen(),
           ),
           GoRoute(
-            path: "/account",
-            name: "account",
+            path: '/account',
+            name: 'account',
             builder: (context, state) => const AccountScreen(),
           ),
+        ],
+      ),
+      ShellRoute(
+        builder: (context, state, child) =>
+            BasicShell(state: state, child: child),
+        routes: [
           GoRoute(
-            path: "/auth/sign-in",
-            name: "signin",
+            path: '/account/personalize',
+            name: 'accountPersonalize',
+            builder: (context, state) => const PersonalizeScreen(),
+          ),
+          GoRoute(
+            path: '/auth/sign-in',
+            name: 'signin',
             builder: (context, state) => const SignInScreen(),
           ),
           GoRoute(
-            path: "/auth/sign-up",
-            name: "signup",
+            path: '/auth/sign-up',
+            name: 'signup',
             builder: (context, state) => const SignUpScreen(),
           ),
         ],
       ),
       GoRoute(
-        path: "/posts/publish",
-        name: "postPublishing",
+        path: '/posts/publish',
+        name: 'postPublishing',
         builder: (context, state) {
           final arguments = state.extra as PostPublishingArguments?;
           return PostPublishingScreen(
