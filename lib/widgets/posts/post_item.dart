@@ -10,11 +10,13 @@ import 'package:timeago/timeago.dart' show format;
 
 class PostItem extends StatefulWidget {
   final Post item;
+  final bool isCompact;
   final bool isReactable;
 
   const PostItem({
     super.key,
     required this.item,
+    this.isCompact = false,
     this.isReactable = true,
   });
 
@@ -31,9 +33,103 @@ class _PostItemState extends State<PostItem> {
     super.initState();
   }
 
+  Widget buildReply(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.reply,
+              size: 18,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+            ),
+            Text(
+              'postRepliedNotify'.trParams(
+                {'username': '@${widget.item.author.name}'},
+              ),
+              style: TextStyle(
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+              ),
+            ).paddingOnly(left: 6),
+          ],
+        ).paddingOnly(left: 12),
+        Card(
+          elevation: 1,
+          child: PostItem(
+            item: widget.item.replyTo!,
+            isCompact: true,
+          ).paddingSymmetric(vertical: 8),
+        ),
+      ],
+    );
+  }
+
+  Widget buildRepost(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.redo,
+              size: 18,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+            ),
+            Text(
+              'postRepostedNotify'.trParams(
+                {'username': '@${widget.item.author.name}'},
+              ),
+              style: TextStyle(
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+              ),
+            ).paddingOnly(left: 6),
+          ],
+        ).paddingOnly(left: 12),
+        Card(
+          elevation: 1,
+          child: PostItem(
+            item: widget.item.repostTo!,
+            isCompact: true,
+          ).paddingSymmetric(vertical: 8),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasAttachment = item.attachments?.isNotEmpty ?? false;
+
+    if (widget.isCompact) {
+      return Column(
+        children: [
+          Row(
+            children: [
+              AccountAvatar(content: item.author.avatar.toString(), radius: 10),
+              Text(
+                item.author.nick,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ).paddingOnly(left: 6),
+              Text(format(item.createdAt, locale: 'en_short'))
+                  .paddingOnly(left: 4),
+            ],
+          ).paddingSymmetric(horizontal: 12),
+          Markdown(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            data: item.content,
+            padding: const EdgeInsets.all(0),
+          ).paddingOnly(
+            left: 16,
+            right: 12,
+            top: 2,
+            bottom: hasAttachment ? 4 : 0,
+          ),
+          AttachmentList(attachmentsId: item.attachments ?? List.empty()),
+        ],
+      );
+    }
 
     return Column(
       children: [
@@ -54,6 +150,8 @@ class _PostItemState extends State<PostItem> {
                           .paddingOnly(left: 4),
                     ],
                   ),
+                  if (widget.item.replyTo != null) buildReply(context),
+                  if (widget.item.repostTo != null) buildRepost(context),
                   Markdown(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

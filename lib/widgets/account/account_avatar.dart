@@ -6,7 +6,8 @@ class AccountAvatar extends StatelessWidget {
   final Color? color;
   final double? radius;
 
-  const AccountAvatar({super.key, required this.content, this.color, this.radius});
+  const AccountAvatar(
+      {super.key, required this.content, this.color, this.radius});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +22,19 @@ class AccountAvatar extends StatelessWidget {
       key: Key('a$content'),
       radius: radius,
       backgroundColor: color,
-      backgroundImage: !isEmpty ? NetworkImage(
-        direct ? content : '${ServiceFinder.services['paperclip']}/api/attachments/$content',
-      ) : null,
-      child: isEmpty ? const Icon(Icons.account_circle) : null,
+      backgroundImage: !isEmpty
+          ? NetworkImage(
+              direct
+                  ? content
+                  : '${ServiceFinder.services['paperclip']}/api/attachments/$content',
+            )
+          : null,
+      child: isEmpty
+          ? Icon(
+              Icons.account_circle,
+              size: radius != null ? radius! * 1.2 : 24,
+            )
+          : null,
     );
   }
 }
