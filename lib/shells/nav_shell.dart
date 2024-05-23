@@ -8,24 +8,32 @@ import 'package:solian/widgets/navigation/app_navigation_bottom_bar.dart';
 import 'package:solian/widgets/navigation/app_navigation_rail.dart';
 
 class NavShell extends StatelessWidget {
+  final bool showAppBar;
   final GoRouterState state;
   final Widget child;
 
-  const NavShell({super.key, required this.child, required this.state});
+  const NavShell({
+    super.key,
+    required this.child,
+    required this.state,
+    this.showAppBar = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     final canPop = AppRouter.instance.canPop();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(state.topRoute?.name?.tr ?? 'page'.tr),
-        centerTitle: false,
-        titleSpacing: canPop ? null : 24,
-        elevation: SolianTheme.isLargeScreen(context) ? 1 : 0,
-        leading: canPop ? const PrevPageButton() : null,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: showAppBar
+          ? AppBar(
+              title: Text(state.topRoute?.name?.tr ?? 'page'.tr),
+              centerTitle: false,
+              titleSpacing: canPop ? null : 24,
+              elevation: SolianTheme.isLargeScreen(context) ? 1 : 0,
+              leading: canPop ? const PrevPageButton() : null,
+              automaticallyImplyLeading: false,
+            )
+          : null,
       bottomNavigationBar: SolianTheme.isLargeScreen(context)
           ? null
           : const AppNavigationBottomBar(),

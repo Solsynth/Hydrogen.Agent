@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
@@ -100,25 +101,67 @@ class AccountNameCard extends StatelessWidget {
       future: provider.getProfile(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return Container();
         }
 
+        final prof = snapshot.data!;
         return Material(
-          child: Card(
-            child: ListTile(
-              contentPadding:
-                  const EdgeInsets.only(left: 22, right: 34, top: 4, bottom: 4),
-              leading: AccountAvatar(
-                  content: snapshot.data!.body?['avatar'], radius: 24),
-              title: Text(snapshot.data!.body?['nick']),
-              subtitle: Text(snapshot.data!.body?['email']),
-            ),
-          ).paddingOnly(
-            left: 16,
-            right: 16,
-            top: SolianTheme.isLargeScreen(context) ? 8 : 0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 16 / 7,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  fit: StackFit.expand,
+                  children: [
+                    if (prof.body['banner'] != null)
+                      Image.network(
+                        '${ServiceFinder.services['paperclip']}/api/attachments/${prof.body['banner']}',
+                        fit: BoxFit.cover,
+                      ),
+                    Positioned(
+                      bottom: -30,
+                      left: 18,
+                      child: AccountAvatar(
+                        content: prof.body['avatar'],
+                        radius: 48,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    prof.body['nick'],
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).paddingOnly(right: 4),
+                  Text(
+                    '@${prof.body['name']}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ).paddingOnly(left: 120, top: 8),
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  child: ListTile(
+                    title: Text('description'.tr),
+                    subtitle: Text(prof.body['description']?.isNotEmpty
+                        ? prof.body['description']
+                        : 'No description yet.'),
+                  ),
+                ),
+              ).paddingOnly(left: 24, right: 24, top: 8),
+            ],
           ),
         );
       },
