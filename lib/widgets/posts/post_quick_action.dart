@@ -50,7 +50,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     setState(() => _isSubmitting = true);
 

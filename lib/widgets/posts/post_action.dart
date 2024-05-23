@@ -156,7 +156,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     setState(() => _isBusy = true);
     final resp = await client.delete('/api/posts/${widget.item.id}');

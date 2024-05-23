@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/screens/auth/signin.dart';
+import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/services.dart';
-import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -42,7 +43,14 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: 'signin'.tr,
                     caption: 'signinCaption'.tr,
                     onTap: () {
-                      AppRouter.instance.pushNamed('signin').then((_) {
+                      showModalBottomSheet(
+                        useRootNavigator: true,
+                        isDismissible: false,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => const SignInPopup(),
+                      ).then((_) async {
+                        await provider.getProfile(noCache: true);
                         setState(() {});
                       });
                     },
@@ -52,7 +60,15 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: 'signup'.tr,
                     caption: 'signupCaption'.tr,
                     onTap: () {
-                      AppRouter.instance.pushNamed('signup');
+                      showModalBottomSheet(
+                        useRootNavigator: true,
+                        isDismissible: false,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => const SignUpPopup(),
+                      ).then((_) {
+                        setState(() {});
+                      });
                     },
                   ),
                 ],
@@ -69,7 +85,9 @@ class _AccountScreenState extends State<AccountScreen> {
                   leading: x.$1,
                   title: Text(x.$2),
                   onTap: () {
-                    AppRouter.instance.pushNamed(x.$3);
+                    AppRouter.instance
+                        .pushNamed(x.$3)
+                        .then((_) => setState(() {}));
                   },
                 ),
               )),
@@ -111,24 +129,27 @@ class AccountNameCard extends StatelessWidget {
             children: [
               AspectRatio(
                 aspectRatio: 16 / 7,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  fit: StackFit.expand,
-                  children: [
-                    if (prof.body['banner'] != null)
-                      Image.network(
-                        '${ServiceFinder.services['paperclip']}/api/attachments/${prof.body['banner']}',
-                        fit: BoxFit.cover,
+                child: Container(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    fit: StackFit.expand,
+                    children: [
+                      if (prof.body['banner'] != null)
+                        Image.network(
+                          '${ServiceFinder.services['paperclip']}/api/attachments/${prof.body['banner']}',
+                          fit: BoxFit.cover,
+                        ),
+                      Positioned(
+                        bottom: -30,
+                        left: 18,
+                        child: AccountAvatar(
+                          content: prof.body['avatar'],
+                          radius: 48,
+                        ),
                       ),
-                    Positioned(
-                      bottom: -30,
-                      left: 18,
-                      child: AccountAvatar(
-                        content: prof.body['avatar'],
-                        radius: 48,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Row(
@@ -155,9 +176,11 @@ class AccountNameCard extends StatelessWidget {
                 child: Card(
                   child: ListTile(
                     title: Text('description'.tr),
-                    subtitle: Text(prof.body['description']?.isNotEmpty
-                        ? prof.body['description']
-                        : 'No description yet.'),
+                    subtitle: Text(
+                      prof.body['description']?.isNotEmpty
+                          ? prof.body['description']
+                          : 'No description yet.',
+                    ),
                   ),
                 ),
               ).paddingOnly(left: 24, right: 24, top: 8),

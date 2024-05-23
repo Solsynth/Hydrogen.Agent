@@ -4,14 +4,14 @@ import 'package:solian/exts.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class SignUpPopup extends StatefulWidget {
+  const SignUpPopup({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<SignUpPopup> createState() => _SignUpPopupState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpPopupState extends State<SignUpPopup> {
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
   final _nicknameController = TextEditingController();
@@ -61,19 +61,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.6,
           constraints: const BoxConstraints(maxWidth: 360),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Image.asset('assets/logo.png', width: 72, height: 72),
-              ),
+              Image.asset('assets/logo.png', width: 64, height: 64)
+                  .paddingOnly(bottom: 4),
+              Text(
+                'signupGreeting'.tr,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
+              ).paddingOnly(left: 4, bottom: 16),
               TextField(
                 autocorrect: false,
                 enableSuggestions: false,
@@ -132,9 +138,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onSubmitted: (_) => performAction(context),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                child: Text('signup'.tr),
-                onPressed: () => performAction(context),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('next'.tr),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ),
+                  onPressed: () => performAction(context),
+                ),
               )
             ],
           ),

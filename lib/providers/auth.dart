@@ -9,13 +9,8 @@ import 'package:solian/services.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
 class AuthProvider extends GetConnect {
-  final deviceEndpoint = Uri.parse(
-      '${ServiceFinder.services['passport']}/api/notifications/subscribe');
   final tokenEndpoint =
       Uri.parse('${ServiceFinder.services['passport']}/api/auth/token');
-  final userinfoEndpoint =
-      Uri.parse('${ServiceFinder.services['passport']}/api/users/me');
-  final redirectUrl = Uri.parse('solian://auth');
 
   static const clientId = 'solian';
   static const clientSecret = '_F4%q2Eea3';
@@ -25,13 +20,12 @@ class AuthProvider extends GetConnect {
   @override
   void onInit() {
     httpClient.baseUrl = ServiceFinder.services['passport'];
-
-    applyAuthenticator();
+    loadCredentials();
   }
 
   oauth2.Credentials? credentials;
 
-  Future<Request<T?>> reqAuthenticator<T>(Request<T?> request) async {
+  Future<Request<T?>> requestAuthenticator<T>(Request<T?> request) async {
     if (credentials != null && credentials!.isExpired) {
       final resp = await post('/api/auth/token', {
         'refresh_token': credentials!.refreshToken,
@@ -48,7 +42,9 @@ class AuthProvider extends GetConnect {
         expiration: DateTime.now().add(const Duration(minutes: 3)),
       );
       storage.write(
-          key: 'auth_credentials', value: jsonEncode(credentials!.toJson()));
+        key: 'auth_credentials',
+        value: jsonEncode(credentials!.toJson()),
+      );
     }
 
     if (credentials != null) {
@@ -58,18 +54,20 @@ class AuthProvider extends GetConnect {
     return request;
   }
 
-  void applyAuthenticator() {
-    isAuthorized.then((status) async {
-      if (status) {
-        final content = await storage.read(key: 'auth_credentials');
-        credentials = oauth2.Credentials.fromJson(jsonDecode(content!));
-        httpClient.addAuthenticator(reqAuthenticator);
-      }
-    });
+  Future<void> loadCredentials() async {
+    if (await isAuthorized) {
+      final content = await storage.read(key: 'auth_credentials');
+      credentials = oauth2.Credentials.fromJson(jsonDecode(content!));
+    }
   }
 
   Future<oauth2.Credentials> signin(
-      BuildContext context, String username, String password) async {
+    BuildContext context,
+    String username,
+    String password,
+  ) async {
+    _cacheUserProfileResponse = null;
+
     final resp = await oauth2.resourceOwnerPasswordGrant(
       tokenEndpoint,
       username,
@@ -89,13 +87,16 @@ class AuthProvider extends GetConnect {
     );
 
     storage.write(
-        key: 'auth_credentials', value: jsonEncode(credentials!.toJson()));
-    applyAuthenticator();
+      key: 'auth_credentials',
+      value: jsonEncode(credentials!.toJson()),
+    );
 
     return credentials!;
   }
 
   void signout() {
+    _cacheUserProfileResponse = null;
+
     storage.deleteAll();
   }
 
@@ -108,7 +109,11 @@ class AuthProvider extends GetConnect {
       return _cacheUserProfileResponse!;
     }
 
-    final resp = await get('/api/users/me');
+    final client = GetConnect();
+    client.httpClient.baseUrl = ServiceFinder.services['passport'];
+    client.httpClient.addAuthenticator(requestAuthenticator);
+
+    final resp = await client.get('/api/users/me');
     _cacheUserProfileResponse = resp;
     return resp;
   }

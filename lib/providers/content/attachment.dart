@@ -39,7 +39,7 @@ class AttachmentProvider extends GetConnect {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     final filePayload =
         MultipartFile(await file.readAsBytes(), filename: basename(file.path));
@@ -78,7 +78,7 @@ class AttachmentProvider extends GetConnect {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     var resp = await client.put('/api/attachments/$id', {
       'metadata': {
@@ -102,7 +102,7 @@ class AttachmentProvider extends GetConnect {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     var resp = await client.delete('/api/attachments/$id');
     if (resp.statusCode != 200) {

@@ -65,7 +65,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     final payload = {
       'content': _contentController.value.text,

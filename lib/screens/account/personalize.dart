@@ -100,7 +100,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     final resp = await client.put(
       '/api/users/me/$position',
@@ -124,7 +124,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.reqAuthenticator);
+    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     _birthday?.toIso8601String();
     final resp = await client.put(

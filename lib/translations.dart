@@ -43,11 +43,13 @@ class SolianMessages extends Translations {
           'aspectRatioPortrait': 'Portrait',
           'aspectRatioLandscape': 'Landscape',
           'signin': 'Sign in',
+          'signinGreeting': 'Welcome back\nSolar Network',
           'signinCaption':
               'Sign in to create post, start a realm, message your friend and more!',
           'signinRiskDetected':
               'Risk detected, click Next to open a webpage and signin through it to pass security check.',
           'signup': 'Sign up',
+          'signupGreeting': 'Welcome onboard 👋',
           'signupCaption':
               'Create an account on Solarpass and then get the access of entire Solar Network!',
           'signout': 'Sign out',
@@ -119,9 +121,11 @@ class SolianMessages extends Translations {
           'aspectRatioPortrait': '竖型',
           'aspectRatioLandscape': '横型',
           'signin': '登录',
+          'signinGreeting': '欢迎回来\nSolar Network',
           'signinCaption': '登录以发表帖子、文章、创建领域、和你的朋友聊天，以及获取更多功能！',
           'signinRiskDetected': '检测到风险，点击下一步按钮来打开一个网页，并通过在其上面登录来通过安全检查。',
           'signup': '注册',
+          'signupGreeting': '欢迎加入\nSolar Network',
           'signupCaption': '在 Solarpass 注册一个账号以获得整个 Solar Network 的存取权！',
           'signout': '登出',
           'riskDetection': '检测到风险',

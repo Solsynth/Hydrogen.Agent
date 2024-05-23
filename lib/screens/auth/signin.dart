@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignInPopup extends StatefulWidget {
+  const SignInPopup({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignInPopup> createState() => _SignInPopupState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInPopupState extends State<SignInPopup> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -23,15 +22,16 @@ class _SignInScreenState extends State<SignInScreen> {
     final username = _usernameController.value.text;
     final password = _passwordController.value.text;
     if (username.isEmpty || password.isEmpty) return;
-    provider.signin(context, username, password).then((_) {
-      AppRouter.instance.pop(true);
+    provider.signin(context, username, password).then((_) async {
+      Navigator.pop(context, true);
     }).catchError((e) {
       List<String> messages = e.toString().split('\n');
       if (messages.last.contains('risk')) {
         final ticketId = RegExp(r'ticketId=(\d+)').firstMatch(messages.last);
         if (ticketId == null) {
           context.showErrorDialog(
-              'Requested to multi-factor authenticate, but the ticket id was not found');
+            'Requested to multi-factor authenticate, but the ticket id was not found',
+          );
         }
         showDialog(
           context: context,
@@ -46,9 +46,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     launchUrlString(
                       '${ServiceFinder.services['passport']}/mfa?ticket=${ticketId!.group(1)}',
                     );
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
+                    Navigator.pop(context);
                   },
                 )
               ],
@@ -56,28 +54,32 @@ class _SignInScreenState extends State<SignInScreen> {
           },
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(messages.last),
-        ));
+        context.showErrorDialog(messages.last);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.6,
           constraints: const BoxConstraints(maxWidth: 360),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Image.asset('assets/logo.png', width: 72, height: 72),
-              ),
+              Image.asset('assets/logo.png', width: 64, height: 64)
+                  .paddingOnly(bottom: 4),
+              Text(
+                'signinGreeting'.tr,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
+              ).paddingOnly(left: 4, bottom: 16),
               TextField(
                 autocorrect: false,
                 enableSuggestions: false,
@@ -107,10 +109,19 @@ class _SignInScreenState extends State<SignInScreen> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 onSubmitted: (_) => performAction(context),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                child: Text('signin'.tr),
-                onPressed: () => performAction(context),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('next'.tr),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ),
+                  onPressed: () => performAction(context),
+                ),
               )
             ],
           ),

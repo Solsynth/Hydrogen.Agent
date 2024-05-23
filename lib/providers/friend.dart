@@ -9,7 +9,7 @@ class FriendProvider extends GetConnect {
     final AuthProvider auth = Get.find();
 
     httpClient.baseUrl = ServiceFinder.services['passport'];
-    httpClient.addAuthenticator(auth.reqAuthenticator);
+    httpClient.addAuthenticator(auth.requestAuthenticator);
   }
 
   Future<Response> listFriendship() => get('/api/users/me/friends');

@@ -2,8 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
-import 'package:solian/screens/auth/signin.dart';
-import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/contact.dart';
 import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/publish.dart';
@@ -47,16 +45,6 @@ abstract class AppRouter {
             path: '/account/personalize',
             name: 'accountPersonalize',
             builder: (context, state) => const PersonalizeScreen(),
-          ),
-          GoRoute(
-            path: '/auth/sign-in',
-            name: 'signin',
-            builder: (context, state) => const SignInScreen(),
-          ),
-          GoRoute(
-            path: '/auth/sign-up',
-            name: 'signup',
-            builder: (context, state) => const SignUpScreen(),
           ),
         ],
       ),
