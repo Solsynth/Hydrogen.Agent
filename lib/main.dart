@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
+import 'package:solian/providers/friend.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
@@ -28,6 +29,7 @@ class SolianApp extends StatelessWidget {
       fallbackLocale: const Locale('en', 'US'),
       onInit: () {
         Get.lazyPut(() => AuthProvider());
+        Get.lazyPut(() => FriendProvider());
         Get.lazyPut(() => AttachmentProvider());
       },
       builder: (context, child) {

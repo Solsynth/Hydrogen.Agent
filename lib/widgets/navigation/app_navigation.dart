@@ -9,6 +9,11 @@ abstract class AppNavigation {
       page: 'social',
     ),
     AppNavigationDestination(
+      icon: const Icon(Icons.contacts),
+      label: 'contact'.tr,
+      page: 'contact',
+    ),
+    AppNavigationDestination(
       icon: const Icon(Icons.account_circle),
       label: 'account'.tr,
       page: 'account',

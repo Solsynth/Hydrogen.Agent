@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:solian/screens/account.dart';
+import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
+import 'package:solian/screens/contact.dart';
 import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/publish.dart';
 import 'package:solian/shells/basic_shell.dart';
@@ -21,6 +23,11 @@ abstract class AppRouter {
             builder: (context, state) => const SocialScreen(),
           ),
           GoRoute(
+            path: '/contact',
+            name: 'contact',
+            builder: (context, state) => const ContactScreen(),
+          ),
+          GoRoute(
             path: '/account',
             name: 'account',
             builder: (context, state) => const AccountScreen(),
@@ -31,6 +38,11 @@ abstract class AppRouter {
         builder: (context, state, child) =>
             BasicShell(state: state, child: child),
         routes: [
+          GoRoute(
+            path: '/account/friend',
+            name: 'accountFriend',
+            builder: (context, state) => const FriendScreen(),
+          ),
           GoRoute(
             path: '/account/personalize',
             name: 'accountPersonalize',
