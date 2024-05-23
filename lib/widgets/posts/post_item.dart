@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
@@ -38,9 +39,9 @@ class _PostItemState extends State<PostItem> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.reply,
-              size: 18,
+            FaIcon(
+              FontAwesomeIcons.reply,
+              size: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
             ),
             Text(
@@ -70,9 +71,9 @@ class _PostItemState extends State<PostItem> {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.redo,
-              size: 18,
+            FaIcon(
+              FontAwesomeIcons.retweet,
+              size: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
             ),
             Text(
@@ -150,14 +151,16 @@ class _PostItemState extends State<PostItem> {
                           .paddingOnly(left: 4),
                     ],
                   ),
-                  if (widget.item.replyTo != null) buildReply(context),
-                  if (widget.item.repostTo != null) buildRepost(context),
                   Markdown(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     data: item.content,
                     padding: const EdgeInsets.all(0),
                   ).paddingOnly(left: 12, right: 8),
+                  if (widget.item.replyTo != null)
+                    buildReply(context).paddingOnly(top: 4),
+                  if (widget.item.repostTo != null)
+                    buildRepost(context).paddingOnly(top: 4),
                 ],
               ),
             )

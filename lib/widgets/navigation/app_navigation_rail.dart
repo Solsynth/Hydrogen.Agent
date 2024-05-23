@@ -15,13 +15,15 @@ class _AppNavigationRailState extends State<AppNavigationRail> {
   @override
   Widget build(BuildContext context) {
     return NavigationRail(
-      destinations: AppNavigation.destinations.map(
-        (e) => NavigationRailDestination(
-          icon: e.icon,
-          label: Text(e.label),
-        ),
-      ).toList(),
-      labelType: NavigationRailLabelType.selected,
+      destinations: AppNavigation.destinations
+          .map(
+            (e) => NavigationRailDestination(
+              icon: e.icon,
+              label: Text(e.label),
+            ),
+          )
+          .toList(),
+      labelType: NavigationRailLabelType.all,
       selectedIndex: _selectedIndex,
       onDestinationSelected: (idx) {
         setState(() => _selectedIndex = idx);

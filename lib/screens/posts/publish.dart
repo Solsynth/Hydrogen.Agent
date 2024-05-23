@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
@@ -150,7 +151,10 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                   child: Column(
                     children: [
                       MaterialBanner(
-                        leading: const Icon(Icons.reply),
+                        leading: const FaIcon(
+                          FontAwesomeIcons.reply,
+                          size: 18,
+                        ),
                         leadingPadding:
                             const EdgeInsets.only(left: 10, right: 20),
                         backgroundColor: Colors.transparent,
@@ -181,7 +185,10 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                   child: Column(
                     children: [
                       MaterialBanner(
-                        leading: const Icon(Icons.redo),
+                        leading: const FaIcon(
+                          FontAwesomeIcons.retweet,
+                          size: 18,
+                        ),
                         leadingPadding:
                             const EdgeInsets.only(left: 10, right: 20),
                         dividerColor: Colors.transparent,

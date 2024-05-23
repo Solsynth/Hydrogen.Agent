@@ -9,14 +9,14 @@ import 'package:solian/router.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class SocialScreen extends StatefulWidget {
+  const SocialScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<SocialScreen> createState() => _SocialScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _SocialScreenState extends State<SocialScreen> {
   final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 

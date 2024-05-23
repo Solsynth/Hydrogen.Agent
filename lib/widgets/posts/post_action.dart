@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
@@ -68,7 +69,7 @@ class _PostActionState extends State<PostAction> {
               children: [
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  leading: const Icon(Icons.reply),
+                  leading: const FaIcon(FontAwesomeIcons.reply, size: 20),
                   title: Text('reply'.tr),
                   onTap: () async {
                     final value = await AppRouter.instance.pushNamed(
@@ -82,7 +83,7 @@ class _PostActionState extends State<PostAction> {
                 ),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  leading: const Icon(Icons.redo),
+                  leading: const FaIcon(FontAwesomeIcons.retweet, size: 20),
                   title: Text('repost'.tr),
                   onTap: () async {
                     final value = await AppRouter.instance.pushNamed(

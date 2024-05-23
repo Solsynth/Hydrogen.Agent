@@ -3,7 +3,7 @@ import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
-import 'package:solian/screens/home.dart';
+import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/publish.dart';
 import 'package:solian/shells/basic_shell.dart';
 import 'package:solian/shells/nav_shell.dart';
@@ -17,8 +17,8 @@ abstract class AppRouter {
         routes: [
           GoRoute(
             path: '/',
-            name: 'home',
-            builder: (context, state) => const HomeScreen(),
+            name: 'social',
+            builder: (context, state) => const SocialScreen(),
           ),
           GoRoute(
             path: '/account',
