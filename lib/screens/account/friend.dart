@@ -5,7 +5,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/friendship.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/friend.dart';
-import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/friend_list.dart';
 
 class FriendScreen extends StatefulWidget {
   const FriendScreen({super.key});
@@ -24,15 +24,6 @@ class _FriendScreenState extends State<FriendScreen> {
     return _friendships.where((x) => x.status == status).toList();
   }
 
-  DismissDirection getDismissDirection(Friendship relation) {
-    if (relation.status == 2) return DismissDirection.endToStart;
-    if (relation.status == 1) return DismissDirection.startToEnd;
-    if (relation.status == 0 && relation.relatedId != _accountId) {
-      return DismissDirection.startToEnd;
-    }
-    return DismissDirection.horizontal;
-  }
-
   Future<void> getFriendship() async {
     setState(() => _isBusy = true);
 
@@ -46,6 +37,41 @@ class _FriendScreenState extends State<FriendScreen> {
           .cast<Friendship>();
       _isBusy = false;
     });
+  }
+
+  void showScopedListPopup(String title, int status) {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.85,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverFriendList(
+                      accountId: _accountId!,
+                      items: filterWithStatus(status),
+                      onUpdate: () {
+                        getFriendship();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void promptAddFriend() async {
@@ -117,46 +143,6 @@ class _FriendScreenState extends State<FriendScreen> {
     Future.delayed(Duration.zero, () => getFriendship());
   }
 
-  Widget buildFriendshipItem(context, index, status) {
-    final element = filterWithStatus(status)[index];
-    final otherside = element.getOtherside(_accountId!);
-
-    final randomId = DateTime.now().microsecondsSinceEpoch >> 10;
-
-    return Dismissible(
-      key: Key(randomId.toString()),
-      background: Container(
-        color: Colors.red,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        alignment: Alignment.centerLeft,
-        child: const Icon(Icons.close, color: Colors.white),
-      ),
-      secondaryBackground: Container(
-        color: Colors.green,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        alignment: Alignment.centerRight,
-        child: const Icon(Icons.check, color: Colors.white),
-      ),
-      direction: getDismissDirection(element),
-      child: ListTile(
-        title: Text(otherside.nick),
-        subtitle: Text(otherside.name),
-        leading: AccountAvatar(content: otherside.avatar),
-      ),
-      onDismissed: (direction) async {
-        final FriendProvider provider = Get.find();
-        if (direction == DismissDirection.startToEnd) {
-          await provider.updateFriendship(element, 2);
-          await getFriendship();
-        }
-        if (direction == DismissDirection.endToStart) {
-          await provider.updateFriendship(element, 1);
-          await getFriendship();
-        }
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -183,7 +169,8 @@ class _FriendScreenState extends State<FriendScreen> {
                   title: Text(
                     '${'accountFriendPending'.tr} (${filterWithStatus(0).length})',
                   ),
-                  onTap: () {},
+                  onTap: () =>
+                      showScopedListPopup('accountFriendPending'.tr, 0),
                 ),
               ),
               SliverToBoxAdapter(
@@ -195,32 +182,26 @@ class _FriendScreenState extends State<FriendScreen> {
                   title: Text(
                     '${'accountFriendBlocked'.tr} (${filterWithStatus(2).length})',
                   ),
-                  onTap: () {},
+                  onTap: () =>
+                      showScopedListPopup('accountFriendBlocked'.tr, 2),
                 ),
               ),
-              SliverList.builder(
-                itemCount: filterWithStatus(1).length,
-                itemBuilder: (_, __) => buildFriendshipItem(_, __, 1),
+              SliverFriendList(
+                accountId: _accountId!,
+                items: filterWithStatus(1),
+                onUpdate: () {
+                  getFriendship();
+                },
+              ),
+              const SliverToBoxAdapter(
+                child: Divider(thickness: 0.3, height: 0.3),
               ),
               SliverToBoxAdapter(
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                        top: BorderSide(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceVariant
-                          .withOpacity(0.8),
-                      width: 0.3,
-                    )),
-                  ),
-                  padding: const EdgeInsets.only(top: 16, bottom: 32),
-                  child: Text(
-                    'accountFriendListHint'.tr,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
+                child: Text(
+                  'accountFriendListHint'.tr,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ).paddingOnly(top: 16, bottom: 32),
               ),
             ],
           ),
