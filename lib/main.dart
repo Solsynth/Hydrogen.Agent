@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/providers/friend.dart';
@@ -31,6 +32,14 @@ class SolianApp extends StatelessWidget {
         Get.lazyPut(() => AuthProvider());
         Get.lazyPut(() => FriendProvider());
         Get.lazyPut(() => AttachmentProvider());
+        Get.lazyPut(() => AccountProvider());
+
+        final AuthProvider auth = Get.find();
+        auth.isAuthorized.then((value) async {
+          if (value) {
+            Get.find<AccountProvider>().connect();
+          }
+        });
       },
       builder: (context, child) {
         return ScaffoldMessenger(

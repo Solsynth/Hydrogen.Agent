@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:solian/providers/account.dart';
 import 'package:solian/services.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
@@ -25,26 +26,30 @@ class AuthProvider extends GetConnect {
 
   oauth2.Credentials? credentials;
 
+  Future<void> refreshCredentials() async {
+    final resp = await post('/api/auth/token', {
+      'refresh_token': credentials!.refreshToken,
+      'grant_type': 'refresh_token',
+    });
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    }
+    credentials = oauth2.Credentials(
+      resp.body['access_token'],
+      refreshToken: resp.body['refresh_token'],
+      idToken: resp.body['access_token'],
+      tokenEndpoint: tokenEndpoint,
+      expiration: DateTime.now().add(const Duration(minutes: 3)),
+    );
+    storage.write(
+      key: 'auth_credentials',
+      value: jsonEncode(credentials!.toJson()),
+    );
+  }
+
   Future<Request<T?>> requestAuthenticator<T>(Request<T?> request) async {
     if (credentials != null && credentials!.isExpired) {
-      final resp = await post('/api/auth/token', {
-        'refresh_token': credentials!.refreshToken,
-        'grant_type': 'refresh_token',
-      });
-      if (resp.statusCode != 200) {
-        throw Exception(resp.bodyString);
-      }
-      credentials = oauth2.Credentials(
-        resp.body['access_token'],
-        refreshToken: resp.body['refresh_token'],
-        idToken: resp.body['access_token'],
-        tokenEndpoint: tokenEndpoint,
-        expiration: DateTime.now().add(const Duration(minutes: 3)),
-      );
-      storage.write(
-        key: 'auth_credentials',
-        value: jsonEncode(credentials!.toJson()),
-      );
+      refreshCredentials();
     }
 
     if (credentials != null) {
@@ -91,11 +96,15 @@ class AuthProvider extends GetConnect {
       value: jsonEncode(credentials!.toJson()),
     );
 
+    Get.find<AccountProvider>().connect();
+
     return credentials!;
   }
 
   void signout() {
     _cacheUserProfileResponse = null;
+
+    Get.find<AccountProvider>().disconnect();
 
     storage.deleteAll();
   }
