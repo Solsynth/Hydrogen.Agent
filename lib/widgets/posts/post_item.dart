@@ -16,6 +16,7 @@ class PostItem extends StatefulWidget {
   final bool isCompact;
   final bool isReactable;
   final bool isShowReply;
+  final bool isShowEmbed;
 
   const PostItem({
     super.key,
@@ -24,6 +25,7 @@ class PostItem extends StatefulWidget {
     this.isCompact = false,
     this.isReactable = true,
     this.isShowReply = true,
+    this.isShowEmbed = true,
   });
 
   @override
@@ -162,7 +164,7 @@ class _PostItemState extends State<PostItem> {
                     data: item.content,
                     padding: const EdgeInsets.all(0),
                   ).paddingOnly(left: 12, right: 8),
-                  if (widget.item.replyTo != null)
+                  if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
                       child: buildReply(context).paddingOnly(top: 4),
                       onTap: () {
@@ -175,7 +177,7 @@ class _PostItemState extends State<PostItem> {
                         );
                       },
                     ),
-                  if (widget.item.repostTo != null)
+                  if (widget.item.repostTo != null && widget.isShowEmbed)
                     GestureDetector(
                       child: buildRepost(context).paddingOnly(top: 4),
                       onTap: () {

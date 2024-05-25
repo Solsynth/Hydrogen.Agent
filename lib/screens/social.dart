@@ -8,8 +8,7 @@ import 'package:solian/providers/content/post_explore.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
-import 'package:solian/widgets/posts/post_action.dart';
-import 'package:solian/widgets/posts/post_item.dart';
+import 'package:solian/widgets/posts/post_list.dart';
 
 class SocialScreen extends StatefulWidget {
   const SocialScreen({super.key});
@@ -44,7 +43,6 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   void initState() {
-    Get.lazyPut(() => PostProvider());
     super.initState();
 
     _pagingController.addPageRequestListener(getPosts);
@@ -99,40 +97,7 @@ class _SocialScreenState extends State<SocialScreen> {
               context: context,
               child: RefreshIndicator(
                 onRefresh: () => Future.sync(() => _pagingController.refresh()),
-                child: PagedListView<int, Post>.separated(
-                  pagingController: _pagingController,
-                  builderDelegate: PagedChildBuilderDelegate<Post>(
-                    itemBuilder: (context, item, index) {
-                      return GestureDetector(
-                        child: PostItem(
-                          key: Key('p${item.alias}'),
-                          item: item,
-                          isClickable: true,
-                        ).paddingSymmetric(
-                          vertical:
-                              (item.attachments?.isEmpty ?? false) ? 8 : 0,
-                        ),
-                        onTap: () {
-                          AppRouter.instance.pushNamed(
-                            'postDetail',
-                            pathParameters: {'alias': item.alias},
-                          );
-                        },
-                        onLongPress: () {
-                          showModalBottomSheet(
-                            useRootNavigator: true,
-                            context: context,
-                            builder: (context) => PostAction(item: item),
-                          ).then((value) {
-                            if (value == true) _pagingController.refresh();
-                          });
-                        },
-                      );
-                    },
-                  ),
-                  separatorBuilder: (_, __) =>
-                      const Divider(thickness: 0.3, height: 0.3),
-                ),
+                child: PostListWidget(controller: _pagingController),
               ),
             ),
           ),

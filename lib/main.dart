@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
+import 'package:solian/providers/content/post_explore.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
@@ -31,6 +32,7 @@ class SolianApp extends StatelessWidget {
       onInit: () {
         Get.lazyPut(() => AuthProvider());
         Get.lazyPut(() => FriendProvider());
+        Get.lazyPut(() => PostProvider());
         Get.lazyPut(() => AttachmentProvider());
         Get.lazyPut(() => AccountProvider());
 

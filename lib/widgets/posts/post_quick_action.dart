@@ -6,6 +6,7 @@ import 'package:solian/models/reaction.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/posts/post_reaction.dart';
+import 'package:solian/widgets/posts/post_replies.dart';
 
 class PostQuickAction extends StatefulWidget {
   final Post item;
@@ -100,7 +101,15 @@ class _PostQuickActionState extends State<PostQuickAction> {
               avatar: const Icon(Icons.comment),
               label: Text(widget.item.replyCount.toString()),
               visualDensity: density,
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                  useRootNavigator: true,
+                  context: context,
+                  builder: (context) {
+                    return PostReplyListPopup(item: widget.item);
+                  },
+                );
+              },
             ),
           if (widget.isReactable && widget.isShowReply)
             const VerticalDivider(
