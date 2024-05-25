@@ -3,6 +3,7 @@ import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/contact.dart';
+import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/publish.dart';
 import 'package:solian/shells/basic_shell.dart';
@@ -29,6 +30,19 @@ abstract class AppRouter {
             path: '/account',
             name: 'account',
             builder: (context, state) => const AccountScreen(),
+          ),
+        ],
+      ),
+      ShellRoute(
+        builder: (context, state, child) =>
+            BasicShell(state: state, child: child),
+        routes: [
+          GoRoute(
+            path: '/posts/:alias',
+            name: 'postDetail',
+            builder: (context, state) => PostDetailScreen(
+              alias: state.pathParameters['alias']!,
+            ),
           ),
         ],
       ),

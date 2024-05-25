@@ -23,10 +23,13 @@ class _SocialScreenState extends State<SocialScreen> {
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final PostExploreProvider provider = Get.find();
-    final resp = await provider.listPost(pageKey);
-    if (resp.statusCode != 200) {
-      _pagingController.error = resp.bodyString;
+    final PostProvider provider = Get.find();
+
+    Response resp;
+    try {
+      resp = await provider.listPost(pageKey);
+    } catch (e) {
+      _pagingController.error = e;
       return;
     }
 
@@ -41,7 +44,7 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   void initState() {
-    Get.lazyPut(() => PostExploreProvider());
+    Get.lazyPut(() => PostProvider());
     super.initState();
 
     _pagingController.addPageRequestListener(getPosts);
@@ -104,11 +107,17 @@ class _SocialScreenState extends State<SocialScreen> {
                         child: PostItem(
                           key: Key('p${item.alias}'),
                           item: item,
+                          isClickable: true,
                         ).paddingSymmetric(
                           vertical:
                               (item.attachments?.isEmpty ?? false) ? 8 : 0,
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          AppRouter.instance.pushNamed(
+                            'postDetail',
+                            pathParameters: {'alias': item.alias},
+                          );
+                        },
                         onLongPress: () {
                           showModalBottomSheet(
                             useRootNavigator: true,

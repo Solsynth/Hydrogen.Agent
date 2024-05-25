@@ -97,6 +97,7 @@ class AuthProvider extends GetConnect {
     );
 
     Get.find<AccountProvider>().connect();
+    Get.find<AccountProvider>().notifyPrefetch();
 
     return credentials!;
   }
@@ -105,6 +106,8 @@ class AuthProvider extends GetConnect {
     _cacheUserProfileResponse = null;
 
     Get.find<AccountProvider>().disconnect();
+    Get.find<AccountProvider>().notifications.clear();
+    Get.find<AccountProvider>().notificationUnread.value = 0;
 
     storage.deleteAll();
   }

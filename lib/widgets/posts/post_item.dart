@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
@@ -11,14 +12,18 @@ import 'package:timeago/timeago.dart' show format;
 
 class PostItem extends StatefulWidget {
   final Post item;
+  final bool isClickable;
   final bool isCompact;
   final bool isReactable;
+  final bool isShowReply;
 
   const PostItem({
     super.key,
     required this.item,
+    this.isClickable = false,
     this.isCompact = false,
     this.isReactable = true,
+    this.isShowReply = true,
   });
 
   @override
@@ -158,9 +163,31 @@ class _PostItemState extends State<PostItem> {
                     padding: const EdgeInsets.all(0),
                   ).paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null)
-                    buildReply(context).paddingOnly(top: 4),
+                    GestureDetector(
+                      child: buildReply(context).paddingOnly(top: 4),
+                      onTap: () {
+                        if (!widget.isClickable) return;
+                        AppRouter.instance.pushNamed(
+                          'postDetail',
+                          pathParameters: {
+                            'alias': widget.item.replyTo!.alias,
+                          },
+                        );
+                      },
+                    ),
                   if (widget.item.repostTo != null)
-                    buildRepost(context).paddingOnly(top: 4),
+                    GestureDetector(
+                      child: buildRepost(context).paddingOnly(top: 4),
+                      onTap: () {
+                        if (!widget.isClickable) return;
+                        AppRouter.instance.pushNamed(
+                          'postDetail',
+                          pathParameters: {
+                            'alias': widget.item.repostTo!.alias,
+                          },
+                        );
+                      },
+                    ),
                 ],
               ),
             )
@@ -173,6 +200,7 @@ class _PostItemState extends State<PostItem> {
         ),
         AttachmentList(attachmentsId: item.attachments ?? List.empty()),
         PostQuickAction(
+          isShowReply: widget.isShowReply,
           isReactable: widget.isReactable,
           item: widget.item,
           onReact: (symbol, changes) {
