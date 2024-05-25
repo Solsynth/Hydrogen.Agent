@@ -9,9 +9,11 @@ import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_list_fullscreen.dart';
 
 class AttachmentList extends StatefulWidget {
+  final String parentId;
   final List<int> attachmentsId;
 
-  const AttachmentList({super.key, required this.attachmentsId});
+  const AttachmentList(
+      {super.key, required this.parentId, required this.attachmentsId});
 
   @override
   State<AttachmentList> createState() => _AttachmentListState();
@@ -126,6 +128,7 @@ class _AttachmentListState extends State<AttachmentList> {
               fit: StackFit.expand,
               children: [
                 AttachmentItem(
+                  parentId: widget.parentId,
                   key: Key('a${element!.uuid}'),
                   item: element,
                   badge: _attachmentsMeta.length > 1
@@ -180,7 +183,8 @@ class _AttachmentListState extends State<AttachmentList> {
             } else {
               Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
-                  builder: (context) => AttachmentListFullscreen(
+                  builder: (context) => AttachmentListFullScreen(
+                    parentId: widget.parentId,
                     attachment: element,
                   ),
                 ),

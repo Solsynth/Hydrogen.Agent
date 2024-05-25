@@ -4,6 +4,7 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/services.dart';
 
 class AttachmentItem extends StatelessWidget {
+  final String parentId;
   final Attachment item;
   final bool showBadge;
   final bool showHideButton;
@@ -13,6 +14,7 @@ class AttachmentItem extends StatelessWidget {
 
   const AttachmentItem({
     super.key,
+    required this.parentId,
     required this.item,
     this.badge,
     this.fit = BoxFit.cover,
@@ -24,7 +26,7 @@ class AttachmentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: Key('a${item.uuid}'),
+      tag: Key('a${item.uuid}p$parentId'),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -48,8 +50,10 @@ class AttachmentItem extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: ActionChip(
-                  visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                  avatar: Icon(Icons.visibility_off, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  visualDensity:
+                      const VisualDensity(vertical: -4, horizontal: -4),
+                  avatar: Icon(Icons.visibility_off,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                   label: Text('hide'.tr),
                   onPressed: () {
                     if (onHide != null) onHide!();

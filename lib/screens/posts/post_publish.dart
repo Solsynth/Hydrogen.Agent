@@ -41,7 +41,7 @@ class PostPublishingScreen extends StatefulWidget {
 class _PostPublishingScreenState extends State<PostPublishingScreen> {
   final _contentController = TextEditingController();
 
-  bool _isSubmitting = false;
+  bool _isBusy = false;
 
   List<int> _attachments = List.empty();
 
@@ -61,7 +61,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
     if (!await auth.isAuthorized) return;
     if (_contentController.value.text.isEmpty) return;
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isBusy = true);
 
     final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
@@ -87,7 +87,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
       AppRouter.instance.pop(resp.body);
     }
 
-    setState(() => _isSubmitting = false);
+    setState(() => _isBusy = false);
   }
 
   void syncWidget() {
@@ -126,8 +126,8 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
           leading: const PrevPageButton(),
           actions: [
             TextButton(
+              onPressed: _isBusy ? null : () => applyPost(),
               child: Text('postAction'.tr.toUpperCase()),
-              onPressed: () => applyPost(),
             )
           ],
         ),
@@ -135,8 +135,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
           top: false,
           child: Column(
             children: [
-              if (_isSubmitting)
-                const LinearProgressIndicator().animate().scaleX(),
+              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
               if (widget.edit != null)
                 MaterialBanner(
                   leading: const Icon(Icons.edit),

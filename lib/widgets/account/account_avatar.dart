@@ -15,7 +15,8 @@ class AccountAvatar extends StatelessWidget {
     bool isEmpty = content == null;
     if (content is String) {
       direct = content.startsWith('http');
-      isEmpty = content.endsWith('/api/attachments/0');
+      if (!isEmpty) isEmpty = content.isEmpty;
+      if (!isEmpty) isEmpty = content.endsWith('/api/attachments/0');
     }
 
     return CircleAvatar(

@@ -4,7 +4,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/post_explore.dart';
+import 'package:solian/providers/content/post.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
@@ -85,8 +85,10 @@ class _SocialScreenState extends State<SocialScreen> {
                     titleSpacing:
                         SolianTheme.isLargeScreen(context) ? null : 24,
                     forceElevated: innerBoxIsScrolled,
-                    actions: const [
-                      NotificationButton(),
+                    actions: [
+                      const NotificationButton(),
+                      if (!SolianTheme.isLargeScreen(context))
+                        const SizedBox(width: 16),
                     ],
                   ),
                 ),

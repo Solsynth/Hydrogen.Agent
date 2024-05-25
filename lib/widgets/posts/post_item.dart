@@ -17,6 +17,7 @@ class PostItem extends StatefulWidget {
   final bool isReactable;
   final bool isShowReply;
   final bool isShowEmbed;
+  final String? overrideAttachmentParent;
 
   const PostItem({
     super.key,
@@ -26,6 +27,7 @@ class PostItem extends StatefulWidget {
     this.isReactable = true,
     this.isShowReply = true,
     this.isShowEmbed = true,
+    this.overrideAttachmentParent,
   });
 
   @override
@@ -53,7 +55,7 @@ class _PostItemState extends State<PostItem> {
             ),
             Text(
               'postRepliedNotify'.trParams(
-                {'username': '@${widget.item.author.name}'},
+                {'username': '@${widget.item.replyTo!.author.name}'},
               ),
               style: TextStyle(
                 color:
@@ -67,6 +69,7 @@ class _PostItemState extends State<PostItem> {
           child: PostItem(
             item: widget.item.replyTo!,
             isCompact: true,
+            overrideAttachmentParent: widget.item.alias,
           ).paddingSymmetric(vertical: 8),
         ),
       ],
@@ -85,7 +88,7 @@ class _PostItemState extends State<PostItem> {
             ),
             Text(
               'postRepostedNotify'.trParams(
-                {'username': '@${widget.item.author.name}'},
+                {'username': '@${widget.item.repostTo!.author.name}'},
               ),
               style: TextStyle(
                 color:
@@ -99,6 +102,7 @@ class _PostItemState extends State<PostItem> {
           child: PostItem(
             item: widget.item.repostTo!,
             isCompact: true,
+            overrideAttachmentParent: widget.item.alias,
           ).paddingSymmetric(vertical: 8),
         ),
       ],
@@ -134,7 +138,10 @@ class _PostItemState extends State<PostItem> {
             top: 2,
             bottom: hasAttachment ? 4 : 0,
           ),
-          AttachmentList(attachmentsId: item.attachments ?? List.empty()),
+          AttachmentList(
+            parentId: widget.overrideAttachmentParent ?? widget.item.alias,
+            attachmentsId: item.attachments ?? List.empty(),
+          ),
         ],
       );
     }
@@ -200,7 +207,10 @@ class _PostItemState extends State<PostItem> {
           right: 16,
           left: 16,
         ),
-        AttachmentList(attachmentsId: item.attachments ?? List.empty()),
+        AttachmentList(
+          parentId: widget.item.alias,
+          attachmentsId: item.attachments ?? List.empty(),
+        ),
         PostQuickAction(
           isShowReply: widget.isShowReply,
           isReactable: widget.isReactable,

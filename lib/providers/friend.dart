@@ -14,6 +14,9 @@ class FriendProvider extends GetConnect {
 
   Future<Response> listFriendship() => get('/api/users/me/friends');
 
+  Future<Response> listFriendshipWithStatus(int status) =>
+      get('/api/users/me/friends?status=$status');
+
   Future<Response> createFriendship(String username) async {
     final resp = await post('/api/users/me/friends?related=$username', {});
     if (resp.statusCode != 200) {

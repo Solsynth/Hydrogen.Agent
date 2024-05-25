@@ -8,7 +8,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/screens/posts/publish.dart';
+import 'package:solian/screens/posts/post_publish.dart';
 import 'package:solian/services.dart';
 
 class PostAction extends StatefulWidget {

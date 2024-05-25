@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
 
-class AttachmentListFullscreen extends StatefulWidget {
+class AttachmentListFullScreen extends StatefulWidget {
+  final String parentId;
   final Attachment attachment;
 
-  const AttachmentListFullscreen({super.key, required this.attachment});
+  const AttachmentListFullScreen(
+      {super.key, required this.parentId, required this.attachment});
 
   @override
-  State<AttachmentListFullscreen> createState() =>
-      _AttachmentListFullscreenState();
+  State<AttachmentListFullScreen> createState() =>
+      _AttachmentListFullScreenState();
 }
 
-class _AttachmentListFullscreenState extends State<AttachmentListFullscreen> {
+class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
   @override
   void initState() {
     super.initState();
@@ -33,6 +35,7 @@ class _AttachmentListFullscreenState extends State<AttachmentListFullscreen> {
             panEnabled: true,
             scaleEnabled: true,
             child: AttachmentItem(
+              parentId: widget.parentId,
               showHideButton: false,
               item: widget.attachment,
               fit: BoxFit.contain,

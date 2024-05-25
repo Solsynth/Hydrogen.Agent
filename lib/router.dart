@@ -2,10 +2,11 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
+import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/contact.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/screens/social.dart';
-import 'package:solian/screens/posts/publish.dart';
+import 'package:solian/screens/posts/post_publish.dart';
 import 'package:solian/shells/basic_shell.dart';
 import 'package:solian/shells/nav_shell.dart';
 
@@ -71,6 +72,17 @@ abstract class AppRouter {
             edit: arguments?.edit,
             reply: arguments?.reply,
             repost: arguments?.repost,
+            realm: state.uri.queryParameters['realm'],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/chat/organize',
+        name: 'channelOrganizing',
+        builder: (context, state) {
+          final arguments = state.extra as ChannelOrganizeArguments?;
+          return ChannelOrganizeScreen(
+            edit: arguments?.edit,
             realm: state.uri.queryParameters['realm'],
           );
         },

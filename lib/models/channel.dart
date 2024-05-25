@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:solian/models/account.dart';
 
 class Channel {
@@ -60,6 +62,15 @@ class Channel {
         'realm_id': realmId,
         'is_encrypted': isEncrypted,
       };
+
+  IconData get icon {
+    switch (type) {
+      case 1:
+        return FontAwesomeIcons.userGroup;
+      default:
+        return FontAwesomeIcons.hashtag;
+    }
+  }
 }
 
 class ChannelMember {
