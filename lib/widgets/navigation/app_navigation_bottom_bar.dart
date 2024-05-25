@@ -15,18 +15,21 @@ class _AppNavigationBottomBarState extends State<AppNavigationBottomBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      items: AppNavigation.destinations.map(
-        (e) => BottomNavigationBarItem(
-          icon: e.icon,
-          label: e.label,
-        ),
-      ).toList(),
+      items: AppNavigation.destinations
+          .map(
+            (e) => BottomNavigationBarItem(
+              icon: e.icon,
+              label: e.label,
+            ),
+          )
+          .toList(),
       landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
       currentIndex: _selectedIndex,
       showUnselectedLabels: false,
       onTap: (idx) {
         setState(() => _selectedIndex = idx);
-        AppRouter.instance.goNamed(AppNavigation.destinations[idx].page);
+        AppRouter.instance
+            .pushReplacementNamed(AppNavigation.destinations[idx].page);
       },
     );
   }

@@ -78,8 +78,9 @@ class _ContactScreenState extends State<ContactScreen> {
                         );
                       },
                     ),
-                    if (!SolianTheme.isLargeScreen(context))
-                      const SizedBox(width: 16),
+                    SizedBox(
+                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                    ),
                   ],
                 ),
               ),
@@ -111,7 +112,16 @@ class _ContactScreenState extends State<ContactScreen> {
                               const EdgeInsets.symmetric(horizontal: 24),
                           title: Text(element.name),
                           subtitle: Text(element.description),
-                          onTap: () {},
+                          onTap: () {
+                            AppRouter.instance.pushNamed(
+                              'channelChat',
+                              pathParameters: {'alias': element.alias},
+                              queryParameters: {
+                                if (element.realmId != null)
+                                  'realm': element.realm!.alias,
+                              },
+                            );
+                          },
                         );
                       },
                     ),

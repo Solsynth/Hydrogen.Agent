@@ -87,8 +87,9 @@ class _SocialScreenState extends State<SocialScreen> {
                     forceElevated: innerBoxIsScrolled,
                     actions: [
                       const NotificationButton(),
-                      if (!SolianTheme.isLargeScreen(context))
-                        const SizedBox(width: 16),
+                      SizedBox(
+                        width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                      ),
                     ],
                   ),
                 ),

@@ -10,7 +10,7 @@ class Realm {
   String description;
   bool isPublic;
   bool isCommunity;
-  int accountId;
+  int? accountId;
 
   Realm({
     required this.id,
@@ -22,14 +22,16 @@ class Realm {
     required this.description,
     required this.isPublic,
     required this.isCommunity,
-    required this.accountId,
+    this.accountId,
   });
 
   factory Realm.fromJson(Map<String, dynamic> json) => Realm(
         id: json['id'],
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
+        deletedAt: json['deleted_at'] != null
+            ? DateTime.parse(json['deleted_at'])
+            : null,
         alias: json['alias'],
         name: json['name'],
         description: json['description'],
@@ -77,7 +79,9 @@ class RealmMember {
         id: json['id'],
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
+        deletedAt: json['deleted_at'] != null
+            ? DateTime.parse(json['deleted_at'])
+            : null,
         realmId: json['realm_id'],
         accountId: json['account_id'],
         account: Account.fromJson(json['account']),

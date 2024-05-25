@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:solian/models/account.dart';
+import 'package:solian/models/realm.dart';
 
 class Channel {
   int id;
@@ -13,6 +14,7 @@ class Channel {
   int type;
   Account account;
   int accountId;
+  Realm? realm;
   int? realmId;
   bool isEncrypted;
 
@@ -30,6 +32,7 @@ class Channel {
     required this.account,
     required this.accountId,
     required this.isEncrypted,
+    this.realm,
     this.realmId,
   });
 
@@ -44,6 +47,7 @@ class Channel {
         type: json['type'],
         account: Account.fromJson(json['account']),
         accountId: json['account_id'],
+        realm: json['realm'] != null ? Realm.fromJson(json['realm']) : null,
         realmId: json['realm_id'],
         isEncrypted: json['is_encrypted'],
       );
@@ -57,8 +61,9 @@ class Channel {
         'name': name,
         'description': description,
         'type': type,
-        'account': account,
+        'account': account.toJson(),
         'account_id': accountId,
+        'realm': realm?.toJson(),
         'realm_id': realmId,
         'is_encrypted': isEncrypted,
       };

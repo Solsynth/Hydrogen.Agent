@@ -14,6 +14,7 @@ class SolianMessages extends Translations {
           'apply': 'Apply',
           'cancel': 'Cancel',
           'confirm': 'Confirm',
+          'loading': 'Loading...',
           'edit': 'Edit',
           'delete': 'Delete',
           'search': 'Search',
@@ -100,6 +101,8 @@ class SolianMessages extends Translations {
           'channelType': 'Channel type',
           'channelTypeCommon': 'Regular',
           'channelTypeDirect': 'DM',
+          'messageDecoding': 'Decoding...',
+          'messageDecodeFailed': 'Unable to decode: @message',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -108,6 +111,7 @@ class SolianMessages extends Translations {
           'reset': '重置',
           'cancel': '取消',
           'confirm': '确认',
+          'loading': '载入中…',
           'edit': '编辑',
           'delete': '删除',
           'page': '页面',
@@ -191,6 +195,8 @@ class SolianMessages extends Translations {
           'channelType': '频道类型',
           'channelTypeCommon': '普通频道',
           'channelTypeDirect': '私信聊天',
+          'messageDecoding': '解码信息中…',
+          'messageDecodeFailed': '解码信息失败：@message',
         }
       };
 }

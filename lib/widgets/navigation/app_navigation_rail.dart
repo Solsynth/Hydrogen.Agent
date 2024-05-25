@@ -27,7 +27,8 @@ class _AppNavigationRailState extends State<AppNavigationRail> {
       selectedIndex: _selectedIndex,
       onDestinationSelected: (idx) {
         setState(() => _selectedIndex = idx);
-        AppRouter.instance.pushNamed(AppNavigation.destinations[idx].page);
+        AppRouter.instance
+            .pushReplacementNamed(AppNavigation.destinations[idx].page);
       },
     );
   }
