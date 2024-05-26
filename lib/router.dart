@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
+import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/contact.dart';
 import 'package:solian/screens/posts/post_detail.dart';
@@ -61,6 +63,20 @@ abstract class AppRouter {
             path: '/account/personalize',
             name: 'accountPersonalize',
             builder: (context, state) => const PersonalizeScreen(),
+          ),
+        ],
+      ),
+      ShellRoute(
+        builder: (context, state, child) =>
+            BasicShell(state: state, child: child),
+        routes: [
+          GoRoute(
+            path: '/chat/:alias/detail',
+            name: 'channelDetail',
+            builder: (context, state) => ChannelDetailScreen(
+              channel: state.extra as Channel,
+              realm: state.uri.queryParameters['realm'] ?? 'global',
+            ),
           ),
         ],
       ),

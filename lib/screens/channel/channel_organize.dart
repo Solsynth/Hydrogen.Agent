@@ -227,7 +227,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
                 ).paddingSymmetric(horizontal: 16, vertical: 12),
               ),
               const Divider(thickness: 0.3),
-              if (_channelType == 1)
+              if (_channelType == 1 && widget.edit == null)
                 ListTile(
                   leading: const Icon(Icons.supervisor_account)
                       .paddingSymmetric(horizontal: 8),
@@ -250,6 +250,8 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
                     isExpanded: true,
                     items: channelTypes.entries
                         .map((item) => DropdownMenuItem<int>(
+                              enabled: widget.edit == null ||
+                                  item.key == widget.edit?.type,
                               value: item.key,
                               child: Text(
                                 item.value,

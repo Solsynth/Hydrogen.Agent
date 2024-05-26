@@ -12,6 +12,7 @@ import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/channel.dart';
+import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
@@ -33,6 +34,7 @@ class ChannelChatScreen extends StatefulWidget {
 
 class _ChannelChatScreenState extends State<ChannelChatScreen> {
   bool _isBusy = false;
+  String? _overrideAlias;
 
   Channel? _channel;
   StreamSubscription<NetworkPackage>? _subscription;
@@ -40,13 +42,20 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   final PagingController<int, Message> _pagingController =
       PagingController(firstPageKey: 0);
 
-  getChannel() async {
+  getChannel({String? overrideAlias}) async {
     final ChannelProvider provider = Get.find();
 
     setState(() => _isBusy = true);
 
+    if (overrideAlias != null) {
+      _overrideAlias = overrideAlias;
+    }
+
     try {
-      final resp = await provider.getChannel(widget.alias, realm: widget.realm);
+      final resp = await provider.getChannel(
+        _overrideAlias ?? widget.alias,
+        realm: widget.realm,
+      );
       setState(() => _channel = Channel.fromJson(resp.body));
     } catch (e) {
       context.showErrorDialog(e);
@@ -184,8 +193,23 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {},
+            icon: const Icon(Icons.more_vert),
+            onPressed: () {
+              AppRouter.instance
+                  .pushNamed(
+                'channelDetail',
+                pathParameters: {'alias': widget.alias},
+                queryParameters: {'realm': widget.realm},
+                extra: _channel,
+              )
+                  .then((value) {
+                if (value == false) AppRouter.instance.pop();
+                if (value != null) {
+                  final resp = Channel.fromJson(value as Map<String, dynamic>);
+                  getChannel(overrideAlias: resp.alias);
+                }
+              });
+            },
           ),
           SizedBox(
             width: SolianTheme.isLargeScreen(context) ? 8 : 16,
