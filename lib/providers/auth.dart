@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:solian/providers/account.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/services.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
@@ -98,6 +99,7 @@ class AuthProvider extends GetConnect {
 
     Get.find<AccountProvider>().connect();
     Get.find<AccountProvider>().notifyPrefetch();
+    Get.find<ChatProvider>().connect();
 
     return credentials!;
   }
@@ -105,6 +107,7 @@ class AuthProvider extends GetConnect {
   void signout() {
     _cacheUserProfileResponse = null;
 
+    Get.find<ChatProvider>().disconnect();
     Get.find<AccountProvider>().disconnect();
     Get.find<AccountProvider>().notifications.clear();
     Get.find<AccountProvider>().notificationUnread.value = 0;
@@ -121,7 +124,7 @@ class AuthProvider extends GetConnect {
       return _cacheUserProfileResponse!;
     }
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(requestAuthenticator);
 

@@ -98,7 +98,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       context.showErrorDialog(e);
     }
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -122,7 +122,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -5,12 +7,15 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
+import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
+import 'package:solian/widgets/chat/chat_message_input.dart';
 
 class ChannelChatScreen extends StatefulWidget {
   final String alias;
@@ -30,6 +35,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   bool _isBusy = false;
 
   Channel? _channel;
+  StreamSubscription<NetworkPackage>? _subscription;
 
   final PagingController<int, Message> _pagingController =
       PagingController(firstPageKey: 0);
@@ -53,7 +59,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -76,10 +82,47 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     }
   }
 
+  void listenMessages() {
+    final ChatProvider provider = Get.find();
+    _subscription = provider.stream.stream.listen((event) {
+      switch (event.method) {
+        case 'messages.new':
+          final payload = Message.fromJson(event.payload!);
+          if (payload.channelId == _channel?.id) {
+            final idx = _pagingController.itemList
+                ?.indexWhere((e) => e.uuid == payload.uuid);
+            if ((idx ?? -1) >= 0) {
+              _pagingController.itemList?[idx!] = payload;
+            } else {
+              _pagingController.itemList?.insert(0, payload);
+            }
+          }
+          break;
+        case 'messages.update':
+          final payload = Message.fromJson(event.payload!);
+          if (payload.channelId == _channel?.id) {
+            _pagingController.itemList
+                ?.map((x) => x.id == payload.id ? payload : x)
+                .toList();
+          }
+          break;
+        case 'messages.burnt':
+          final payload = Message.fromJson(event.payload!);
+          if (payload.channelId == _channel?.id) {
+            _pagingController.itemList = _pagingController.itemList
+                ?.where((x) => x.id != payload.id)
+                .toList();
+          }
+          break;
+      }
+      setState(() {});
+    });
+  }
+
   bool checkMessageMergeable(Message? a, Message? b) {
     if (a?.replyTo != null) return false;
     if (a == null || b == null) return false;
-    if (a.senderId != b.senderId) return false;
+    if (a.sender.account.id != b.sender.account.id) return false;
     return a.createdAt.difference(b.createdAt).inMinutes <= 3;
   }
 
@@ -107,7 +150,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         ),
         child: ChatMessage(
           item: item,
-          isCompact: isMerged,
+          isMerged: isMerged,
         ),
       ),
       onLongPress: () {},
@@ -124,6 +167,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     super.initState();
 
     getChannel().then((_) {
+      listenMessages();
       _pagingController.addPageRequestListener(getMessages);
     });
   }
@@ -150,22 +194,47 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: PagedListView<int, Message>(
-              reverse: true,
-              pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<Message>(
-                animateTransitions: true,
-                transitionDuration: 350.ms,
-                itemBuilder: chatHistoryBuilder,
-                noItemsFoundIndicatorBuilder: (_) => Container(),
+          Column(
+            children: [
+              Expanded(
+                child: PagedListView<int, Message>(
+                  reverse: true,
+                  clipBehavior: Clip.none,
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<Message>(
+                    animateTransitions: true,
+                    transitionDuration: 350.ms,
+                    itemBuilder: chatHistoryBuilder,
+                    noItemsFoundIndicatorBuilder: (_) => Container(),
+                  ),
+                ).paddingOnly(bottom: 64),
               ),
+            ],
+          ),
+          Positioned(
+            bottom: MediaQuery.of(context).padding.bottom,
+            left: 16,
+            right: 16,
+            child: ChatMessageInput(
+              realm: widget.realm,
+              channel: _channel!,
+              onSent: (Message item) {
+                setState(() {
+                  _pagingController.itemList?.insert(0, item);
+                });
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 }

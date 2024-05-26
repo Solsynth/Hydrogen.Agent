@@ -1,17 +1,15 @@
-import 'dart:convert';
-
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 
 class Message {
   int id;
+  String uuid;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
   Map<String, dynamic> content;
-  Map<String, dynamic>? metadata;
   String type;
-  List<String>? attachments;
+  List<int>? attachments;
   Channel? channel;
   Sender sender;
   int? replyId;
@@ -23,11 +21,11 @@ class Message {
 
   Message({
     required this.id,
+    required this.uuid,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
     required this.content,
-    required this.metadata,
     required this.type,
     this.attachments,
     this.channel,
@@ -40,13 +38,15 @@ class Message {
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
         id: json['id'],
+        uuid: json['uuid'],
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: DateTime.parse(json['updated_at']),
         deletedAt: json['deleted_at'],
         content: json['content'],
-        metadata: json['metadata'],
         type: json['type'],
-        attachments: json['attachments'],
+        attachments: json["attachments"] != null
+            ? List<int>.from(json["attachments"])
+            : null,
         channel: Channel.fromJson(json['channel']),
         sender: Sender.fromJson(json['sender']),
         replyId: json['reply_id'],
@@ -59,11 +59,11 @@ class Message {
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'uuid': uuid,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
         'deleted_at': deletedAt,
         'content': content,
-        'metadata': metadata,
         'type': type,
         'attachments': attachments,
         'channel': channel?.toJson(),

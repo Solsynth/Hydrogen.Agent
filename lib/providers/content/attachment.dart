@@ -37,7 +37,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -76,7 +76,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -100,7 +100,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

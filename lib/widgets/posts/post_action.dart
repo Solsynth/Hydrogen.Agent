@@ -154,7 +154,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/post.dart';
@@ -36,6 +37,7 @@ class SolianApp extends StatelessWidget {
         Get.lazyPut(() => FriendProvider());
         Get.lazyPut(() => PostProvider());
         Get.lazyPut(() => AttachmentProvider());
+        Get.lazyPut(() => ChatProvider());
         Get.lazyPut(() => AccountProvider());
         Get.lazyPut(() => ChannelProvider());
         Get.lazyPut(() => RealmProvider());
@@ -44,6 +46,7 @@ class SolianApp extends StatelessWidget {
         auth.isAuthorized.then((value) async {
           if (value) {
             Get.find<AccountProvider>().connect();
+            Get.find<ChatProvider>().connect();
           }
         });
       },

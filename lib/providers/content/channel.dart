@@ -7,7 +7,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
 
     final resp = await client.get('/api/channels/$realm/$alias');
@@ -22,7 +22,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

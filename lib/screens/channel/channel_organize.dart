@@ -82,7 +82,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

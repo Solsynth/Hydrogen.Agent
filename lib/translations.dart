@@ -103,6 +103,7 @@ class SolianMessages extends Translations {
           'channelTypeDirect': 'DM',
           'messageDecoding': 'Decoding...',
           'messageDecodeFailed': 'Unable to decode: @message',
+          'messageInputPlaceholder': 'Message @channel...',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -197,6 +198,7 @@ class SolianMessages extends Translations {
           'channelTypeDirect': '私信聊天',
           'messageDecoding': '解码信息中…',
           'messageDecodeFailed': '解码信息失败：@message',
+          'messageInputPlaceholder': '在 @channel 发信息…',
         }
       };
 }

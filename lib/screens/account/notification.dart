@@ -33,7 +33,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     if (markList.isNotEmpty) {
-      final client = GetConnect();
+      final client = GetConnect(maxAuthRetries: 3);
       client.httpClient.baseUrl = ServiceFinder.services['passport'];
       client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -58,7 +58,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

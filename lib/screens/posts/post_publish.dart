@@ -63,7 +63,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['interactive'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
