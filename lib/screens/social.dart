@@ -82,6 +82,8 @@ class _SocialScreenState extends State<SocialScreen> {
                   sliver: SliverAppBar(
                     title: Text('social'.tr),
                     centerTitle: false,
+                    floating: true,
+                    snap: true,
                     titleSpacing:
                         SolianTheme.isLargeScreen(context) ? null : 24,
                     forceElevated: innerBoxIsScrolled,

@@ -45,7 +45,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
   List<int> _attachments = List.empty();
 
-  void showAttachments(BuildContext context) {
+  void showAttachments() {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentPublishingPopup(
@@ -258,7 +258,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                     TextButton(
                       style: TextButton.styleFrom(shape: const CircleBorder()),
                       child: const Icon(Icons.camera_alt),
-                      onPressed: () => showAttachments(context),
+                      onPressed: () => showAttachments(),
                     )
                   ],
                 ),

@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:timeago/timeago.dart' show format;
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -136,7 +137,11 @@ class ChatMessage extends StatelessWidget {
                 ),
               ),
             ],
-          ),
+          ).paddingSymmetric(horizontal: 12),
+          AttachmentList(
+            parentId: item.uuid,
+            attachmentsId: item.attachments ?? List.empty(),
+          ).paddingSymmetric(vertical: 4),
         ],
       );
     }

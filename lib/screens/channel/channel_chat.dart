@@ -145,8 +145,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         padding: EdgeInsets.only(
           top: !isMerged ? 8 : 0,
           bottom: !hasMerged ? 8 : 0,
-          left: 12,
-          right: 12,
         ),
         child: ChatMessage(
           item: item,

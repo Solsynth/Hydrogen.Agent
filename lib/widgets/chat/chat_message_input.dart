@@ -6,6 +6,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatMessageInput extends StatefulWidget {
@@ -33,6 +34,17 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   final FocusNode _focusNode = FocusNode();
 
   List<int> _attachments = List.empty(growable: true);
+
+  void showAttachments() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => AttachmentPublishingPopup(
+        usage: 'm.attachment',
+        current: _attachments,
+        onUpdate: (value) => _attachments = value,
+      ),
+    );
+  }
 
   Map<String, dynamic> encodeMessage(String content) {
     // TODO Impl E2EE
@@ -143,6 +155,11 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                   onTapOutside: (_) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.attach_file),
+                color: Colors.teal,
+                onPressed: () => showAttachments(),
               ),
               IconButton(
                 icon: const Icon(Icons.send),
