@@ -30,6 +30,8 @@ class AttachmentProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.services['paperclip'];
   }
 
+  static Map<String, String> mimetypeOverrides = {'mov': 'video/quicktime'};
+
   Future<Response> getMetadata(int id) => get('/api/attachments/$id/meta');
 
   Future<Response> createAttachment(File file, String hash, String usage,
@@ -46,7 +48,15 @@ class AttachmentProvider extends GetConnect {
     final fileAlt = basename(file.path).contains('.')
         ? basename(file.path).substring(0, basename(file.path).lastIndexOf('.'))
         : basename(file.path);
+    final fileExt = basename(file.path)
+        .substring(basename(file.path).lastIndexOf('.') + 1)
+        .toLowerCase();
 
+    // Override for some files cannot be detected mimetype by server-side
+    String? mimetypeOverride;
+    if (mimetypeOverrides.keys.contains(fileExt)) {
+      mimetypeOverride = mimetypeOverrides[fileExt];
+    }
     final resp = await client.post(
       '/api/attachments',
       FormData({
@@ -54,16 +64,17 @@ class AttachmentProvider extends GetConnect {
         'file': filePayload,
         'hash': hash,
         'usage': usage,
+        if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
         'metadata': jsonEncode({
           if (ratio != null) 'ratio': ratio,
         }),
       }),
     );
-    if (resp.statusCode == 200) {
-      return resp;
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
     }
 
-    throw Exception(resp.bodyString);
+    return resp;
   }
 
   Future<Response> updateAttachment(
@@ -93,7 +104,7 @@ class AttachmentProvider extends GetConnect {
       throw Exception(resp.bodyString);
     }
 
-    return resp.body;
+    return resp;
   }
 
   Future<Response> deleteAttachment(int id) async {

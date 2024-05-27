@@ -57,7 +57,11 @@ class _AttachmentListState extends State<AttachmentList> {
     int portrait = 0, square = 0, landscape = 0;
     for (var entry in _attachmentsMeta) {
       if (entry!.metadata?['ratio'] != null) {
-        consistentValue ??= entry.metadata?['ratio'];
+        if (entry.metadata?['ratio'] is int) {
+          consistentValue ??= entry.metadata?['ratio'].toDouble();
+        } else {
+          consistentValue ??= entry.metadata?['ratio'];
+        }
         if (isConsistent && entry.metadata?['ratio'] != consistentValue) {
           isConsistent = false;
         }
@@ -180,7 +184,7 @@ class _AttachmentListState extends State<AttachmentList> {
           onTap: () {
             if (!_showMature && _attachmentsMeta.any((e) => e!.isMature)) {
               setState(() => _showMature = true);
-            } else {
+            } else if (['image'].contains(element.mimetype.split('/').first)) {
               Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(
                   builder: (context) => AttachmentListFullScreen(

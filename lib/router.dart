@@ -42,7 +42,7 @@ abstract class AppRouter {
             BasicShell(state: state, child: child),
         routes: [
           GoRoute(
-            path: '/posts/:alias',
+            path: '/posts/view/:alias',
             name: 'postDetail',
             builder: (context, state) => PostDetailScreen(
               alias: state.pathParameters['alias']!,
