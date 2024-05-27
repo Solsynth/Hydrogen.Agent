@@ -57,6 +57,7 @@ class SolianMessages extends Translations {
           'signupCaption':
               'Create an account on Solarpass and then get the access of entire Solar Network!',
           'signout': 'Sign out',
+          'joinedAt': 'Joined at @date',
           'riskDetection': 'Risk Detected',
           'matureContent': 'Mature Content',
           'matureContentCaption':
@@ -100,6 +101,8 @@ class SolianMessages extends Translations {
           'channelEncrypted': 'Encrypted Channel',
           'channelMember': 'Channel member',
           'channelMembers': 'Channel members',
+          'channelMembersAdd': 'Add channel members',
+          'channelMembersAddHint': 'Into @channel',
           'channelType': 'Channel type',
           'channelTypeCommon': 'Regular',
           'channelTypeDirect': 'DM',
@@ -111,7 +114,7 @@ class SolianMessages extends Translations {
               'Are you sure to delete channel @channel? This action cannot be undone!',
           'messageDecoding': 'Decoding...',
           'messageDecodeFailed': 'Unable to decode: @message',
-          'messageInputPlaceholder': 'Message @channel...',
+          'messageInputPlaceholder': 'Message @channel',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -162,6 +165,7 @@ class SolianMessages extends Translations {
           'signupGreeting': '欢迎加入\nSolar Network',
           'signupCaption': '在 Solarpass 注册一个账号以获得整个 Solar Network 的存取权！',
           'signout': '登出',
+          'joinedAt': '加入于 @date',
           'riskDetection': '检测到风险',
           'matureContent': '评级内容',
           'matureContentCaption': '该内容已被评级为家长指导级或以上，这可能说明内容包含一系列不友好的成分',
@@ -203,6 +207,8 @@ class SolianMessages extends Translations {
           'channelEncrypted': '加密频道',
           'channelMember': '频道成员',
           'channelMembers': '频道成员',
+          'channelMembersAdd': '添加频道成员',
+          'channelMembersAddHint': '到 @channel',
           'channelType': '频道类型',
           'channelTypeCommon': '普通频道',
           'channelTypeDirect': '私信聊天',
@@ -213,7 +219,7 @@ class SolianMessages extends Translations {
           'channelDeletionConfirmCaption': '你确认要删除频道 @channel 吗？该操作不可撤销。',
           'messageDecoding': '解码信息中…',
           'messageDecodeFailed': '解码信息失败：@message',
-          'messageInputPlaceholder': '在 @channel 发信息…',
+          'messageInputPlaceholder': '在 @channel 发信息',
         }
       };
 }

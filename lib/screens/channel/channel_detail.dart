@@ -6,6 +6,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/widgets/channel/channel_deletion.dart';
+import 'package:solian/widgets/channel/channel_member.dart';
 
 class ChannelDetailScreen extends StatefulWidget {
   final String realm;
@@ -30,6 +31,18 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
     setState(() {
       _isOwned = prof.body['id'] == widget.channel.account.externalId;
     });
+  }
+
+  void showMemberList() {
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      builder: (context) => ChannelMemberListPopup(
+        channel: widget.channel,
+        realm: widget.realm,
+      ),
+    );
   }
 
   void promptLeaveChannel() async {
@@ -58,6 +71,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
     final ownerActions = [
       ListTile(
         leading: const Icon(Icons.edit),
+        trailing: const Icon(Icons.chevron_right),
         title: Text('channelAdjust'.tr),
         onTap: () async {
           AppRouter.instance
@@ -116,13 +130,14 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.settings),
+                trailing: const Icon(Icons.chevron_right),
                 title: Text('channelSettings'.tr),
-                onTap: () {},
               ),
               ListTile(
                 leading: const Icon(Icons.supervisor_account),
+                trailing: const Icon(Icons.chevron_right),
                 title: Text('channelMembers'.tr),
-                onTap: () {},
+                onTap: () => showMemberList(),
               ),
               ...(_isOwned ? ownerActions : List.empty()),
               const Divider(thickness: 0.3),
