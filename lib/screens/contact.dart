@@ -8,6 +8,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/account/signin_required_overlay.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -48,90 +49,108 @@ class _ContactScreenState extends State<ContactScreen> {
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
 
-    // TODO Un signed in tip
-
     return Material(
       color: Theme.of(context).colorScheme.surface,
-      child: SafeArea(
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverOverlapAbsorber(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                sliver: SliverAppBar(
-                  title: Text('contact'.tr),
-                  centerTitle: false,
-                  titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
-                  forceElevated: innerBoxIsScrolled,
-                  actions: [
-                    const NotificationButton(),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle),
-                      onPressed: () {
-                        AppRouter.instance.pushNamed('channelOrganizing').then(
-                          (value) {
-                            if (value != null) {
-                              getChannels();
-                            }
-                          },
-                        );
-                      },
-                    ),
-                    SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                    ),
-                  ],
-                ),
-              ),
-            ];
-          },
-          body: MediaQuery.removePadding(
-            removeTop: true,
-            context: context,
-            child: Column(
-              children: [
-                if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () => getChannels(),
-                    child: ListView.builder(
-                      itemCount: _channels.length,
-                      itemBuilder: (context, index) {
-                        final element = _channels[index];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.indigo,
-                            child: FaIcon(
-                              element.icon,
-                              color: Colors.white,
-                              size: 16,
-                            ),
+      child: FutureBuilder(
+          future: auth.isAuthorized,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.data == false) {
+              return SigninRequiredOverlay(
+                onSignedIn: () {
+                  getChannels();
+                },
+              );
+            }
+
+            return SafeArea(
+              child: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    SliverOverlapAbsorber(
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                          context),
+                      sliver: SliverAppBar(
+                        title: Text('contact'.tr),
+                        centerTitle: false,
+                        titleSpacing:
+                            SolianTheme.isLargeScreen(context) ? null : 24,
+                        forceElevated: innerBoxIsScrolled,
+                        actions: [
+                          const NotificationButton(),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle),
+                            onPressed: () {
+                              AppRouter.instance
+                                  .pushNamed('channelOrganizing')
+                                  .then(
+                                (value) {
+                                  if (value != null) {
+                                    getChannels();
+                                  }
+                                },
+                              );
+                            },
                           ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 24),
-                          title: Text(element.name),
-                          subtitle: Text(element.description),
-                          onTap: () {
-                            AppRouter.instance.pushNamed(
-                              'channelChat',
-                              pathParameters: {'alias': element.alias},
-                              queryParameters: {
-                                if (element.realmId != null)
-                                  'realm': element.realm!.alias,
-                              },
-                            );
-                          },
-                        );
-                      },
+                          SizedBox(
+                            width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                          ),
+                        ],
+                      ),
                     ),
+                  ];
+                },
+                body: MediaQuery.removePadding(
+                  removeTop: true,
+                  context: context,
+                  child: Column(
+                    children: [
+                      if (_isBusy)
+                        const LinearProgressIndicator().animate().scaleX(),
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: () => getChannels(),
+                          child: ListView.builder(
+                            itemCount: _channels.length,
+                            itemBuilder: (context, index) {
+                              final element = _channels[index];
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.indigo,
+                                  child: FaIcon(
+                                    element.icon,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 24),
+                                title: Text(element.name),
+                                subtitle: Text(element.description),
+                                onTap: () {
+                                  AppRouter.instance.pushNamed(
+                                    'channelChat',
+                                    pathParameters: {'alias': element.alias},
+                                    queryParameters: {
+                                      if (element.realmId != null)
+                                        'realm': element.realm!.alias,
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            );
+          }),
     );
   }
 }

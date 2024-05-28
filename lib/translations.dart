@@ -48,6 +48,8 @@ class SolianMessages extends Translations {
           'aspectRatioPortrait': 'Portrait',
           'aspectRatioLandscape': 'Landscape',
           'signin': 'Sign in',
+          'signinRequired': 'Sign in',
+          'signinRequiredHint': 'Sign in to get full access of Solar Network',
           'signinGreeting': 'Welcome back\nSolar Network',
           'signinCaption':
               'Sign in to create post, start a realm, message your friend and more!',
@@ -160,6 +162,8 @@ class SolianMessages extends Translations {
           'aspectRatioPortrait': '竖型',
           'aspectRatioLandscape': '横型',
           'signin': '登录',
+          'signinRequired': '需要登录',
+          'signinRequiredHint': '登陆以获得 Solar Network 的全部功能使用权。',
           'signinGreeting': '欢迎回来\nSolar Network',
           'signinCaption': '登录以发表帖子、文章、创建领域、和你的朋友聊天，以及获取更多功能！',
           'signinRiskDetected': '检测到风险，点击下一步按钮来打开一个网页，并通过在其上面登录来通过安全检查。',
