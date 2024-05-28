@@ -23,6 +23,7 @@ class _AppNavigationBottomBarState extends State<AppNavigationBottomBar> {
             ),
           )
           .toList(),
+      type: BottomNavigationBarType.fixed,
       landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
       currentIndex: _selectedIndex,
       showUnselectedLabels: false,

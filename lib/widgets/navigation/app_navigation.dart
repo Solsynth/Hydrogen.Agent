@@ -14,6 +14,11 @@ abstract class AppNavigation {
       page: 'contact',
     ),
     AppNavigationDestination(
+      icon: const Icon(Icons.workspaces),
+      label: 'realms'.tr,
+      page: 'realms',
+    ),
+    AppNavigationDestination(
       icon: const Icon(Icons.account_circle),
       label: 'account'.tr,
       page: 'account',
@@ -26,6 +31,9 @@ class AppNavigationDestination {
   final String label;
   final String page;
 
-  AppNavigationDestination(
-      {required this.icon, required this.label, required this.page});
+  AppNavigationDestination({
+    required this.icon,
+    required this.label,
+    required this.page,
+  });
 }

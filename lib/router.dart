@@ -8,6 +8,8 @@ import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/contact.dart';
 import 'package:solian/screens/posts/post_detail.dart';
+import 'package:solian/screens/realms.dart';
+import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/post_publish.dart';
 import 'package:solian/shells/basic_shell.dart';
@@ -29,6 +31,11 @@ abstract class AppRouter {
             path: '/contact',
             name: 'contact',
             builder: (context, state) => const ContactScreen(),
+          ),
+          GoRoute(
+            path: '/realms',
+            name: 'realms',
+            builder: (context, state) => const RealmListScreen(),
           ),
           GoRoute(
             path: '/account',
@@ -111,6 +118,16 @@ abstract class AppRouter {
           return ChannelChatScreen(
             alias: state.pathParameters['alias']!,
             realm: state.uri.queryParameters['realm'] ?? 'global',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/realm/organize',
+        name: 'realmOrganizing',
+        builder: (context, state) {
+          final arguments = state.extra as RealmOrganizeArguments?;
+          return RealmOrganizeScreen(
+            edit: arguments?.edit,
           );
         },
       ),

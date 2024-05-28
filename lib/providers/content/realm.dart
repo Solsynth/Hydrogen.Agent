@@ -11,7 +11,7 @@ class RealmProvider extends GetxController {
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
-    final resp = await client.get('/realms/me/available');
+    final resp = await client.get('/api/realms/me/available');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
