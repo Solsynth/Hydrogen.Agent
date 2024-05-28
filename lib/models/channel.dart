@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/realm.dart';
 
@@ -12,6 +10,7 @@ class Channel {
   String name;
   String description;
   int type;
+  List<ChannelMember>? members;
   Account account;
   int accountId;
   Realm? realm;
@@ -24,16 +23,17 @@ class Channel {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
-    this.deletedAt,
+    required this.deletedAt,
     required this.alias,
     required this.name,
     required this.description,
     required this.type,
+    required this.members,
     required this.account,
     required this.accountId,
     required this.isEncrypted,
-    this.realm,
-    this.realmId,
+    required this.realm,
+    required this.realmId,
   });
 
   factory Channel.fromJson(Map<String, dynamic> json) => Channel(
@@ -45,6 +45,10 @@ class Channel {
         name: json['name'],
         description: json['description'],
         type: json['type'],
+        members: json['members']
+            ?.map((e) => ChannelMember.fromJson(e))
+            .toList()
+            .cast<ChannelMember>(),
         account: Account.fromJson(json['account']),
         accountId: json['account_id'],
         realm: json['realm'] != null ? Realm.fromJson(json['realm']) : null,
@@ -61,21 +65,13 @@ class Channel {
         'name': name,
         'description': description,
         'type': type,
+        'members': members?.map((e) => e.toJson()).toList(),
         'account': account.toJson(),
         'account_id': accountId,
         'realm': realm?.toJson(),
         'realm_id': realmId,
         'is_encrypted': isEncrypted,
       };
-
-  IconData get icon {
-    switch (type) {
-      case 1:
-        return FontAwesomeIcons.userGroup;
-      default:
-        return FontAwesomeIcons.hashtag;
-    }
-  }
 }
 
 class ChannelMember {

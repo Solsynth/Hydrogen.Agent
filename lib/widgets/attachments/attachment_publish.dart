@@ -56,7 +56,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
           ratio: await calculateFileAspectRatio(file),
         );
       } catch (err) {
-        this.context.showErrorDialog(err);
+        context.showErrorDialog(err);
       }
     }
 
@@ -79,7 +79,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     try {
       await uploadAttachment(file, hash, ratio: ratio);
     } catch (err) {
-      this.context.showErrorDialog(err);
+      context.showErrorDialog(err);
     }
 
     setState(() => _isBusy = false);
@@ -102,7 +102,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
       try {
         await uploadAttachment(file, hash);
       } catch (err) {
-        this.context.showErrorDialog(err);
+        context.showErrorDialog(err);
       }
     }
 
@@ -136,7 +136,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
     try {
       await uploadAttachment(file, hash, ratio: ratio);
     } catch (err) {
-      this.context.showErrorDialog(err);
+      context.showErrorDialog(err);
     }
 
     setState(() => _isBusy = false);
@@ -392,7 +392,7 @@ class _AttachmentEditingDialogState extends State<AttachmentEditingDialog> {
       );
       return Attachment.fromJson(resp.body);
     } catch (e) {
-      this.context.showErrorDialog(e);
+      context.showErrorDialog(e);
       return null;
     } finally {
       setState(() => _isBusy = false);
@@ -406,7 +406,7 @@ class _AttachmentEditingDialogState extends State<AttachmentEditingDialog> {
       await provider.deleteAttachment(widget.item.id);
       widget.onDelete();
     } catch (e) {
-      this.context.showErrorDialog(e);
+      context.showErrorDialog(e);
     } finally {
       setState(() => _isBusy = false);
     }

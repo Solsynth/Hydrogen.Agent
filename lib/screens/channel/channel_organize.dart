@@ -1,14 +1,12 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
-import 'package:solian/widgets/account/friend_select.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,11 +27,6 @@ class ChannelOrganizeScreen extends StatefulWidget {
 }
 
 class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
-  static Map<int, String> channelTypes = {
-    0: 'channelTypeCommon'.tr,
-    1: 'channelTypeDirect'.tr,
-  };
-
   bool _isBusy = false;
 
   final _aliasController = TextEditingController();
@@ -41,38 +34,6 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
   final _descriptionController = TextEditingController();
 
   bool _isEncrypted = false;
-  int _channelType = 0;
-
-  List<Account> _initialMembers = List.empty(growable: true);
-
-  void selectInitialMembers() async {
-    final input = await showModalBottomSheet(
-      useRootNavigator: true,
-      isScrollControlled: true,
-      context: context,
-      builder: (context) => FriendSelect(
-        title: 'channelMember'.tr,
-        trailingBuilder: (item) {
-          if (_initialMembers.any((e) => e.id == item.id)) {
-            return const Icon(Icons.check);
-          } else {
-            return null;
-          }
-        },
-      ),
-    );
-    if (input == null) return;
-
-    setState(() {
-      if (_initialMembers.any((e) => e.id == input.id)) {
-        _initialMembers = _initialMembers
-            .where((e) => e.id != input.id)
-            .toList(growable: true);
-      } else {
-        _initialMembers.add(input as Account);
-      }
-    });
-  }
 
   void applyChannel() async {
     final AuthProvider auth = Get.find();
@@ -81,6 +42,8 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
     if (_aliasController.value.text.isEmpty) randomizeAlias();
 
     setState(() => _isBusy = true);
+
+    final ChannelProvider provider = Get.find();
 
     final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
@@ -92,26 +55,20 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
       'name': _nameController.value.text,
       'description': _descriptionController.value.text,
       'is_encrypted': _isEncrypted,
-      if (_channelType == 1)
-        'members': _initialMembers.map((e) => e.id).toList(),
     };
 
-    Response resp;
-    if (widget.edit != null) {
-      resp = await client.put(
-        '/api/channels/$scope/${widget.edit!.id}',
-        payload,
-      );
-    } else if (_channelType == 1) {
-      resp = await client.post('/api/channels/$scope/dm', payload);
-    } else {
-      resp = await client.post('/api/channels/$scope', payload);
+    Response? resp;
+    try {
+      if (widget.edit != null) {
+        resp = await provider.updateChannel(scope!, widget.edit!.id, payload);
+      } else {
+        resp = await provider.createChannel(scope!, payload);
+      }
+    } catch (e) {
+      context.showErrorDialog(e);
     }
-    if (resp.statusCode != 200) {
-      context.showErrorDialog(resp.bodyString);
-    } else {
-      AppRouter.instance.pop(resp.body);
-    }
+
+    AppRouter.instance.pop(resp!.body);
 
     setState(() => _isBusy = false);
   }
@@ -127,7 +84,6 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
       _nameController.text = widget.edit!.name;
       _descriptionController.text = widget.edit!.description;
       _isEncrypted = widget.edit!.isEncrypted;
-      _channelType = widget.edit!.type;
     }
   }
 
@@ -227,55 +183,6 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
                 ).paddingSymmetric(horizontal: 16, vertical: 12),
               ),
               const Divider(thickness: 0.3),
-              if (_channelType == 1 && widget.edit == null)
-                ListTile(
-                  leading: const Icon(Icons.supervisor_account)
-                      .paddingSymmetric(horizontal: 8),
-                  title: Text('channelMember'.tr),
-                  subtitle: _initialMembers.isNotEmpty
-                      ? Text(_initialMembers.map((e) => e.name).join(' '))
-                      : null,
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => selectInitialMembers(),
-                ).animate().fadeIn().slideY(
-                      begin: 1,
-                      end: 0,
-                      curve: Curves.fastEaseInToSlowEaseOut,
-                    ),
-              ListTile(
-                leading: const Icon(Icons.mode).paddingSymmetric(horizontal: 8),
-                title: Text('channelType'.tr),
-                trailing: DropdownButtonHideUnderline(
-                  child: DropdownButton2<int>(
-                    isExpanded: true,
-                    items: channelTypes.entries
-                        .map((item) => DropdownMenuItem<int>(
-                              enabled: widget.edit == null ||
-                                  item.key == widget.edit?.type,
-                              value: item.key,
-                              child: Text(
-                                item.value,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ))
-                        .toList(),
-                    value: _channelType,
-                    onChanged: (int? value) {
-                      setState(() => _channelType = value ?? 0);
-                    },
-                    buttonStyleData: const ButtonStyleData(
-                      padding: EdgeInsets.only(left: 16, right: 1),
-                      height: 40,
-                      width: 140,
-                    ),
-                    menuItemStyleData: const MenuItemStyleData(
-                      height: 40,
-                    ),
-                  ),
-                ),
-              ),
               CheckboxListTile(
                 title: Text('channelEncrypted'.tr),
                 value: _isEncrypted,

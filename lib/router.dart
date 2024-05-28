@@ -20,7 +20,7 @@ abstract class AppRouter {
     routes: [
       ShellRoute(
         builder: (context, state, child) =>
-            NavShell(state: state, child: child, showAppBar: false),
+            NavShell(state: state, showAppBar: false, child: child),
         routes: [
           GoRoute(
             path: '/',

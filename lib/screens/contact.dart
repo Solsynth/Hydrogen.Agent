@@ -8,6 +8,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 
 class ContactScreen extends StatefulWidget {
@@ -19,8 +20,15 @@ class ContactScreen extends StatefulWidget {
 
 class _ContactScreenState extends State<ContactScreen> {
   bool _isBusy = true;
+  int? _accountId;
 
   final List<Channel> _channels = List.empty(growable: true);
+
+  getProfile() async {
+    final AuthProvider auth = Get.find();
+    final prof = await auth.getProfile();
+    _accountId = prof.body['id'];
+  }
 
   getChannels() async {
     setState(() => _isBusy = true);
@@ -42,6 +50,7 @@ class _ContactScreenState extends State<ContactScreen> {
   void initState() {
     super.initState();
 
+    getProfile();
     getChannels();
   }
 
@@ -81,17 +90,48 @@ class _ContactScreenState extends State<ContactScreen> {
                       forceElevated: innerBoxIsScrolled,
                       actions: [
                         const NotificationButton(),
-                        IconButton(
+                        PopupMenuButton(
                           icon: const Icon(Icons.add_circle),
-                          onPressed: () {
-                            AppRouter.instance
-                                .pushNamed('channelOrganizing')
-                                .then(
-                              (value) {
-                                if (value != null) getChannels();
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text('channelOrganizeCommon'.tr),
+                                leading: const Icon(Icons.tag),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              onTap: () {
+                                AppRouter.instance
+                                    .pushNamed('channelOrganizing')
+                                    .then(
+                                  (value) {
+                                    if (value != null) getChannels();
+                                  },
+                                );
                               },
-                            );
-                          },
+                            ),
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text('channelOrganizeDirect'.tr),
+                                leading: const FaIcon(
+                                  FontAwesomeIcons.userGroup,
+                                  size: 16,
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              onTap: () {
+                                final ChannelProvider provider = Get.find();
+                                provider
+                                    .createDirectChannel(context, 'global')
+                                    .then((resp) {
+                                  if (resp != null) {
+                                    getChannels();
+                                  }
+                                });
+                              },
+                            ),
+                          ],
                         ),
                         SizedBox(
                           width: SolianTheme.isLargeScreen(context) ? 8 : 16,
@@ -115,30 +155,7 @@ class _ContactScreenState extends State<ContactScreen> {
                           itemCount: _channels.length,
                           itemBuilder: (context, index) {
                             final element = _channels[index];
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.indigo,
-                                child: FaIcon(
-                                  element.icon,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                              ),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 24),
-                              title: Text(element.name),
-                              subtitle: Text(element.description),
-                              onTap: () {
-                                AppRouter.instance.pushNamed(
-                                  'channelChat',
-                                  pathParameters: {'alias': element.alias},
-                                  queryParameters: {
-                                    if (element.realmId != null)
-                                      'realm': element.realm!.alias,
-                                  },
-                                );
-                              },
-                            );
+                            return buildItem(element);
                           },
                         ),
                       ),
@@ -150,6 +167,60 @@ class _ContactScreenState extends State<ContactScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget buildItem(Channel element) {
+    if (element.type == 1) {
+      final otherside = element.members!
+          .where((e) => e.account.externalId != _accountId)
+          .first;
+
+      return ListTile(
+        leading: AccountAvatar(
+          content: otherside.account.avatar,
+          bgColor: Colors.indigo,
+          feColor: Colors.white,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+        title: Text(otherside.account.name),
+        subtitle: Text(
+          'channelDirectDescription'
+              .trParams({'username': otherside.account.name}),
+        ),
+        onTap: () {
+          AppRouter.instance.pushNamed(
+            'channelChat',
+            pathParameters: {'alias': element.alias},
+            queryParameters: {
+              if (element.realmId != null) 'realm': element.realm!.alias,
+            },
+          );
+        },
+      );
+    }
+
+    return ListTile(
+      leading: const CircleAvatar(
+        backgroundColor: Colors.indigo,
+        child: FaIcon(
+          FontAwesomeIcons.hashtag,
+          color: Colors.white,
+          size: 16,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+      title: Text(element.name),
+      subtitle: Text(element.description),
+      onTap: () {
+        AppRouter.instance.pushNamed(
+          'channelChat',
+          pathParameters: {'alias': element.alias},
+          queryParameters: {
+            if (element.realmId != null) 'realm': element.realm!.alias,
+          },
+        );
+      },
     );
   }
 }

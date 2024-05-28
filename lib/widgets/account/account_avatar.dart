@@ -3,11 +3,17 @@ import 'package:solian/services.dart';
 
 class AccountAvatar extends StatelessWidget {
   final dynamic content;
-  final Color? color;
+  final Color? bgColor;
+  final Color? feColor;
   final double? radius;
 
-  const AccountAvatar(
-      {super.key, required this.content, this.color, this.radius});
+  const AccountAvatar({
+    super.key,
+    required this.content,
+    this.bgColor,
+    this.feColor,
+    this.radius,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +28,7 @@ class AccountAvatar extends StatelessWidget {
     return CircleAvatar(
       key: Key('a$content'),
       radius: radius,
-      backgroundColor: color,
+      backgroundColor: bgColor,
       backgroundImage: !isEmpty
           ? NetworkImage(
               direct
@@ -34,6 +40,7 @@ class AccountAvatar extends StatelessWidget {
           ? Icon(
               Icons.account_circle,
               size: radius != null ? radius! * 1.2 : 24,
+              color: feColor,
             )
           : null,
     );

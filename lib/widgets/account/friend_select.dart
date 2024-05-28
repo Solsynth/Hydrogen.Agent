@@ -19,7 +19,7 @@ class FriendSelect extends StatefulWidget {
 class _FriendSelectState extends State<FriendSelect> {
   int _accountId = 0;
 
-  List<Friendship> _friends = List.empty(growable: true);
+  final List<Friendship> _friends = List.empty(growable: true);
 
   getFriends() async {
     final AuthProvider auth = Get.find();

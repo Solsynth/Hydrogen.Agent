@@ -96,11 +96,11 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 28,
                 backgroundColor: Colors.teal,
                 child: FaIcon(
-                  widget.channel.icon,
+                  FontAwesomeIcons.hashtag,
                   color: Colors.white,
                   size: 18,
                 ),

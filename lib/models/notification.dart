@@ -16,25 +16,31 @@ class Notification {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
-    this.deletedAt,
+    required this.deletedAt,
     required this.subject,
     required this.content,
-    this.links,
+    required this.links,
     required this.isImportant,
     required this.isRealtime,
-    this.readAt,
-    this.senderId,
+    required this.readAt,
+    required this.senderId,
     required this.recipientId,
   });
 
   factory Notification.fromJson(Map<String, dynamic> json) => Notification(
         id: json['id'] ?? 0,
-        createdAt: json['created_at'] == null ? DateTime.now() : DateTime.parse(json['created_at']),
-        updatedAt: json['updated_at'] == null ? DateTime.now() : DateTime.parse(json['updated_at']),
+        createdAt: json['created_at'] == null
+            ? DateTime.now()
+            : DateTime.parse(json['created_at']),
+        updatedAt: json['updated_at'] == null
+            ? DateTime.now()
+            : DateTime.parse(json['updated_at']),
         deletedAt: json['deleted_at'],
         subject: json['subject'],
         content: json['content'],
-        links: json['links'] != null ? List<Link>.from(json['links'].map((x) => Link.fromJson(x))) : List.empty(),
+        links: json['links'] != null
+            ? List<Link>.from(json['links'].map((x) => Link.fromJson(x)))
+            : List.empty(),
         isImportant: json['is_important'],
         isRealtime: json['is_realtime'],
         readAt: json['read_at'],
@@ -49,7 +55,9 @@ class Notification {
         'deleted_at': deletedAt,
         'subject': subject,
         'content': content,
-        'links': links != null ? List<dynamic>.from(links!.map((x) => x.toJson())) : List.empty(),
+        'links': links != null
+            ? List<dynamic>.from(links!.map((x) => x.toJson()))
+            : List.empty(),
         'is_important': isImportant,
         'is_realtime': isRealtime,
         'read_at': readAt,

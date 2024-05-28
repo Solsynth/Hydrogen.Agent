@@ -15,13 +15,13 @@ class Account {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
-    this.deletedAt,
+    required this.deletedAt,
     required this.name,
     required this.nick,
     required this.avatar,
     required this.banner,
     required this.description,
-    this.emailAddress,
+    required this.emailAddress,
     this.externalId,
   });
 
