@@ -48,7 +48,7 @@ class PostListWidget extends StatelessWidget {
                 context: context,
                 builder: (context) => PostAction(item: item),
               ).then((value) {
-                if (value == true) controller.refresh();
+                if (value != null) controller.refresh();
               });
             },
           );

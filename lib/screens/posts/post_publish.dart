@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
@@ -16,15 +17,16 @@ class PostPublishingArguments {
   final Post? edit;
   final Post? reply;
   final Post? repost;
+  final Realm? realm;
 
-  PostPublishingArguments({this.edit, this.reply, this.repost});
+  PostPublishingArguments({this.edit, this.reply, this.repost, this.realm});
 }
 
 class PostPublishingScreen extends StatefulWidget {
   final Post? edit;
   final Post? reply;
   final Post? repost;
-  final String? realm;
+  final Realm? realm;
 
   const PostPublishingScreen({
     super.key,
@@ -73,6 +75,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
       if (widget.edit != null) 'alias': widget.edit!.alias,
       if (widget.reply != null) 'reply_to': widget.reply!.id,
       if (widget.repost != null) 'repost_to': widget.repost!.id,
+      if (widget.realm != null) 'realm': widget.realm!.alias,
     };
 
     Response resp;
@@ -226,7 +229,18 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                   }
                 },
               ),
-              const Divider(thickness: 0.3),
+              if (widget.realm != null)
+                MaterialBanner(
+                  leading: const Icon(Icons.group),
+                  leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                  dividerColor: Colors.transparent,
+                  content: Text(
+                    'postInRealmNotify'
+                        .trParams({'realm': '#${widget.realm!.alias}'}),
+                  ),
+                  actions: notifyBannerActions,
+                ),
+              const Divider(thickness: 0.3, height: 0.3).paddingOnly(bottom: 8),
               Expanded(
                 child: Container(
                   padding:
@@ -245,14 +259,9 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                   ),
                 ),
               ),
-              Container(
-                constraints: const BoxConstraints(minHeight: 56),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                        width: 0.3, color: Theme.of(context).dividerColor),
-                  ),
-                ),
+              const Divider(thickness: 0.3, height: 0.3),
+              SizedBox(
+                height: 56,
                 child: Row(
                   children: [
                     TextButton(

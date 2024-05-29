@@ -161,12 +161,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         ),
       ),
       onLongPress: () {},
-    ).animate(key: Key('m${item.id}'), autoPlay: true).slideY(
-          curve: Curves.fastEaseInToSlowEaseOut,
-          duration: 350.ms,
-          begin: 0.25,
-          end: 0,
-        );
+    );
   }
 
   @override

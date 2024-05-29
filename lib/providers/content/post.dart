@@ -7,8 +7,13 @@ class PostProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.services['interactive'];
   }
 
-  Future<Response> listPost(int page) async {
-    final resp = await get('/api/feed?take=${10}&offset=$page');
+  Future<Response> listPost(int page, {int? realm}) async {
+    final queries = [
+      'take=${10}',
+      'offset=$page',
+      if (realm != null) 'realmId=$realm',
+    ];
+    final resp = await get('/api/feed?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }

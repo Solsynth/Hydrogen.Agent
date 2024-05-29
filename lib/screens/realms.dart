@@ -154,7 +154,11 @@ class _RealmListScreenState extends State<RealmListScreen> {
               )
             ],
           ),
-          onTap: () {},
+          onTap: () {
+            AppRouter.instance.pushNamed('realmView', pathParameters: {
+              'alias': element.alias,
+            });
+          },
         ),
       ),
     ).paddingOnly(left: 8, right: 8, bottom: 4);

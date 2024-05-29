@@ -165,10 +165,10 @@ class _ContactScreenState extends State<ContactScreen> {
           feColor: Colors.white,
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-        title: Text(otherside.account.name),
+        title: Text(otherside.account.nick),
         subtitle: Text(
           'channelDirectDescription'
-              .trParams({'username': otherside.account.name}),
+              .trParams({'username': '@${otherside.account.name}'}),
         ),
         onTap: () {
           AppRouter.instance.pushNamed(

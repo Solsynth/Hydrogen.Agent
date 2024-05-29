@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:solian/models/channel.dart';
+import 'package:solian/models/realm.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
@@ -9,7 +10,9 @@ import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/contact.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/screens/realms.dart';
+import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
+import 'package:solian/screens/realms/realm_view.dart';
 import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/post_publish.dart';
 import 'package:solian/shells/basic_shell.dart';
@@ -57,6 +60,19 @@ abstract class AppRouter {
           ),
         ],
       ),
+      GoRoute(
+        path: '/posts/publish',
+        name: 'postPublishing',
+        builder: (context, state) {
+          final arguments = state.extra as PostPublishingArguments?;
+          return PostPublishingScreen(
+            edit: arguments?.edit,
+            reply: arguments?.reply,
+            repost: arguments?.repost,
+            realm: arguments?.realm,
+          );
+        },
+      ),
       ShellRoute(
         builder: (context, state, child) =>
             BasicShell(state: state, child: child),
@@ -88,19 +104,6 @@ abstract class AppRouter {
         ],
       ),
       GoRoute(
-        path: '/posts/publish',
-        name: 'postPublishing',
-        builder: (context, state) {
-          final arguments = state.extra as PostPublishingArguments?;
-          return PostPublishingScreen(
-            edit: arguments?.edit,
-            reply: arguments?.reply,
-            repost: arguments?.repost,
-            realm: state.uri.queryParameters['realm'],
-          );
-        },
-      ),
-      GoRoute(
         path: '/chat/organize',
         name: 'channelOrganizing',
         builder: (context, state) {
@@ -121,6 +124,20 @@ abstract class AppRouter {
           );
         },
       ),
+      ShellRoute(
+        builder: (context, state, child) =>
+            BasicShell(state: state, child: child),
+        routes: [
+          GoRoute(
+            path: '/realms/:alias/detail',
+            name: 'realmDetail',
+            builder: (context, state) => RealmDetailScreen(
+              realm: state.extra as Realm,
+              alias: state.pathParameters['alias']!,
+            ),
+          ),
+        ],
+      ),
       GoRoute(
         path: '/realm/organize',
         name: 'realmOrganizing',
@@ -128,6 +145,15 @@ abstract class AppRouter {
           final arguments = state.extra as RealmOrganizeArguments?;
           return RealmOrganizeScreen(
             edit: arguments?.edit,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/realm/:alias',
+        name: 'realmView',
+        builder: (context, state) {
+          return RealmViewScreen(
+            alias: state.pathParameters['alias']!,
           );
         },
       ),

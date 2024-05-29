@@ -3,6 +3,21 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
 class RealmProvider extends GetxController {
+  Future<Response> getRealm(String alias) async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) throw Exception('unauthorized');
+
+    final client = GetConnect(maxAuthRetries: 3);
+    client.httpClient.baseUrl = ServiceFinder.services['passport'];
+
+    final resp = await client.get('/api/realms/$alias');
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    }
+
+    return resp;
+  }
+
   Future<Response> listAvailableRealm() async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
