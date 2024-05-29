@@ -75,94 +75,76 @@ class _ContactScreenState extends State<ContactScreen> {
             );
           }
 
-          return SafeArea(
-            child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) {
-                return [
-                  SliverOverlapAbsorber(
-                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                        context),
-                    sliver: SliverAppBar(
-                      title: Text('contact'.tr),
-                      centerTitle: false,
-                      titleSpacing:
-                          SolianTheme.isLargeScreen(context) ? null : 24,
-                      forceElevated: innerBoxIsScrolled,
-                      actions: [
-                        const NotificationButton(),
-                        PopupMenuButton(
-                          icon: const Icon(Icons.add_circle),
-                          itemBuilder: (BuildContext context) => [
-                            PopupMenuItem(
-                              child: ListTile(
-                                title: Text('channelOrganizeCommon'.tr),
-                                leading: const Icon(Icons.tag),
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                              onTap: () {
-                                AppRouter.instance
-                                    .pushNamed('channelOrganizing')
-                                    .then(
-                                  (value) {
-                                    if (value != null) getChannels();
-                                  },
-                                );
+          return RefreshIndicator(
+            onRefresh: () => getChannels(),
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  title: Text('contact'.tr),
+                  centerTitle: false,
+                  titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
+                  actions: [
+                    const NotificationButton(),
+                    PopupMenuButton(
+                      icon: const Icon(Icons.add_circle),
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text('channelOrganizeCommon'.tr),
+                            leading: const Icon(Icons.tag),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          onTap: () {
+                            AppRouter.instance
+                                .pushNamed('channelOrganizing')
+                                .then(
+                              (value) {
+                                if (value != null) getChannels();
                               },
-                            ),
-                            PopupMenuItem(
-                              child: ListTile(
-                                title: Text('channelOrganizeDirect'.tr),
-                                leading: const FaIcon(
-                                  FontAwesomeIcons.userGroup,
-                                  size: 16,
-                                ),
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                              onTap: () {
-                                final ChannelProvider provider = Get.find();
-                                provider
-                                    .createDirectChannel(context, 'global')
-                                    .then((resp) {
-                                  if (resp != null) {
-                                    getChannels();
-                                  }
-                                });
-                              },
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                        SizedBox(
-                          width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text('channelOrganizeDirect'.tr),
+                            leading: const FaIcon(
+                              FontAwesomeIcons.userGroup,
+                              size: 16,
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          onTap: () {
+                            final ChannelProvider provider = Get.find();
+                            provider
+                                .createDirectChannel(context, 'global')
+                                .then((resp) {
+                              if (resp != null) {
+                                getChannels();
+                              }
+                            });
+                          },
                         ),
                       ],
                     ),
-                  ),
-                ];
-              },
-              body: MediaQuery.removePadding(
-                removeTop: true,
-                context: context,
-                child: Column(
-                  children: [
-                    if (_isBusy)
-                      const LinearProgressIndicator().animate().scaleX(),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () => getChannels(),
-                        child: ListView.builder(
-                          itemCount: _channels.length,
-                          itemBuilder: (context, index) {
-                            final element = _channels[index];
-                            return buildItem(element);
-                          },
-                        ),
-                      ),
+                    SizedBox(
+                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                     ),
                   ],
                 ),
-              ),
+                if (_isBusy)
+                  SliverToBoxAdapter(
+                    child: const LinearProgressIndicator().animate().scaleX(),
+                  ),
+                SliverList.builder(
+                  itemCount: _channels.length,
+                  itemBuilder: (context, index) {
+                    final element = _channels[index];
+                    return buildItem(element);
+                  },
+                ),
+              ],
             ),
           );
         },

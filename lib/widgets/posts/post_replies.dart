@@ -8,12 +8,10 @@ import 'package:solian/widgets/posts/post_list.dart';
 
 class PostReplyList extends StatefulWidget {
   final Post item;
-  final bool shrinkWrap;
 
   const PostReplyList({
     super.key,
     required this.item,
-    this.shrinkWrap = false,
   });
 
   @override
@@ -55,7 +53,6 @@ class _PostReplyListState extends State<PostReplyList> {
   Widget build(BuildContext context) {
     return PostListWidget(
       isShowEmbed: false,
-      shrinkWrap: widget.shrinkWrap,
       controller: _pagingController,
     );
   }
@@ -76,8 +73,8 @@ class PostReplyListPopup extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineSmall,
         ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
         Expanded(
-          child: PostReplyList(
-            item: item,
+          child: CustomScrollView(
+            slivers: [PostReplyList(item: item)],
           ),
         ),
       ],

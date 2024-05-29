@@ -44,22 +44,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             );
           }
 
-          return ListView(
-            children: [
-              PostItem(
-                item: item!,
-                isClickable: true,
-                isShowReply: false,
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: PostItem(
+                  item: item!,
+                  isClickable: true,
+                  isShowReply: false,
+                ),
               ),
-              const Divider(thickness: 0.3, height: 0.3),
-              Text(
-                'postReplies'.tr,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ).paddingOnly(left: 24, right: 24, top: 16),
-              PostReplyList(
-                item: item!,
-                shrinkWrap: true,
+              const SliverToBoxAdapter(
+                child: Divider(thickness: 0.3, height: 0.3),
               ),
+              SliverToBoxAdapter(
+                child: Text(
+                  'postReplies'.tr,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ).paddingOnly(left: 24, right: 24, top: 16),
+              ),
+              PostReplyList(item: item!),
             ],
           );
         },

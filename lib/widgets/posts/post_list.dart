@@ -7,7 +7,6 @@ import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
 class PostListWidget extends StatelessWidget {
-  final bool shrinkWrap;
   final bool isShowEmbed;
   final bool isClickable;
   final bool isNestedClickable;
@@ -16,7 +15,6 @@ class PostListWidget extends StatelessWidget {
   const PostListWidget({
     super.key,
     required this.controller,
-    this.shrinkWrap = false,
     this.isShowEmbed = true,
     this.isClickable = true,
     this.isNestedClickable = true,
@@ -24,8 +22,7 @@ class PostListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PagedListView<int, Post>.separated(
-      shrinkWrap: shrinkWrap,
+    return PagedSliverList<int, Post>.separated(
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {

@@ -72,39 +72,24 @@ class _SocialScreenState extends State<SocialScreen> {
           }),
       body: Material(
         color: Theme.of(context).colorScheme.surface,
-        child: SafeArea(
-          child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                SliverOverlapAbsorber(
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: SliverAppBar(
-                    title: Text('social'.tr),
-                    centerTitle: false,
-                    floating: true,
-                    snap: true,
-                    titleSpacing:
-                        SolianTheme.isLargeScreen(context) ? null : 24,
-                    forceElevated: innerBoxIsScrolled,
-                    actions: [
-                      const NotificationButton(),
-                      SizedBox(
-                        width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                      ),
-                    ],
+        child: RefreshIndicator(
+          onRefresh: () => Future.sync(() => _pagingController.refresh()),
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                title: Text('social'.tr),
+                centerTitle: false,
+                floating: true,
+                titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
+                actions: [
+                  const NotificationButton(),
+                  SizedBox(
+                    width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                   ),
-                ),
-              ];
-            },
-            body: MediaQuery.removePadding(
-              removeTop: true,
-              context: context,
-              child: RefreshIndicator(
-                onRefresh: () => Future.sync(() => _pagingController.refresh()),
-                child: PostListWidget(controller: _pagingController),
+                ],
               ),
-            ),
+              PostListWidget(controller: _pagingController),
+            ],
           ),
         ),
       ),

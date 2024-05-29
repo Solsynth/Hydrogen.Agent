@@ -66,63 +66,43 @@ class _RealmListScreenState extends State<RealmListScreen> {
             );
           }
 
-          return SafeArea(
-            child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) {
-                return [
-                  SliverOverlapAbsorber(
-                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                        context),
-                    sliver: SliverAppBar(
-                      title: Text('realm'.tr),
-                      centerTitle: false,
-                      titleSpacing:
-                          SolianTheme.isLargeScreen(context) ? null : 24,
-                      forceElevated: innerBoxIsScrolled,
-                      actions: [
-                        const NotificationButton(),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle),
-                          onPressed: () {
-                            AppRouter.instance
-                                .pushNamed('realmOrganizing')
-                                .then(
-                              (value) {
-                                if (value != null) getRealms();
-                              },
-                            );
+          return RefreshIndicator(
+            onRefresh: () => getRealms(),
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  title: Text('realm'.tr),
+                  centerTitle: false,
+                  titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
+                  actions: [
+                    const NotificationButton(),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle),
+                      onPressed: () {
+                        AppRouter.instance.pushNamed('realmOrganizing').then(
+                          (value) {
+                            if (value != null) getRealms();
                           },
-                        ),
-                        SizedBox(
-                          width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
-                ];
-              },
-              body: MediaQuery.removePadding(
-                removeTop: true,
-                context: context,
-                child: Column(
-                  children: [
-                    if (_isBusy)
-                      const LinearProgressIndicator().animate().scaleX(),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () => getRealms(),
-                        child: ListView.builder(
-                          itemCount: _realms.length,
-                          itemBuilder: (context, index) {
-                            final element = _realms[index];
-                            return buildRealm(element);
-                          },
-                        ),
-                      ),
+                    SizedBox(
+                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                     ),
                   ],
                 ),
-              ),
+                if (_isBusy)
+                  SliverToBoxAdapter(
+                    child: const LinearProgressIndicator().animate().scaleX(),
+                  ),
+                SliverList.builder(
+                  itemCount: _realms.length,
+                  itemBuilder: (context, index) {
+                    final element = _realms[index];
+                    return buildRealm(element);
+                  },
+                )
+              ],
             ),
           );
         },
