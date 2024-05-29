@@ -78,8 +78,6 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
               .pushNamed(
             'channelOrganizing',
             extra: ChannelOrganizeArguments(edit: widget.channel),
-            queryParameters:
-                widget.realm != 'global' ? {'realm': widget.realm} : {},
           )
               .then((resp) {
             if (resp != null) {

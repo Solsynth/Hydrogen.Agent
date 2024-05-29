@@ -12,11 +12,13 @@ class ChatMessage extends StatelessWidget {
   final Message item;
   final bool isCompact;
   final bool isMerged;
+  final bool isHasMerged;
 
   const ChatMessage({
     super.key,
     required this.item,
     this.isMerged = false,
+    this.isHasMerged = false,
     this.isCompact = false,
   });
 
@@ -28,7 +30,6 @@ class ChatMessage extends StatelessWidget {
           text = content['value'];
         default:
           throw Exception('Unsupported algorithm');
-        // TODO Impl AES algorithm
       }
     }
 
@@ -94,7 +95,7 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget widget;
     if (isMerged) {
-      widget = buildContent().paddingOnly(left: 40);
+      widget = buildContent().paddingOnly(left: 52);
     } else if (isCompact) {
       widget = Row(
         crossAxisAlignment: CrossAxisAlignment.start,

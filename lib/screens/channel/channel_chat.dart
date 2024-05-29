@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/exts.dart';
@@ -221,8 +220,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                   clipBehavior: Clip.none,
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<Message>(
-                    animateTransitions: true,
-                    transitionDuration: 350.ms,
                     itemBuilder: chatHistoryBuilder,
                     noItemsFoundIndicatorBuilder: (_) => Container(),
                   ),

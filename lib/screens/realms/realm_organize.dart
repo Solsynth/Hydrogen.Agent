@@ -129,7 +129,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
                       child: Text('cancel'.tr),
                     ),
                   ],
-                ),
+                ).paddingOnly(bottom: 6),
               Row(
                 children: [
                   Expanded(

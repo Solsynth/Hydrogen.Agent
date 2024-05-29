@@ -47,8 +47,6 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   }
 
   Map<String, dynamic> encodeMessage(String content) {
-    // TODO Impl E2EE
-
     return {
       'value': content,
       'keypair_id': null,
