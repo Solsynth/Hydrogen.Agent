@@ -110,7 +110,7 @@ abstract class AppRouter {
           final arguments = state.extra as ChannelOrganizeArguments?;
           return ChannelOrganizeScreen(
             edit: arguments?.edit,
-            realm: state.uri.queryParameters['realm'],
+            realm: arguments?.realm,
           );
         },
       ),

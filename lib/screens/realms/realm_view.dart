@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
+import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/post.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/router.dart';
+import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/posts/post_publish.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class RealmViewScreen extends StatefulWidget {
@@ -26,6 +31,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
   String? _overrideAlias;
 
   Realm? _realm;
+  final List<Channel> _channels = List.empty(growable: true);
 
   getRealm({String? overrideAlias}) async {
     final RealmProvider provider = Get.find();
@@ -46,11 +52,29 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
     setState(() => _isBusy = false);
   }
 
+  getChannels() async {
+    setState(() => _isBusy = true);
+
+    final ChannelProvider provider = Get.find();
+    final resp = await provider.listChannel(scope: _realm!.alias);
+
+    setState(() {
+      _channels.clear();
+      _channels.addAll(
+        resp.body.map((e) => Channel.fromJson(e)).toList().cast<Channel>(),
+      );
+    });
+
+    setState(() => _isBusy = false);
+  }
+
   @override
   void initState() {
     super.initState();
 
-    getRealm();
+    getRealm().then((_) {
+      getChannels();
+    });
   }
 
   @override
@@ -113,7 +137,11 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
                 return TabBarView(
                   children: [
                     RealmPostListWidget(realm: _realm!),
-                    Icon(Icons.directions_transit),
+                    RealmChannelListWidget(
+                      realm: _realm!,
+                      channels: _channels,
+                      onRefresh: () => getChannels(),
+                    ),
                   ],
                 );
               },
@@ -174,7 +202,7 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
           SliverToBoxAdapter(
             child: ListTile(
               leading: const Icon(Icons.post_add),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              contentPadding: const EdgeInsets.only(left: 24, right: 8),
               tileColor: Theme.of(context).colorScheme.surfaceContainer,
               title: Text('postNew'.tr),
               subtitle: Text(
@@ -196,6 +224,63 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
           PostListWidget(controller: _pagingController),
         ],
       ),
+    );
+  }
+}
+
+class RealmChannelListWidget extends StatelessWidget {
+  final Realm realm;
+  final List<Channel> channels;
+  final Future Function() onRefresh;
+
+  const RealmChannelListWidget({
+    super.key,
+    required this.realm,
+    required this.channels,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthProvider auth = Get.find();
+
+    return FutureBuilder(
+      future: auth.getProfile(),
+      builder: (context, snapshot) {
+        return RefreshIndicator(
+          onRefresh: onRefresh,
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: ListTile(
+                  leading: const Icon(Icons.add_box),
+                  contentPadding: const EdgeInsets.only(left: 32, right: 8),
+                  tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                  title: Text('channelNew'.tr),
+                  subtitle: Text(
+                    'channelNewInRealmHint'
+                        .trParams({'realm': '#${realm.alias}'}),
+                  ),
+                  onTap: () {
+                    AppRouter.instance
+                        .pushNamed(
+                      'channelOrganizing',
+                      extra: ChannelOrganizeArguments(realm: realm),
+                    )
+                        .then((value) {
+                      if (value != null) onRefresh();
+                    });
+                  },
+                ),
+              ),
+              ChannelListWidget(
+                channels: channels,
+                selfId: snapshot.data?.body['id'] ?? 0,
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -8,8 +8,8 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
-import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
+import 'package:solian/widgets/channel/channel_list.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -137,72 +137,12 @@ class _ContactScreenState extends State<ContactScreen> {
                   SliverToBoxAdapter(
                     child: const LinearProgressIndicator().animate().scaleX(),
                   ),
-                SliverList.builder(
-                  itemCount: _channels.length,
-                  itemBuilder: (context, index) {
-                    final element = _channels[index];
-                    return buildItem(element);
-                  },
-                ),
+                ChannelListWidget(channels: _channels, selfId: _accountId ?? 0),
               ],
             ),
           );
         },
       ),
-    );
-  }
-
-  Widget buildItem(Channel element) {
-    if (element.type == 1) {
-      final otherside = element.members!
-          .where((e) => e.account.externalId != _accountId)
-          .first;
-
-      return ListTile(
-        leading: AccountAvatar(
-          content: otherside.account.avatar,
-          bgColor: Colors.indigo,
-          feColor: Colors.white,
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-        title: Text(otherside.account.nick),
-        subtitle: Text(
-          'channelDirectDescription'
-              .trParams({'username': '@${otherside.account.name}'}),
-        ),
-        onTap: () {
-          AppRouter.instance.pushNamed(
-            'channelChat',
-            pathParameters: {'alias': element.alias},
-            queryParameters: {
-              if (element.realmId != null) 'realm': element.realm!.alias,
-            },
-          );
-        },
-      );
-    }
-
-    return ListTile(
-      leading: const CircleAvatar(
-        backgroundColor: Colors.indigo,
-        child: FaIcon(
-          FontAwesomeIcons.hashtag,
-          color: Colors.white,
-          size: 16,
-        ),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-      title: Text(element.name),
-      subtitle: Text(element.description),
-      onTap: () {
-        AppRouter.instance.pushNamed(
-          'channelChat',
-          pathParameters: {'alias': element.alias},
-          queryParameters: {
-            if (element.realmId != null) 'realm': element.realm!.alias,
-          },
-        );
-      },
     );
   }
 }

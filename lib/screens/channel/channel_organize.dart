@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
+import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
@@ -12,13 +13,14 @@ import 'package:uuid/uuid.dart';
 
 class ChannelOrganizeArguments {
   final Channel? edit;
+  final Realm? realm;
 
-  ChannelOrganizeArguments({this.edit});
+  ChannelOrganizeArguments({this.edit, this.realm});
 }
 
 class ChannelOrganizeScreen extends StatefulWidget {
   final Channel? edit;
-  final String? realm;
+  final Realm? realm;
 
   const ChannelOrganizeScreen({super.key, this.edit, this.realm});
 
@@ -49,7 +51,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
-    final scope = (widget.realm?.isNotEmpty ?? false) ? widget.realm : 'global';
+    final scope = widget.realm != null ? widget.realm!.alias : 'global';
     final payload = {
       'alias': _aliasController.value.text.toLowerCase(),
       'name': _nameController.value.text,
@@ -60,9 +62,9 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
     Response? resp;
     try {
       if (widget.edit != null) {
-        resp = await provider.updateChannel(scope!, widget.edit!.id, payload);
+        resp = await provider.updateChannel(scope, widget.edit!.id, payload);
       } else {
-        resp = await provider.createChannel(scope!, payload);
+        resp = await provider.createChannel(scope, payload);
       }
     } catch (e) {
       context.showErrorDialog(e);
@@ -99,6 +101,13 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notifyBannerActions = [
+      TextButton(
+        onPressed: cancelAction,
+        child: Text('cancel'.tr),
+      ),
+    ];
+
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
@@ -126,13 +135,19 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
                     'channelEditingNotify'
                         .trParams({'channel': '#${widget.edit!.alias}'}),
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: cancelAction,
-                      child: Text('cancel'.tr),
-                    ),
-                  ],
-                ),
+                  actions: notifyBannerActions,
+                ).paddingOnly(bottom: 6),
+              if (widget.realm != null)
+                MaterialBanner(
+                  leading: const Icon(Icons.group),
+                  leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                  dividerColor: Colors.transparent,
+                  content: Text(
+                    'channelInRealmNotify'
+                        .trParams({'realm': '#${widget.realm!.alias}'}),
+                  ),
+                  actions: notifyBannerActions,
+                ).paddingOnly(bottom: 6),
               Row(
                 children: [
                   Expanded(
