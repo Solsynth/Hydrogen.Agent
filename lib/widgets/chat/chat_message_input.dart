@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 class ChatMessageInput extends StatefulWidget {
   final Message? edit;
   final Message? reply;
+  final String? placeholder;
   final Channel channel;
   final String realm;
   final Function(Message) onSent;
@@ -20,6 +21,7 @@ class ChatMessageInput extends StatefulWidget {
     super.key,
     this.edit,
     this.reply,
+    this.placeholder,
     required this.channel,
     required this.realm,
     required this.onSent,
@@ -145,9 +147,10 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                   autocorrect: true,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration.collapsed(
-                    hintText: 'messageInputPlaceholder'.trParams(
-                      {'channel': '#${widget.channel.alias}'},
-                    ),
+                    hintText: widget.placeholder ??
+                        'messageInputPlaceholder'.trParams(
+                          {'channel': '#${widget.channel.alias}'},
+                        ),
                   ),
                   onSubmitted: (_) => sendMessage(),
                   onTapOutside: (_) =>

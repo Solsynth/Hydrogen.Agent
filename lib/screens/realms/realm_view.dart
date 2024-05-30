@@ -276,6 +276,7 @@ class RealmChannelListWidget extends StatelessWidget {
               ChannelListWidget(
                 channels: channels,
                 selfId: snapshot.data?.body['id'] ?? 0,
+                noCategory: true,
               )
             ],
           ),

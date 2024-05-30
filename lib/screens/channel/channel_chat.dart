@@ -33,6 +33,8 @@ class ChannelChatScreen extends StatefulWidget {
 
 class _ChannelChatScreenState extends State<ChannelChatScreen> {
   bool _isBusy = false;
+  int? _accountId;
+
   String? _overrideAlias;
 
   Channel? _channel;
@@ -40,6 +42,12 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   final PagingController<int, Message> _pagingController =
       PagingController(firstPageKey: 0);
+
+  getProfile() async {
+    final AuthProvider auth = Get.find();
+    final prof = await auth.getProfile();
+    _accountId = prof.body['id'];
+  }
 
   getChannel({String? overrideAlias}) async {
     final ChannelProvider provider = Get.find();
@@ -167,6 +175,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   void initState() {
     super.initState();
 
+    getProfile();
     getChannel().then((_) {
       listenMessages();
       _pagingController.addPageRequestListener(getMessages);
@@ -181,9 +190,22 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       );
     }
 
+    String title = _channel?.name ?? 'loading'.tr;
+    String? placeholder;
+
+    if (_channel?.type == 1) {
+      final otherside = _channel!.members!
+          .where((e) => e.account.externalId != _accountId)
+          .first;
+      title = otherside.account.nick;
+      placeholder = 'messageInputPlaceholder'.trParams(
+        {'channel': '@${otherside.account.name}'},
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_channel?.name ?? 'loading'.tr),
+        title: Text(title),
         centerTitle: false,
         actions: [
           IconButton(
@@ -233,6 +255,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
             right: 16,
             child: ChatMessageInput(
               realm: widget.realm,
+              placeholder: placeholder,
               channel: _channel!,
               onSent: (Message item) {
                 setState(() {

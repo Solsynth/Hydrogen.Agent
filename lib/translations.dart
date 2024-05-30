@@ -144,6 +144,8 @@ class SolianMessages extends Translations {
           'channelDeletionConfirm': 'Confirm channel deletion',
           'channelDeletionConfirmCaption':
               'Are you sure to delete channel @channel? This action cannot be undone!',
+          'channelCategoryDirect': 'DM',
+          'channelCategoryDirectHint': 'Your direct messages',
           'messageDecoding': 'Decoding...',
           'messageDecodeFailed': 'Unable to decode: @message',
           'messageInputPlaceholder': 'Message @channel',
@@ -280,6 +282,8 @@ class SolianMessages extends Translations {
           'channelSettings': '频道设置',
           'channelDeletionConfirm': '确认删除频道',
           'channelDeletionConfirmCaption': '你确认要删除频道 @channel 吗？该操作不可撤销。',
+          'channelCategoryDirect': '私聊频道',
+          'channelCategoryDirectHint': '你的所有私聊频道',
           'messageDecoding': '解码信息中…',
           'messageDecodeFailed': '解码信息失败：@message',
           'messageInputPlaceholder': '在 @channel 发信息',
