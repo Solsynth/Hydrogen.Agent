@@ -39,7 +39,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
   void getMembers() async {
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
 
     final resp = await client
@@ -76,7 +76,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -99,7 +99,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

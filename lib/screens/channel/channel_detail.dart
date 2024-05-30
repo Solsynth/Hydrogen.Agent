@@ -48,7 +48,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
   void promptLeaveChannel() async {
     final did = await showDialog(
       context: context,
-      builder: (context) => ChannelDeletion(
+      builder: (context) => ChannelDeletionDialog(
         channel: widget.channel,
         realm: widget.realm,
         isOwned: _isOwned,

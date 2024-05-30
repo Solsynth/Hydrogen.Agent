@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class ChatMessage extends StatelessWidget {
   final Message item;
+  final bool isContentPreviewing;
   final bool isCompact;
   final bool isMerged;
   final bool isHasMerged;
@@ -17,6 +18,7 @@ class ChatMessage extends StatelessWidget {
   const ChatMessage({
     super.key,
     required this.item,
+    this.isContentPreviewing = false,
     this.isMerged = false,
     this.isHasMerged = false,
     this.isCompact = false,
@@ -94,7 +96,9 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget widget;
-    if (isMerged) {
+    if (isContentPreviewing) {
+      widget = buildContent();
+    } else if (isMerged) {
       widget = buildContent().paddingOnly(left: 52);
     } else if (isCompact) {
       widget = Row(
@@ -139,10 +143,11 @@ class ChatMessage extends StatelessWidget {
               ),
             ],
           ).paddingSymmetric(horizontal: 12),
-          AttachmentList(
-            parentId: item.uuid,
-            attachmentsId: item.attachments ?? List.empty(),
-          ).paddingSymmetric(vertical: 4),
+          if (item.attachments?.isNotEmpty ?? false)
+            AttachmentList(
+              parentId: item.uuid,
+              attachmentsId: item.attachments ?? List.empty(),
+            ).paddingSymmetric(vertical: 4),
         ],
       );
     }

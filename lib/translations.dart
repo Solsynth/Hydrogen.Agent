@@ -149,6 +149,10 @@ class SolianMessages extends Translations {
           'messageDecoding': 'Decoding...',
           'messageDecodeFailed': 'Unable to decode: @message',
           'messageInputPlaceholder': 'Message @channel',
+          'messageActionList': 'Actions of Message',
+          'messageDeletionConfirm': 'Confirm message deletion',
+          'messageDeletionConfirmCaption':
+              'Are your sure to delete message @id? This action cannot be undone!',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -287,6 +291,9 @@ class SolianMessages extends Translations {
           'messageDecoding': '解码信息中…',
           'messageDecodeFailed': '解码信息失败：@message',
           'messageInputPlaceholder': '在 @channel 发信息',
+          'messageActionList': '消息的操作',
+          'messageDeletionConfirm': '确认删除消息',
+          'messageDeletionConfirmCaption': '你确定要删除消息 @id 吗？该操作不可撤销。',
         }
       };
 }

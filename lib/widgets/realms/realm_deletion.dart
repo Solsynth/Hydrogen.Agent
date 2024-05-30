@@ -5,21 +5,21 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
-class RealmDeletion extends StatefulWidget {
+class RealmDeletionDialog extends StatefulWidget {
   final Realm realm;
   final bool isOwned;
 
-  const RealmDeletion({
+  const RealmDeletionDialog({
     super.key,
     required this.realm,
     required this.isOwned,
   });
 
   @override
-  State<RealmDeletion> createState() => _RealmDeletionState();
+  State<RealmDeletionDialog> createState() => _RealmDeletionDialogState();
 }
 
-class _RealmDeletionState extends State<RealmDeletion> {
+class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
   bool _isBusy = false;
 
   Future<void> deleteChannel() async {
@@ -28,7 +28,7 @@ class _RealmDeletionState extends State<RealmDeletion> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -48,7 +48,7 @@ class _RealmDeletionState extends State<RealmDeletion> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

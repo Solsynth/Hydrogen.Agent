@@ -46,7 +46,7 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
   void promptLeaveChannel() async {
     final did = await showDialog(
       context: context,
-      builder: (context) => RealmDeletion(
+      builder: (context) => RealmDeletionDialog(
         realm: widget.realm,
         isOwned: _isOwned,
       ),

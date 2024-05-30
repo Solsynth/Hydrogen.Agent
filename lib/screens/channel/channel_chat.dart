@@ -15,6 +15,7 @@ import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
+import 'package:solian/widgets/chat/chat_message_action.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
 
 class ChannelChatScreen extends StatefulWidget {
@@ -117,17 +118,21 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         case 'messages.update':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            _pagingController.itemList
-                ?.map((x) => x.id == payload.id ? payload : x)
-                .toList();
+            final idx = _pagingController.itemList
+                ?.indexWhere((x) => x.uuid == payload.uuid);
+            if (idx != null) {
+              _pagingController.itemList?[idx] = payload;
+            }
           }
           break;
         case 'messages.burnt':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            _pagingController.itemList = _pagingController.itemList
-                ?.where((x) => x.id != payload.id)
-                .toList();
+            final idx = _pagingController.itemList
+                ?.indexWhere((x) => x.uuid != payload.uuid);
+            if (idx != null) {
+              _pagingController.itemList?.removeAt(idx - 1);
+            }
           }
           break;
       }
@@ -141,6 +146,9 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     if (a.sender.account.id != b.sender.account.id) return false;
     return a.createdAt.difference(b.createdAt).inMinutes <= 3;
   }
+
+  Message? _messageToReplying;
+  Message? _messageToEditing;
 
   Widget chatHistoryBuilder(context, item, index) {
     bool isMerged = false, hasMerged = false;
@@ -158,16 +166,31 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     }
     return InkWell(
       child: Container(
-        padding: EdgeInsets.only(
-          top: !isMerged ? 8 : 0,
-          bottom: !hasMerged ? 8 : 0,
-        ),
         child: ChatMessage(
           item: item,
           isMerged: isMerged,
+        ).paddingOnly(
+          top: !isMerged ? 8 : 0,
+          bottom: !hasMerged ? 8 : 0,
         ),
       ),
-      onLongPress: () {},
+      onLongPress: () {
+        showModalBottomSheet(
+          useRootNavigator: true,
+          context: context,
+          builder: (context) => ChatMessageAction(
+            channel: _channel!,
+            realm: _channel!.realm,
+            item: item,
+            onEdit: () {
+              setState(() => _messageToEditing = item);
+            },
+            onReply: () {
+              setState(() => _messageToReplying = item);
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -254,12 +277,20 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
             left: 16,
             right: 16,
             child: ChatMessageInput(
+              edit: _messageToEditing,
+              reply: _messageToReplying,
               realm: widget.realm,
               placeholder: placeholder,
               channel: _channel!,
               onSent: (Message item) {
                 setState(() {
                   _pagingController.itemList?.insert(0, item);
+                });
+              },
+              onReset: () {
+                setState(() {
+                  _messageToReplying = null;
+                  _messageToEditing = null;
                 });
               },
             ),

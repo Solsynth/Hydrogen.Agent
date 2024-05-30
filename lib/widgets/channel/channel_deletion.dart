@@ -5,12 +5,12 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
-class ChannelDeletion extends StatefulWidget {
+class ChannelDeletionDialog extends StatefulWidget {
   final Channel channel;
   final String realm;
   final bool isOwned;
 
-  const ChannelDeletion({
+  const ChannelDeletionDialog({
     super.key,
     required this.channel,
     required this.realm,
@@ -18,10 +18,10 @@ class ChannelDeletion extends StatefulWidget {
   });
 
   @override
-  State<ChannelDeletion> createState() => _ChannelDeletionState();
+  State<ChannelDeletionDialog> createState() => _ChannelDeletionDialogState();
 }
 
-class _ChannelDeletionState extends State<ChannelDeletion> {
+class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
   bool _isBusy = false;
 
   Future<void> deleteChannel() async {
@@ -30,7 +30,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -51,7 +51,7 @@ class _ChannelDeletionState extends State<ChannelDeletion> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['messaging'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 

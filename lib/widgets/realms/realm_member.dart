@@ -37,7 +37,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
   void getMembers() async {
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
 
     final resp = await client.get('/api/realms/${widget.realm.alias}/members');
@@ -73,7 +73,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -96,7 +96,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
+    final client = GetConnect(maxAuthRetries: 3);
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
