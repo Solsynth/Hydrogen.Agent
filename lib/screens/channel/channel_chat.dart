@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/packet.dart';
@@ -14,6 +15,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
 import 'package:solian/widgets/chat/chat_message_action.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
@@ -39,6 +41,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   String? _overrideAlias;
 
   Channel? _channel;
+  Call? _ongoingCall;
   StreamSubscription<NetworkPackage>? _subscription;
 
   final PagingController<int, Message> _pagingController =
@@ -65,6 +68,26 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         realm: widget.realm,
       );
       setState(() => _channel = Channel.fromJson(resp.body));
+    } catch (e) {
+      context.showErrorDialog(e);
+    }
+
+    setState(() => _isBusy = false);
+  }
+
+  getOngoingCall() async {
+    final ChannelProvider provider = Get.find();
+
+    setState(() => _isBusy = true);
+
+    try {
+      final resp = await provider.getChannelOngoingCall(
+        _overrideAlias ?? widget.alias,
+        realm: widget.realm,
+      );
+      if (resp != null) {
+        setState(() => _ongoingCall = Call.fromJson(resp.body));
+      }
     } catch (e) {
       context.showErrorDialog(e);
     }
@@ -135,6 +158,13 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
             }
           }
           break;
+        case 'calls.new':
+          final payload = Call.fromJson(event.payload!);
+          _ongoingCall = payload;
+          break;
+        case 'calls.end':
+          _ongoingCall = null;
+          break;
       }
       setState(() {});
     });
@@ -150,7 +180,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Message? _messageToReplying;
   Message? _messageToEditing;
 
-  Widget chatHistoryBuilder(context, item, index) {
+  Widget buildHistory(context, item, index) {
     bool isMerged = false, hasMerged = false;
     if (index > 0) {
       hasMerged = checkMessageMergeable(
@@ -203,6 +233,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       listenMessages();
       _pagingController.addPageRequestListener(getMessages);
     });
+    getOngoingCall();
   }
 
   @override
@@ -231,6 +262,14 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         title: Text(title),
         centerTitle: false,
         actions: [
+          Builder(builder: (context) {
+            if (_isBusy) return const SizedBox();
+            return ChatCallButton(
+              realm: _channel!.realm,
+              channel: _channel!,
+              ongoingCall: _ongoingCall,
+            );
+          }),
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
@@ -265,7 +304,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                   clipBehavior: Clip.none,
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<Message>(
-                    itemBuilder: chatHistoryBuilder,
+                    itemBuilder: buildHistory,
                     noItemsFoundIndicatorBuilder: (_) => Container(),
                   ),
                 ).paddingOnly(bottom: 64),
@@ -295,6 +334,20 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
               },
             ),
           ),
+          if (_ongoingCall != null)
+            MaterialBanner(
+              padding: const EdgeInsets.only(left: 10, right: 20),
+              leading: const Icon(Icons.call_received),
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+              dividerColor: const Color.fromARGB(1, 0, 0, 0),
+              content: Text('callOngoing'.tr),
+              actions: [
+                TextButton(
+                  child: Text('callJoin'.tr),
+                  onPressed: () {},
+                ),
+              ],
+            ),
         ],
       ),
     );

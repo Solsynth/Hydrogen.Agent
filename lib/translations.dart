@@ -153,6 +153,8 @@ class SolianMessages extends Translations {
           'messageDeletionConfirm': 'Confirm message deletion',
           'messageDeletionConfirmCaption':
               'Are your sure to delete message @id? This action cannot be undone!',
+          'callOngoing': 'A call is ongoing...',
+          'callJoin': 'Join',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -294,6 +296,8 @@ class SolianMessages extends Translations {
           'messageActionList': '消息的操作',
           'messageDeletionConfirm': '确认删除消息',
           'messageDeletionConfirmCaption': '你确定要删除消息 @id 吗？该操作不可撤销。',
+          'callOngoing': '一则通话正在进行中…',
+          'callJoin': '加入',
         }
       };
 }

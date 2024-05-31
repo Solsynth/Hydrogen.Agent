@@ -129,7 +129,12 @@ class AuthProvider extends GetConnect {
     client.httpClient.addAuthenticator(requestAuthenticator);
 
     final resp = await client.get('/api/users/me');
-    _cacheUserProfileResponse = resp;
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    } else {
+      _cacheUserProfileResponse = resp;
+    }
+
     return resp;
   }
 }

@@ -60,6 +60,8 @@ dependencies:
   video_player: ^2.8.6
   video_player_win: ^2.3.6
   chewie: ^1.8.1
+  livekit_client: ^2.1.5
+  flutter_webrtc: ^0.10.7
 
 dev_dependencies:
   flutter_test:

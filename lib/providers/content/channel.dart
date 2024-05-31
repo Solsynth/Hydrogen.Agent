@@ -21,6 +21,24 @@ class ChannelProvider extends GetxController {
     return resp;
   }
 
+  Future<Response?> getChannelOngoingCall(String alias,
+      {String realm = 'global'}) async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) throw Exception('unauthorized');
+
+    final client = GetConnect(maxAuthRetries: 3);
+    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
+
+    final resp = await client.get('/api/channels/$realm/$alias/calls/ongoing');
+    if (resp.statusCode == 404) {
+      return null;
+    } else if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    }
+
+    return resp;
+  }
+
   Future<Response> listChannel({String scope = 'global'}) async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
