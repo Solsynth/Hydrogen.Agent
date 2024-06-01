@@ -84,9 +84,11 @@ class AccountProvider extends GetxController {
       },
       onDone: () {
         isConnected.value = false;
+        Future.delayed(const Duration(milliseconds: 1000), () => connect());
       },
       onError: (err) {
         isConnected.value = false;
+        Future.delayed(const Duration(milliseconds: 1000), () => connect());
       },
     );
   }
