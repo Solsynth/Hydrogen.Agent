@@ -68,8 +68,10 @@ class _AttachmentItemState extends State<AttachmentItem> {
                   imageUrl:
                       '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      CircularProgressIndicator(
-                    value: downloadProgress.progress,
+                      Center(
+                    child: CircularProgressIndicator(
+                      value: downloadProgress.progress,
+                    ),
                   ),
                   fit: widget.fit,
                 )
