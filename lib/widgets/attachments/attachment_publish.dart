@@ -390,12 +390,16 @@ class _AttachmentEditingDialogState extends State<AttachmentEditingDialog> {
             : null,
         isMature: _isMature,
       );
+
+      Get.find<AttachmentProvider>().clearCache(id: widget.item.id);
+
+      setState(() => _isBusy = false);
       return Attachment.fromJson(resp.body);
     } catch (e) {
       context.showErrorDialog(e);
-      return null;
-    } finally {
+
       setState(() => _isBusy = false);
+      return null;
     }
   }
 

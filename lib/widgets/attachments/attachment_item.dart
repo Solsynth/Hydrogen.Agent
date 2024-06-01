@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:video_player/video_player.dart';
@@ -61,10 +63,33 @@ class _AttachmentItemState extends State<AttachmentItem> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.network(
-                '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
-                fit: widget.fit,
-              ),
+              if (PlatformInfo.canCacheImage)
+                CachedNetworkImage(
+                  imageUrl:
+                      '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                  ),
+                  fit: widget.fit,
+                )
+              else
+                Image.network(
+                  '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
+                  fit: widget.fit,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
+                ),
               if (widget.showBadge && widget.badge != null)
                 Positioned(
                   right: 12,

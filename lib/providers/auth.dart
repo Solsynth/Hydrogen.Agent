@@ -72,7 +72,7 @@ class AuthProvider extends GetConnect {
     String username,
     String password,
   ) async {
-    _cacheUserProfileResponse = null;
+    _cachedUserProfileResponse = null;
 
     final resp = await oauth2.resourceOwnerPasswordGrant(
       tokenEndpoint,
@@ -105,7 +105,7 @@ class AuthProvider extends GetConnect {
   }
 
   void signout() {
-    _cacheUserProfileResponse = null;
+    _cachedUserProfileResponse = null;
 
     Get.find<ChatProvider>().disconnect();
     Get.find<AccountProvider>().disconnect();
@@ -115,13 +115,13 @@ class AuthProvider extends GetConnect {
     storage.deleteAll();
   }
 
-  Response? _cacheUserProfileResponse;
+  Response? _cachedUserProfileResponse;
 
   Future<bool> get isAuthorized => storage.containsKey(key: 'auth_credentials');
 
   Future<Response> getProfile({noCache = false}) async {
-    if (!noCache && _cacheUserProfileResponse != null) {
-      return _cacheUserProfileResponse!;
+    if (!noCache && _cachedUserProfileResponse != null) {
+      return _cachedUserProfileResponse!;
     }
 
     final client = GetConnect(maxAuthRetries: 3);
@@ -132,7 +132,7 @@ class AuthProvider extends GetConnect {
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     } else {
-      _cacheUserProfileResponse = resp;
+      _cachedUserProfileResponse = resp;
     }
 
     return resp;

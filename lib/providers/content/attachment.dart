@@ -25,14 +25,25 @@ Future<double> calculateFileAspectRatio(File file) async {
 }
 
 class AttachmentProvider extends GetConnect {
+  static Map<String, String> mimetypeOverrides = {'mov': 'video/quicktime'};
+
   @override
   void onInit() {
     httpClient.baseUrl = ServiceFinder.services['paperclip'];
   }
 
-  static Map<String, String> mimetypeOverrides = {'mov': 'video/quicktime'};
+  final Map<int, Response> _cachedResponses = {};
 
-  Future<Response> getMetadata(int id) => get('/api/attachments/$id/meta');
+  Future<Response> getMetadata(int id, {noCache = false}) async {
+    if (!noCache && _cachedResponses.containsKey(id)) {
+      return _cachedResponses[id]!;
+    }
+
+    final resp = await get('/api/attachments/$id/meta');
+    _cachedResponses[id] = resp;
+
+    return resp;
+  }
 
   Future<Response> createAttachment(File file, String hash, String usage,
       {double? ratio}) async {
@@ -121,5 +132,13 @@ class AttachmentProvider extends GetConnect {
     }
 
     return resp;
+  }
+
+  void clearCache({int? id}) {
+    if (id != null) {
+      _cachedResponses.remove(id);
+    } else {
+      _cachedResponses.clear();
+    }
   }
 }

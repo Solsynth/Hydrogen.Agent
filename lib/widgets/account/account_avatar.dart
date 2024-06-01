@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/services.dart';
 
 class AccountAvatar extends StatelessWidget {
@@ -25,16 +27,18 @@ class AccountAvatar extends StatelessWidget {
       if (!isEmpty) isEmpty = content.endsWith('/api/attachments/0');
     }
 
+    final url = direct
+        ? content
+        : '${ServiceFinder.services['paperclip']}/api/attachments/$content';
+
     return CircleAvatar(
       key: Key('a$content'),
       radius: radius,
       backgroundColor: bgColor,
       backgroundImage: !isEmpty
-          ? NetworkImage(
-              direct
-                  ? content
-                  : '${ServiceFinder.services['paperclip']}/api/attachments/$content',
-            )
+          ? (PlatformInfo.canCacheImage
+              ? CachedNetworkImageProvider(url)
+              : NetworkImage(url)) as ImageProvider<Object>?
           : null,
       child: isEmpty
           ? Icon(
