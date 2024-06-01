@@ -1,5 +1,5 @@
 abstract class ServiceFinder {
-  static const bool devFlag = true;
+  static const bool devFlag = false;
 
   static Map<String, String> services = {
     'paperclip':
