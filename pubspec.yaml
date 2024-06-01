@@ -64,6 +64,7 @@ dependencies:
   wakelock_plus: ^1.2.5
   flutter_background: ^1.2.0
   cached_network_image: ^3.3.1
+  sentry_flutter: ^8.2.0
 
 dev_dependencies:
   flutter_test:

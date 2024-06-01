@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
@@ -13,8 +14,16 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
 
-void main() {
-  runApp(const SolianApp());
+void main() async {
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          'https://55438cdff9048aa2225df72fdc629c42@o4506965897117696.ingest.us.sentry.io/4507357676437504';
+      options.tracesSampleRate = 1.0;
+      options.profilesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(const SolianApp()),
+  );
 }
 
 class SolianApp extends StatelessWidget {

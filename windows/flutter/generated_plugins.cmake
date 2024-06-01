@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_webrtc
   livekit_client
   permission_handler_windows
+  sentry_flutter
   url_launcher_windows
   video_player_win
 )
