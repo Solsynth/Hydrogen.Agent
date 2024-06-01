@@ -38,10 +38,10 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
 
     for (final channel in widget.channels) {
       if (channel.realmId != null) {
-        if (_inRealms[channel.alias] == null) {
-          _inRealms[channel.alias] = List.empty(growable: true);
+        if (_inRealms[channel.realm!.alias] == null) {
+          _inRealms[channel.realm!.alias] = List.empty(growable: true);
         }
-        _inRealms[channel.alias]!.add(channel);
+        _inRealms[channel.realm!.alias]!.add(channel);
       } else if (channel.type == 1) {
         _directMessages.add(channel);
       } else {

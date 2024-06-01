@@ -142,7 +142,7 @@ class _ContactScreenState extends State<ContactScreen> {
                       child: ChatCallCurrentIndicator(),
                     );
                   } else {
-                    return const SizedBox();
+                    return const SliverToBoxAdapter();
                   }
                 }),
                 if (_isBusy)
