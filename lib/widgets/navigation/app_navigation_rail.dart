@@ -23,6 +23,7 @@ class _AppNavigationRailState extends State<AppNavigationRail> {
             ),
           )
           .toList(),
+      groupAlignment: 0,
       labelType: NavigationRailLabelType.all,
       selectedIndex: _selectedIndex,
       onDestinationSelected: (idx) {
