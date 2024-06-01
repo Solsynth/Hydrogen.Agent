@@ -114,7 +114,6 @@
 				DD2E0D3CBC50FE4BCEF3770A /* Pods-RunnerTests.release.xcconfig */,
 				02A460D36C4C66B1E6179D1B /* Pods-RunnerTests.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -702,7 +701,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.solian;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.solsynth.solian;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
