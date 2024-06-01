@@ -1,3 +1,4 @@
+import 'package:livekit_client/livekit_client.dart';
 import 'package:solian/models/channel.dart';
 
 class Call {
@@ -47,4 +48,22 @@ class Call {
         'channel_id': channelId,
         'channel': channel.toJson(),
       };
+}
+
+enum ParticipantStatsType {
+  unknown,
+  localAudioSender,
+  localVideoSender,
+  remoteAudioReceiver,
+  remoteVideoReceiver,
+}
+
+class ParticipantTrack {
+  ParticipantTrack(
+      {required this.participant,
+      required this.videoTrack,
+      required this.isScreenShare});
+  VideoTrack? videoTrack;
+  Participant participant;
+  bool isScreenShare;
 }

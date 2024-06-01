@@ -4,12 +4,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
+import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -57,6 +59,7 @@ class _ContactScreenState extends State<ContactScreen> {
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
+    final ChatCallProvider call = Get.find();
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -133,6 +136,15 @@ class _ContactScreenState extends State<ContactScreen> {
                     ),
                   ],
                 ),
+                Obx(() {
+                  if (call.current.value != null) {
+                    return const SliverToBoxAdapter(
+                      child: ChatCallCurrentIndicator(),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                }),
                 if (_isBusy)
                   SliverToBoxAdapter(
                     child: const LinearProgressIndicator().animate().scaleX(),

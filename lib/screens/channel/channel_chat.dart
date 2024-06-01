@@ -11,10 +11,12 @@ import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
+import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/chat/call/call_prejoin.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
 import 'package:solian/widgets/chat/chat_message_action.dart';
@@ -177,6 +179,17 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     return a.createdAt.difference(b.createdAt).inMinutes <= 3;
   }
 
+  void showCallPrejoin() {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      builder: (context) => ChatCallPrejoinPopup(
+        ongoingCall: _ongoingCall!,
+        channel: _channel!,
+      ),
+    );
+  }
+
   Message? _messageToReplying;
   Message? _messageToEditing;
 
@@ -238,7 +251,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isBusy) {
+    if (_isBusy || _channel == null) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -256,6 +269,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         {'channel': '@${otherside.account.name}'},
       );
     }
+
+    final ChatCallProvider call = Get.find();
 
     return Scaffold(
       appBar: AppBar(
@@ -335,18 +350,37 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
             ),
           ),
           if (_ongoingCall != null)
-            MaterialBanner(
-              padding: const EdgeInsets.only(left: 10, right: 20),
-              leading: const Icon(Icons.call_received),
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-              dividerColor: const Color.fromARGB(1, 0, 0, 0),
-              content: Text('callOngoing'.tr),
-              actions: [
-                TextButton(
-                  child: Text('callJoin'.tr),
-                  onPressed: () {},
-                ),
-              ],
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: MaterialBanner(
+                padding: const EdgeInsets.only(left: 16, top: 4, bottom: 4),
+                leading: const Icon(Icons.call_received),
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+                dividerColor: Colors.transparent,
+                content: Text('callOngoing'.tr),
+                actions: [
+                  Obx(() {
+                    if (call.current.value == null) {
+                      return TextButton(
+                        onPressed: showCallPrejoin,
+                        child: Text('callJoin'.tr),
+                      );
+                    } else if (call.channel.value?.id == _channel?.id) {
+                      return TextButton(
+                        onPressed: () => call.gotoScreen(context),
+                        child: Text('callResume'.tr),
+                      );
+                    } else {
+                      return TextButton(
+                        onPressed: null,
+                        child: Text('callJoin'.tr),
+                      );
+                    }
+                  })
+                ],
+              ),
             ),
         ],
       ),

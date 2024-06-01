@@ -14,11 +14,13 @@ extension SolianExtenions on BuildContext {
       if (message.trim().isEmpty) return '';
       return message
           .split(' ')
-          .map((element) => '${element[0].toUpperCase()}${element.substring(1).toLowerCase()}')
+          .map((element) =>
+              '${element[0].toUpperCase()}${element.substring(1).toLowerCase()}')
           .join(' ');
     }
 
     return showDialog<void>(
+      useRootNavigator: true,
       context: this,
       builder: (ctx) => AlertDialog(
         title: Text('errorHappened'.tr),
