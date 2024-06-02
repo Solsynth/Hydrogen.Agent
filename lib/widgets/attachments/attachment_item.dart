@@ -110,9 +110,10 @@ class _AttachmentItemState extends State<AttachmentItem> {
                     child: ActionChip(
                       visualDensity:
                           const VisualDensity(vertical: -4, horizontal: -4),
-                      avatar: Icon(Icons.visibility_off,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
+                      avatar: Icon(
+                        Icons.visibility_off,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       label: Text('hide'.tr),
                       onPressed: () {
                         if (widget.onHide != null) widget.onHide!();

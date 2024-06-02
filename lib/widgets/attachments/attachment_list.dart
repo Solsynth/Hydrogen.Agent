@@ -97,19 +97,14 @@ class _AttachmentListState extends State<AttachmentList> {
   @override
   Widget build(BuildContext context) {
     if (widget.attachmentsId.isEmpty) {
-      return Container();
+      return const SizedBox();
     }
 
     if (_isLoading) {
-      return AspectRatio(
-        aspectRatio: _aspectRatio,
-        child: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh),
-          child: const Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
+      return Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh),
+        child: const LinearProgressIndicator(),
       );
     }
 
