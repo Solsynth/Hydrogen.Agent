@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -210,6 +211,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     return InkWell(
       child: Container(
         child: ChatMessage(
+          key: Key('m${item.uuid}'),
           item: item,
           isMerged: isMerged,
         ).paddingOnly(
@@ -327,7 +329,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
             ],
           ),
           Positioned(
-            bottom: MediaQuery.of(context).padding.bottom,
+            bottom: math.max(MediaQuery.of(context).padding.bottom, 16),
             left: 16,
             right: 16,
             child: ChatMessageInput(

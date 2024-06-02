@@ -6,6 +6,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:solian/widgets/navigation/app_navigation_bottom_bar.dart';
 import 'package:solian/widgets/navigation/app_navigation_rail.dart';
+import 'package:solian/widgets/sidebar/sidebar_placeholder.dart';
 
 class NavShell extends StatelessWidget {
   final bool showAppBar;
@@ -42,7 +43,17 @@ class NavShell extends StatelessWidget {
               children: [
                 const AppNavigationRail(),
                 const VerticalDivider(thickness: 0.3, width: 1),
-                Expanded(child: child),
+                Flexible(
+                  flex: 2,
+                  child: child,
+                ),
+                if (SolianTheme.isExtraLargeScreen(context))
+                  const VerticalDivider(thickness: 0.3, width: 1),
+                if (SolianTheme.isExtraLargeScreen(context))
+                  const Flexible(
+                    flex: 1,
+                    child: SidebarPlaceholder(),
+                  ),
               ],
             )
           : child,
