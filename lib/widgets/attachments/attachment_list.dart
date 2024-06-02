@@ -91,6 +91,7 @@ class _AttachmentListState extends State<AttachmentList> {
   @override
   void initState() {
     super.initState();
+
     getMetadataList();
   }
 
