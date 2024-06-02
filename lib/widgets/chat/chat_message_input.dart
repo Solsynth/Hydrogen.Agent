@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
@@ -39,6 +40,9 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   final FocusNode _focusNode = FocusNode();
 
   List<int> _attachments = List.empty(growable: true);
+
+  Message? _editTo;
+  Message? _replyTo;
 
   void showAttachments() {
     showModalBottomSheet(
@@ -96,17 +100,18 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       content: payload['content'] as Map<String, dynamic>,
       type: payload['type'] as String,
       sender: sender,
-      replyId: widget.reply?.id,
-      replyTo: widget.reply,
+      replyId: _replyTo?.id,
+      replyTo: _replyTo,
       channelId: widget.channel.id,
       senderId: sender.id,
     );
+    message.isSending = true;
 
     if (widget.edit == null) widget.onSent(message);
     resetInput();
 
     Response resp;
-    if (widget.edit != null) {
+    if (_editTo != null) {
       resp = await client.put(
         '/api/channels/${widget.realm}/${widget.channel.alias}/messages/${widget.edit!.id}',
         payload,
@@ -125,13 +130,22 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
   void resetInput() {
     if (widget.onReset != null) widget.onReset!();
+    _editTo = null;
+    _replyTo = null;
     _textController.clear();
+    setState(() {});
   }
 
   void syncWidget() {
     if (widget.edit != null) {
+      _editTo = widget.edit!;
       _textController.text = widget.edit!.content['value'];
     }
+    if (widget.reply != null) {
+      _replyTo = widget.reply!;
+    }
+
+    setState(() {});
   }
 
   @override
@@ -159,12 +173,22 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (widget.edit != null)
+            if (_replyTo != null)
+              MaterialBanner(
+                leading: const FaIcon(FontAwesomeIcons.reply, size: 18),
+                dividerColor: Colors.transparent,
+                content: ChatMessage(
+                  item: _replyTo!,
+                  isContentPreviewing: true,
+                ),
+                actions: notifyBannerActions,
+              ),
+            if (_editTo != null)
               MaterialBanner(
                 leading: const Icon(Icons.edit),
                 dividerColor: Colors.transparent,
                 content: ChatMessage(
-                  item: widget.edit!,
+                  item: _editTo!,
                   isContentPreviewing: true,
                 ),
                 actions: notifyBannerActions,
