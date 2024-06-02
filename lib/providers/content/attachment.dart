@@ -82,7 +82,7 @@ class AttachmentProvider extends GetConnect {
       }),
     );
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw Exception('${resp.statusCode}: ${resp.bodyString}');
     }
 
     return resp;

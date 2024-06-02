@@ -40,12 +40,15 @@ class _AttachmentListState extends State<AttachmentList> {
     for (var idx = 0; idx < widget.attachmentsId.length; idx++) {
       provider.getMetadata(widget.attachmentsId[idx]).then((resp) {
         progress++;
-        _attachmentsMeta[idx] = Attachment.fromJson(resp.body);
+        if (resp.body != null) {
+          _attachmentsMeta[idx] = Attachment.fromJson(resp.body);
+        }
         if (progress == widget.attachmentsId.length) {
-          setState(() {
-            calculateAspectRatio();
-            _isLoading = false;
-          });
+          calculateAspectRatio();
+
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
         }
       });
     }
@@ -118,6 +121,31 @@ class _AttachmentListState extends State<AttachmentList> {
       itemCount: _attachmentsMeta.length,
       itemBuilder: (context, idx, _) {
         final element = _attachmentsMeta[idx];
+
+        if (element == null) {
+          return Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 280),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.close, size: 32),
+                  const SizedBox(height: 8),
+                  Text(
+                    'attachmentLoadFailed'.tr,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(
+                    'attachmentLoadFailedCaption'.tr,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         return GestureDetector(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -129,7 +157,7 @@ class _AttachmentListState extends State<AttachmentList> {
               children: [
                 AttachmentItem(
                   parentId: widget.parentId,
-                  key: Key('a${element!.uuid}'),
+                  key: Key('a${element.uuid}'),
                   item: element,
                   badge: _attachmentsMeta.length > 1
                       ? '${idx + 1}/${_attachmentsMeta.length}'

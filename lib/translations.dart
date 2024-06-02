@@ -99,6 +99,9 @@ class SolianMessages extends Translations {
           'attachmentAddFile': 'Attach file',
           'attachmentSetting': 'Adjust attachment',
           'attachmentAlt': 'Alternative text',
+          'attachmentLoadFailed': 'Load Attachment Failed',
+          'attachmentLoadFailedCaption':
+              'Something went wrong during loading the attachment metadata...',
           'realm': 'Realm',
           'realms': 'Realms',
           'realmOrganizing': 'Organize a realm',
@@ -274,6 +277,8 @@ class SolianMessages extends Translations {
           'attachmentAddFile': '附加文件',
           'attachmentSetting': '调整附件',
           'attachmentAlt': '替代文字',
+          'attachmentLoadFailed': '加载失败',
+          'attachmentLoadFailedCaption': '有错误发生于加载附件元数据的过程中了…',
           'realm': '领域',
           'realms': '领域',
           'realmOrganizing': '组织领域',

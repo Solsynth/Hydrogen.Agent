@@ -154,7 +154,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
       var result = Attachment.fromJson(resp.body);
       setState(() => _attachments.add(result));
       widget.onUpdate(_attachments.map((e) => e!.id).toList());
-    } catch (e) {
+    } catch (err) {
       rethrow;
     }
   }
@@ -239,7 +239,8 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
                   itemCount: _attachments.length,
                   itemBuilder: (context, index) {
                     final element = _attachments[index];
-                    final fileType = element!.mimetype.split('/').first;
+                    var fileType = element!.mimetype.split('/').firstOrNull;
+                    fileType ??= 'unknown';
                     return Container(
                       padding:
                           const EdgeInsets.only(left: 16, right: 8, bottom: 16),
