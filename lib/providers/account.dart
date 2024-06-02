@@ -36,6 +36,8 @@ class AccountProvider extends GetxController {
   }
 
   void connect({noRetry = false}) async {
+    if (isConnected.value) return;
+
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
@@ -66,6 +68,7 @@ class AccountProvider extends GetxController {
 
   void disconnect() {
     websocket?.sink.close(WebSocketStatus.normalClosure);
+    websocket = null;
     isConnected.value = false;
   }
 

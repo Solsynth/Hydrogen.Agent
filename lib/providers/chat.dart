@@ -17,6 +17,8 @@ class ChatProvider extends GetxController {
   StreamController<NetworkPackage> stream = StreamController.broadcast();
 
   void connect({noRetry = false}) async {
+    if (isConnected.value) return;
+
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
@@ -47,6 +49,7 @@ class ChatProvider extends GetxController {
 
   void disconnect() {
     websocket?.sink.close(WebSocketStatus.normalClosure);
+    websocket = null;
     isConnected.value = false;
   }
 
