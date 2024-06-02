@@ -16,6 +16,9 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
+  Timer? timer;
+  String currentDuration = '00:00:00';
+
   String parseDuration() {
     final ChatCallProvider provider = Get.find();
     if (provider.current.value == null) return '00:00:00';
@@ -27,17 +30,21 @@ class _CallScreenState extends State<CallScreen> {
         "${twoDigits(duration.inMinutes.remainder(60))}:"
         "${twoDigits(duration.inSeconds.remainder(60))}";
 
-    Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {});
-    });
-
     return formattedTime;
+  }
+
+  void updateDuration() {
+    setState(() {
+      currentDuration = parseDuration();
+    });
   }
 
   @override
   void initState() {
     Get.find<ChatCallProvider>().setupRoom();
     super.initState();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (_) => updateDuration());
   }
 
   @override
@@ -57,7 +64,7 @@ class _CallScreenState extends State<CallScreen> {
               ),
               const TextSpan(text: "\n"),
               TextSpan(
-                text: parseDuration(),
+                text: currentDuration,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ]),
@@ -136,5 +143,21 @@ class _CallScreenState extends State<CallScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void deactivate() {
+    timer?.cancel();
+    timer = null;
+    super.deactivate();
+  }
+
+  @override
+  void activate() {
+    timer ??= Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => updateDuration(),
+    );
+    super.activate();
   }
 }
