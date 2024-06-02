@@ -5,6 +5,7 @@ import 'package:get/get_utils/get_utils.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:timeago/timeago.dart' show format;
@@ -158,7 +159,18 @@ class _PostItemState extends State<PostItem> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AccountAvatar(content: item.author.avatar.toString()),
+            GestureDetector(
+              child: AccountAvatar(content: item.author.avatar.toString()),
+              onTap: () {
+                showModalBottomSheet(
+                  useRootNavigator: true,
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) =>
+                      AccountProfilePopup(account: item.author),
+                );
+              },
+            ),
             Expanded(
               child: Column(
                 children: [
