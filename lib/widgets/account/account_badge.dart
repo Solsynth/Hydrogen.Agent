@@ -31,6 +31,14 @@ class _AccountBadgeWidgetState extends State<AccountBadgeWidget> {
         color: Colors.orange,
       ),
     ),
+    'solar.greatCommunityContributor': (
+      'badgeGreatCommunityContributor'.tr,
+      const FaIcon(
+        FontAwesomeIcons.handshakeAngle,
+        size: 16,
+        color: Colors.green,
+      ),
+    )
   };
 
   @override

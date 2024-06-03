@@ -192,6 +192,7 @@ class SolianMessages extends Translations {
           'badgeGrantAt': 'Badge awarded on @date',
           'badgeSolsynthStaff': 'Solsynth Staff',
           'badgeSolarOriginalCitizen': 'Solar Network Natives',
+          'badgeGreatCommunityContributor': 'Great Community Contributor',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -370,6 +371,7 @@ class SolianMessages extends Translations {
           'badgeGrantAt': '徽章颁发于 @date',
           'badgeSolsynthStaff': 'Solsynth 工作人员',
           'badgeSolarOriginalCitizen': 'Solar Network 原住民',
+          'badgeGreatCommunityContributor': '优秀社区贡献者',
         }
       };
 }
