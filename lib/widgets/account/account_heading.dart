@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_badge.dart';
 
@@ -84,7 +85,10 @@ class AccountHeadingWidget extends StatelessWidget {
                   children: badges!.map((e) {
                     return AccountBadgeWidget(item: e);
                   }).toList(),
-                ).paddingSymmetric(horizontal: 8),
+                ).paddingSymmetric(
+                  horizontal: 8,
+                  vertical: PlatformInfo.isMobile ? 0 : 6,
+                ),
               ),
             ).paddingOnly(left: 16, right: 16),
           SizedBox(
