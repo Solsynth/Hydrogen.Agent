@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/services.dart';
-import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_heading.dart';
 
 class AccountProfilePopup extends StatefulWidget {
   final Account account;
@@ -44,7 +44,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isBusy) {
+    if (_isBusy || _userinfo == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -53,64 +53,14 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AspectRatio(
-            aspectRatio: 16 / 7,
-            child: Container(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-              child: Stack(
-                clipBehavior: Clip.none,
-                fit: StackFit.expand,
-                children: [
-                  if (_userinfo!.banner != null)
-                    Image.network(
-                      '${ServiceFinder.services['paperclip']}/api/attachments/${_userinfo!.banner}',
-                      fit: BoxFit.cover,
-                    ),
-                  Positioned(
-                    bottom: -30,
-                    left: 18,
-                    child: AccountAvatar(
-                      content: widget.account.banner,
-                      radius: 48,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ).paddingOnly(top: 32),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                _userinfo!.nick,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ).paddingOnly(right: 4),
-              Text(
-                '@${_userinfo!.name}',
-                style: const TextStyle(
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ).paddingOnly(left: 120, top: 8),
-          SizedBox(
-            width: double.infinity,
-            child: Card(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-              child: ListTile(
-                title: Text('description'.tr),
-                subtitle: Text(
-                  _userinfo!.description.isNotEmpty
-                      ? widget.account.description
-                      : 'No description yet.',
-                ),
-              ),
-            ),
-          ).paddingOnly(left: 24, right: 24, top: 8),
+          AccountHeadingWidget(
+            avatar: _userinfo!.avatar,
+            banner: _userinfo!.banner,
+            name: _userinfo!.name,
+            nick: _userinfo!.nick,
+            desc: _userinfo!.description,
+            badges: _userinfo!.badges,
+          ).paddingOnly(top: 16),
         ],
       ),
     );

@@ -165,9 +165,11 @@ class _PostItemState extends State<PostItem> {
                 showModalBottomSheet(
                   useRootNavigator: true,
                   isScrollControlled: true,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   context: context,
-                  builder: (context) =>
-                      AccountProfilePopup(account: item.author),
+                  builder: (context) => AccountProfilePopup(
+                    account: item.author,
+                  ),
                 );
               },
             ),

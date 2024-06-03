@@ -50,7 +50,10 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect(maxAuthRetries: 3);
+    final client = GetConnect(
+      maxAuthRetries: 3,
+      timeout: const Duration(minutes: 3),
+    );
     client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
     client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
@@ -68,21 +71,19 @@ class AttachmentProvider extends GetConnect {
     if (mimetypeOverrides.keys.contains(fileExt)) {
       mimetypeOverride = mimetypeOverrides[fileExt];
     }
-    final resp = await client.post(
-      '/api/attachments',
-      FormData({
-        'alt': fileAlt,
-        'file': filePayload,
-        'hash': hash,
-        'usage': usage,
-        if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
-        'metadata': jsonEncode({
-          if (ratio != null) 'ratio': ratio,
-        }),
+    final payload = FormData({
+      'alt': fileAlt,
+      'file': filePayload,
+      'hash': hash,
+      'usage': usage,
+      if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
+      'metadata': jsonEncode({
+        if (ratio != null) 'ratio': ratio,
       }),
-    );
+    });
+    final resp = await client.post('/api/attachments', payload);
     if (resp.statusCode != 200) {
-      throw Exception('${resp.statusCode}: ${resp.bodyString}');
+      throw Exception(resp.bodyString);
     }
 
     return resp;

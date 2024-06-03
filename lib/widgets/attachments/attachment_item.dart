@@ -65,6 +65,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
             children: [
               if (PlatformInfo.canCacheImage)
                 CachedNetworkImage(
+                  fit: widget.fit,
                   imageUrl:
                       '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
@@ -73,7 +74,6 @@ class _AttachmentItemState extends State<AttachmentItem> {
                       value: downloadProgress.progress,
                     ),
                   ),
-                  fit: widget.fit,
                 )
               else
                 Image.network(

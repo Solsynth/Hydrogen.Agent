@@ -50,3 +50,58 @@ class AccountAvatar extends StatelessWidget {
     );
   }
 }
+
+class AccountProfileImage extends StatelessWidget {
+  final dynamic content;
+  final BoxFit fit;
+
+  const AccountProfileImage({
+    super.key,
+    required this.content,
+    this.fit = BoxFit.cover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    bool direct = false;
+    bool isEmpty = content == null;
+    if (content is String) {
+      direct = content.startsWith('http');
+      if (!isEmpty) isEmpty = content.isEmpty;
+      if (!isEmpty) isEmpty = content.endsWith('/api/attachments/0');
+    }
+
+    final url = direct
+        ? content
+        : '${ServiceFinder.services['paperclip']}/api/attachments/$content';
+
+    if (PlatformInfo.canCacheImage) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: fit,
+        progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+          child: CircularProgressIndicator(
+            value: downloadProgress.progress,
+          ),
+        ),
+      );
+    } else {
+      return Image.network(
+        url,
+        fit: fit,
+        loadingBuilder: (BuildContext context, Widget child,
+            ImageChunkEvent? loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
+      );
+    }
+  }
+}

@@ -36,7 +36,11 @@ class AccountProvider extends GetxController {
   }
 
   void connect({noRetry = false}) async {
-    if (isConnected.value) return;
+    if (isConnected.value) {
+      return;
+    } else {
+      disconnect();
+    }
 
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');

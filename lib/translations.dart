@@ -186,7 +186,12 @@ class SolianMessages extends Translations {
           'callParticipantVideoOn': 'Turn On Participant Video',
           'callAlreadyOngoing': 'A call is already ongoing',
           'sidebarPlaceholder':
-              'Your screen is really too large, so we had to leave some space here to prevent the layout from being too messy. In the future, we will add some small widgets here for wealthy users like you to enjoy, but for now, it will stay this way.'
+              'Your screen is really too large, so we had to leave some space here to prevent the layout from being too messy. In the future, we will add some small widgets here for wealthy users like you to enjoy, but for now, it will stay this way.',
+          'badge': 'Badge',
+          'badges': 'Badges',
+          'badgeGrantAt': 'Badge awarded on @date',
+          'badgeSolsynthStaff': 'Solsynth Staff',
+          'badgeSolarOriginalCitizen': 'Solar Network Natives',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -359,7 +364,12 @@ class SolianMessages extends Translations {
           'callParticipantVideoOn': '解除静音参与者',
           'callAlreadyOngoing': '当前正在进行一则通话',
           'sidebarPlaceholder':
-              '你的屏幕真的太大啦，我们只好空出一块地方好让布局不那么混乱，未来我们会在此处加入一下小挂件来供你这样的富人玩乐，但现在就这样吧。'
+              '你的屏幕真的太大啦，我们只好空出一块地方好让布局不那么混乱，未来我们会在此处加入一下小挂件来供你这样的富人玩乐，但现在就这样吧。',
+          'badge': '徽章',
+          'badges': '徽章',
+          'badgeGrantAt': '徽章颁发于 @date',
+          'badgeSolsynthStaff': 'Solsynth 工作人员',
+          'badgeSolarOriginalCitizen': 'Solar Network 原住民',
         }
       };
 }
