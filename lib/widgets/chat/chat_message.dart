@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
@@ -11,7 +12,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 class ChatMessage extends StatelessWidget {
   final Message item;
   final bool isContentPreviewing;
-  final bool isCompact;
+  final bool isReply;
   final bool isMerged;
   final bool isHasMerged;
 
@@ -21,7 +22,7 @@ class ChatMessage extends StatelessWidget {
     this.isContentPreviewing = false,
     this.isMerged = false,
     this.isHasMerged = false,
-    this.isCompact = false,
+    this.isReply = false,
   });
 
   Future<String?> decodeContent(Map<String, dynamic> content) async {
@@ -100,19 +101,24 @@ class ChatMessage extends StatelessWidget {
       widget = buildContent();
     } else if (isMerged) {
       widget = buildContent().paddingOnly(left: 52);
-    } else if (isCompact) {
+    } else if (isReply) {
       widget = Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Transform.scale(
+            scaleX: -1,
+            child: const FaIcon(FontAwesomeIcons.reply, size: 14),
+          ),
+          const SizedBox(width: 12),
           AccountAvatar(content: item.sender.account.avatar, radius: 8),
+          const SizedBox(width: 4),
           Text(
             item.sender.account.nick,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(width: 4),
           Text(format(item.createdAt, locale: 'en_short')),
-          const SizedBox(width: 4),
-          buildContent(),
+          Expanded(child: buildContent()),
         ],
       );
     } else {

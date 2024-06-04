@@ -208,13 +208,34 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         _pagingController.itemList?[index + 1],
       );
     }
+
+    Widget content;
+    if (item.replyTo != null) {
+      content = Column(
+        children: [
+          ChatMessage(
+            key: Key('m${item.replyTo.uuid}'),
+            item: item.replyTo,
+            isReply: true,
+          ).paddingOnly(left: 24, right: 4, bottom: 2),
+          ChatMessage(
+            key: Key('m${item.uuid}'),
+            item: item,
+            isMerged: isMerged,
+          ),
+        ],
+      );
+    } else {
+      content = ChatMessage(
+        key: Key('m${item.uuid}'),
+        item: item,
+        isMerged: isMerged,
+      );
+    }
+
     return InkWell(
       child: Container(
-        child: ChatMessage(
-          key: Key('m${item.uuid}'),
-          item: item,
-          isMerged: isMerged,
-        ).paddingOnly(
+        child: content.paddingOnly(
           top: !isMerged ? 8 : 0,
           bottom: !hasMerged ? 8 : 0,
         ),

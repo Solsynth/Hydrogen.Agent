@@ -79,7 +79,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       'type': 'm.text',
       'content': encodeMessage(_textController.value.text),
       'attachments': _attachments,
-      'reply_to': widget.reply?.id,
+      'reply_to': _replyTo?.id,
     };
 
     // The mock data
@@ -105,6 +105,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       channelId: widget.channel.id,
       senderId: sender.id,
     );
+
     message.isSending = true;
 
     if (widget.edit == null) widget.onSent(message);
