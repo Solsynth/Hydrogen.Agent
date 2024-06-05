@@ -339,7 +339,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
               Expanded(
                 child: PagedListView<int, Message>(
                   reverse: true,
-                  clipBehavior: Clip.none,
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<Message>(
                     itemBuilder: buildHistory,
@@ -351,8 +350,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           ),
           Positioned(
             bottom: math.max(MediaQuery.of(context).padding.bottom, 16),
-            left: 16,
-            right: 16,
+            left: 0,
+            right: 0,
             child: ChatMessageInput(
               edit: _messageToEditing,
               reply: _messageToReplying,

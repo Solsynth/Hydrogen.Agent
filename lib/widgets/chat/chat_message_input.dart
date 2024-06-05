@@ -157,8 +157,6 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
   @override
   Widget build(BuildContext context) {
-    const borderRadius = BorderRadius.all(Radius.circular(20));
-
     final notifyBannerActions = [
       TextButton(
         onPressed: resetInput,
@@ -167,71 +165,68 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     ];
 
     return Material(
-      borderRadius: borderRadius,
-      elevation: 2,
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_replyTo != null)
-              MaterialBanner(
-                leading: const FaIcon(FontAwesomeIcons.reply, size: 18),
-                dividerColor: Colors.transparent,
-                content: ChatMessage(
-                  item: _replyTo!,
-                  isContentPreviewing: true,
-                ),
-                actions: notifyBannerActions,
+      color: Theme.of(context).colorScheme.surface,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Divider(thickness: 0.3, height: 0.3),
+          if (_replyTo != null)
+            MaterialBanner(
+              leading: const FaIcon(FontAwesomeIcons.reply, size: 18),
+              dividerColor: Colors.transparent,
+              content: ChatMessage(
+                item: _replyTo!,
+                isContentPreviewing: true,
               ),
-            if (_editTo != null)
-              MaterialBanner(
-                leading: const Icon(Icons.edit),
-                dividerColor: Colors.transparent,
-                content: ChatMessage(
-                  item: _editTo!,
-                  isContentPreviewing: true,
-                ),
-                actions: notifyBannerActions,
-              ),
-            SizedBox(
-              height: 56,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      focusNode: _focusNode,
-                      maxLines: null,
-                      autocorrect: true,
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration.collapsed(
-                        hintText: widget.placeholder ??
-                            'messageInputPlaceholder'.trParams(
-                              {'channel': '#${widget.channel.alias}'},
-                            ),
-                      ),
-                      onSubmitted: (_) => sendMessage(),
-                      onTapOutside: (_) =>
-                          FocusManager.instance.primaryFocus?.unfocus(),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.attach_file),
-                    color: Colors.teal,
-                    onPressed: () => showAttachments(),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    color: Theme.of(context).colorScheme.primary,
-                    onPressed: () => sendMessage(),
-                  )
-                ],
-              ).paddingOnly(left: 16, right: 4),
+              actions: notifyBannerActions,
             ),
-          ],
-        ),
+          if (_editTo != null)
+            MaterialBanner(
+              leading: const Icon(Icons.edit),
+              dividerColor: Colors.transparent,
+              content: ChatMessage(
+                item: _editTo!,
+                isContentPreviewing: true,
+              ),
+              actions: notifyBannerActions,
+            ),
+          SizedBox(
+            height: 56,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _textController,
+                    focusNode: _focusNode,
+                    maxLines: null,
+                    autocorrect: true,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration.collapsed(
+                      hintText: widget.placeholder ??
+                          'messageInputPlaceholder'.trParams(
+                            {'channel': '#${widget.channel.alias}'},
+                          ),
+                    ),
+                    onSubmitted: (_) => sendMessage(),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.attach_file),
+                  color: Colors.teal,
+                  onPressed: () => showAttachments(),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  color: Theme.of(context).colorScheme.primary,
+                  onPressed: () => sendMessage(),
+                )
+              ],
+            ).paddingOnly(left: 20, right: 16),
+          ),
+        ],
       ),
     );
   }

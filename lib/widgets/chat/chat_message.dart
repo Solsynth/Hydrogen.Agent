@@ -116,8 +116,6 @@ class ChatMessage extends StatelessWidget {
             item.sender.account.nick,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: 4),
-          Text(format(item.createdAt, locale: 'en_short')),
           Expanded(child: buildContent()),
         ],
       );
