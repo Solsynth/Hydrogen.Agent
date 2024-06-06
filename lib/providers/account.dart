@@ -173,11 +173,12 @@ class AccountProvider extends GetxController {
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
     final deviceUuid = await PlatformDeviceId.getDeviceId;
-    final token = await FirebaseMessaging.instance.setAutoInitEnabled(true);
+    final token = await FirebaseMessaging.instance.getToken();
+    // TODO On iOS/macOS, using getAPNSToken() instead.
 
     final client = auth.configureClient(service: 'passport');
 
-    final resp = await client.post('/api/notifications/subtribe', {
+    final resp = await client.post('/api/notifications/subscribe', {
       'provider': 'firebase',
       'device_token': token,
       'device_id': deviceUuid,

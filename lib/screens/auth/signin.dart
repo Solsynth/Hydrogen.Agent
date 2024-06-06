@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/account/push_notify_register_dialog.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInPopup extends StatefulWidget {
@@ -23,6 +24,11 @@ class _SignInPopupState extends State<SignInPopup> {
     final password = _passwordController.value.text;
     if (username.isEmpty || password.isEmpty) return;
     provider.signin(context, username, password).then((_) async {
+      await showDialog(
+        context: context,
+        builder: (context) => const PushNotifyRegisterDialog(),
+      );
+
       Navigator.pop(context, true);
     }).catchError((e) {
       List<String> messages = e.toString().split('\n');
