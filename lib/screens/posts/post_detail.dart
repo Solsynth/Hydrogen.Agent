@@ -63,6 +63,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 ).paddingOnly(left: 24, right: 24, top: 16),
               ),
               PostReplyList(item: item!),
+              SliverToBoxAdapter(
+                child: SizedBox(height: MediaQuery.of(context).padding.bottom),
+              ),
             ],
           );
         },
