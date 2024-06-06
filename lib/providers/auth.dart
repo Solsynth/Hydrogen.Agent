@@ -141,6 +141,8 @@ class AuthProvider extends GetConnect {
     storage.deleteAll();
   }
 
+  // Data Layer
+
   Response? _cachedUserProfileResponse;
 
   Future<bool> get isAuthorized => storage.containsKey(key: 'auth_credentials');

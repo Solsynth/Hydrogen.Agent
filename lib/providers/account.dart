@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import 'package:solian/models/notification.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
@@ -163,6 +165,25 @@ class AccountProvider extends GetxController {
         notifications.addAll(data);
         notificationUnread.value = data.length;
       }
+    }
+  }
+
+  Future<void> registerPushNotifications() async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) throw Exception('unauthorized');
+
+    final deviceUuid = await PlatformDeviceId.getDeviceId;
+    final token = await FirebaseMessaging.instance.setAutoInitEnabled(true);
+
+    final client = auth.configureClient(service: 'passport');
+
+    final resp = await client.post('/api/notifications/subtribe', {
+      'provider': 'firebase',
+      'device_token': token,
+      'device_id': deviceUuid,
+    });
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
     }
   }
 }
