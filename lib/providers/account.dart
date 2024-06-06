@@ -9,6 +9,7 @@ import 'package:platform_device_id/platform_device_id.dart';
 import 'package:solian/models/notification.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:web_socket_channel/io.dart';
@@ -172,14 +173,22 @@ class AccountProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
+    late final String? token;
+    late final String provider;
     final deviceUuid = await PlatformDeviceId.getDeviceId;
-    final token = await FirebaseMessaging.instance.getToken();
-    // TODO On iOS/macOS, using getAPNSToken() instead.
+
+    if (PlatformInfo.isIOS || PlatformInfo.isMacOS) {
+      provider = "apple";
+      token = await FirebaseMessaging.instance.getAPNSToken();
+    } else {
+      provider = "firebase";
+      token = await FirebaseMessaging.instance.getToken();
+    }
 
     final client = auth.configureClient(service: 'passport');
 
     final resp = await client.post('/api/notifications/subscribe', {
-      'provider': 'firebase',
+      'provider': provider,
       'device_token': token,
       'device_id': deviceUuid,
     });
