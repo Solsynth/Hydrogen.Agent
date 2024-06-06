@@ -9,6 +9,7 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
+import 'package:solian/widgets/current_state_action.dart';
 
 class RealmListScreen extends StatefulWidget {
   const RealmListScreen({super.key});
@@ -75,6 +76,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
                   centerTitle: false,
                   titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
                   actions: [
+                    const BackgroundStateWidget(),
                     const NotificationButton(),
                     IconButton(
                       icon: const Icon(Icons.add_circle),

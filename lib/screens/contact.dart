@@ -12,6 +12,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
+import 'package:solian/widgets/current_state_action.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -87,6 +88,7 @@ class _ContactScreenState extends State<ContactScreen> {
                   centerTitle: false,
                   titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
                   actions: [
+                    const BackgroundStateWidget(),
                     const NotificationButton(),
                     PopupMenuButton(
                       icon: const Icon(Icons.add_circle),

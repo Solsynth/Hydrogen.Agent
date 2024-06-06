@@ -22,6 +22,7 @@ import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
 import 'package:solian/widgets/chat/chat_message_action.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
+import 'package:solian/widgets/current_state_action.dart';
 
 class ChannelChatScreen extends StatefulWidget {
   final String alias;
@@ -300,6 +301,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         title: Text(title),
         centerTitle: false,
         actions: [
+          const BackgroundStateWidget(),
           Builder(builder: (context) {
             if (_isBusy) return const SizedBox();
             return ChatCallButton(

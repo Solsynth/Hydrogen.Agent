@@ -8,6 +8,7 @@ import 'package:solian/providers/content/post.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class SocialScreen extends StatefulWidget {
@@ -82,6 +83,7 @@ class _SocialScreenState extends State<SocialScreen> {
                 floating: true,
                 titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
                 actions: [
+                  const BackgroundStateWidget(),
                   const NotificationButton(),
                   SizedBox(
                     width: SolianTheme.isLargeScreen(context) ? 8 : 16,
