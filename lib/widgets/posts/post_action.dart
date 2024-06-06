@@ -9,7 +9,6 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_publish.dart';
-import 'package:solian/services.dart';
 
 class PostAction extends StatefulWidget {
   final Post item;
@@ -154,9 +153,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['interactive'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'interactive');
 
     setState(() => _isBusy = true);
     final resp = await client.delete('/api/posts/${widget.item.id}');

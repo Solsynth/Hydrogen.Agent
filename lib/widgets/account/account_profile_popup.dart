@@ -22,7 +22,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
   void getUserinfo() async {
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
+    final client = GetConnect();
     client.httpClient.baseUrl = ServiceFinder.services['passport'];
 
     final resp = await client.get('/api/users/${widget.account.name}');

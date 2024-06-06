@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -49,15 +50,40 @@ class AuthProvider extends GetConnect {
   }
 
   Future<Request<T?>> requestAuthenticator<T>(Request<T?> request) async {
-    if (credentials != null && credentials!.isExpired) {
-      refreshCredentials();
-    }
-
-    if (credentials != null) {
+    try {
+      await ensureCredentials();
       request.headers['Authorization'] = 'Bearer ${credentials!.accessToken}';
-    }
+    } catch (_) {}
 
     return request;
+  }
+
+  GetConnect configureClient({
+    String? service,
+    timeout = const Duration(seconds: 5),
+  }) {
+    final client = GetConnect(
+      maxAuthRetries: 3,
+      timeout: timeout,
+      allowAutoSignedCert: true,
+    );
+    client.httpClient.addAuthenticator(requestAuthenticator);
+
+    if (service != null) {
+      client.httpClient.baseUrl = ServiceFinder.services[service];
+    }
+
+    return client;
+  }
+
+  Future<void> ensureCredentials() async {
+    if (!await isAuthorized) throw Exception('unauthorized');
+    if (credentials == null) await loadCredentials();
+
+    if (credentials!.isExpired) {
+      await refreshCredentials();
+      log("Refreshed credentials at ${DateTime.now()}");
+    }
   }
 
   Future<void> loadCredentials() async {
@@ -124,9 +150,7 @@ class AuthProvider extends GetConnect {
       return _cachedUserProfileResponse!;
     }
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(requestAuthenticator);
+    final client = configureClient(service: 'passport');
 
     final resp = await client.get('/api/users/me');
     if (resp.statusCode != 200) {

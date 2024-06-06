@@ -4,7 +4,6 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/reaction.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 import 'package:solian/widgets/posts/post_reaction.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
 
@@ -51,9 +50,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
     if (_isSubmitting) return;
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['interactive'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'interactive');
 
     setState(() => _isSubmitting = true);
 

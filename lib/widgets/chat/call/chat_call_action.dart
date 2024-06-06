@@ -5,7 +5,6 @@ import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 
 class ChatCallButton extends StatefulWidget {
   final Realm? realm;
@@ -34,9 +33,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     setState(() => _isBusy = true);
 
@@ -60,9 +57,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     setState(() => _isBusy = true);
 

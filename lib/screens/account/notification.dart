@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 import 'package:solian/models/notification.dart' as notify;
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:uuid/uuid.dart';
@@ -33,9 +32,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     if (markList.isNotEmpty) {
-      final client = GetConnect(maxAuthRetries: 3);
-      client.httpClient.baseUrl = ServiceFinder.services['passport'];
-      client.httpClient.addAuthenticator(auth.requestAuthenticator);
+      final client = auth.configureClient(service: 'passport');
 
       await client.put('/api/notifications/batch/read', {'messages': markList});
     }
@@ -58,9 +55,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'passport');
 
     await client.put('/api/notifications/${element.id}/read', {});
 

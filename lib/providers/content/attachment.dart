@@ -50,12 +50,10 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect(
-      maxAuthRetries: 3,
+    final client = auth.configureClient(
+      service: 'paperclip',
       timeout: const Duration(minutes: 3),
     );
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     final filePayload =
         MultipartFile(await file.readAsBytes(), filename: basename(file.path));
@@ -99,9 +97,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'paperclip');
 
     var resp = await client.put('/api/attachments/$id', {
       'metadata': {
@@ -123,9 +119,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['paperclip'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'paperclip');
 
     var resp = await client.delete('/api/attachments/$id');
     if (resp.statusCode != 200) {

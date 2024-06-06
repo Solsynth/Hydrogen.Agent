@@ -7,7 +7,6 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
@@ -65,9 +64,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['interactive'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'interactive');
 
     final payload = {
       'content': _contentController.value.text,

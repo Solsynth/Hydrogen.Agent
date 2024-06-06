@@ -39,8 +39,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
   void getMembers() async {
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
+    final client = ServiceFinder.configureClient('messaging');
 
     final resp = await client
         .get('/api/channels/${widget.realm}/${widget.channel.alias}/members');
@@ -76,9 +75,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final resp = await client.post(
       '/api/channels/${widget.realm}/${widget.channel.alias}/members',
@@ -99,9 +96,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final resp = await client.request(
       '/api/channels/${widget.realm}/${widget.channel.alias}/members',

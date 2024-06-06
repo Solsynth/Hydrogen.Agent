@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 
 class RealmDeletionDialog extends StatefulWidget {
   final Realm realm;
@@ -22,15 +21,13 @@ class RealmDeletionDialog extends StatefulWidget {
 class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
   bool _isBusy = false;
 
-  Future<void> deleteChannel() async {
+  Future<void> deleteRealm() async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'passport');
 
     final resp = await client.delete('/api/realms/${widget.realm.id}');
     if (resp.statusCode != 200) {
@@ -42,15 +39,13 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> leaveChannel() async {
+  Future<void> leaveRealm() async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'passport');
 
     final resp =
         await client.delete('/api/realms/${widget.realm.id}/members/me');
@@ -80,8 +75,8 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
           onPressed: _isBusy
               ? null
               : widget.isOwned
-                  ? deleteChannel
-                  : leaveChannel,
+                  ? deleteRealm
+                  : leaveRealm,
           child: Text('confirm'.tr),
         ),
       ],

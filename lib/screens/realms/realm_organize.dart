@@ -5,7 +5,6 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/services.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
@@ -42,9 +41,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'passport');
 
     final payload = {
       'alias': _aliasController.value.text.toLowerCase(),

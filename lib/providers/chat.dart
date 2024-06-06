@@ -24,9 +24,7 @@ class ChatProvider extends GetxController {
     }
 
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
-
-    if (auth.credentials == null) await auth.loadCredentials();
+    auth.ensureCredentials();
 
     final uri = Uri.parse(
       '${ServiceFinder.services['messaging']}/api/ws?tk=${auth.credentials!.accessToken}'
@@ -65,11 +63,11 @@ class ChatProvider extends GetxController {
       },
       onDone: () {
         isConnected.value = false;
-        Future.delayed(const Duration(milliseconds: 1000), () => connect());
+        Future.delayed(const Duration(seconds: 3), () => connect());
       },
       onError: (err) {
         isConnected.value = false;
-        Future.delayed(const Duration(milliseconds: 1000), () => connect());
+        Future.delayed(const Duration(seconds: 3), () => connect());
       },
     );
   }

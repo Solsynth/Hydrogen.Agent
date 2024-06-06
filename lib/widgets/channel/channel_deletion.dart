@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 
 class ChannelDeletionDialog extends StatefulWidget {
   final Channel channel;
@@ -30,9 +29,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final resp = await client
         .delete('/api/channels/${widget.realm}/${widget.channel.id}');
@@ -51,9 +48,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final resp = await client.delete(
       '/api/channels/${widget.realm}/${widget.channel.alias}/members/me',

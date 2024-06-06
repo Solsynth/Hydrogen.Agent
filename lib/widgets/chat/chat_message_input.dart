@@ -6,7 +6,6 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
 import 'package:uuid/uuid.dart';
@@ -70,9 +69,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     final prof = await auth.getProfile();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final payload = {
       'uuid': const Uuid().v4(),

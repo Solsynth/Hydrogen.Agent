@@ -43,7 +43,7 @@ class AccountProvider extends GetxController {
     }
 
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
+    auth.ensureCredentials();
 
     if (auth.credentials == null) await auth.loadCredentials();
 
@@ -91,11 +91,11 @@ class AccountProvider extends GetxController {
       },
       onDone: () {
         isConnected.value = false;
-        Future.delayed(const Duration(milliseconds: 1000), () => connect());
+        Future.delayed(const Duration(seconds: 3), () => connect());
       },
       onError: (err) {
         isConnected.value = false;
-        Future.delayed(const Duration(milliseconds: 1000), () => connect());
+        Future.delayed(const Duration(seconds: 3), () => connect());
       },
     );
   }
@@ -153,9 +153,7 @@ class AccountProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'passport');
 
     final resp = await client.get('/api/notifications?skip=0&take=100');
     if (resp.statusCode == 200) {

@@ -29,9 +29,9 @@ class BackgroundStateWidget extends StatelessWidget {
             ].join('\n'),
             icon: const Icon(Icons.wifi_off)
                 .animate(onPlay: (c) => c.repeat())
-                .fadeIn(duration: 500.ms)
+                .fadeIn(duration: 800.ms)
                 .then()
-                .fadeOut(duration: 500.ms),
+                .fadeOut(duration: 800.ms),
             onPressed: () {
               if (account.isConnected.isFalse) account.connect();
               if (chat.isConnected.isFalse) chat.connect();

@@ -27,8 +27,8 @@ class _SignUpPopupState extends State<SignUpPopup> {
         nickname.isEmpty ||
         password.isEmpty) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
+    final client = ServiceFinder.configureClient('passport');
+
     final resp = await client.post('/api/users', {
       'name': username,
       'nick': nickname,

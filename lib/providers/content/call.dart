@@ -9,7 +9,6 @@ import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/screens/channel/call/call.dart';
-import 'package:solian/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 class ChatCallProvider extends GetxController {
@@ -64,9 +63,7 @@ class ChatCallProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final resp = await client.post(
       '/api/channels/global/${channel.value!.alias}/calls/ongoing/token',

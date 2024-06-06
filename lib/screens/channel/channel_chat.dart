@@ -15,7 +15,6 @@ import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
-import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
@@ -103,9 +102,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
+    final client = auth.configureClient(service: 'messaging');
 
     final resp = await client.get(
         '/api/channels/${widget.realm}/${widget.alias}/messages?take=10&offset=$pageKey');

@@ -7,7 +7,6 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
-import 'package:solian/services.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
@@ -46,10 +45,6 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
     setState(() => _isBusy = true);
 
     final ChannelProvider provider = Get.find();
-
-    final client = GetConnect(maxAuthRetries: 3);
-    client.httpClient.baseUrl = ServiceFinder.services['messaging'];
-    client.httpClient.addAuthenticator(auth.requestAuthenticator);
 
     final scope = widget.realm != null ? widget.realm!.alias : 'global';
     final payload = {
