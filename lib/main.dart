@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:solian/exts.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
@@ -66,6 +67,13 @@ class SolianApp extends StatelessWidget {
           if (value) {
             Get.find<AccountProvider>().connect();
             Get.find<ChatProvider>().connect();
+
+            try {
+              Get.find<AccountProvider>().registerPushNotifications();
+            } catch (err) {
+              context.showSnackbar('pushNotifyRegisterFailed'
+                  .trParams({'reason': err.toString()}));
+            }
           }
         });
       },

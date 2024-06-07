@@ -166,7 +166,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Divider(thickness: 0.3, height: 0.3),
+          const Divider(thickness: 0.3, height: 1),
           if (_replyTo != null)
             MaterialBanner(
               leading: const FaIcon(FontAwesomeIcons.reply, size: 18),

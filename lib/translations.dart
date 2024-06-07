@@ -193,11 +193,13 @@ class SolianMessages extends Translations {
           'badgeSolsynthStaff': 'Solsynth Staff',
           'badgeSolarOriginalCitizen': 'Solar Network Natives',
           'badgeGreatCommunityContributor': 'Great Community Contributor',
-          'pushNotifyRegisterAction': 'Enable Push Notifications',
           'pushNotifyRegister': 'Register Push Notification Device',
           'pushNotifyRegisterCaption':
-              'Activating push notifications allows you to get our latest notifications even when the app is completely closed. We use Apple\'s official push service on iOS/macOS devices; other devices provide push notifications through Google Firebase. To register a device for push notifications, you may need to connect to Google\'s servers and install the Google Framework on your device.',
-          'pushNotifyRegisterDone': 'Push Notifications has been activated.',
+              'Activating push notifications allows you to get our latest notifications even when the app is completely closed. We use Apple\'s official push service on iOS/macOS devices; other devices provide push notifications through Google Firebase. To register a device for push notifications, you may need to connect to Google\'s servers and install the Google Framework on your device. Although you dismiss this dialog, this registration will be auto performed when you next time launch the app.',
+          'pushNotifyRegisterDone': 'Push notifications has been activated.',
+          'pushNotifyRegisterFailed':
+              'Unable to active push notification... @reason',
+          'about': 'About',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -377,11 +379,12 @@ class SolianMessages extends Translations {
           'badgeSolsynthStaff': 'Solsynth 工作人员',
           'badgeSolarOriginalCitizen': 'Solar Network 原住民',
           'badgeGreatCommunityContributor': '优秀社区贡献者',
-          'pushNotifyRegisterAction': '激活推送通知',
           'pushNotifyRegister': '注册推送通知设备',
           'pushNotifyRegisterCaption':
-              '激活推送通知便可以让你在应用程序完全关闭的时候仍然获取到我们最新的通知。在 iOS/macOS 设备上我们使用 Apple 官方的推送服务；其他设备则通过 Google Firebase 提供推送通知。要注册推送通知设备，您可能需要连接到 Google 的服务器（在中国大陆不可用）并在您的设备上安装 Google Framework。',
+              '激活推送通知便可以让你在应用程序完全关闭的时候仍然获取到我们最新的通知。在 iOS/macOS 设备上我们使用 Apple 官方的推送服务；其他设备则通过 Google Firebase 提供推送通知。要注册推送通知设备，您可能需要连接到 Google 的服务器（在中国大陆不可用）并在您的设备上安装 Google Framework。即使您关闭此对话框，下次启动应用程序时仍会自动执行此注册。',
           'pushNotifyRegisterDone': '推送通知已成功激活',
+          'pushNotifyRegisterFailed': '推送通知激活失败…… @reason',
+          'about': '关于',
         }
       };
 }

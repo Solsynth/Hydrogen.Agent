@@ -6,7 +6,6 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/widgets/account/account_heading.dart';
-import 'package:solian/widgets/account/push_notify_register_dialog.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -102,31 +101,6 @@ class _AccountScreenState extends State<AccountScreen> {
                     setState(() {});
                   },
                 ),
-                const Divider(thickness: 0.3, height: 0.3)
-                    .paddingSymmetric(vertical: 16),
-                Wrap(
-                  spacing: 4,
-                  children: [
-                    InkWell(
-                      child: Text(
-                        'pushNotifyRegisterAction'.tr,
-                        style: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.85),
-                        ),
-                      ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) =>
-                              const PushNotifyRegisterDialog(),
-                        );
-                      },
-                    )
-                  ],
-                )
               ],
             );
           },
