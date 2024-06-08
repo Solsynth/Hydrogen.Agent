@@ -16,6 +16,7 @@ class SolianMessages extends Translations {
           'confirm': 'Confirm',
           'leave': 'Leave',
           'loading': 'Loading...',
+          'about': 'About',
           'edit': 'Edit',
           'delete': 'Delete',
           'search': 'Search',
@@ -199,7 +200,6 @@ class SolianMessages extends Translations {
           'pushNotifyRegisterDone': 'Push notifications has been activated.',
           'pushNotifyRegisterFailed':
               'Unable to active push notification... @reason',
-          'about': 'About',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -210,6 +210,7 @@ class SolianMessages extends Translations {
           'confirm': '确认',
           'leave': '离开',
           'loading': '载入中…',
+          'about': '关于',
           'edit': '编辑',
           'delete': '删除',
           'page': '页面',
@@ -384,7 +385,6 @@ class SolianMessages extends Translations {
               '激活推送通知便可以让你在应用程序完全关闭的时候仍然获取到我们最新的通知。在 iOS/macOS 设备上我们使用 Apple 官方的推送服务；其他设备则通过 Google Firebase 提供推送通知。要注册推送通知设备，您可能需要连接到 Google 的服务器（在中国大陆不可用）并在您的设备上安装 Google Framework。即使您关闭此对话框，下次启动应用程序时仍会自动执行此注册。',
           'pushNotifyRegisterDone': '推送通知已成功激活',
           'pushNotifyRegisterFailed': '推送通知激活失败…… @reason',
-          'about': '关于',
         }
       };
 }

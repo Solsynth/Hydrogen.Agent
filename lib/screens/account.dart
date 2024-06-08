@@ -24,6 +24,7 @@ class _AccountScreenState extends State<AccountScreen> {
         'accountPersonalize'
       ),
       (const Icon(Icons.diversity_1), 'accountFriend'.tr, 'accountFriend'),
+      (const Icon(Icons.info_outline), 'about'.tr, 'about'),
     ];
 
     final AuthProvider provider = Get.find();
