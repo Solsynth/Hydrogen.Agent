@@ -25,6 +25,7 @@ class _SignInPopupState extends State<SignInPopup> {
     if (username.isEmpty || password.isEmpty) return;
     provider.signin(context, username, password).then((_) async {
       await showDialog(
+        useRootNavigator: true,
         context: context,
         builder: (context) => const PushNotifyRegisterDialog(),
       );

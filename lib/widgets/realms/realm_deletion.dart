@@ -61,10 +61,15 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('realmDeletionConfirm'.tr),
+      title: Text(widget.isOwned
+          ? 'realmDeletionConfirm'.tr
+          : 'channelLeaveConfirm'.tr),
       content: Text(
-        'realmDeletionConfirmCaption'
-            .trParams({'realm': '#${widget.realm.alias}'}),
+        widget.isOwned
+            ? 'realmDeletionConfirmCaption'
+                .trParams({'realm': '#${widget.realm.alias}'})
+            : 'realmLeaveConfirmCaption'
+                .trParams({'realm': '#${widget.realm.alias}'}),
       ),
       actions: <Widget>[
         TextButton(

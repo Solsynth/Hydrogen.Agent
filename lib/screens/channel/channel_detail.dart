@@ -1,6 +1,8 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
@@ -8,14 +10,23 @@ import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/widgets/channel/channel_deletion.dart';
 import 'package:solian/widgets/channel/channel_member.dart';
 
+class ChannelDetailArguments {
+  final Channel channel;
+  final ChannelMember profile;
+
+  ChannelDetailArguments({required this.channel, required this.profile});
+}
+
 class ChannelDetailScreen extends StatefulWidget {
   final String realm;
   final Channel channel;
+  final ChannelMember profile;
 
   const ChannelDetailScreen({
     super.key,
     required this.channel,
     required this.realm,
+    required this.profile,
   });
 
   @override
@@ -23,7 +34,10 @@ class ChannelDetailScreen extends StatefulWidget {
 }
 
 class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
+  bool _isBusy = false;
+
   bool _isOwned = false;
+  int _notifyLevel = 0;
 
   void checkOwner() async {
     final AuthProvider auth = Get.find();
@@ -59,15 +73,43 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
     }
   }
 
+  void applyProfileChanges() async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) return;
+
+    setState(() => _isBusy = true);
+
+    final client = auth.configureClient(service: 'messaging');
+
+    final resp = await client
+        .put('/api/channels/${widget.realm}/${widget.channel.alias}/members/me', {
+      'nick': null,
+      'notify_level': _notifyLevel,
+    });
+    if (resp.statusCode != 200) {
+      context.showErrorDialog(resp.bodyString);
+    } else {
+      context.showSnackbar('channelNotifyLevelApplied'.tr);
+    }
+
+    setState(() => _isBusy = false);
+  }
+
   @override
   void initState() {
+    _notifyLevel = widget.profile.notify;
     super.initState();
-
     checkOwner();
   }
 
   @override
   Widget build(BuildContext context) {
+    final notifyTypes = {
+      0: 'channelNotifyLevelAll'.tr,
+      1: 'channelNotifyLevelMentioned'.tr,
+      2: 'channelNotifyLevelNone'.tr,
+    };
+
     final ownerActions = [
       ListTile(
         leading: const Icon(Icons.edit),
@@ -127,9 +169,38 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
           child: ListView(
             children: [
               ListTile(
-                leading: const Icon(Icons.settings),
-                trailing: const Icon(Icons.chevron_right),
-                title: Text('channelSettings'.tr.capitalize!),
+                leading: const Icon(Icons.notifications_active),
+                title: Text('channelNotifyLevel'.tr.capitalize!),
+                trailing: DropdownButtonHideUnderline(
+                  child: DropdownButton2<int>(
+                    isExpanded: true,
+                    items: notifyTypes.entries
+                        .map((item) => DropdownMenuItem<int>(
+                      enabled: !_isBusy,
+                              value: item.key,
+                              child: Text(
+                                item.value,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    value: _notifyLevel,
+                    onChanged: (int? value) {
+                      setState(() => _notifyLevel = value ?? 0);
+                      applyProfileChanges();
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      padding: EdgeInsets.only(left: 16, right: 1),
+                      height: 40,
+                      width: 140,
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      height: 40,
+                    ),
+                  ),
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.supervisor_account),

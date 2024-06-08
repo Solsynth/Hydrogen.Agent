@@ -19,6 +19,20 @@ class ChannelProvider extends GetxController {
     return resp;
   }
 
+  Future<Response> getMyChannelProfile(String alias, {String realm = 'global'}) async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) throw Exception('unauthorized');
+
+    final client = auth.configureClient(service: 'messaging');
+
+    final resp = await client.get('/api/channels/$realm/$alias/me');
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    }
+
+    return resp;
+  }
+
   Future<Response?> getChannelOngoingCall(String alias,
       {String realm = 'global'}) async {
     final AuthProvider auth = Get.find();

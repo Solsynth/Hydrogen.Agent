@@ -65,9 +65,14 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('channelDeletionConfirm'.tr),
+      title: Text(widget.isOwned
+          ? 'channelDeletionConfirm'.tr
+          : 'channelLeaveConfirm'.tr),
       content: Text(
+        widget.isOwned ?
         'channelDeletionConfirmCaption'
+            .trParams({'channel': '#${widget.channel.alias}'}) :
+        'channelLeaveConfirmCaption'
             .trParams({'channel': '#${widget.channel.alias}'}),
       ),
       actions: <Widget>[

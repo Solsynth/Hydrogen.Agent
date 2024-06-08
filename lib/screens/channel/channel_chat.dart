@@ -15,6 +15,7 @@ import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
+import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
@@ -44,6 +45,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   String? _overrideAlias;
 
   Channel? _channel;
+  ChannelMember? _channelProfile;
   Call? _ongoingCall;
   StreamSubscription<NetworkPackage>? _subscription;
 
@@ -61,16 +63,21 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
     setState(() => _isBusy = true);
 
-    if (overrideAlias != null) {
-      _overrideAlias = overrideAlias;
-    }
+    if (overrideAlias != null) _overrideAlias = overrideAlias;
 
     try {
       final resp = await provider.getChannel(
         _overrideAlias ?? widget.alias,
         realm: widget.realm,
       );
-      setState(() => _channel = Channel.fromJson(resp.body));
+      final respProfile = await provider.getMyChannelProfile(
+        _overrideAlias ?? widget.alias,
+        realm: widget.realm,
+      );
+      setState(() {
+        _channel = Channel.fromJson(resp.body);
+        _channelProfile = ChannelMember.fromJson(respProfile.body);
+      });
     } catch (e) {
       context.showErrorDialog(e);
     }
@@ -192,7 +199,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Message? _messageToReplying;
   Message? _messageToEditing;
 
-  Widget buildHistory(context, item, index) {
+  Widget buildHistory(context, Message item, index) {
     bool isMerged = false, hasMerged = false;
     if (index > 0) {
       hasMerged = checkMessageMergeable(
@@ -212,8 +219,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       content = Column(
         children: [
           ChatMessage(
-            key: Key('m${item.replyTo.uuid}'),
-            item: item.replyTo,
+            key: Key('m${item.replyTo!.uuid}'),
+            item: item.replyTo!,
             isReply: true,
           ).paddingOnly(left: 24, right: 4, bottom: 2),
           ChatMessage(
@@ -273,8 +280,11 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isBusy || _channel == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Material(
+        color: Theme.of(context).colorScheme.surface,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
@@ -315,7 +325,10 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                 'channelDetail',
                 pathParameters: {'alias': widget.alias},
                 queryParameters: {'realm': widget.realm},
-                extra: _channel,
+                extra: ChannelDetailArguments(
+                  profile: _channelProfile!,
+                  channel: _channel!,
+                ),
               )
                   .then((value) {
                 if (value == false) AppRouter.instance.pop();

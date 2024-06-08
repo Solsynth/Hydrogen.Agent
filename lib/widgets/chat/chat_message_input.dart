@@ -113,7 +113,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     Response resp;
     if (_editTo != null) {
       resp = await client.put(
-        '/api/channels/${widget.realm}/${widget.channel.alias}/messages/${widget.edit!.id}',
+        '/api/channels/${widget.realm}/${widget.channel.alias}/messages/${_editTo!.id}',
         payload,
       );
     } else {
@@ -171,6 +171,11 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
           MaterialBanner(
             leading: const FaIcon(FontAwesomeIcons.reply, size: 18),
             dividerColor: Colors.transparent,
+            padding: const EdgeInsets.only(left: 20),
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.5),
             content: ChatMessage(
               item: _replyTo!,
               isContentPreviewing: true,
@@ -181,6 +186,11 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
           MaterialBanner(
             leading: const Icon(Icons.edit),
             dividerColor: Colors.transparent,
+            padding: const EdgeInsets.only(left: 20),
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.5),
             content: ChatMessage(
               item: _editTo!,
               isContentPreviewing: true,

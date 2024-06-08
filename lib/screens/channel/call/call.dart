@@ -55,6 +55,7 @@ class _CallScreenState extends State<CallScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: RichText(
             textAlign: TextAlign.center,
             text: TextSpan(children: [

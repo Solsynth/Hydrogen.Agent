@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:solian/models/channel.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
@@ -102,10 +101,14 @@ abstract class AppRouter {
           GoRoute(
             path: '/chat/:alias/detail',
             name: 'channelDetail',
-            builder: (context, state) => ChannelDetailScreen(
-              channel: state.extra as Channel,
-              realm: state.uri.queryParameters['realm'] ?? 'global',
-            ),
+            builder: (context, state) {
+              final arguments = state.extra as ChannelDetailArguments;
+              return ChannelDetailScreen(
+                channel: arguments.channel,
+                profile: arguments.profile,
+                realm: state.uri.queryParameters['realm'] ?? 'global',
+              );
+            },
           ),
         ],
       ),

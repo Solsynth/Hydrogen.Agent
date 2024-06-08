@@ -31,8 +31,6 @@ class ChatCallProvider extends GetxController {
   Rx<MediaDevice?> videoDevice = Rx(null);
   Rx<MediaDevice?> audioDevice = Rx(null);
 
-  final VideoParameters videoParameters = VideoParametersPresets.h720_169;
-
   late Room room;
   late EventsListener<RoomEvent> listener;
 
@@ -105,29 +103,27 @@ class ChatCallProvider extends GetxController {
       await room.connect(
         url,
         token,
-        roomOptions: RoomOptions(
+        roomOptions: const RoomOptions(
           dynacast: true,
           adaptiveStream: true,
-          defaultAudioPublishOptions: const AudioPublishOptions(
+          defaultAudioPublishOptions: AudioPublishOptions(
             name: 'call_voice',
             stream: 'call_stream',
           ),
-          defaultVideoPublishOptions: const VideoPublishOptions(
+          defaultVideoPublishOptions: VideoPublishOptions(
             name: 'call_video',
             stream: 'call_stream',
             simulcast: true,
             backupVideoCodec: BackupVideoCodec(enabled: true),
           ),
-          defaultScreenShareCaptureOptions: const ScreenShareCaptureOptions(
+          defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
             useiOSBroadcastExtension: true,
-            params: VideoParameters(
-              dimensions: VideoDimensionsPresets.h1080_169,
-              encoding:
-                  VideoEncoding(maxBitrate: 3 * 1000 * 1000, maxFramerate: 30),
-            ),
+            params: VideoParametersPresets.screenShareH1080FPS30,
           ),
-          defaultCameraCaptureOptions:
-              CameraCaptureOptions(maxFrameRate: 30, params: videoParameters),
+          defaultCameraCaptureOptions: CameraCaptureOptions(
+            maxFrameRate: 30,
+            params: VideoParametersPresets.h1080_169,
+          ),
         ),
         fastConnectOptions: FastConnectOptions(
           microphone: TrackOption(track: audioTrack.value),
@@ -334,7 +330,7 @@ class ChatCallProvider extends GetxController {
       videoTrack.value = await LocalVideoTrack.createCameraTrack(
         CameraCaptureOptions(
           deviceId: videoDevice.value!.deviceId,
-          params: videoParameters,
+          params: VideoParametersPresets.h1080_169,
         ),
       );
       await videoTrack.value!.start();

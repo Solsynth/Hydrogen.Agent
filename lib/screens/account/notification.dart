@@ -33,7 +33,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     if (markList.isNotEmpty) {
       final client = auth.configureClient(service: 'passport');
-
       await client.put('/api/notifications/batch/read', {'messages': markList});
     }
 
@@ -129,6 +128,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           ),
                           title: Text(element.subject),
                           subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(element.content),
                               if (element.links != null)
