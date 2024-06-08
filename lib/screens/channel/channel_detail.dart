@@ -72,7 +72,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
       ListTile(
         leading: const Icon(Icons.edit),
         trailing: const Icon(Icons.chevron_right),
-        title: Text('channelAdjust'.tr),
+        title: Text('channelAdjust'.tr.capitalize!),
         onTap: () async {
           AppRouter.instance
               .pushNamed(
@@ -129,12 +129,12 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
               ListTile(
                 leading: const Icon(Icons.settings),
                 trailing: const Icon(Icons.chevron_right),
-                title: Text('channelSettings'.tr),
+                title: Text('channelSettings'.tr.capitalize!),
               ),
               ListTile(
                 leading: const Icon(Icons.supervisor_account),
                 trailing: const Icon(Icons.chevron_right),
-                title: Text('channelMembers'.tr),
+                title: Text('channelMembers'.tr.capitalize!),
                 onTap: () => showMemberList(),
               ),
               ...(_isOwned ? ownerActions : List.empty()),

@@ -56,7 +56,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
   Map<String, dynamic> encodeMessage(String content) {
     return {
-      'value': content,
+      'value': content.trim(),
       'keypair_id': null,
       'algorithm': 'plain',
     };
@@ -103,9 +103,11 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       senderId: sender.id,
     );
 
-    message.isSending = true;
+    if (_editTo == null) {
+      message.isSending = true;
+      widget.onSent(message);
+    }
 
-    if (widget.edit == null) widget.onSent(message);
     resetInput();
 
     Response resp;
@@ -131,6 +133,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     _editTo = null;
     _replyTo = null;
     _textController.clear();
+    _attachments.clear();
     setState(() {});
   }
 
@@ -161,70 +164,66 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       )
     ];
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Divider(thickness: 0.3, height: 1),
-          if (_replyTo != null)
-            MaterialBanner(
-              leading: const FaIcon(FontAwesomeIcons.reply, size: 18),
-              dividerColor: Colors.transparent,
-              content: ChatMessage(
-                item: _replyTo!,
-                isContentPreviewing: true,
-              ),
-              actions: notifyBannerActions,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (_replyTo != null)
+          MaterialBanner(
+            leading: const FaIcon(FontAwesomeIcons.reply, size: 18),
+            dividerColor: Colors.transparent,
+            content: ChatMessage(
+              item: _replyTo!,
+              isContentPreviewing: true,
             ),
-          if (_editTo != null)
-            MaterialBanner(
-              leading: const Icon(Icons.edit),
-              dividerColor: Colors.transparent,
-              content: ChatMessage(
-                item: _editTo!,
-                isContentPreviewing: true,
-              ),
-              actions: notifyBannerActions,
-            ),
-          SizedBox(
-            height: 56,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    focusNode: _focusNode,
-                    maxLines: null,
-                    autocorrect: true,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration.collapsed(
-                      hintText: widget.placeholder ??
-                          'messageInputPlaceholder'.trParams(
-                            {'channel': '#${widget.channel.alias}'},
-                          ),
-                    ),
-                    onSubmitted: (_) => sendMessage(),
-                    onTapOutside: (_) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.attach_file),
-                  color: Colors.teal,
-                  onPressed: () => showAttachments(),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  color: Theme.of(context).colorScheme.primary,
-                  onPressed: () => sendMessage(),
-                )
-              ],
-            ).paddingOnly(left: 20, right: 16),
+            actions: notifyBannerActions,
           ),
-        ],
-      ),
+        if (_editTo != null)
+          MaterialBanner(
+            leading: const Icon(Icons.edit),
+            dividerColor: Colors.transparent,
+            content: ChatMessage(
+              item: _editTo!,
+              isContentPreviewing: true,
+            ),
+            actions: notifyBannerActions,
+          ),
+        SizedBox(
+          height: 56,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  focusNode: _focusNode,
+                  maxLines: null,
+                  autocorrect: true,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration.collapsed(
+                    hintText: widget.placeholder ??
+                        'messageInputPlaceholder'.trParams(
+                          {'channel': '#${widget.channel.alias}'},
+                        ),
+                  ),
+                  onSubmitted: (_) => sendMessage(),
+                  onTapOutside: (_) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.attach_file),
+                color: Colors.teal,
+                onPressed: () => showAttachments(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send),
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: () => sendMessage(),
+              )
+            ],
+          ).paddingOnly(left: 20, right: 16),
+        ),
+      ],
     );
   }
 }

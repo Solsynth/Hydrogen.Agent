@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -171,35 +170,6 @@ class _ControlsWidgetState extends State<ControlsWidget> {
       }
       return;
     }
-    if (lkPlatformIs(PlatformType.android)) {
-      requestBackgroundPermission([bool isRetry = false]) async {
-        try {
-          bool hasPermissions = await FlutterBackground.hasPermissions;
-          if (!isRetry) {
-            const androidConfig = FlutterBackgroundAndroidConfig(
-              notificationTitle: 'Screen Sharing',
-              notificationText: 'Solar Messager is sharing your screen',
-              notificationImportance: AndroidNotificationImportance.Default,
-              notificationIcon:
-                  AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
-            );
-            hasPermissions = await FlutterBackground.initialize(
-                androidConfig: androidConfig);
-          }
-          if (hasPermissions &&
-              !FlutterBackground.isBackgroundExecutionEnabled) {
-            await FlutterBackground.enableBackgroundExecution();
-          }
-        } catch (e) {
-          if (!isRetry) {
-            return await Future<void>.delayed(const Duration(seconds: 1),
-                () => requestBackgroundPermission(true));
-          }
-        }
-      }
-
-      await requestBackgroundPermission();
-    }
     if (lkPlatformIs(PlatformType.iOS)) {
       var track = await LocalVideoTrack.createScreenShareTrack(
         const ScreenShareCaptureOptions(
@@ -223,12 +193,6 @@ class _ControlsWidgetState extends State<ControlsWidget> {
 
   void disableScreenShare() async {
     await participant.setScreenShareEnabled(false);
-    if (lkPlatformIs(PlatformType.android)) {
-      // Android specific
-      try {
-        await FlutterBackground.disableBackgroundExecution();
-      } catch (_) {}
-    }
   }
 
   @override

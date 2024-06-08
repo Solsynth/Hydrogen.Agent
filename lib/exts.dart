@@ -9,22 +9,12 @@ extension SolianExtenions on BuildContext {
   }
 
   Future<void> showErrorDialog(dynamic exception) {
-    String formatMessage(dynamic exception) {
-      final message = exception.toString();
-      if (message.trim().isEmpty) return '';
-      return message
-          .split(' ')
-          .map((element) =>
-              '${element[0].toUpperCase()}${element.substring(1).toLowerCase()}')
-          .join(' ');
-    }
-
     return showDialog<void>(
       useRootNavigator: true,
       context: this,
       builder: (ctx) => AlertDialog(
         title: Text('errorHappened'.tr),
-        content: Text(formatMessage(exception)),
+        content: Text(exception.toString().capitalize!),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),

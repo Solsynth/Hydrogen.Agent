@@ -14,7 +14,10 @@ abstract class ServiceFinder {
 
   static GetConnect configureClient(String service,
       {timeout = const Duration(seconds: 5)}) {
-    final client = GetConnect(timeout: timeout, allowAutoSignedCert: true);
+    final client = GetConnect(
+      timeout: timeout,
+      allowAutoSignedCert: true,
+    );
     client.httpClient.baseUrl = ServiceFinder.services[service];
 
     return client;

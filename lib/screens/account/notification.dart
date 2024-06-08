@@ -27,7 +27,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     List<int> markList = List.empty(growable: true);
     for (final element in provider.notifications) {
-      if (element.isRealtime) continue;
+      if (element.id <= 0) continue;
       markList.add(element.id);
     }
 
@@ -48,7 +48,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     final AccountProvider provider = Get.find();
 
-    if (element.isRealtime) {
+    if (element.id <= 0) {
       provider.notifications.removeAt(index);
       return;
     }

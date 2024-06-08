@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/account.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 
 class BackgroundStateWidget extends StatelessWidget {
@@ -9,6 +10,7 @@ class BackgroundStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthProvider auth = Get.find();
     final AccountProvider account = Get.find();
     final ChatProvider chat = Get.find();
 
@@ -20,35 +22,51 @@ class BackgroundStateWidget extends StatelessWidget {
 
       return Row(children: [
         if (disconnected && !connecting)
-          IconButton(
-            tooltip: [
-              if (account.isConnected.isFalse)
-                'Lost Connection with Passport Server...',
-              if (chat.isConnected.isFalse)
-                'Lost Connection with Messaging Server...',
-            ].join('\n'),
-            icon: const Icon(Icons.wifi_off)
-                .animate(onPlay: (c) => c.repeat())
-                .fadeIn(duration: 800.ms)
-                .then()
-                .fadeOut(duration: 800.ms),
-            onPressed: () {
-              if (account.isConnected.isFalse) account.connect();
-              if (chat.isConnected.isFalse) chat.connect();
+          FutureBuilder(
+            future: auth.isAuthorized,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.data == false) {
+                return const SizedBox();
+              }
+              return IconButton(
+                tooltip: [
+                  if (account.isConnected.isFalse)
+                    'Lost Connection with Passport Server...',
+                  if (chat.isConnected.isFalse)
+                    'Lost Connection with Messaging Server...',
+                ].join('\n'),
+                icon: const Icon(Icons.wifi_off)
+                    .animate(onPlay: (c) => c.repeat())
+                    .fadeIn(duration: 800.ms)
+                    .then()
+                    .fadeOut(duration: 800.ms),
+                onPressed: () {
+                  if (account.isConnected.isFalse) account.connect();
+                  if (chat.isConnected.isFalse) chat.connect();
+                },
+              );
             },
           ),
         if (connecting)
-          IconButton(
-            tooltip: [
-              if (account.isConnecting.isTrue)
-                'Waiting Passport Server Response...',
-              if (chat.isConnecting.isTrue)
-                'Waiting Messaging Server Response...',
-            ].join('\n'),
-            icon: const Icon(Icons.sync)
-                .animate(onPlay: (c) => c.repeat())
-                .rotate(duration: 1850.ms, begin: 1, end: 0),
-            onPressed: () {},
+          FutureBuilder(
+            future: auth.isAuthorized,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.data == false) {
+                return const SizedBox();
+              }
+              return IconButton(
+                tooltip: [
+                  if (account.isConnecting.isTrue)
+                    'Waiting Passport Server Response...',
+                  if (chat.isConnecting.isTrue)
+                    'Waiting Messaging Server Response...',
+                ].join('\n'),
+                icon: const Icon(Icons.sync)
+                    .animate(onPlay: (c) => c.repeat())
+                    .rotate(duration: 1850.ms, begin: 1, end: 0),
+                onPressed: () {},
+              );
+            },
           ),
       ]);
     });

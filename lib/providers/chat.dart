@@ -63,7 +63,7 @@ class ChatProvider extends GetxController {
       },
       onDone: () {
         isConnected.value = false;
-        Future.delayed(const Duration(seconds: 3), () => connect());
+        Future.delayed(const Duration(seconds: 1), () => connect());
       },
       onError: (err) {
         isConnected.value = false;

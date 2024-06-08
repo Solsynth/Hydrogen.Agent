@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -337,37 +337,45 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
             children: [
               Expanded(
                 child: PagedListView<int, Message>(
+                  clipBehavior: Clip.none,
                   reverse: true,
                   pagingController: _pagingController,
                   builderDelegate: PagedChildBuilderDelegate<Message>(
                     itemBuilder: buildHistory,
                     noItemsFoundIndicatorBuilder: (_) => Container(),
                   ),
-                ).paddingOnly(bottom: 64),
+                ).paddingOnly(bottom: 56),
               ),
             ],
           ),
           Positioned(
-            bottom: math.max(MediaQuery.of(context).padding.bottom, 16),
+            bottom: 0,
             left: 0,
             right: 0,
-            child: ChatMessageInput(
-              edit: _messageToEditing,
-              reply: _messageToReplying,
-              realm: widget.realm,
-              placeholder: placeholder,
-              channel: _channel!,
-              onSent: (Message item) {
-                setState(() {
-                  _pagingController.itemList?.insert(0, item);
-                });
-              },
-              onReset: () {
-                setState(() {
-                  _messageToReplying = null;
-                  _messageToEditing = null;
-                });
-              },
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: SafeArea(
+                  child: ChatMessageInput(
+                    edit: _messageToEditing,
+                    reply: _messageToReplying,
+                    realm: widget.realm,
+                    placeholder: placeholder,
+                    channel: _channel!,
+                    onSent: (Message item) {
+                      setState(() {
+                        _pagingController.itemList?.insert(0, item);
+                      });
+                    },
+                    onReset: () {
+                      setState(() {
+                        _messageToReplying = null;
+                        _messageToEditing = null;
+                      });
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
           if (_ongoingCall != null)

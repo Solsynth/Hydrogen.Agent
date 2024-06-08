@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_background/flutter_background.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -43,9 +42,6 @@ class ChatCallProvider extends GetxController {
   Future<void> checkPermissions() async {
     if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) {
       return;
-    }
-    if (lkPlatformIs(PlatformType.android)) {
-      FlutterBackground.enableBackgroundExecution();
     }
 
     await Permission.camera.request();

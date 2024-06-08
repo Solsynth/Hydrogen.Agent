@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:solian/models/notification.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
@@ -30,7 +31,14 @@ class AccountProvider extends GetxController {
 
   @override
   onInit() {
-    Permission.notification.request().then((status) {
+    FirebaseMessaging.instance
+        .requestPermission(
+            alert: true,
+            announcement: true,
+            carPlay: true,
+            badge: true,
+            sound: true)
+        .then((status) {
       notifyInitialization();
       notifyPrefetch();
     });
@@ -94,7 +102,7 @@ class AccountProvider extends GetxController {
       },
       onDone: () {
         isConnected.value = false;
-        Future.delayed(const Duration(seconds: 3), () => connect());
+        Future.delayed(const Duration(seconds: 1), () => connect());
       },
       onError: (err) {
         isConnected.value = false;
@@ -175,7 +183,11 @@ class AccountProvider extends GetxController {
 
     late final String? token;
     late final String provider;
-    final deviceUuid = await PlatformDeviceId.getDeviceId;
+    final deviceUuid = await _getDeviceUuid();
+
+    if (deviceUuid == null) {
+      log("Unable to active push notifications, couldn't get device uuid");
+    }
 
     if (PlatformInfo.isIOS || PlatformInfo.isMacOS) {
       provider = "apple";
@@ -195,5 +207,32 @@ class AccountProvider extends GetxController {
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
+  }
+
+  Future<String?> _getDeviceUuid() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (PlatformInfo.isWeb) {
+      final WebBrowserInfo webInfo = await deviceInfo.webBrowserInfo;
+      return webInfo.vendor! +
+          webInfo.userAgent! +
+          webInfo.hardwareConcurrency.toString();
+    }
+    if (PlatformInfo.isAndroid) {
+      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.id;
+    }
+    if (PlatformInfo.isIOS) {
+      final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor!;
+    }
+    if (PlatformInfo.isLinux) {
+      final LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
+      return linuxInfo.machineId!;
+    }
+    if (PlatformInfo.isWindows) {
+      final WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+      return windowsInfo.deviceId;
+    }
+    return null;
   }
 }

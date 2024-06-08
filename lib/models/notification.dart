@@ -6,8 +6,6 @@ class Notification {
   String subject;
   String content;
   List<Link>? links;
-  bool isImportant;
-  bool isRealtime;
   DateTime? readAt;
   int? senderId;
   int recipientId;
@@ -20,8 +18,6 @@ class Notification {
     required this.subject,
     required this.content,
     required this.links,
-    required this.isImportant,
-    required this.isRealtime,
     required this.readAt,
     required this.senderId,
     required this.recipientId,
@@ -41,8 +37,6 @@ class Notification {
         links: json['links'] != null
             ? List<Link>.from(json['links'].map((x) => Link.fromJson(x)))
             : List.empty(),
-        isImportant: json['is_important'],
-        isRealtime: json['is_realtime'],
         readAt: json['read_at'],
         senderId: json['sender_id'],
         recipientId: json['recipient_id'],
@@ -58,8 +52,6 @@ class Notification {
         'links': links != null
             ? List<dynamic>.from(links!.map((x) => x.toJson()))
             : List.empty(),
-        'is_important': isImportant,
-        'is_realtime': isRealtime,
         'read_at': readAt,
         'sender_id': senderId,
         'recipient_id': recipientId,

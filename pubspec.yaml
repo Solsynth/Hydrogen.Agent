@@ -62,13 +62,13 @@ dependencies:
   livekit_client: ^2.1.5
   flutter_webrtc: ^0.10.7
   wakelock_plus: ^1.2.5
-  flutter_background: ^1.2.0
   cached_network_image: ^3.3.1
   sentry_flutter: ^8.2.0
   firebase_core: ^3.0.0
   firebase_messaging: ^15.0.0
-  platform_device_id: ^1.0.1
   package_info_plus: ^8.0.0
+  device_info_plus: ^10.1.0
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

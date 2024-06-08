@@ -78,9 +78,9 @@ class _AccountScreenState extends State<AccountScreen> {
               );
             }
 
-            return Column(
+            return ListView(
               children: [
-                const AccountHeading().paddingOnly(bottom: 8),
+                const AccountHeading().paddingOnly(bottom: 8, top: 16),
                 ...(actionItems.map(
                   (x) => ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 34),
