@@ -26,7 +26,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.solian"
+    namespace "dev.solsynth.solian"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
