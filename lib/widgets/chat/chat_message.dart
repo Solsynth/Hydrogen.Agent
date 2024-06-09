@@ -100,7 +100,17 @@ class ChatMessage extends StatelessWidget {
     if (isContentPreviewing) {
       widget = buildContent();
     } else if (isMerged) {
-      widget = buildContent().paddingOnly(left: 52);
+      widget = Column(
+        children: [
+          buildContent().paddingOnly(left: 52),
+          if (item.attachments?.isNotEmpty ?? false)
+            AttachmentList(
+              key: Key('m${item.uuid}attachments'),
+              parentId: item.uuid,
+              attachmentsId: item.attachments ?? List.empty(),
+            ).paddingSymmetric(vertical: 4),
+        ],
+      );
     } else if (isReply) {
       widget = Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,6 +159,7 @@ class ChatMessage extends StatelessWidget {
           ).paddingSymmetric(horizontal: 12),
           if (item.attachments?.isNotEmpty ?? false)
             AttachmentList(
+              key: Key('m${item.uuid}attachments'),
               parentId: item.uuid,
               attachmentsId: item.attachments ?? List.empty(),
             ).paddingSymmetric(vertical: 4),

@@ -24,7 +24,7 @@ class ChatProvider extends GetxController {
     }
 
     final AuthProvider auth = Get.find();
-    auth.ensureCredentials();
+    await auth.ensureCredentials();
 
     final uri = Uri.parse(
       '${ServiceFinder.services['messaging']}/api/ws?tk=${auth.credentials!.accessToken}'

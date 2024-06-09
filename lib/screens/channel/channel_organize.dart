@@ -132,7 +132,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
                   ),
                   actions: notifyBannerActions,
                 ).paddingOnly(bottom: 6),
-              if (widget.realm != null)
+              if (widget.realm != null && widget.edit == null)
                 MaterialBanner(
                   leading: const Icon(Icons.group),
                   leadingPadding: const EdgeInsets.only(left: 10, right: 20),

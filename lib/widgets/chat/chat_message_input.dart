@@ -75,7 +75,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       'uuid': const Uuid().v4(),
       'type': 'm.text',
       'content': encodeMessage(_textController.value.text),
-      'attachments': _attachments,
+      'attachments': List.from(_attachments),
       'reply_to': _replyTo?.id,
     };
 
@@ -96,6 +96,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       updatedAt: DateTime.now(),
       content: payload['content'] as Map<String, dynamic>,
       type: payload['type'] as String,
+      attachments: _attachments,
       sender: sender,
       replyId: _replyTo?.id,
       replyTo: _replyTo,

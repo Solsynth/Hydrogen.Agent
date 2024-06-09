@@ -81,8 +81,8 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 
     final client = auth.configureClient(service: 'messaging');
 
-    final resp = await client
-        .put('/api/channels/${widget.realm}/${widget.channel.alias}/members/me', {
+    final resp = await client.put(
+        '/api/channels/${widget.realm}/${widget.channel.alias}/members/me', {
       'nick': null,
       'notify_level': _notifyLevel,
     });
@@ -112,14 +112,17 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 
     final ownerActions = [
       ListTile(
-        leading: const Icon(Icons.edit),
+        leading: const Icon(Icons.settings),
         trailing: const Icon(Icons.chevron_right),
-        title: Text('channelAdjust'.tr.capitalize!),
+        title: Text('channelSettings'.tr.capitalize!),
         onTap: () async {
           AppRouter.instance
               .pushNamed(
             'channelOrganizing',
-            extra: ChannelOrganizeArguments(edit: widget.channel),
+            extra: ChannelOrganizeArguments(
+              edit: widget.channel,
+              realm: widget.channel.realm,
+            ),
           )
               .then((resp) {
             if (resp != null) {
@@ -176,7 +179,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
                     isExpanded: true,
                     items: notifyTypes.entries
                         .map((item) => DropdownMenuItem<int>(
-                      enabled: !_isBusy,
+                              enabled: !_isBusy,
                               value: item.key,
                               child: Text(
                                 item.value,

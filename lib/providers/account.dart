@@ -54,7 +54,7 @@ class AccountProvider extends GetxController {
     }
 
     final AuthProvider auth = Get.find();
-    auth.ensureCredentials();
+    await auth.ensureCredentials();
 
     if (auth.credentials == null) await auth.loadCredentials();
 
@@ -185,7 +185,7 @@ class AccountProvider extends GetxController {
     late final String provider;
     final deviceUuid = await _getDeviceUuid();
 
-    if (deviceUuid == null) {
+    if (deviceUuid == null || deviceUuid.isEmpty) {
       log("Unable to active push notifications, couldn't get device uuid");
     }
 

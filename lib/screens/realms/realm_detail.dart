@@ -67,9 +67,9 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
   Widget build(BuildContext context) {
     final ownerActions = [
       ListTile(
-        leading: const Icon(Icons.edit),
+        leading: const Icon(Icons.settings),
         trailing: const Icon(Icons.chevron_right),
-        title: Text('realmAdjust'.tr.capitalize!),
+        title: Text('realmSettings'.tr.capitalize!),
         onTap: () async {
           AppRouter.instance
               .pushNamed(
@@ -119,11 +119,6 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
         Expanded(
           child: ListView(
             children: [
-              ListTile(
-                leading: const Icon(Icons.settings),
-                trailing: const Icon(Icons.chevron_right),
-                title: Text('realmSettings'.tr.capitalize!),
-              ),
               ListTile(
                 leading: const Icon(Icons.supervisor_account),
                 trailing: const Icon(Icons.chevron_right),
