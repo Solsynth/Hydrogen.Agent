@@ -51,7 +51,7 @@ class AttachmentProvider extends GetConnect {
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
     final client = auth.configureClient(
-      service: 'paperclip',
+      'paperclip',
       timeout: const Duration(minutes: 3),
     );
 

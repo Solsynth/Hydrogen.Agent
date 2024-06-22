@@ -1,10 +1,13 @@
+import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/firebase_options.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
@@ -17,6 +20,8 @@ import 'package:solian/providers/friend.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
+
+late final double titlebarHeight;
 
 void main() async {
   await SentryFlutter.init(
@@ -32,6 +37,20 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+      if (PlatformInfo.isDesktop) {
+        await Window.initialize();
+        await Window.setEffect(
+          effect: WindowEffect.transparent,
+          dark: true,
+        );
+
+        if (PlatformInfo.isMacOS) {
+          await Window.makeTitlebarTransparent();
+          await Window.enableFullSizeContentView();
+
+          titlebarHeight = await Window.getTitlebarHeight();
+        }
+      }
 
       runApp(const SolianApp());
     },
@@ -81,10 +100,22 @@ class SolianApp extends StatelessWidget {
         });
       },
       builder: (context, child) {
-        return ScaffoldMessenger(
+        final content = ScaffoldMessenger(
           child: child ?? Container(),
         );
-      },
+
+        if (PlatformInfo.isMacOS) {
+          return Material(
+            color: Theme.of(context).colorScheme.surface,
+            child: Padding(
+              padding: EdgeInsets.only(top: titlebarHeight),
+              child: content,
+            ),
+          );
+        } else {
+          return content;
+        }
+      }
     );
   }
 }
