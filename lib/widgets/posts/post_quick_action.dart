@@ -50,7 +50,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
     if (_isSubmitting) return;
     if (!await auth.isAuthorized) return;
 
-    final client = auth.configureClient(service: 'interactive');
+    final client = auth.configureClient('interactive');
 
     setState(() => _isSubmitting = true);
 

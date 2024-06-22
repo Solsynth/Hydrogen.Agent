@@ -97,7 +97,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'paperclip');
+    final client = auth.configureClient('paperclip');
 
     var resp = await client.put('/api/attachments/$id', {
       'metadata': {
@@ -119,7 +119,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'paperclip');
+    final client = auth.configureClient('paperclip');
 
     var resp = await client.delete('/api/attachments/$id');
     if (resp.statusCode != 200) {

@@ -64,7 +64,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'interactive');
+    final client = auth.configureClient('interactive');
 
     final payload = {
       'content': _contentController.value.text,

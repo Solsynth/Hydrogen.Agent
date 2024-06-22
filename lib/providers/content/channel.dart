@@ -9,7 +9,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.get('/api/channels/$realm/$alias');
     if (resp.statusCode != 200) {
@@ -23,7 +23,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.get('/api/channels/$realm/$alias/me');
     if (resp.statusCode != 200) {
@@ -38,7 +38,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.get('/api/channels/$realm/$alias/calls/ongoing');
     if (resp.statusCode == 404) {
@@ -54,7 +54,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.get('/api/channels/$scope');
     if (resp.statusCode != 200) {
@@ -68,7 +68,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.get('/api/channels/$realm/me/available');
     if (resp.statusCode != 200) {
@@ -82,7 +82,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.post('/api/channels/$scope', payload);
     if (resp.statusCode != 200) {
@@ -107,7 +107,7 @@ class ChannelProvider extends GetxController {
     if (related == null) return null;
 
     final prof = await auth.getProfile();
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.post('/api/channels/$scope/dm', {
       'alias': const Uuid().v4().replaceAll('-', '').substring(0, 12),
@@ -128,7 +128,7 @@ class ChannelProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.put('/api/channels/$scope/$id', payload);
     if (resp.statusCode != 200) {

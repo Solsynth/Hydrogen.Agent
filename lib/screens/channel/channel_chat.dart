@@ -110,7 +110,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.get(
         '/api/channels/${widget.realm}/${widget.alias}/messages?take=10&offset=$pageKey');

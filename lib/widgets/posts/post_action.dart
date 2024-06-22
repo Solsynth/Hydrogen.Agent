@@ -153,7 +153,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = auth.configureClient(service: 'interactive');
+    final client = auth.configureClient('interactive');
 
     setState(() => _isBusy = true);
     final resp = await client.delete('/api/posts/${widget.item.id}');

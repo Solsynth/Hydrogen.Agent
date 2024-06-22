@@ -58,8 +58,8 @@ class AuthProvider extends GetConnect {
     return request;
   }
 
-  GetConnect configureClient({
-    String? service,
+  GetConnect configureClient(
+    String service, {
     timeout = const Duration(seconds: 5),
   }) {
     final client = GetConnect(
@@ -68,10 +68,7 @@ class AuthProvider extends GetConnect {
       allowAutoSignedCert: true,
     );
     client.httpClient.addAuthenticator(requestAuthenticator);
-
-    if (service != null) {
-      client.httpClient.baseUrl = ServiceFinder.services[service];
-    }
+    client.httpClient.baseUrl = ServiceFinder.services[service];
 
     return client;
   }
@@ -152,7 +149,7 @@ class AuthProvider extends GetConnect {
       return _cachedUserProfileResponse!;
     }
 
-    final client = configureClient(service: 'passport');
+    final client = configureClient('passport');
 
     final resp = await client.get('/api/users/me');
     if (resp.statusCode != 200) {

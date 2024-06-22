@@ -29,7 +29,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client
         .delete('/api/channels/${widget.realm}/${widget.channel.id}');
@@ -48,7 +48,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.delete(
       '/api/channels/${widget.realm}/${widget.channel.alias}/members/me',

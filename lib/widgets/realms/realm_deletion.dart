@@ -27,7 +27,7 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     final resp = await client.delete('/api/realms/${widget.realm.id}');
     if (resp.statusCode != 200) {
@@ -45,7 +45,7 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     final resp =
         await client.delete('/api/realms/${widget.realm.id}/members/me');

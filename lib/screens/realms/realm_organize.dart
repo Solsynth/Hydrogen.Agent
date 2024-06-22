@@ -41,7 +41,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     final payload = {
       'alias': _aliasController.value.text.toLowerCase(),

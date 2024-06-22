@@ -98,7 +98,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       context.showErrorDialog(e);
     }
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     final resp = await client.put(
       '/api/users/me/$position',
@@ -120,7 +120,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     _birthday?.toIso8601String();
     final resp = await client.put(

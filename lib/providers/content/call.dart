@@ -57,7 +57,7 @@ class ChatCallProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.post(
       '/api/channels/global/${channel.value!.alias}/calls/ongoing/token',

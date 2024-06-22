@@ -69,7 +69,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     final prof = await auth.getProfile();
     if (!await auth.isAuthorized) return;
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final payload = {
       'uuid': const Uuid().v4(),

@@ -75,7 +75,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.post(
       '/api/channels/${widget.realm}/${widget.channel.alias}/members',
@@ -96,7 +96,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient(service: 'messaging');
+    final client = auth.configureClient('messaging');
 
     final resp = await client.request(
       '/api/channels/${widget.realm}/${widget.channel.alias}/members',

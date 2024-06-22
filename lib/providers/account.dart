@@ -164,7 +164,7 @@ class AccountProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     final resp = await client.get('/api/notifications?skip=0&take=100');
     if (resp.statusCode == 200) {
@@ -197,7 +197,7 @@ class AccountProvider extends GetxController {
       token = await FirebaseMessaging.instance.getToken();
     }
 
-    final client = auth.configureClient(service: 'passport');
+    final client = auth.configureClient('passport');
 
     final resp = await client.post('/api/notifications/subscribe', {
       'provider': provider,
