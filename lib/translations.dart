@@ -127,6 +127,7 @@ class SolianMessages extends Translations {
           'realmDeletionConfirm': 'Confirm realm deletion',
           'realmDeletionConfirmCaption':
               'Are you sure to delete realm @realm? This action cannot be undone!',
+          'channels': 'Channels',
           'channelNew': 'Create a new channel',
           'channelNewInRealmHint': 'Create channel in realm @realm',
           'channelOrganizing': 'Organize a channel',
@@ -328,6 +329,7 @@ class SolianMessages extends Translations {
           'realmLeaveConfirmCaption': '你确认要离开领域 @realm 吗？你在该领域发表的内容不会被删除。',
           'realmDeletionConfirm': '确认删除领域',
           'realmDeletionConfirmCaption': '你确定要删除领域 @realm 嘛？该操作不可撤销。',
+          'channels': '频道',
           'channelNew': '创建新频道',
           'channelNewInRealmHint': '在领域 @realm 里创建新频道',
           'channelOrganizing': '组织频道',

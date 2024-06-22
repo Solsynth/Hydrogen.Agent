@@ -23,13 +23,11 @@ class ChannelListWidget extends StatefulWidget {
 
 class _ChannelListWidgetState extends State<ChannelListWidget> {
   final List<Channel> _globalChannels = List.empty(growable: true);
-  final List<Channel> _directMessages = List.empty(growable: true);
   final Map<String, List<Channel>> _inRealms = {};
 
   void mapChannels() {
     _inRealms.clear();
     _globalChannels.clear();
-    _directMessages.clear();
 
     if (widget.noCategory) {
       _globalChannels.addAll(widget.channels);
@@ -42,8 +40,6 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
           _inRealms[channel.realm!.alias] = List.empty(growable: true);
         }
         _inRealms[channel.realm!.alias]!.add(channel);
-      } else if (channel.type == 1) {
-        _directMessages.add(channel);
       } else {
         _globalChannels.add(channel);
       }
@@ -54,6 +50,12 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   void didUpdateWidget(covariant ChannelListWidget oldWidget) {
     setState(() => mapChannels());
     super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void initState() {
+    mapChannels();
+    super.initState();
   }
 
   Widget buildItem(Channel element) {
@@ -125,13 +127,6 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     return SliverList.list(
       children: [
         ..._globalChannels.map((e) => buildItem(e)),
-        if (_directMessages.isNotEmpty)
-          ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-            title: Text('channelCategoryDirect'.tr),
-            subtitle: Text('channelCategoryDirectHint'.tr),
-            children: _directMessages.map((e) => buildItem(e)).toList(),
-          ),
         ..._inRealms.entries.map((element) {
           return ExpansionTile(
             tilePadding: const EdgeInsets.symmetric(horizontal: 24),

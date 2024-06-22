@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
@@ -80,82 +79,135 @@ class _ChatScreenState extends State<ChatScreen> {
             );
           }
 
-          return RefreshIndicator(
-            onRefresh: () => getChannels(),
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  title: AppBarTitle('chat'.tr),
-                  centerTitle: false,
-                  floating: true,
-                  titleSpacing: SolianTheme.titleSpacing(context),
-                  toolbarHeight: SolianTheme.toolbarHeight(context),
-                  actions: [
-                    const BackgroundStateWidget(),
-                    const NotificationButton(),
-                    PopupMenuButton(
-                      icon: const Icon(Icons.add_circle),
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: Text('channelOrganizeCommon'.tr),
-                            leading: const Icon(Icons.tag),
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                          onTap: () {
-                            AppRouter.instance
-                                .pushNamed('channelOrganizing')
-                                .then(
-                              (value) {
-                                if (value != null) getChannels();
+          final prefixSlivers = [
+            Obx(() {
+              if (call.current.value != null) {
+                return const SliverToBoxAdapter(
+                  child: ChatCallCurrentIndicator(),
+                );
+              } else {
+                return const SliverToBoxAdapter();
+              }
+            }),
+          ];
+
+          return DefaultTabController(
+            length: 2,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverOverlapAbsorber(
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context),
+                    sliver: SliverAppBar(
+                      title: AppBarTitle('chat'.tr),
+                      centerTitle: true,
+                      floating: true,
+                      titleSpacing: SolianTheme.titleSpacing(context),
+                      toolbarHeight: SolianTheme.toolbarHeight(context),
+                      actions: [
+                        const BackgroundStateWidget(),
+                        const NotificationButton(),
+                        PopupMenuButton(
+                          icon: const Icon(Icons.add_circle),
+                          itemBuilder: (BuildContext context) => [
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text('channelOrganizeCommon'.tr),
+                                leading: const Icon(Icons.tag),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              onTap: () {
+                                AppRouter.instance
+                                    .pushNamed('channelOrganizing')
+                                    .then(
+                                  (value) {
+                                    if (value != null) getChannels();
+                                  },
+                                );
                               },
-                            );
-                          },
-                        ),
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: Text('channelOrganizeDirect'.tr),
-                            leading: const FaIcon(
-                              FontAwesomeIcons.userGroup,
-                              size: 16,
                             ),
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 8),
-                          ),
-                          onTap: () {
-                            final ChannelProvider provider = Get.find();
-                            provider
-                                .createDirectChannel(context, 'global')
-                                .then((resp) {
-                              if (resp != null) {
-                                getChannels();
-                              }
-                            });
-                          },
+                            PopupMenuItem(
+                              child: ListTile(
+                                title: Text('channelOrganizeDirect'.tr),
+                                leading: const FaIcon(
+                                  FontAwesomeIcons.userGroup,
+                                  size: 16,
+                                ),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              onTap: () {
+                                final ChannelProvider provider = Get.find();
+                                provider
+                                    .createDirectChannel(context, 'global')
+                                    .then((resp) {
+                                  if (resp != null) {
+                                    getChannels();
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                         ),
                       ],
+                      bottom: TabBar(
+                        tabs: [
+                          Tab(
+                            icon: const Icon(Icons.tag),
+                            text: 'channels'.tr,
+                          ),
+                          Tab(
+                            icon: const Icon(Icons.chat),
+                            text: 'channelCategoryDirect'.tr,
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                  ),
+                ];
+              },
+              body: Builder(builder: (context) {
+                if (_isBusy) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return TabBarView(
+                  children: [
+                    RefreshIndicator(
+                      onRefresh: () => getChannels(),
+                      child: CustomScrollView(
+                        slivers: [
+                          ...prefixSlivers,
+                          ChannelListWidget(
+                            channels:
+                                _channels.where((x) => x.type == 0).toList(),
+                            selfId: _accountId ?? 0,
+                          ),
+                        ],
+                      ),
+                    ),
+                    RefreshIndicator(
+                      onRefresh: () => getChannels(),
+                      child: CustomScrollView(
+                        slivers: [
+                          ...prefixSlivers,
+                          ChannelListWidget(
+                            channels:
+                                _channels.where((x) => x.type == 1).toList(),
+                            selfId: _accountId ?? 0,
+                            noCategory: true,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-                Obx(() {
-                  if (call.current.value != null) {
-                    return const SliverToBoxAdapter(
-                      child: ChatCallCurrentIndicator(),
-                    );
-                  } else {
-                    return const SliverToBoxAdapter();
-                  }
-                }),
-                if (_isBusy)
-                  SliverToBoxAdapter(
-                    child: const LinearProgressIndicator().animate().scaleX(),
-                  ),
-                ChannelListWidget(channels: _channels, selfId: _accountId ?? 0),
-              ],
+                );
+              }),
             ),
           );
         },
