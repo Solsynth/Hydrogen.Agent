@@ -15,14 +15,14 @@ import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
 
-class ContactScreen extends StatefulWidget {
-  const ContactScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
 
   @override
-  State<ContactScreen> createState() => _ContactScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ContactScreenState extends State<ContactScreen> {
+class _ChatScreenState extends State<ChatScreen> {
   bool _isBusy = true;
   int? _accountId;
 
@@ -85,7 +85,7 @@ class _ContactScreenState extends State<ContactScreen> {
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  title: AppBarTitle('contact'.tr),
+                  title: AppBarTitle('chat'.tr),
                   centerTitle: false,
                   floating: true,
                   titleSpacing: SolianTheme.titleSpacing(context),

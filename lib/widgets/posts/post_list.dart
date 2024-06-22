@@ -32,9 +32,7 @@ class PostListWidget extends StatelessWidget {
               item: item,
               isShowEmbed: isShowEmbed,
               isClickable: isNestedClickable,
-            ).paddingSymmetric(
-              vertical: (item.attachments?.isEmpty ?? false) ? 8 : 0,
-            ),
+            ).paddingSymmetric(vertical: 8),
             onTap: () {
               if (!isClickable) return;
               AppRouter.instance.pushNamed(

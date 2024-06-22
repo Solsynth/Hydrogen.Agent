@@ -11,9 +11,16 @@ import 'package:solian/widgets/attachments/attachment_list_fullscreen.dart';
 class AttachmentList extends StatefulWidget {
   final String parentId;
   final List<int> attachmentsId;
+  final bool divided;
+  final double dividedPadding;
 
-  const AttachmentList(
-      {super.key, required this.parentId, required this.attachmentsId});
+  const AttachmentList({
+    super.key,
+    required this.parentId,
+    required this.attachmentsId,
+    this.divided = false,
+    this.dividedPadding = 16,
+  });
 
   @override
   State<AttachmentList> createState() => _AttachmentListState();
@@ -91,6 +98,83 @@ class _AttachmentListState extends State<AttachmentList> {
     }
   }
 
+  Widget buildEntry(Attachment element, int idx) {
+    return GestureDetector(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AttachmentItem(
+              parentId: widget.parentId,
+              key: Key('a${element.uuid}'),
+              item: element,
+              badge: _attachmentsMeta.length > 1
+                  ? '${idx + 1}/${_attachmentsMeta.length}'
+                  : null,
+              showHideButton: !element.isMature || _showMature,
+              onHide: () {
+                setState(() => _showMature = false);
+              },
+            ),
+            if (element.isMature && !_showMature)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            if (element.isMature && !_showMature)
+              Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 280),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.visibility_off,
+                          color: Colors.white, size: 32),
+                      const SizedBox(height: 8),
+                      Text(
+                        'matureContent'.tr,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                      Text(
+                        'matureContentCaption'.tr,
+                        style: const TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+      onTap: () {
+        if (!_showMature && _attachmentsMeta.any((e) => e!.isMature)) {
+          setState(() => _showMature = true);
+        } else if (['image'].contains(element.mimetype.split('/').first)) {
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => AttachmentListFullScreen(
+                parentId: widget.parentId,
+                attachment: element,
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -145,80 +229,21 @@ class _AttachmentListState extends State<AttachmentList> {
           );
         }
 
-        return GestureDetector(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
+        if (widget.divided) {
+          const radius = BorderRadius.all(Radius.circular(16));
+          return Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              border: Border.all(color: Theme.of(context).dividerColor, width: 1),
+              borderRadius: radius,
             ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                AttachmentItem(
-                  parentId: widget.parentId,
-                  key: Key('a${element.uuid}'),
-                  item: element,
-                  badge: _attachmentsMeta.length > 1
-                      ? '${idx + 1}/${_attachmentsMeta.length}'
-                      : null,
-                  showHideButton: !element.isMature || _showMature,
-                  onHide: () {
-                    setState(() => _showMature = false);
-                  },
-                ),
-                if (element.isMature && !_showMature)
-                  BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                      ),
-                    ),
-                  ),
-                if (element.isMature && !_showMature)
-                  Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 280),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.visibility_off,
-                              color: Colors.white, size: 32),
-                          const SizedBox(height: 8),
-                          Text(
-                            'matureContent'.tr,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          ),
-                          Text(
-                            'matureContentCaption'.tr,
-                            style: const TextStyle(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
+            child: ClipRRect(
+              borderRadius: radius,
+              child: buildEntry(element, idx),
             ),
-          ),
-          onTap: () {
-            if (!_showMature && _attachmentsMeta.any((e) => e!.isMature)) {
-              setState(() => _showMature = true);
-            } else if (['image'].contains(element.mimetype.split('/').first)) {
-              Navigator.of(context, rootNavigator: true).push(
-                MaterialPageRoute(
-                  builder: (context) => AttachmentListFullScreen(
-                    parentId: widget.parentId,
-                    attachment: element,
-                  ),
-                ),
-              );
-            }
-          },
-        );
+          ).paddingSymmetric(horizontal: widget.dividedPadding);
+        } else {
+          return buildEntry(element, idx);
+        }
       },
     );
   }

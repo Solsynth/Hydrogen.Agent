@@ -50,6 +50,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 child: PostItem(
                   item: item!,
                   isClickable: true,
+                  isFullDate: true,
                   isShowReply: false,
                 ),
               ),

@@ -7,7 +7,7 @@ import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
-import 'package:solian/screens/contact.dart';
+import 'package:solian/screens/chat.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
@@ -31,9 +31,9 @@ abstract class AppRouter {
             builder: (context, state) => const SocialScreen(),
           ),
           GoRoute(
-            path: '/contact',
-            name: 'contact',
-            builder: (context, state) => const ContactScreen(),
+            path: '/chat',
+            name: 'chat',
+            builder: (context, state) => const ChatScreen(),
           ),
           GoRoute(
             path: '/realms',

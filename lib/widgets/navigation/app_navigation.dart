@@ -9,9 +9,9 @@ abstract class AppNavigation {
       page: 'social',
     ),
     AppNavigationDestination(
-      icon: const Icon(Icons.contacts),
-      label: 'contact'.tr,
-      page: 'contact',
+      icon: const Icon(Icons.forum),
+      label: 'chat'.tr,
+      page: 'chat',
     ),
     AppNavigationDestination(
       icon: const Icon(Icons.workspaces),

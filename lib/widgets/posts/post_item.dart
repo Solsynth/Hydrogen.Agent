@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_utils/get_utils.dart';
+import 'package:intl/intl.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
@@ -18,6 +19,7 @@ class PostItem extends StatefulWidget {
   final bool isReactable;
   final bool isShowReply;
   final bool isShowEmbed;
+  final bool isFullDate;
   final String? overrideAttachmentParent;
 
   const PostItem({
@@ -28,6 +30,7 @@ class PostItem extends StatefulWidget {
     this.isReactable = true,
     this.isShowReply = true,
     this.isShowEmbed = true,
+    this.isFullDate = false,
     this.overrideAttachmentParent,
   });
 
@@ -42,6 +45,69 @@ class _PostItemState extends State<PostItem> {
   void initState() {
     item = widget.item;
     super.initState();
+  }
+
+  Widget buildDate() {
+    if (widget.isFullDate) {
+      return Text(DateFormat('y/M/d H:m').format(item.createdAt));
+    } else {
+      return Text(format(item.createdAt, locale: 'en_short'));
+    }
+  }
+
+  Widget buildHeader() {
+    return Row(
+      children: [
+        Text(
+          item.author.nick,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ).paddingOnly(left: 12),
+        buildDate().paddingOnly(left: 4),
+      ],
+    );
+  }
+
+  Widget buildBody() {
+    return Markdown(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      data: item.content,
+      padding: const EdgeInsets.all(0),
+      onTapLink: (text, href, title) async {
+        if (href == null) return;
+        await launchUrlString(
+          href,
+          mode: LaunchMode.externalApplication,
+        );
+      },
+    );
+  }
+
+  Widget buildFooter() {
+    List<String> labels = List.empty(growable: true);
+    if (widget.item.createdAt != widget.item.updatedAt) {
+      labels.add('postEdited'.trParams({
+        'date': DateFormat('yy/M/d H:m').format(item.updatedAt),
+      }));
+    }
+    if (widget.item.realm != null) {
+      labels.add('postInRealm'.trParams({
+        'realm': '#${widget.item.realm!.alias}',
+      }));
+    }
+
+    if (labels.isNotEmpty) {
+      return Text(
+        labels.join(" · "),
+        textAlign: TextAlign.left,
+        style: TextStyle(
+          fontSize: 12,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+        ),
+      ).paddingOnly(top: 8);
+    } else {
+      return const SizedBox();
+    }
   }
 
   Widget buildReply(BuildContext context) {
@@ -116,39 +182,20 @@ class _PostItemState extends State<PostItem> {
 
     if (widget.isCompact) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              AccountAvatar(content: item.author.avatar.toString(), radius: 10),
-              Text(
-                item.author.nick,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ).paddingOnly(left: 6),
-              Text(format(item.createdAt, locale: 'en_short'))
-                  .paddingOnly(left: 4),
-            ],
-          ).paddingSymmetric(horizontal: 12),
-          Markdown(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            data: item.content,
-            padding: const EdgeInsets.all(0),
-            onTapLink: (text, href, title) async {
-              if (href == null) return;
-              await launchUrlString(
-                href,
-                mode: LaunchMode.externalApplication,
-              );
-            },
-          ).paddingOnly(
+          buildHeader().paddingSymmetric(horizontal: 12),
+          buildBody().paddingOnly(
             left: 16,
             right: 12,
             top: 2,
             bottom: hasAttachment ? 4 : 0,
           ),
+          buildFooter().paddingOnly(left: 16),
           AttachmentList(
             parentId: widget.overrideAttachmentParent ?? widget.item.alias,
             attachmentsId: item.attachments ?? List.empty(),
+            divided: true,
           ),
         ],
       );
@@ -175,23 +222,10 @@ class _PostItemState extends State<PostItem> {
             ),
             Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        item.author.nick,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ).paddingOnly(left: 12),
-                      Text(format(item.createdAt, locale: 'en_short'))
-                          .paddingOnly(left: 4),
-                    ],
-                  ),
-                  Markdown(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    data: item.content,
-                    padding: const EdgeInsets.all(0),
-                  ).paddingOnly(left: 12, right: 8),
+                  buildHeader(),
+                  buildBody().paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
                       child: buildReply(context).paddingOnly(top: 4),
@@ -218,6 +252,7 @@ class _PostItemState extends State<PostItem> {
                         );
                       },
                     ),
+                  buildFooter().paddingOnly(left: 12),
                 ],
               ),
             )
@@ -231,6 +266,7 @@ class _PostItemState extends State<PostItem> {
         AttachmentList(
           parentId: widget.item.alias,
           attachmentsId: item.attachments ?? List.empty(),
+          divided: true,
         ),
         PostQuickAction(
           isShowReply: widget.isShowReply,

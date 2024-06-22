@@ -83,69 +83,67 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: DefaultTabController(
         length: 2,
-        child: SafeArea(
-          child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                SliverOverlapAbsorber(
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: SliverAppBar(
-                    title: Text(_realm?.name ?? 'loading'.tr),
-                    centerTitle: false,
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onPressed: () {
-                          AppRouter.instance
-                              .pushNamed(
-                            'realmDetail',
-                            pathParameters: {'alias': widget.alias},
-                            extra: _realm,
-                          )
-                              .then((value) {
-                            if (value == false) AppRouter.instance.pop();
-                            if (value != null) {
-                              final resp =
-                                  Realm.fromJson(value as Map<String, dynamic>);
-                              getRealm(overrideAlias: resp.alias);
-                            }
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                      ),
-                    ],
-                    bottom: const TabBar(
-                      isScrollable: true,
-                      tabs: [
-                        Tab(icon: Icon(Icons.feed)),
-                        Tab(icon: Icon(Icons.chat)),
-                      ],
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverOverlapAbsorber(
+                handle:
+                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                sliver: SliverAppBar(
+                  title: Text(_realm?.name ?? 'loading'.tr),
+                  centerTitle: false,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () {
+                        AppRouter.instance
+                            .pushNamed(
+                          'realmDetail',
+                          pathParameters: {'alias': widget.alias},
+                          extra: _realm,
+                        )
+                            .then((value) {
+                          if (value == false) AppRouter.instance.pop();
+                          if (value != null) {
+                            final resp =
+                                Realm.fromJson(value as Map<String, dynamic>);
+                            getRealm(overrideAlias: resp.alias);
+                          }
+                        });
+                      },
                     ),
-                  ),
-                )
-              ];
-            },
-            body: Builder(
-              builder: (context) {
-                if (_isBusy) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                return TabBarView(
-                  children: [
-                    RealmPostListWidget(realm: _realm!),
-                    RealmChannelListWidget(
-                      realm: _realm!,
-                      channels: _channels,
-                      onRefresh: () => getChannels(),
+                    SizedBox(
+                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                     ),
                   ],
-                );
-              },
-            ),
+                  bottom: const TabBar(
+                    isScrollable: true,
+                    tabs: [
+                      Tab(icon: Icon(Icons.feed)),
+                      Tab(icon: Icon(Icons.chat)),
+                    ],
+                  ),
+                ),
+              )
+            ];
+          },
+          body: Builder(
+            builder: (context) {
+              if (_isBusy) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              return TabBarView(
+                children: [
+                  RealmPostListWidget(realm: _realm!),
+                  RealmChannelListWidget(
+                    realm: _realm!,
+                    channels: _channels,
+                    onRefresh: () => getChannels(),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
