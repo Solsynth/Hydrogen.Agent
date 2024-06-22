@@ -9,6 +9,7 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 
 class RealmListScreen extends StatefulWidget {
@@ -72,9 +73,11 @@ class _RealmListScreenState extends State<RealmListScreen> {
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  title: Text('realm'.tr),
+                  title: AppBarTitle('realm'.tr),
                   centerTitle: false,
-                  titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
+                  floating: true,
+                  titleSpacing: SolianTheme.titleSpacing(context),
+                  toolbarHeight: SolianTheme.toolbarHeight(context),
                   actions: [
                     const BackgroundStateWidget(),
                     const NotificationButton(),

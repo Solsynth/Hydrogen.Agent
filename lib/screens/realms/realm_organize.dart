@@ -5,6 +5,8 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
@@ -97,7 +99,9 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('realmOrganizing'.tr),
+          title: AppBarTitle('realmOrganizing'.tr),
+          centerTitle: false,
+          toolbarHeight: SolianTheme.toolbarHeight(context),
           leading: const PrevPageButton(),
           actions: [
             TextButton(

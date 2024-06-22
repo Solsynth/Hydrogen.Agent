@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
@@ -20,8 +18,6 @@ import 'package:solian/providers/friend.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
-
-late final double titlebarHeight;
 
 void main() async {
   await SentryFlutter.init(
@@ -45,10 +41,12 @@ void main() async {
         );
 
         if (PlatformInfo.isMacOS) {
+          await Window.hideTitle();
+          await Window.hideCloseButton();
+          await Window.hideMiniaturizeButton();
+          await Window.hideZoomButton();
           await Window.makeTitlebarTransparent();
           await Window.enableFullSizeContentView();
-
-          titlebarHeight = await Window.getTitlebarHeight();
         }
       }
 
@@ -100,22 +98,10 @@ class SolianApp extends StatelessWidget {
         });
       },
       builder: (context, child) {
-        final content = ScaffoldMessenger(
+        return ScaffoldMessenger(
           child: child ?? Container(),
         );
-
-        if (PlatformInfo.isMacOS) {
-          return Material(
-            color: Theme.of(context).colorScheme.surface,
-            child: Padding(
-              padding: EdgeInsets.only(top: titlebarHeight),
-              child: content,
-            ),
-          );
-        } else {
-          return content;
-        }
-      }
+      },
     );
   }
 }

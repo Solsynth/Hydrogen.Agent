@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/content/call.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/call/call_controls.dart';
 import 'package:solian/widgets/chat/call/call_participant.dart';
 import 'package:solian/widgets/prev_page.dart';
@@ -55,7 +56,9 @@ class _CallScreenState extends State<CallScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: true,
+          centerTitle: false,
+          titleSpacing: SolianTheme.titleSpacing(context),
+          toolbarHeight: SolianTheme.toolbarHeight(context),
           title: RichText(
             textAlign: TextAlign.center,
             text: TextSpan(children: [

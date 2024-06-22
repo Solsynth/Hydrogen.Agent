@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/prev_page.dart';
 
 class BasicShell extends StatelessWidget {
@@ -17,10 +18,9 @@ class BasicShell extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(state.topRoute?.name?.tr ?? 'page'.tr),
+        title: AppBarTitle(state.topRoute?.name?.tr ?? 'page'.tr),
         centerTitle: false,
-        titleSpacing: canPop ? null : 24,
-        elevation: SolianTheme.isLargeScreen(context) ? 1 : 0,
+        toolbarHeight: SolianTheme.toolbarHeight(context),
         leading: canPop ? const PrevPageButton() : null,
         automaticallyImplyLeading: false,
       ),

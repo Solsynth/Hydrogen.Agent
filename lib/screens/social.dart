@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/post.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
@@ -78,10 +80,11 @@ class _SocialScreenState extends State<SocialScreen> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                title: Text('social'.tr),
+                title: AppBarTitle('social'.tr),
                 centerTitle: false,
                 floating: true,
-                titleSpacing: SolianTheme.isLargeScreen(context) ? null : 24,
+                titleSpacing: SolianTheme.titleSpacing(context),
+                toolbarHeight: SolianTheme.toolbarHeight(context),
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),

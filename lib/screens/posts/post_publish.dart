@@ -7,7 +7,9 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/prev_page.dart';
@@ -122,7 +124,9 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('postPublishing'.tr),
+          title: AppBarTitle('postPublishing'.tr),
+          centerTitle: false,
+          toolbarHeight: SolianTheme.toolbarHeight(context),
           leading: const PrevPageButton(),
           actions: [
             TextButton(

@@ -17,6 +17,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
@@ -305,8 +306,10 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: AppBarTitle(title),
         centerTitle: false,
+        titleSpacing: SolianTheme.titleSpacing(context),
+        toolbarHeight: SolianTheme.toolbarHeight(context),
         actions: [
           const BackgroundStateWidget(),
           Builder(builder: (context) {

@@ -7,6 +7,8 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
+import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
@@ -107,7 +109,9 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('channelOrganizing'.tr),
+          title: AppBarTitle('channelOrganizing'.tr),
+          centerTitle: false,
+          toolbarHeight: SolianTheme.toolbarHeight(context),
           leading: const PrevPageButton(),
           actions: [
             TextButton(
