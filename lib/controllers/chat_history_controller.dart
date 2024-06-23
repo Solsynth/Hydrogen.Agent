@@ -10,14 +10,29 @@ class ChatHistoryController {
   final RxList<LocalMessage> currentHistory = RxList.empty(growable: true);
   final RxInt totalHistoryCount = 0.obs;
 
+  final RxBool isLoading = false.obs;
+
   initialize() async {
     database = await createHistoryDb();
     currentHistory.clear();
   }
 
   Future<void> getMessages(Channel channel, String scope) async {
-    totalHistoryCount.value = await database.syncMessages(channel, scope: scope);
+    totalHistoryCount.value =
+        await database.syncMessages(channel, scope: scope);
     await syncHistory(channel);
+  }
+
+  Future<void> getMoreMessages(Channel channel, String scope) async {
+    isLoading.value = true;
+    totalHistoryCount.value = await database.syncMessages(
+      channel,
+      breath: 3,
+      scope: scope,
+      offset: currentHistory.length,
+    );
+    await syncHistory(channel);
+    isLoading.value = false;
   }
 
   Future<void> syncHistory(Channel channel) async {
@@ -27,7 +42,6 @@ class ChatHistoryController {
 
   receiveMessage(Message remote) async {
     final entry = await database.receiveMessage(remote);
-    totalHistoryCount.value++;
     currentHistory.add(entry);
   }
 
@@ -42,7 +56,6 @@ class ChatHistoryController {
 
   void burnMessage(int id) async {
     await database.burnMessage(id);
-    totalHistoryCount.value--;
     currentHistory.removeWhere((x) => x.id == id);
   }
 }

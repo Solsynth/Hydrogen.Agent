@@ -36,13 +36,13 @@ extension MessageHistoryHelper on MessageHistoryDb {
     await localMessages.delete(id);
   }
 
-  syncMessages(Channel channel, {String scope = 'global', offset = 0}) async {
+  syncMessages(Channel channel, {String scope = 'global', breath = 10, offset = 0}) async {
     final lastOne = await localMessages.findLastByChannel(channel.id);
 
     final data = await _getRemoteMessages(
       channel,
       scope,
-      remainBreath: 10,
+      remainBreath: breath,
       offset: offset,
       onBrake: (items) {
         return items.any((x) => x.id == lastOne?.id);

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_history_controller.dart';
 import 'package:solian/exts.dart';
@@ -330,23 +331,41 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                     Obx(() {
                       final amount = _chatController.totalHistoryCount -
                           _chatController.currentHistory.length;
-                      if (amount > 0) {
-                        return SliverToBoxAdapter(
-                          child: ListTile(
-                            tileColor: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
-                            leading: const Icon(Icons.sync_disabled),
-                            title: Text('messageUnsync'.tr),
-                            subtitle: Text('messageUnsyncCaption'.trParams({
-                              'count': amount.string,
-                            })),
-                            onTap: () {},
-                          ),
-                        );
-                      } else {
+
+                      if (amount.value <= 0 ||
+                          _chatController.isLoading.isTrue) {
                         return const SliverToBoxAdapter(child: SizedBox());
                       }
+
+                      return SliverToBoxAdapter(
+                        child: ListTile(
+                          tileColor:
+                              Theme.of(context).colorScheme.surfaceContainerLow,
+                          leading: const Icon(Icons.sync_disabled),
+                          title: Text('messageUnsync'.tr),
+                          subtitle: Text('messageUnsyncCaption'.trParams({
+                            'count': amount.string,
+                          })),
+                          onTap: () {
+                            _chatController.getMoreMessages(
+                              _channel!,
+                              widget.realm,
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                    Obx(() {
+                      if (_chatController.isLoading.isFalse) {
+                        return const SliverToBoxAdapter(child: SizedBox());
+                      }
+
+                      return SliverToBoxAdapter(
+                        child: const LinearProgressIndicator()
+                            .animate()
+                            .slideY()
+                            .paddingOnly(bottom: 4),
+                      );
                     }),
                   ],
                 ),
