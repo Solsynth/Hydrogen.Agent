@@ -27,9 +27,9 @@ class _CallScreenState extends State<CallScreen> {
         DateTime.now().difference(provider.current.value!.createdAt);
 
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String formattedTime = "${twoDigits(duration.inHours)}:"
-        "${twoDigits(duration.inMinutes.remainder(60))}:"
-        "${twoDigits(duration.inSeconds.remainder(60))}";
+    String formattedTime = '${twoDigits(duration.inHours)}:'
+        '${twoDigits(duration.inMinutes.remainder(60))}:'
+        '${twoDigits(duration.inSeconds.remainder(60))}';
 
     return formattedTime;
   }
@@ -66,7 +66,7 @@ class _CallScreenState extends State<CallScreen> {
                 text: 'call'.tr,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const TextSpan(text: "\n"),
+              const TextSpan(text: '\n'),
               TextSpan(
                 text: currentDuration,
                 style: Theme.of(context).textTheme.bodySmall,

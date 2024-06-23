@@ -81,24 +81,24 @@ class AccountBadge {
   });
 
   factory AccountBadge.fromJson(Map<String, dynamic> json) => AccountBadge(
-        id: json["id"],
-        accountId: json["account_id"],
-        updatedAt: DateTime.parse(json["updated_at"]),
-        createdAt: DateTime.parse(json["created_at"]),
-        deletedAt: json["deleted_at"] != null
-            ? DateTime.parse(json["deleted_at"])
+        id: json['id'],
+        accountId: json['account_id'],
+        updatedAt: DateTime.parse(json['updated_at']),
+        createdAt: DateTime.parse(json['created_at']),
+        deletedAt: json['deleted_at'] != null
+            ? DateTime.parse(json['deleted_at'])
             : null,
-        metadata: json["metadata"],
-        type: json["type"],
+        metadata: json['metadata'],
+        type: json['type'],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "account_id": accountId,
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
-        "deleted_at": deletedAt?.toIso8601String(),
-        "metadata": metadata,
-        "type": type,
+        'id': id,
+        'account_id': accountId,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+        'deleted_at': deletedAt?.toIso8601String(),
+        'metadata': metadata,
+        'type': type,
       };
 }

@@ -190,10 +190,10 @@ class AccountProvider extends GetxController {
     }
 
     if (PlatformInfo.isIOS || PlatformInfo.isMacOS) {
-      provider = "apple";
+      provider = 'apple';
       token = await FirebaseMessaging.instance.getAPNSToken();
     } else {
-      provider = "firebase";
+      provider = 'firebase';
       token = await FirebaseMessaging.instance.getToken();
     }
 

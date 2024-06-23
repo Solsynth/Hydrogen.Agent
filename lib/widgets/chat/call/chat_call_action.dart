@@ -65,7 +65,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
         ? widget.realm?.alias
         : 'global';
     final resp = await client
-        .delete('/api/channels/${scope}/${widget.channel.alias}/calls/ongoing');
+        .delete('/api/channels/$scope/${widget.channel.alias}/calls/ongoing');
     if (resp.statusCode == 200) {
       if (widget.onEnded != null) widget.onEnded!();
     } else {

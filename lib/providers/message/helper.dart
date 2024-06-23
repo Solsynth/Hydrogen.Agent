@@ -13,19 +13,23 @@ Future<MessageHistoryDb> createHistoryDb() async {
 
 extension MessageHistoryHelper on MessageHistoryDb {
   receiveMessage(Message remote) async {
-    await localMessages.insert(LocalMessage(
+    final entry = LocalMessage(
       remote.id,
       remote,
       remote.channelId,
-    ));
+    );
+    await localMessages.insert(entry);
+    return entry;
   }
 
   replaceMessage(Message remote) async {
-    await localMessages.update(LocalMessage(
+    final entry = LocalMessage(
       remote.id,
       remote,
       remote.channelId,
-    ));
+    );
+    await localMessages.update(entry);
+    return entry;
   }
 
   burnMessage(int id) async {
@@ -38,18 +42,22 @@ extension MessageHistoryHelper on MessageHistoryDb {
     final data = await _getRemoteMessages(
       channel,
       scope,
-      remainBreath: 3,
+      remainBreath: 10,
       offset: offset,
       onBrake: (items) {
         return items.any((x) => x.id == lastOne?.id);
       },
     );
-    await localMessages.insertBulk(
-      data.map((x) => LocalMessage(x.id, x, x.channelId)).toList(),
-    );
+    if (data != null) {
+      await localMessages.insertBulk(
+        data.$1.map((x) => LocalMessage(x.id, x, x.channelId)).toList(),
+      );
+    }
+
+    return data?.$2 ?? 0;
   }
 
-  Future<List<Message>> _getRemoteMessages(
+  Future<(List<Message>, int)?> _getRemoteMessages(
     Channel channel,
     String scope, {
     required int remainBreath,
@@ -58,11 +66,11 @@ extension MessageHistoryHelper on MessageHistoryDb {
     offset = 0,
   }) async {
     if (remainBreath <= 0) {
-      return List.empty();
+      return null;
     }
 
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return List.empty();
+    if (!await auth.isAuthorized) return null;
 
     final client = auth.configureClient('messaging');
 
@@ -78,18 +86,20 @@ extension MessageHistoryHelper on MessageHistoryDb {
         response.data?.map((e) => Message.fromJson(e)).toList() ?? List.empty();
 
     if (onBrake != null && onBrake(result)) {
-      return result;
+      return (result, response.count);
     }
 
-    final expandResult = await _getRemoteMessages(
-      channel,
-      scope,
-      remainBreath: remainBreath - 1,
-      take: take,
-      offset: offset + result.length,
-    );
+    final expandResult = (await _getRemoteMessages(
+          channel,
+          scope,
+          remainBreath: remainBreath - 1,
+          take: take,
+          offset: offset + result.length,
+        ))
+            ?.$1 ??
+        List.empty();
 
-    return [...result, ...expandResult];
+    return ([...result, ...expandResult], response.count);
   }
 
   Future<List<LocalMessage>> listMessages(Channel channel) async {

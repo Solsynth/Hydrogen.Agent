@@ -44,8 +44,8 @@ class Message {
         deletedAt: json['deleted_at'],
         content: json['content'],
         type: json['type'],
-        attachments: json["attachments"] != null
-            ? List<int>.from(json["attachments"])
+        attachments: json['attachments'] != null
+            ? List<int>.from(json['attachments'])
             : null,
         channel:
             json['channel'] != null ? Channel.fromJson(json['channel']) : null,

@@ -79,7 +79,7 @@ class AuthProvider extends GetConnect {
 
     if (credentials!.isExpired) {
       await refreshCredentials();
-      log("Refreshed credentials at ${DateTime.now()}");
+      log('Refreshed credentials at ${DateTime.now()}');
     }
   }
 
