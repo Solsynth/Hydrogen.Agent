@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/call.dart';
@@ -40,16 +41,20 @@ class ChannelChatScreen extends StatefulWidget {
 }
 
 class _ChannelChatScreenState extends State<ChannelChatScreen> {
+  final _chatScrollController = ScrollController();
+
   bool _isBusy = false;
+  bool _isLoadingMore = false;
   int? _accountId;
 
   String? _overrideAlias;
 
   Channel? _channel;
-  ChannelMember? _channelProfile;
   Call? _ongoingCall;
+  ChannelMember? _channelProfile;
   StreamSubscription<NetworkPackage>? _subscription;
 
+  int _nextHistorySyncOffset = 0;
   MessageHistoryDb? _db;
   List<LocalMessage> _currentHistory = List.empty();
 
@@ -107,13 +112,19 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   }
 
   Future<void> getMessages() async {
-    await _db!.syncMessages(_channel!, scope: widget.realm);
+    await _db!.syncMessages(
+      _channel!,
+      scope: widget.realm,
+      offset: _nextHistorySyncOffset,
+    );
     await syncHistory();
   }
 
   Future<void> syncHistory() async {
-    _currentHistory = await _db!.localMessages.findAllByChannel(_channel!.id);
-    setState(() {});
+    final data = await _db!.localMessages.findAllByChannel(_channel!.id);
+    setState(() {
+      _currentHistory = data;
+    });
   }
 
   void listenMessages() {
@@ -171,6 +182,31 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Message? _messageToReplying;
   Message? _messageToEditing;
 
+  Widget buildHistoryBody(Message item, {bool isMerged = false}) {
+    if (item.replyTo != null) {
+      return Column(
+        children: [
+          ChatMessage(
+            key: Key('m${item.replyTo!.uuid}'),
+            item: item.replyTo!,
+            isReply: true,
+          ).paddingOnly(left: 24, right: 4, bottom: 2),
+          ChatMessage(
+            key: Key('m${item.uuid}'),
+            item: item,
+            isMerged: isMerged,
+          ),
+        ],
+      );
+    }
+
+    return ChatMessage(
+      key: Key('m${item.uuid}'),
+      item: item,
+      isMerged: isMerged,
+    );
+  }
+
   Widget buildHistory(context, index) {
     bool isMerged = false, hasMerged = false;
     if (index > 0) {
@@ -188,33 +224,9 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
     final item = _currentHistory[index].data;
 
-    Widget content;
-    if (item.replyTo != null) {
-      content = Column(
-        children: [
-          ChatMessage(
-            key: Key('m${item.replyTo!.uuid}'),
-            item: item.replyTo!,
-            isReply: true,
-          ).paddingOnly(left: 24, right: 4, bottom: 2),
-          ChatMessage(
-            key: Key('m${item.uuid}'),
-            item: item,
-            isMerged: isMerged,
-          ),
-        ],
-      );
-    } else {
-      content = ChatMessage(
-        key: Key('m${item.uuid}'),
-        item: item,
-        isMerged: isMerged,
-      );
-    }
-
     return InkWell(
       child: Container(
-        child: content.paddingOnly(
+        child: buildHistoryBody(item, isMerged: isMerged).paddingOnly(
           top: !isMerged ? 8 : 0,
           bottom: !hasMerged ? 8 : 0,
         ),
@@ -241,6 +253,16 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   @override
   void initState() {
+    _chatScrollController.addListener(() async {
+      if (_chatScrollController.position.pixels ==
+          _chatScrollController.position.maxScrollExtent) {
+        setState(() => _isLoadingMore = true);
+        _nextHistorySyncOffset = _currentHistory.length;
+        await getMessages();
+        setState(() => _isLoadingMore = false);
+      }
+    });
+
     createHistoryDb().then((db) async {
       _db = db;
 
@@ -330,8 +352,14 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         children: [
           Column(
             children: [
+              if (_isLoadingMore)
+                const LinearProgressIndicator()
+                    .paddingOnly(bottom: 4)
+                    .animate()
+                    .slideY(),
               Expanded(
                 child: ListView.builder(
+                  controller: _chatScrollController,
                   itemCount: _currentHistory.length,
                   clipBehavior: Clip.none,
                   reverse: true,

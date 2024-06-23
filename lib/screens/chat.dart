@@ -101,7 +101,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         context),
                     sliver: SliverAppBar(
                       title: AppBarTitle('chat'.tr),
-                      centerTitle: true,
+                      centerTitle: false,
                       floating: true,
                       titleSpacing: SolianTheme.titleSpacing(context),
                       toolbarHeight: SolianTheme.toolbarHeight(context),
