@@ -3,17 +3,17 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/packet.dart';
-import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
+import 'package:solian/providers/message/helper.dart';
+import 'package:solian/providers/message/history.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/theme.dart';
@@ -50,8 +50,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Call? _ongoingCall;
   StreamSubscription<NetworkPackage>? _subscription;
 
-  final PagingController<int, Message> _pagingController =
-      PagingController(firstPageKey: 0);
+  MessageHistoryDb? _db;
+  List<LocalMessage> _currentHistory = List.empty();
 
   getProfile() async {
     final AuthProvider auth = Get.find();
@@ -106,29 +106,14 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> getMessages(int pageKey) async {
-    final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+  Future<void> getMessages() async {
+    await _db!.syncMessages(_channel!, scope: widget.realm);
+    await syncHistory();
+  }
 
-    final client = auth.configureClient('messaging');
-
-    final resp = await client.get(
-        '/api/channels/${widget.realm}/${widget.alias}/messages?take=10&offset=$pageKey');
-
-    if (resp.statusCode == 200) {
-      final PaginationResult result = PaginationResult.fromJson(resp.body);
-      final parsed = result.data?.map((e) => Message.fromJson(e)).toList();
-
-      if (parsed != null && parsed.length >= 10) {
-        _pagingController.appendPage(parsed, pageKey + parsed.length);
-      } else if (parsed != null) {
-        _pagingController.appendLastPage(parsed);
-      }
-    } else if (resp.statusCode == 403) {
-      _pagingController.appendLastPage([]);
-    } else {
-      _pagingController.error = resp.bodyString;
-    }
+  Future<void> syncHistory() async {
+    _currentHistory = await _db!.localMessages.findAllByChannel(_channel!.id);
+    setState(() {});
   }
 
   void listenMessages() {
@@ -138,33 +123,19 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         case 'messages.new':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            final idx = _pagingController.itemList
-                ?.indexWhere((e) => e.uuid == payload.uuid);
-            if ((idx ?? -1) >= 0) {
-              _pagingController.itemList?[idx!] = payload;
-            } else {
-              _pagingController.itemList?.insert(0, payload);
-            }
+            _db?.receiveMessage(payload);
           }
           break;
         case 'messages.update':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            final idx = _pagingController.itemList
-                ?.indexWhere((x) => x.uuid == payload.uuid);
-            if (idx != null) {
-              _pagingController.itemList?[idx] = payload;
-            }
+            _db?.replaceMessage(payload);
           }
           break;
         case 'messages.burnt':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            final idx = _pagingController.itemList
-                ?.indexWhere((x) => x.uuid != payload.uuid);
-            if (idx != null) {
-              _pagingController.itemList?.removeAt(idx - 1);
-            }
+            _db?.burnMessage(payload.id);
           }
           break;
         case 'calls.new':
@@ -175,7 +146,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           _ongoingCall = null;
           break;
       }
-      setState(() {});
+      syncHistory();
     });
   }
 
@@ -200,20 +171,22 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Message? _messageToReplying;
   Message? _messageToEditing;
 
-  Widget buildHistory(context, Message item, index) {
+  Widget buildHistory(context, index) {
     bool isMerged = false, hasMerged = false;
     if (index > 0) {
       hasMerged = checkMessageMergeable(
-        _pagingController.itemList?[index - 1],
-        item,
+        _currentHistory[index - 1].data,
+        _currentHistory[index].data,
       );
     }
-    if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
+    if (index + 1 < _currentHistory.length) {
       isMerged = checkMessageMergeable(
-        item,
-        _pagingController.itemList?[index + 1],
+        _currentHistory[index].data,
+        _currentHistory[index + 1].data,
       );
     }
+
+    final item = _currentHistory[index].data;
 
     Widget content;
     if (item.replyTo != null) {
@@ -268,14 +241,20 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   @override
   void initState() {
-    super.initState();
+    createHistoryDb().then((db) async {
+      _db = db;
 
-    getProfile();
-    getChannel().then((_) {
+      await getChannel();
+      await syncHistory();
+
+      getProfile();
+      getOngoingCall();
+      getMessages();
+
       listenMessages();
-      _pagingController.addPageRequestListener(getMessages);
     });
-    getOngoingCall();
+
+    super.initState();
   }
 
   @override
@@ -352,14 +331,11 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           Column(
             children: [
               Expanded(
-                child: PagedListView<int, Message>(
+                child: ListView.builder(
+                  itemCount: _currentHistory.length,
                   clipBehavior: Clip.none,
                   reverse: true,
-                  pagingController: _pagingController,
-                  builderDelegate: PagedChildBuilderDelegate<Message>(
-                    itemBuilder: buildHistory,
-                    noItemsFoundIndicatorBuilder: (_) => Container(),
-                  ),
+                  itemBuilder: buildHistory,
                 ).paddingOnly(bottom: 56),
               ),
             ],
@@ -380,7 +356,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                     channel: _channel!,
                     onSent: (Message item) {
                       setState(() {
-                        _pagingController.itemList?.insert(0, item);
+                        _db?.receiveMessage(item);
+                        syncHistory();
                       });
                     },
                     onReset: () {

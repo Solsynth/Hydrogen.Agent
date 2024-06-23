@@ -31,8 +31,14 @@ class RemoteMessageConverter extends TypeConverter<Message, String> {
 
 @dao
 abstract class LocalMessageDao {
-  @Query('SELECT * FROM LocalMessage WHERE channelId = :channelId')
+  @Query('SELECT COUNT(id) FROM LocalMessage WHERE channelId = :channelId')
+  Future<int?> countByChannel(int channelId);
+
+  @Query('SELECT * FROM LocalMessage WHERE channelId = :channelId ORDER BY id DESC')
   Future<List<LocalMessage>> findAllByChannel(int channelId);
+
+  @Query('SELECT * FROM LocalMessage WHERE channelId = :channelId ORDER BY id DESC LIMIT 1')
+  Future<LocalMessage?> findLastByChannel(int channelId);
 
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insert(LocalMessage m);
@@ -40,7 +46,16 @@ abstract class LocalMessageDao {
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertBulk(List<LocalMessage> m);
 
-  @Query('DELETE * FROM LocalMessage')
+  @Update(onConflict: OnConflictStrategy.replace)
+  Future<void> update(LocalMessage person);
+
+  @Query('DELETE FROM LocalMessage WHERE id = :id')
+  Future<void> delete(int id);
+
+  @Query('DELETE FROM LocalMessage WHERE channelId = :channelId')
+  Future<List<LocalMessage>> deleteByChannel(int channelId);
+
+  @Query('DELETE FROM LocalMessage')
   Future<void> wipeLocalMessages();
 }
 

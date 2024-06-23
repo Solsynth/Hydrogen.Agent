@@ -123,6 +123,15 @@ class _$LocalMessageDao extends LocalMessageDao {
                   'id': item.id,
                   'data': _remoteMessageConverter.encode(item.data),
                   'channelId': item.channelId
+                }),
+        _localMessageUpdateAdapter = UpdateAdapter(
+            database,
+            'LocalMessage',
+            ['id'],
+            (LocalMessage item) => <String, Object?>{
+                  'id': item.id,
+                  'data': _remoteMessageConverter.encode(item.data),
+                  'channelId': item.channelId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -133,10 +142,45 @@ class _$LocalMessageDao extends LocalMessageDao {
 
   final InsertionAdapter<LocalMessage> _localMessageInsertionAdapter;
 
+  final UpdateAdapter<LocalMessage> _localMessageUpdateAdapter;
+
+  @override
+  Future<int?> countByChannel(int channelId) async {
+    return _queryAdapter.query(
+        'SELECT COUNT(id) FROM LocalMessage WHERE channelId = ?1',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [channelId]);
+  }
+
   @override
   Future<List<LocalMessage>> findAllByChannel(int channelId) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM LocalMessage WHERE channelId = ?1',
+        'SELECT * FROM LocalMessage WHERE channelId = ?1 ORDER BY id DESC',
+        mapper: (Map<String, Object?> row) => LocalMessage(
+            row['id'] as int,
+            _remoteMessageConverter.decode(row['data'] as String),
+            row['channelId'] as int),
+        arguments: [channelId]);
+  }
+
+  @override
+  Future<LocalMessage?> findLastByChannel(int channelId) async {
+    return _queryAdapter.query(
+        'SELECT * FROM LocalMessage WHERE channelId = ?1 ORDER BY id DESC LIMIT 1',
+        mapper: (Map<String, Object?> row) => LocalMessage(row['id'] as int, _remoteMessageConverter.decode(row['data'] as String), row['channelId'] as int),
+        arguments: [channelId]);
+  }
+
+  @override
+  Future<void> delete(int id) async {
+    await _queryAdapter.queryNoReturn('DELETE FROM LocalMessage WHERE id = ?1',
+        arguments: [id]);
+  }
+
+  @override
+  Future<List<LocalMessage>> deleteByChannel(int channelId) async {
+    return _queryAdapter.queryList(
+        'DELETE FROM LocalMessage WHERE channelId = ?1',
         mapper: (Map<String, Object?> row) => LocalMessage(
             row['id'] as int,
             _remoteMessageConverter.decode(row['data'] as String),
@@ -146,7 +190,7 @@ class _$LocalMessageDao extends LocalMessageDao {
 
   @override
   Future<void> wipeLocalMessages() async {
-    await _queryAdapter.queryNoReturn('DELETE * FROM LocalMessage');
+    await _queryAdapter.queryNoReturn('DELETE FROM LocalMessage');
   }
 
   @override
@@ -158,6 +202,11 @@ class _$LocalMessageDao extends LocalMessageDao {
   Future<void> insertBulk(List<LocalMessage> m) async {
     await _localMessageInsertionAdapter.insertList(
         m, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> update(LocalMessage person) async {
+    await _localMessageUpdateAdapter.update(person, OnConflictStrategy.replace);
   }
 }
 

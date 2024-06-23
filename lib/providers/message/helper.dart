@@ -20,28 +20,75 @@ extension MessageHistoryHelper on MessageHistoryDb {
     ));
   }
 
-  syncMessages(Channel channel, {String? scope}) async {
+  replaceMessage(Message remote) async {
+    await localMessages.update(LocalMessage(
+      remote.id,
+      remote,
+      remote.channelId,
+    ));
+  }
+
+  burnMessage(int id) async {
+    await localMessages.delete(id);
+  }
+
+  syncMessages(Channel channel, {String scope = 'global'}) async {
+    final lastOne = await localMessages.findLastByChannel(channel.id);
+
+    final data = await _getRemoteMessages(
+      channel,
+      scope,
+      remainBreath: 5,
+      onBrake: (items) {
+        return items.any((x) => x.id == lastOne?.id);
+      },
+    );
+    await localMessages.insertBulk(
+      data.map((x) => LocalMessage(x.id, x, x.channelId)).toList(),
+    );
+  }
+
+  Future<List<Message>> _getRemoteMessages(
+    Channel channel,
+    String scope, {
+    required int remainBreath,
+    bool Function(List<Message> items)? onBrake,
+    take = 10,
+    offset = 0,
+  }) async {
+    if (remainBreath <= 0) {
+      return List.empty();
+    }
+
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (!await auth.isAuthorized) return List.empty();
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client
-        .get('/api/channels/$scope/${channel.alias}/messages?take=10&offset=0');
+    final resp = await client.get(
+        '/api/channels/$scope/${channel.alias}/messages?take=$take&offset=$offset');
 
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
 
-    // TODO Continue sync until the last message / the message exists / sync limitation
+    final PaginationResult response = PaginationResult.fromJson(resp.body);
+    final result =
+        response.data?.map((e) => Message.fromJson(e)).toList() ?? List.empty();
 
-    final PaginationResult result = PaginationResult.fromJson(resp.body);
-    final parsed = result.data?.map((e) => Message.fromJson(e)).toList();
-    if (parsed != null) {
-      await localMessages.insertBulk(
-        parsed.map((x) => LocalMessage(x.id, x, x.channelId)).toList(),
-      );
+    if (onBrake != null && onBrake(result)) {
+      return result;
     }
+
+    final expandResult = await _getRemoteMessages(
+      channel,
+      scope,
+      remainBreath: remainBreath - 1,
+      take: take,
+      offset: offset + result.length,
+    );
+
+    return [...result, ...expandResult];
   }
 
   Future<List<LocalMessage>> listMessages(Channel channel) async {
