@@ -324,6 +324,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                   slivers: [
                     Obx(() {
                       return SliverList.builder(
+                        key: Key('chat-history#${_channel!.id}'),
                         itemCount: _chatController.currentHistory.length,
                         itemBuilder: buildHistory,
                       );
@@ -382,7 +383,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                       channel: _channel!,
                       onSent: (Message item) {
                         setState(() {
-                          _chatController.receiveMessage(item);
+                          _chatController.addTemporaryMessage(item);
                         });
                       },
                       onReset: () {

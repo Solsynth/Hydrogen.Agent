@@ -18,9 +18,11 @@ class ChatHistoryController {
   }
 
   Future<void> getMessages(Channel channel, String scope) async {
+    isLoading.value = true;
     totalHistoryCount.value =
         await database.syncMessages(channel, scope: scope);
     await syncHistory(channel);
+    isLoading.value = false;
   }
 
   Future<void> getMoreMessages(Channel channel, String scope) async {
@@ -42,7 +44,23 @@ class ChatHistoryController {
 
   receiveMessage(Message remote) async {
     final entry = await database.receiveMessage(remote);
-    currentHistory.add(entry);
+    final idx = currentHistory.indexWhere((x) => x.data.uuid == remote.uuid);
+    if (idx != -1) {
+      currentHistory[idx] = entry;
+    } else {
+      currentHistory.insert(0, entry);
+    }
+  }
+
+  addTemporaryMessage(Message info) async {
+    currentHistory.insert(
+      0,
+      LocalMessage(
+        info.id,
+        info,
+        info.channelId,
+      ),
+    );
   }
 
   void replaceMessage(Message remote) async {
