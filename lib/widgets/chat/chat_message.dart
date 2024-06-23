@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -72,35 +74,37 @@ class ChatMessage extends StatelessWidget {
           );
         }
 
-        return Markdown(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          data: snapshot.data ?? '',
-          padding: const EdgeInsets.all(0),
-          onTapLink: (text, href, title) async {
-            if (href == null) return;
-            await launchUrlString(
-              href,
-              mode: LaunchMode.externalApplication,
-            );
-          },
-        ).paddingOnly(
-          left: 12,
-          right: 12,
-          top: 2,
-          bottom: hasAttachment ? 4 : 0,
-        );
+        if (snapshot.data?.isNotEmpty ?? false) {
+          return Markdown(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            data: snapshot.data ?? '',
+            padding: const EdgeInsets.all(0),
+            onTapLink: (text, href, title) async {
+              if (href == null) return;
+              await launchUrlString(
+                href,
+                mode: LaunchMode.externalApplication,
+              );
+            },
+          ).paddingOnly(
+            left: 12,
+            right: 12,
+            top: 2,
+            bottom: hasAttachment ? 4 : 0,
+          );
+        } else {
+          return const SizedBox();
+        }
       },
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Widget widget;
+  Widget buildBody(BuildContext context) {
     if (isContentPreviewing) {
-      widget = buildContent();
+      return buildContent();
     } else if (isMerged) {
-      widget = Column(
+      return Column(
         children: [
           buildContent().paddingOnly(left: 52),
           if (item.attachments?.isNotEmpty ?? false)
@@ -112,7 +116,7 @@ class ChatMessage extends StatelessWidget {
         ],
       );
     } else if (isReply) {
-      widget = Row(
+      return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Transform.scale(
@@ -130,7 +134,7 @@ class ChatMessage extends StatelessWidget {
         ],
       );
     } else {
-      widget = Column(
+      return Column(
         key: Key('m${item.uuid}'),
         children: [
           Row(
@@ -152,25 +156,29 @@ class ChatMessage extends StatelessWidget {
                       ],
                     ).paddingSymmetric(horizontal: 12),
                     buildContent(),
+                    if (item.attachments?.isNotEmpty ?? false)
+                      SizedBox(
+                        width: min(MediaQuery.of(context).size.width, 640),
+                        child: AttachmentList(
+                          key: Key('m${item.uuid}attachments'),
+                          parentId: item.uuid,
+                          attachmentsId: item.attachments ?? List.empty(),
+                          divided: true,
+                          viewport: 1,
+                        ),
+                      ),
                   ],
                 ),
               ),
             ],
           ).paddingSymmetric(horizontal: 12),
-          if (item.attachments?.isNotEmpty ?? false)
-            AttachmentList(
-              key: Key('m${item.uuid}attachments'),
-              parentId: item.uuid,
-              attachmentsId: item.attachments ?? List.empty(),
-            ).paddingSymmetric(vertical: 4),
         ],
       );
     }
+  }
 
-    if (item.isSending) {
-      return Opacity(opacity: 0.65, child: widget);
-    } else {
-      return widget;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return buildBody(context);
   }
 }

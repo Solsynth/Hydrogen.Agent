@@ -12,14 +12,17 @@ class AttachmentList extends StatefulWidget {
   final String parentId;
   final List<int> attachmentsId;
   final bool divided;
-  final double dividedPadding;
+
+  final double? width;
+  final double? viewport;
 
   const AttachmentList({
     super.key,
     required this.parentId,
     required this.attachmentsId,
     this.divided = false,
-    this.dividedPadding = 16,
+    this.width,
+    this.viewport,
   });
 
   @override
@@ -101,7 +104,7 @@ class _AttachmentListState extends State<AttachmentList> {
   Widget buildEntry(Attachment element, int idx) {
     return GestureDetector(
       child: Container(
-        width: MediaQuery.of(context).size.width,
+        width: widget.width ?? MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHigh,
         ),
@@ -198,7 +201,7 @@ class _AttachmentListState extends State<AttachmentList> {
     return CarouselSlider.builder(
       options: CarouselOptions(
         aspectRatio: _aspectRatio,
-        viewportFraction: 1,
+        viewportFraction: widget.viewport ?? (widget.divided ? 0.9 : 1),
         enableInfiniteScroll: false,
       ),
       itemCount: _attachmentsMeta.length,
@@ -240,7 +243,7 @@ class _AttachmentListState extends State<AttachmentList> {
               borderRadius: radius,
               child: buildEntry(element, idx),
             ),
-          ).paddingSymmetric(horizontal: widget.dividedPadding);
+          ).paddingSymmetric(horizontal: widget.divided ? 4 : 0);
         } else {
           return buildEntry(element, idx);
         }

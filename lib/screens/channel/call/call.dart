@@ -56,8 +56,7 @@ class _CallScreenState extends State<CallScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: false,
-          titleSpacing: SolianTheme.titleSpacing(context),
+          centerTitle: true,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           title: RichText(
             textAlign: TextAlign.center,

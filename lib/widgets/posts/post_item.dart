@@ -280,7 +280,7 @@ class _PostItemState extends State<PostItem> {
           },
         ).paddingOnly(
           top: hasAttachment ? 10 : 6,
-          left: hasAttachment ? 16 : 60,
+          left: hasAttachment ? 24 : 60,
           right: 16,
           bottom: 10,
         ),
