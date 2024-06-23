@@ -83,7 +83,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     final AttachmentProvider provider = Get.find();
 
-    late Response attachResp;
+    Response? attachResp;
     try {
       final file = File(image.path);
       final hash = await calculateFileSha256(file);
@@ -96,6 +96,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     } catch (e) {
       setState(() => _isBusy = false);
       context.showErrorDialog(e);
+      return;
     }
 
     final client = auth.configureClient('passport');
