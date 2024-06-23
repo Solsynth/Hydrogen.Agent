@@ -49,9 +49,9 @@ class _PostItemState extends State<PostItem> {
 
   Widget buildDate() {
     if (widget.isFullDate) {
-      return Text(DateFormat('y/M/d H:m').format(item.createdAt));
+      return Text(DateFormat('y/M/d H:m').format(item.createdAt.toLocal()));
     } else {
-      return Text(format(item.createdAt, locale: 'en_short'));
+      return Text(format(item.createdAt.toLocal(), locale: 'en_short'));
     }
   }
 
@@ -87,7 +87,7 @@ class _PostItemState extends State<PostItem> {
     List<String> labels = List.empty(growable: true);
     if (widget.item.createdAt != widget.item.updatedAt) {
       labels.add('postEdited'.trParams({
-        'date': DateFormat('yy/M/d H:m').format(item.updatedAt),
+        'date': DateFormat('yy/M/d H:m').format(item.updatedAt.toLocal()),
       }));
     }
     if (widget.item.realm != null) {
