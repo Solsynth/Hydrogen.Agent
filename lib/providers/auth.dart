@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:solian/controllers/chat_history_controller.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/services.dart';
@@ -79,7 +80,7 @@ class AuthProvider extends GetConnect {
 
     if (credentials!.isExpired) {
       await refreshCredentials();
-      log("Refreshed credentials at ${DateTime.now()}");
+      log('Refreshed credentials at ${DateTime.now()}');
     }
   }
 
@@ -134,6 +135,11 @@ class AuthProvider extends GetConnect {
     Get.find<AccountProvider>().disconnect();
     Get.find<AccountProvider>().notifications.clear();
     Get.find<AccountProvider>().notificationUnread.value = 0;
+
+    final chatHistory = ChatHistoryController();
+    chatHistory.initialize().then((_) async {
+      await chatHistory.database.localMessages.wipeLocalMessages();
+    });
 
     storage.deleteAll();
   }

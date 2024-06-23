@@ -44,10 +44,11 @@ class Message {
         deletedAt: json['deleted_at'],
         content: json['content'],
         type: json['type'],
-        attachments: json["attachments"] != null
-            ? List<int>.from(json["attachments"])
+        attachments: json['attachments'] != null
+            ? List<int>.from(json['attachments'])
             : null,
-        channel: Channel.fromJson(json['channel']),
+        channel:
+            json['channel'] != null ? Channel.fromJson(json['channel']) : null,
         sender: Sender.fromJson(json['sender']),
         replyId: json['reply_id'],
         replyTo: json['reply_to'] != null

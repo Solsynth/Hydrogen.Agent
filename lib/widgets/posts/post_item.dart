@@ -98,7 +98,7 @@ class _PostItemState extends State<PostItem> {
 
     if (labels.isNotEmpty) {
       return Text(
-        labels.join(" · "),
+        labels.join(' · '),
         textAlign: TextAlign.left,
         style: TextStyle(
           fontSize: 12,

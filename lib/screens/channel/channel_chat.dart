@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:solian/controllers/chat_history_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/models/packet.dart';
-import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/call.dart';
@@ -46,12 +46,11 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   String? _overrideAlias;
 
   Channel? _channel;
-  ChannelMember? _channelProfile;
   Call? _ongoingCall;
+  ChannelMember? _channelProfile;
   StreamSubscription<NetworkPackage>? _subscription;
 
-  final PagingController<int, Message> _pagingController =
-      PagingController(firstPageKey: 0);
+  late final ChatHistoryController _chatController;
 
   getProfile() async {
     final AuthProvider auth = Get.find();
@@ -106,31 +105,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> getMessages(int pageKey) async {
-    final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
-
-    final client = auth.configureClient('messaging');
-
-    final resp = await client.get(
-        '/api/channels/${widget.realm}/${widget.alias}/messages?take=10&offset=$pageKey');
-
-    if (resp.statusCode == 200) {
-      final PaginationResult result = PaginationResult.fromJson(resp.body);
-      final parsed = result.data?.map((e) => Message.fromJson(e)).toList();
-
-      if (parsed != null && parsed.length >= 10) {
-        _pagingController.appendPage(parsed, pageKey + parsed.length);
-      } else if (parsed != null) {
-        _pagingController.appendLastPage(parsed);
-      }
-    } else if (resp.statusCode == 403) {
-      _pagingController.appendLastPage([]);
-    } else {
-      _pagingController.error = resp.bodyString;
-    }
-  }
-
   void listenMessages() {
     final ChatProvider provider = Get.find();
     _subscription = provider.stream.stream.listen((event) {
@@ -138,33 +112,19 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         case 'messages.new':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            final idx = _pagingController.itemList
-                ?.indexWhere((e) => e.uuid == payload.uuid);
-            if ((idx ?? -1) >= 0) {
-              _pagingController.itemList?[idx!] = payload;
-            } else {
-              _pagingController.itemList?.insert(0, payload);
-            }
+            _chatController.receiveMessage(payload);
           }
           break;
         case 'messages.update':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            final idx = _pagingController.itemList
-                ?.indexWhere((x) => x.uuid == payload.uuid);
-            if (idx != null) {
-              _pagingController.itemList?[idx] = payload;
-            }
+            _chatController.replaceMessage(payload);
           }
           break;
         case 'messages.burnt':
           final payload = Message.fromJson(event.payload!);
           if (payload.channelId == _channel?.id) {
-            final idx = _pagingController.itemList
-                ?.indexWhere((x) => x.uuid != payload.uuid);
-            if (idx != null) {
-              _pagingController.itemList?.removeAt(idx - 1);
-            }
+            _chatController.burnMessage(payload.id);
           }
           break;
         case 'calls.new':
@@ -175,7 +135,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           _ongoingCall = null;
           break;
       }
-      setState(() {});
     });
   }
 
@@ -200,24 +159,9 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Message? _messageToReplying;
   Message? _messageToEditing;
 
-  Widget buildHistory(context, Message item, index) {
-    bool isMerged = false, hasMerged = false;
-    if (index > 0) {
-      hasMerged = checkMessageMergeable(
-        _pagingController.itemList?[index - 1],
-        item,
-      );
-    }
-    if (index + 1 < (_pagingController.itemList?.length ?? 0)) {
-      isMerged = checkMessageMergeable(
-        item,
-        _pagingController.itemList?[index + 1],
-      );
-    }
-
-    Widget content;
+  Widget buildHistoryBody(Message item, {bool isMerged = false}) {
     if (item.replyTo != null) {
-      content = Column(
+      return Column(
         children: [
           ChatMessage(
             key: Key('m${item.replyTo!.uuid}'),
@@ -231,17 +175,35 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           ),
         ],
       );
-    } else {
-      content = ChatMessage(
-        key: Key('m${item.uuid}'),
-        item: item,
-        isMerged: isMerged,
+    }
+
+    return ChatMessage(
+      key: Key('m${item.uuid}'),
+      item: item,
+      isMerged: isMerged,
+    );
+  }
+
+  Widget buildHistory(context, index) {
+    bool isMerged = false, hasMerged = false;
+    if (index > 0) {
+      hasMerged = checkMessageMergeable(
+        _chatController.currentHistory[index - 1].data,
+        _chatController.currentHistory[index].data,
+      );
+    }
+    if (index + 1 < _chatController.currentHistory.length) {
+      isMerged = checkMessageMergeable(
+        _chatController.currentHistory[index].data,
+        _chatController.currentHistory[index + 1].data,
       );
     }
 
+    final item = _chatController.currentHistory[index].data;
+
     return InkWell(
       child: Container(
-        child: content.paddingOnly(
+        child: buildHistoryBody(item, isMerged: isMerged).paddingOnly(
           top: !isMerged ? 8 : 0,
           bottom: !hasMerged ? 8 : 0,
         ),
@@ -268,14 +230,19 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   @override
   void initState() {
-    super.initState();
+    _chatController = ChatHistoryController();
+    _chatController.initialize();
+
+    getChannel().then((_) {
+      _chatController.getMessages(_channel!, widget.realm);
+    });
 
     getProfile();
-    getChannel().then((_) {
-      listenMessages();
-      _pagingController.addPageRequestListener(getMessages);
-    });
     getOngoingCall();
+
+    listenMessages();
+
+    super.initState();
   }
 
   @override
@@ -352,47 +319,84 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           Column(
             children: [
               Expanded(
-                child: PagedListView<int, Message>(
-                  clipBehavior: Clip.none,
+                child: CustomScrollView(
                   reverse: true,
-                  pagingController: _pagingController,
-                  builderDelegate: PagedChildBuilderDelegate<Message>(
-                    itemBuilder: buildHistory,
-                    noItemsFoundIndicatorBuilder: (_) => Container(),
-                  ),
-                ).paddingOnly(bottom: 56),
+                  slivers: [
+                    Obx(() {
+                      return SliverList.builder(
+                        key: Key('chat-history#${_channel!.id}'),
+                        itemCount: _chatController.currentHistory.length,
+                        itemBuilder: buildHistory,
+                      );
+                    }),
+                    Obx(() {
+                      final amount = _chatController.totalHistoryCount -
+                          _chatController.currentHistory.length;
+
+                      if (amount.value <= 0 ||
+                          _chatController.isLoading.isTrue) {
+                        return const SliverToBoxAdapter(child: SizedBox());
+                      }
+
+                      return SliverToBoxAdapter(
+                        child: ListTile(
+                          tileColor:
+                              Theme.of(context).colorScheme.surfaceContainerLow,
+                          leading: const Icon(Icons.sync_disabled),
+                          title: Text('messageUnsync'.tr),
+                          subtitle: Text('messageUnsyncCaption'.trParams({
+                            'count': amount.string,
+                          })),
+                          onTap: () {
+                            _chatController.getMoreMessages(
+                              _channel!,
+                              widget.realm,
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                    Obx(() {
+                      if (_chatController.isLoading.isFalse) {
+                        return const SliverToBoxAdapter(child: SizedBox());
+                      }
+
+                      return SliverToBoxAdapter(
+                        child: const LinearProgressIndicator()
+                            .animate()
+                            .slideY()
+                            .paddingOnly(bottom: 4),
+                      );
+                    }),
+                  ],
+                ),
               ),
-            ],
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                child: SafeArea(
-                  child: ChatMessageInput(
-                    edit: _messageToEditing,
-                    reply: _messageToReplying,
-                    realm: widget.realm,
-                    placeholder: placeholder,
-                    channel: _channel!,
-                    onSent: (Message item) {
-                      setState(() {
-                        _pagingController.itemList?.insert(0, item);
-                      });
-                    },
-                    onReset: () {
-                      setState(() {
-                        _messageToReplying = null;
-                        _messageToEditing = null;
-                      });
-                    },
+              ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                  child: SafeArea(
+                    child: ChatMessageInput(
+                      edit: _messageToEditing,
+                      reply: _messageToReplying,
+                      realm: widget.realm,
+                      placeholder: placeholder,
+                      channel: _channel!,
+                      onSent: (Message item) {
+                        setState(() {
+                          _chatController.addTemporaryMessage(item);
+                        });
+                      },
+                      onReset: () {
+                        setState(() {
+                          _messageToReplying = null;
+                          _messageToEditing = null;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
           if (_ongoingCall != null)
             Positioned(

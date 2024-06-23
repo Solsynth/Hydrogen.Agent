@@ -67,7 +67,7 @@ class SliverFriendList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList.builder(
       itemCount: items.length,
-      itemBuilder: (_, __) => buildItem(_, __),
+      itemBuilder: (context, idx) => buildItem(context, idx),
     );
   }
 }

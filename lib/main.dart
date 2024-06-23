@@ -33,6 +33,7 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
       if (PlatformInfo.isDesktop) {
         await Window.initialize();
         await Window.setEffect(
