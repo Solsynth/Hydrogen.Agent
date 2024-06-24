@@ -13,5 +13,6 @@ import Flutter
     
     override func applicationDidBecomeActive(_ application: UIApplication) {
         application.applicationIconBadgeNumber = 0;
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications();
     }
 }
