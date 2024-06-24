@@ -18,9 +18,13 @@ class ChatHistoryController {
   }
 
   Future<void> getMessages(Channel channel, String scope) async {
+    syncHistory(channel);
+
     isLoading.value = true;
-    totalHistoryCount.value =
-        await database.syncMessages(channel, scope: scope);
+    totalHistoryCount.value = await database.syncMessages(
+      channel,
+      scope: scope,
+    );
     await syncHistory(channel);
     isLoading.value = false;
   }
