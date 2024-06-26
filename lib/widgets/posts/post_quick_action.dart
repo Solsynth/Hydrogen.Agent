@@ -31,7 +31,6 @@ class _PostQuickActionState extends State<PostQuickAction> {
   void showReactMenu() {
     showModalBottomSheet(
       useRootNavigator: true,
-      isScrollControlled: true,
       context: context,
       builder: (context) => PostReactionPopup(
         item: widget.item,

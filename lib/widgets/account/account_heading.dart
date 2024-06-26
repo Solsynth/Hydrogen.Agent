@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
+import 'package:solian/models/account_status.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/providers/status.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_badge.dart';
+import 'package:solian/widgets/account/account_status_action.dart';
 
 class AccountHeadingWidget extends StatelessWidget {
   final dynamic avatar;
@@ -13,6 +16,9 @@ class AccountHeadingWidget extends StatelessWidget {
   final String? desc;
   final List<AccountBadge>? badges;
 
+  final Future<Response>? status;
+  final Function? onEditStatus;
+
   const AccountHeadingWidget({
     super.key,
     this.avatar,
@@ -21,7 +27,17 @@ class AccountHeadingWidget extends StatelessWidget {
     required this.nick,
     required this.desc,
     required this.badges,
+    this.status,
+    this.onEditStatus,
   });
+
+  void showStatusAction(BuildContext context, bool hasStatus) {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      builder: (context) => AccountStatusAction(hasStatus: hasStatus),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,23 +71,59 @@ class AccountHeadingWidget extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
+          Column(
             children: [
-              Text(
-                nick,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ).paddingOnly(right: 4),
-              Text(
-                '@$name',
-                style: const TextStyle(
-                  fontSize: 15,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    nick,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).paddingOnly(right: 4),
+                  Text(
+                    '@$name',
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
               ),
+              if (status != null)
+                SizedBox(
+                  width: double.infinity,
+                  child: FutureBuilder(
+                    future: status,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData || snapshot.data!.body == null) {
+                        return Text('loading'.tr);
+                      }
+
+                      final info = StatusController.determineStatus(
+                        AccountStatus.fromJson(snapshot.data!.body),
+                      );
+
+                      return GestureDetector(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(info.$2),
+                            info.$1.paddingSymmetric(horizontal: 6),
+                          ],
+                        ),
+                        onTap: () {
+                          showStatusAction(
+                            context,
+                            snapshot.data!.body['status'] != null,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
             ],
           ).paddingOnly(left: 116, top: 6),
           const SizedBox(height: 4),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/status.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
@@ -132,6 +133,7 @@ class AccountHeading extends StatelessWidget {
           name: prof.body['name'],
           nick: prof.body['nick'],
           desc: prof.body['description'],
+          status: Get.find<StatusController>().getCurrentStatus(),
           badges: prof.body['badges']
               ?.map((e) => AccountBadge.fromJson(e))
               .toList()
