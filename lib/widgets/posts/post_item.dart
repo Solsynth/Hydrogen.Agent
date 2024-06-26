@@ -66,7 +66,7 @@ class _PostItemState extends State<PostItem> {
         Text(
           item.author.nick,
           style: const TextStyle(fontWeight: FontWeight.bold),
-        ).paddingOnly(left: 6),
+        ).paddingOnly(left: widget.isCompact ? 6 : 12),
         buildDate().paddingOnly(left: 4),
       ],
     );
