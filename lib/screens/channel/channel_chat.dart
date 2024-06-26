@@ -362,10 +362,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                       }
 
                       return SliverToBoxAdapter(
-                        child: const LinearProgressIndicator()
-                            .animate()
-                            .slideY()
-                            .paddingOnly(bottom: 4),
+                        child: const LinearProgressIndicator().animate().slideY(),
                       );
                     }),
                   ],

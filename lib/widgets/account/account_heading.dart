@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/account_status.dart';
 import 'package:solian/platform.dart';
-import 'package:solian/providers/status.dart';
+import 'package:solian/providers/account_status.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_badge.dart';
 import 'package:solian/widgets/account/account_status_action.dart';
@@ -32,11 +32,15 @@ class AccountHeadingWidget extends StatelessWidget {
   });
 
   void showStatusAction(BuildContext context, bool hasStatus) {
+    if (onEditStatus == null) return;
+
     showModalBottomSheet(
       useRootNavigator: true,
       context: context,
       builder: (context) => AccountStatusAction(hasStatus: hasStatus),
-    );
+    ).then((val) {
+      if(val == true) onEditStatus!();
+    });
   }
 
   @override
@@ -102,7 +106,7 @@ class AccountHeadingWidget extends StatelessWidget {
                         return Text('loading'.tr);
                       }
 
-                      final info = StatusController.determineStatus(
+                      final info = StatusProvider.determineStatus(
                         AccountStatus.fromJson(snapshot.data!.body),
                       );
 

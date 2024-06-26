@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
-import 'package:solian/providers/status.dart';
+import 'package:solian/providers/account_status.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_heading.dart';
 
@@ -61,7 +61,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
             nick: _userinfo!.nick,
             desc: _userinfo!.description,
             badges: _userinfo!.badges,
-            status: Get.find<StatusController>().getSomeoneStatus(_userinfo!.name),
+            status: Get.find<StatusProvider>().getSomeoneStatus(_userinfo!.name),
           ).paddingOnly(top: 16),
         ],
       ),

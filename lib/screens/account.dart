@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/status.dart';
+import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
@@ -112,8 +112,21 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 }
 
-class AccountHeading extends StatelessWidget {
+class AccountHeading extends StatefulWidget {
   const AccountHeading({super.key});
+
+  @override
+  State<AccountHeading> createState() => _AccountHeadingState();
+}
+
+class _AccountHeadingState extends State<AccountHeading> {
+  late Future<Response> _status;
+
+  @override
+  void initState() {
+    _status = Get.find<StatusProvider>().getCurrentStatus();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +146,16 @@ class AccountHeading extends StatelessWidget {
           name: prof.body['name'],
           nick: prof.body['nick'],
           desc: prof.body['description'],
-          status: Get.find<StatusController>().getCurrentStatus(),
+          status: _status,
           badges: prof.body['badges']
               ?.map((e) => AccountBadge.fromJson(e))
               .toList()
               .cast<AccountBadge>(),
+          onEditStatus: () {
+            setState(() {
+              _status = Get.find<StatusProvider>().getCurrentStatus();
+            });
+          },
         );
       },
     );

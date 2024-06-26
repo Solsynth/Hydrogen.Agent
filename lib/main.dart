@@ -15,7 +15,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/post.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/friend.dart';
-import 'package:solian/providers/status.dart';
+import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
@@ -80,7 +80,7 @@ class SolianApp extends StatelessWidget {
         Get.lazyPut(() => AttachmentProvider());
         Get.lazyPut(() => ChatProvider());
         Get.lazyPut(() => AccountProvider());
-        Get.lazyPut(() => StatusController());
+        Get.lazyPut(() => StatusProvider());
         Get.lazyPut(() => ChannelProvider());
         Get.lazyPut(() => RealmProvider());
         Get.lazyPut(() => ChatCallProvider());
