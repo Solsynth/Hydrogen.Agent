@@ -58,10 +58,15 @@ class _PostItemState extends State<PostItem> {
   Widget buildHeader() {
     return Row(
       children: [
+        if (widget.isCompact)
+          AccountAvatar(
+            content: item.author.avatar.toString(),
+            radius: 10,
+          ).paddingOnly(left: 2),
         Text(
           item.author.nick,
           style: const TextStyle(fontWeight: FontWeight.bold),
-        ).paddingOnly(left: 12),
+        ).paddingOnly(left: 6),
         buildDate().paddingOnly(left: 4),
       ],
     );
