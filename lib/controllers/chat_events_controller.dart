@@ -17,14 +17,27 @@ class ChatEventController {
   String? scope;
 
   initialize() async {
-    database = await createHistoryDb();
+    if (!PlatformInfo.isWeb) {
+      database = await createHistoryDb();
+    }
     currentEvents.clear();
   }
 
   Future<LocalEvent?> getEvent(int id) async {
-    if(channel == null || scope == null) return null;
+    if (channel == null || scope == null) return null;
 
-    return await database.getEvent(id, channel!, scope: scope!);
+    if (PlatformInfo.isWeb) {
+      final remoteRecord = await getRemoteEvent(id, channel!, scope!);
+      if (remoteRecord == null) return null;
+      return LocalEvent(
+        remoteRecord.id,
+        remoteRecord,
+        remoteRecord.channelId,
+        remoteRecord.createdAt,
+      );
+    } else {
+      return await database.getEvent(id, channel!, scope: scope!);
+    }
   }
 
   Future<void> getEvents(Channel channel, String scope) async {
@@ -34,42 +47,82 @@ class ChatEventController {
     syncLocal(channel);
 
     isLoading.value = true;
-    final result = await database.syncEvents(
-      channel,
-      scope: scope,
-    );
-    totalEvents.value = result?.$2 ?? 0;
-    if (!await syncLocal(channel) && result != null) {
-      currentEvents.addAll(result.$1.map(
-        (x) => LocalEvent(
-          x.id,
-          x,
-          x.channelId,
-          x.createdAt,
-        ),
-      ));
+    if (PlatformInfo.isWeb) {
+      final result = await getRemoteEvents(
+        channel,
+        scope,
+        remainDepth: 3,
+        offset: 0,
+      );
+      totalEvents.value = result?.$2 ?? 0;
+      if (result != null) {
+        currentEvents.addAll(result.$1.map(
+          (x) => LocalEvent(
+            x.id,
+            x,
+            x.channelId,
+            x.createdAt,
+          ),
+        ));
+      }
+    } else {
+      final result = await database.syncEvents(
+        channel,
+        scope: scope,
+      );
+      totalEvents.value = result?.$2 ?? 0;
+      if (!await syncLocal(channel) && result != null) {
+        currentEvents.addAll(result.$1.map(
+          (x) => LocalEvent(
+            x.id,
+            x,
+            x.channelId,
+            x.createdAt,
+          ),
+        ));
+      }
     }
     isLoading.value = false;
   }
 
   Future<void> loadEvents(Channel channel, String scope) async {
     isLoading.value = true;
-    final result = await database.syncEvents(
-      channel,
-      depth: 3,
-      scope: scope,
-      offset: currentEvents.length,
-    );
-    totalEvents.value = result?.$2 ?? 0;
-    if (!await syncLocal(channel) && result != null) {
-      currentEvents.addAll(result.$1.map(
-        (x) => LocalEvent(
-          x.id,
-          x,
-          x.channelId,
-          x.createdAt,
-        ),
-      ));
+    if (PlatformInfo.isWeb) {
+      final result = await getRemoteEvents(
+        channel,
+        scope,
+        remainDepth: 3,
+        offset: currentEvents.length,
+      );
+      totalEvents.value = result?.$2 ?? 0;
+      if (result != null) {
+        currentEvents.addAll(result.$1.map(
+          (x) => LocalEvent(
+            x.id,
+            x,
+            x.channelId,
+            x.createdAt,
+          ),
+        ));
+      }
+    } else {
+      final result = await database.syncEvents(
+        channel,
+        depth: 3,
+        scope: scope,
+        offset: currentEvents.length,
+      );
+      totalEvents.value = result?.$2 ?? 0;
+      if (!await syncLocal(channel) && result != null) {
+        currentEvents.addAll(result.$1.map(
+          (x) => LocalEvent(
+            x.id,
+            x,
+            x.channelId,
+            x.createdAt,
+          ),
+        ));
+      }
     }
     isLoading.value = false;
   }
@@ -85,7 +138,17 @@ class ChatEventController {
   }
 
   receiveEvent(Event remote) async {
-    final entry = await database.receiveEvent(remote);
+    LocalEvent entry;
+    if (PlatformInfo.isWeb) {
+      entry = LocalEvent(
+        remote.id,
+        remote,
+        remote.channelId,
+        remote.createdAt,
+      );
+    } else {
+      entry = await database.receiveEvent(remote);
+    }
 
     if (remote.channelId != channel?.id) return;
 

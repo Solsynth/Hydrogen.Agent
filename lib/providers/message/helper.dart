@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/pagination.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/message/events.dart';
 
@@ -15,6 +14,71 @@ Future<MessageHistoryDb> createHistoryDb() async {
   return await $FloorMessageHistoryDb
       .databaseBuilder('messaging_data.dart')
       .addMigrations([migration1to2]).build();
+}
+
+Future<Event?> getRemoteEvent(int id, Channel channel, String scope) async {
+  final AuthProvider auth = Get.find();
+  if (!await auth.isAuthorized) return null;
+
+  final client = auth.configureClient('messaging');
+
+  final resp = await client.get(
+    '/api/channels/$scope/${channel.alias}/events/$id',
+  );
+
+  if (resp.statusCode == 404) {
+    return null;
+  } else if (resp.statusCode != 200) {
+    throw Exception(resp.bodyString);
+  }
+
+  return Event.fromJson(resp.body);
+}
+
+Future<(List<Event>, int)?> getRemoteEvents(
+    Channel channel,
+    String scope, {
+      required int remainDepth,
+      bool Function(List<Event> items)? onBrake,
+      take = 10,
+      offset = 0,
+    }) async {
+  if (remainDepth <= 0) {
+    return null;
+  }
+
+  final AuthProvider auth = Get.find();
+  if (!await auth.isAuthorized) return null;
+
+  final client = auth.configureClient('messaging');
+
+  final resp = await client.get(
+    '/api/channels/$scope/${channel.alias}/events?take=$take&offset=$offset',
+  );
+
+  if (resp.statusCode != 200) {
+    throw Exception(resp.bodyString);
+  }
+
+  final PaginationResult response = PaginationResult.fromJson(resp.body);
+  final result =
+      response.data?.map((e) => Event.fromJson(e)).toList() ?? List.empty();
+
+  if (onBrake != null && onBrake(result)) {
+    return (result, response.count);
+  }
+
+  final expandResult = (await getRemoteEvents(
+    channel,
+    scope,
+    remainDepth: remainDepth - 1,
+    take: take,
+    offset: offset + result.length,
+  ))
+      ?.$1 ??
+      List.empty();
+
+  return ([...result, ...expandResult], response.count);
 }
 
 extension MessageHistoryHelper on MessageHistoryDb {
@@ -51,7 +115,7 @@ extension MessageHistoryHelper on MessageHistoryDb {
     final localRecord = await localEvents.findById(id);
     if (localRecord != null) return localRecord;
 
-    final remoteRecord = await _getRemoteEvent(id, channel, scope);
+    final remoteRecord = await getRemoteEvent(id, channel, scope);
     if (remoteRecord == null) return null;
 
     return await receiveEvent(remoteRecord);
@@ -61,7 +125,7 @@ extension MessageHistoryHelper on MessageHistoryDb {
       {String scope = 'global', depth = 10, offset = 0}) async {
     final lastOne = await localEvents.findLastByChannel(channel.id);
 
-    final data = await _getRemoteEvents(
+    final data = await getRemoteEvents(
       channel,
       scope,
       remainDepth: depth,
@@ -70,7 +134,7 @@ extension MessageHistoryHelper on MessageHistoryDb {
         return items.any((x) => x.id == lastOne?.id);
       },
     );
-    if (data != null && !PlatformInfo.isWeb) {
+    if (data != null) {
       await localEvents.insertBulk(
         data.$1
             .map((x) => LocalEvent(x.id, x, x.channelId, x.createdAt))
@@ -79,71 +143,6 @@ extension MessageHistoryHelper on MessageHistoryDb {
     }
 
     return data;
-  }
-
-  Future<Event?> _getRemoteEvent(int id, Channel channel, String scope) async {
-    final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return null;
-
-    final client = auth.configureClient('messaging');
-
-    final resp = await client.get(
-      '/api/channels/$scope/${channel.alias}/events/$id',
-    );
-
-    if (resp.statusCode == 404) {
-      return null;
-    } else if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
-    }
-
-    return Event.fromJson(resp.body);
-  }
-
-  Future<(List<Event>, int)?> _getRemoteEvents(
-    Channel channel,
-    String scope, {
-    required int remainDepth,
-    bool Function(List<Event> items)? onBrake,
-    take = 10,
-    offset = 0,
-  }) async {
-    if (remainDepth <= 0) {
-      return null;
-    }
-
-    final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return null;
-
-    final client = auth.configureClient('messaging');
-
-    final resp = await client.get(
-      '/api/channels/$scope/${channel.alias}/events?take=$take&offset=$offset',
-    );
-
-    if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
-    }
-
-    final PaginationResult response = PaginationResult.fromJson(resp.body);
-    final result =
-        response.data?.map((e) => Event.fromJson(e)).toList() ?? List.empty();
-
-    if (onBrake != null && onBrake(result)) {
-      return (result, response.count);
-    }
-
-    final expandResult = (await _getRemoteEvents(
-          channel,
-          scope,
-          remainDepth: remainDepth - 1,
-          take: take,
-          offset: offset + result.length,
-        ))
-            ?.$1 ??
-        List.empty();
-
-    return ([...result, ...expandResult], response.count);
   }
 
   Future<List<LocalEvent>> listMessages(Channel channel) async {
