@@ -104,16 +104,16 @@ class ChatEvent extends StatelessWidget {
         ],
       );
     } else if (isQuote) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          const Opacity(
-            opacity: 0.75,
-            child: FaIcon(FontAwesomeIcons.quoteLeft, size: 14),
-          ).paddingOnly(bottom: 4),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Card(
+      return Card(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Opacity(
+              opacity: 0.75,
+              child: FaIcon(FontAwesomeIcons.quoteLeft, size: 14),
+            ).paddingOnly(bottom: 2.75),
+            const SizedBox(width: 4),
+            Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,11 +133,11 @@ class ChatEvent extends StatelessWidget {
                   ),
                   buildContent().paddingOnly(left: 0.5),
                 ],
-              ).paddingSymmetric(horizontal: 12, vertical: 4),
+              ),
             ),
-          ),
-        ],
-      ).paddingOnly(left: isMerged ? 66 : 14, right: 4);
+          ],
+        ).paddingOnly(left: 12, right: 12, top: 8, bottom: 4),
+      ).paddingOnly(left: isMerged ? 52 : 0, right: 4);
     } else {
       return Column(
         key: Key('m${item.uuid}'),
