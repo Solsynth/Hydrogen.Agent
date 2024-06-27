@@ -1,59 +1,46 @@
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 
-class Message {
+class Event {
   int id;
   String uuid;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
-  Map<String, dynamic> content;
+  Map<String, dynamic> body;
   String type;
-  List<int>? attachments;
   Channel? channel;
   Sender sender;
-  int? replyId;
-  Message? replyTo;
   int channelId;
   int senderId;
 
-  bool isSending = false;
+  bool isPending = false;
 
-  Message({
+  Event({
     required this.id,
     required this.uuid,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
-    required this.content,
+    required this.body,
     required this.type,
-    this.attachments,
     this.channel,
     required this.sender,
-    required this.replyId,
-    required this.replyTo,
     required this.channelId,
     required this.senderId,
   });
 
-  factory Message.fromJson(Map<String, dynamic> json) => Message(
+  factory Event.fromJson(Map<String, dynamic> json) => Event(
         id: json['id'],
         uuid: json['uuid'],
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: DateTime.parse(json['updated_at']),
         deletedAt: json['deleted_at'],
-        content: json['content'],
+        body: json['body'],
         type: json['type'],
-        attachments: json['attachments'] != null
-            ? List<int>.from(json['attachments'])
-            : null,
         channel:
             json['channel'] != null ? Channel.fromJson(json['channel']) : null,
         sender: Sender.fromJson(json['sender']),
-        replyId: json['reply_id'],
-        replyTo: json['reply_to'] != null
-            ? Message.fromJson(json['reply_to'])
-            : null,
         channelId: json['channel_id'],
         senderId: json['sender_id'],
       );
@@ -64,15 +51,53 @@ class Message {
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
         'deleted_at': deletedAt,
-        'content': content,
+        'body': body,
         'type': type,
-        'attachments': attachments,
         'channel': channel?.toJson(),
         'sender': sender.toJson(),
-        'reply_id': replyId,
-        'reply_to': replyTo?.toJson(),
         'channel_id': channelId,
         'sender_id': senderId,
+      };
+}
+
+class EventMessageBody {
+  String text;
+  String algorithm;
+  List<int>? attachments;
+  int? quoteEvent;
+  int? relatedEvent;
+  List<int>? relatedUsers;
+
+  EventMessageBody({
+    required this.text,
+    required this.algorithm,
+    required this.attachments,
+    required this.quoteEvent,
+    required this.relatedEvent,
+    required this.relatedUsers,
+  });
+
+  factory EventMessageBody.fromJson(Map<String, dynamic> json) =>
+      EventMessageBody(
+        text: json['text'],
+        algorithm: json['algorithm'],
+        attachments: json['attachments'] != null
+            ? List<int>.from(json['attachments'].map((x) => x))
+            : null,
+        quoteEvent: json['quote_event'],
+        relatedEvent: json['related_event'],
+        relatedUsers: json['related_users'] != null
+            ? List<int>.from(json['related_users'].map((x) => x))
+            : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'algorithm': algorithm,
+        'attachments': attachments?.cast<dynamic>(),
+        'quote_event': quoteEvent,
+        'related_event': relatedEvent,
+        'related_users': relatedUsers?.cast<dynamic>(),
       };
 }
 

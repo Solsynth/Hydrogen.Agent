@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'history.dart';
+part of 'events.dart';
 
 // **************************************************************************
 // FloorGenerator
@@ -72,7 +72,7 @@ class _$MessageHistoryDb extends MessageHistoryDb {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 
-  LocalMessageDao? _localMessagesInstance;
+  LocalEventDao? _localEventsInstance;
 
   Future<sqflite.Database> open(
     String path,
@@ -80,7 +80,7 @@ class _$MessageHistoryDb extends MessageHistoryDb {
     Callback? callback,
   ]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 1,
+      version: 2,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -96,7 +96,7 @@ class _$MessageHistoryDb extends MessageHistoryDb {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `LocalMessage` (`id` INTEGER NOT NULL, `data` TEXT NOT NULL, `channelId` INTEGER NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `LocalEvent` (`id` INTEGER NOT NULL, `data` TEXT NOT NULL, `channelId` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -105,33 +105,34 @@ class _$MessageHistoryDb extends MessageHistoryDb {
   }
 
   @override
-  LocalMessageDao get localMessages {
-    return _localMessagesInstance ??=
-        _$LocalMessageDao(database, changeListener);
+  LocalEventDao get localEvents {
+    return _localEventsInstance ??= _$LocalEventDao(database, changeListener);
   }
 }
 
-class _$LocalMessageDao extends LocalMessageDao {
-  _$LocalMessageDao(
+class _$LocalEventDao extends LocalEventDao {
+  _$LocalEventDao(
     this.database,
     this.changeListener,
   )   : _queryAdapter = QueryAdapter(database),
-        _localMessageInsertionAdapter = InsertionAdapter(
+        _localEventInsertionAdapter = InsertionAdapter(
             database,
-            'LocalMessage',
-            (LocalMessage item) => <String, Object?>{
+            'LocalEvent',
+            (LocalEvent item) => <String, Object?>{
                   'id': item.id,
-                  'data': _remoteMessageConverter.encode(item.data),
-                  'channelId': item.channelId
+                  'data': _remoteEventConverter.encode(item.data),
+                  'channelId': item.channelId,
+                  'createdAt': _dateTimeConverter.encode(item.createdAt)
                 }),
-        _localMessageUpdateAdapter = UpdateAdapter(
+        _localEventUpdateAdapter = UpdateAdapter(
             database,
-            'LocalMessage',
+            'LocalEvent',
             ['id'],
-            (LocalMessage item) => <String, Object?>{
+            (LocalEvent item) => <String, Object?>{
                   'id': item.id,
-                  'data': _remoteMessageConverter.encode(item.data),
-                  'channelId': item.channelId
+                  'data': _remoteEventConverter.encode(item.data),
+                  'channelId': item.channelId,
+                  'createdAt': _dateTimeConverter.encode(item.createdAt)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -140,75 +141,88 @@ class _$LocalMessageDao extends LocalMessageDao {
 
   final QueryAdapter _queryAdapter;
 
-  final InsertionAdapter<LocalMessage> _localMessageInsertionAdapter;
+  final InsertionAdapter<LocalEvent> _localEventInsertionAdapter;
 
-  final UpdateAdapter<LocalMessage> _localMessageUpdateAdapter;
+  final UpdateAdapter<LocalEvent> _localEventUpdateAdapter;
 
   @override
   Future<int?> countByChannel(int channelId) async {
     return _queryAdapter.query(
-        'SELECT COUNT(id) FROM LocalMessage WHERE channelId = ?1',
+        'SELECT COUNT(id) FROM LocalEvent WHERE channelId = ?1',
         mapper: (Map<String, Object?> row) => row.values.first as int,
         arguments: [channelId]);
   }
 
   @override
-  Future<List<LocalMessage>> findAllByChannel(int channelId) async {
-    return _queryAdapter.queryList(
-        'SELECT * FROM LocalMessage WHERE channelId = ?1 ORDER BY id DESC',
-        mapper: (Map<String, Object?> row) => LocalMessage(
+  Future<LocalEvent?> findById(int id) async {
+    return _queryAdapter.query('SELECT * FROM LocalEvent WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => LocalEvent(
             row['id'] as int,
-            _remoteMessageConverter.decode(row['data'] as String),
-            row['channelId'] as int),
+            _remoteEventConverter.decode(row['data'] as String),
+            row['channelId'] as int,
+            _dateTimeConverter.decode(row['createdAt'] as int)),
+        arguments: [id]);
+  }
+
+  @override
+  Future<List<LocalEvent>> findAllByChannel(int channelId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM LocalEvent WHERE channelId = ?1 ORDER BY createdAt DESC',
+        mapper: (Map<String, Object?> row) => LocalEvent(
+            row['id'] as int,
+            _remoteEventConverter.decode(row['data'] as String),
+            row['channelId'] as int,
+            _dateTimeConverter.decode(row['createdAt'] as int)),
         arguments: [channelId]);
   }
 
   @override
-  Future<LocalMessage?> findLastByChannel(int channelId) async {
+  Future<LocalEvent?> findLastByChannel(int channelId) async {
     return _queryAdapter.query(
-        'SELECT * FROM LocalMessage WHERE channelId = ?1 ORDER BY id DESC LIMIT 1',
-        mapper: (Map<String, Object?> row) => LocalMessage(row['id'] as int, _remoteMessageConverter.decode(row['data'] as String), row['channelId'] as int),
+        'SELECT * FROM LocalEvent WHERE channelId = ?1 ORDER BY createdAt DESC LIMIT 1',
+        mapper: (Map<String, Object?> row) => LocalEvent(row['id'] as int, _remoteEventConverter.decode(row['data'] as String), row['channelId'] as int, _dateTimeConverter.decode(row['createdAt'] as int)),
         arguments: [channelId]);
   }
 
   @override
   Future<void> delete(int id) async {
-    await _queryAdapter.queryNoReturn('DELETE FROM LocalMessage WHERE id = ?1',
-        arguments: [id]);
+    await _queryAdapter
+        .queryNoReturn('DELETE FROM LocalEvent WHERE id = ?1', arguments: [id]);
   }
 
   @override
-  Future<List<LocalMessage>> deleteByChannel(int channelId) async {
+  Future<List<LocalEvent>> deleteByChannel(int channelId) async {
     return _queryAdapter.queryList(
-        'DELETE FROM LocalMessage WHERE channelId = ?1',
-        mapper: (Map<String, Object?> row) => LocalMessage(
+        'DELETE FROM LocalEvent WHERE channelId = ?1',
+        mapper: (Map<String, Object?> row) => LocalEvent(
             row['id'] as int,
-            _remoteMessageConverter.decode(row['data'] as String),
-            row['channelId'] as int),
+            _remoteEventConverter.decode(row['data'] as String),
+            row['channelId'] as int,
+            _dateTimeConverter.decode(row['createdAt'] as int)),
         arguments: [channelId]);
   }
 
   @override
-  Future<void> wipeLocalMessages() async {
-    await _queryAdapter.queryNoReturn('DELETE FROM LocalMessage');
+  Future<void> wipeLocalEvents() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM LocalEvent');
   }
 
   @override
-  Future<void> insert(LocalMessage m) async {
-    await _localMessageInsertionAdapter.insert(m, OnConflictStrategy.replace);
+  Future<void> insert(LocalEvent m) async {
+    await _localEventInsertionAdapter.insert(m, OnConflictStrategy.replace);
   }
 
   @override
-  Future<void> insertBulk(List<LocalMessage> m) async {
-    await _localMessageInsertionAdapter.insertList(
-        m, OnConflictStrategy.replace);
+  Future<void> insertBulk(List<LocalEvent> m) async {
+    await _localEventInsertionAdapter.insertList(m, OnConflictStrategy.replace);
   }
 
   @override
-  Future<void> update(LocalMessage person) async {
-    await _localMessageUpdateAdapter.update(person, OnConflictStrategy.replace);
+  Future<void> update(LocalEvent m) async {
+    await _localEventUpdateAdapter.update(m, OnConflictStrategy.replace);
   }
 }
 
 // ignore_for_file: unused_element
-final _remoteMessageConverter = RemoteMessageConverter();
+final _dateTimeConverter = DateTimeConverter();
+final _remoteEventConverter = RemoteEventConverter();

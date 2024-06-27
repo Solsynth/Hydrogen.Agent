@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
-import 'package:solian/controllers/chat_history_controller.dart';
+import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/chat.dart';
 import 'package:solian/services.dart';
@@ -136,9 +136,9 @@ class AuthProvider extends GetConnect {
     Get.find<AccountProvider>().notifications.clear();
     Get.find<AccountProvider>().notificationUnread.value = 0;
 
-    final chatHistory = ChatHistoryController();
+    final chatHistory = ChatEventController();
     chatHistory.initialize().then((_) async {
-      await chatHistory.database.localMessages.wipeLocalMessages();
+      await chatHistory.database.localEvents.wipeLocalEvents();
     });
 
     storage.deleteAll();

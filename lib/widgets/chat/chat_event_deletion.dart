@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 
-class ChatMessageDeletionDialog extends StatefulWidget {
+class ChatEventDeletionDialog extends StatefulWidget {
   final Channel channel;
   final Realm? realm;
-  final Message item;
+  final Event item;
 
-  const ChatMessageDeletionDialog({
+  const ChatEventDeletionDialog({
     super.key,
     required this.channel,
     required this.realm,
@@ -19,11 +19,11 @@ class ChatMessageDeletionDialog extends StatefulWidget {
   });
 
   @override
-  State<ChatMessageDeletionDialog> createState() =>
-      _ChatMessageDeletionDialogState();
+  State<ChatEventDeletionDialog> createState() =>
+      _ChatEventDeletionDialogState();
 }
 
-class _ChatMessageDeletionDialogState extends State<ChatMessageDeletionDialog> {
+class _ChatEventDeletionDialogState extends State<ChatEventDeletionDialog> {
   bool _isBusy = false;
 
   void performAction() async {

@@ -4,19 +4,19 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
-import 'package:solian/widgets/chat/chat_message.dart';
+import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatMessageInput extends StatefulWidget {
-  final Message? edit;
-  final Message? reply;
+  final Event? edit;
+  final Event? reply;
   final String? placeholder;
   final Channel channel;
   final String realm;
-  final Function(Message) onSent;
+  final Function(Event) onSent;
   final Function()? onReset;
 
   const ChatMessageInput({
@@ -40,8 +40,8 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
   List<int> _attachments = List.empty(growable: true);
 
-  Message? _editTo;
-  Message? _replyTo;
+  Event? _editTo;
+  Event? _replyTo;
 
   void showAttachments() {
     showModalBottomSheet(
@@ -54,14 +54,6 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     );
   }
 
-  Map<String, dynamic> encodeMessage(String content) {
-    return {
-      'value': content.trim(),
-      'keypair_id': null,
-      'algorithm': 'plain',
-    };
-  }
-
   Future<void> sendMessage() async {
     _focusNode.requestFocus();
 
@@ -71,15 +63,25 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
     final client = auth.configureClient('messaging');
 
+    // TODO Deal with the @ ping (query uid with username), and then add into related_user and replace the @ with internal link in body
+
+    const uuid = Uuid();
     final payload = {
-      'uuid': const Uuid().v4(),
-      'type': 'm.text',
-      'content': encodeMessage(_textController.value.text),
-      'attachments': List.from(_attachments),
-      'reply_to': _replyTo?.id,
+      'uuid': uuid.v4(),
+      'type': _editTo == null ? 'messages.new' : 'messages.edit',
+      'body': {
+        'text': _textController.value.text,
+        'algorithm': 'plain',
+        'attachments': List.from(_attachments),
+        'related_users': [
+          if (_replyTo != null) _replyTo!.sender.accountId,
+        ],
+        if (_replyTo != null) 'quote_event': _replyTo!.id,
+        if (_editTo != null) 'related_event': _editTo!.id,
+      }
     };
 
-    // The mock data
+    // The local mock data
     final sender = Sender(
       id: 0,
       createdAt: DateTime.now(),
@@ -89,23 +91,20 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       accountId: prof.body['id'],
       notify: 0,
     );
-    final message = Message(
+    final message = Event(
       id: 0,
       uuid: payload['uuid'] as String,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      content: payload['content'] as Map<String, dynamic>,
+      body: payload['body'] as Map<String, dynamic>,
       type: payload['type'] as String,
-      attachments: _attachments,
       sender: sender,
-      replyId: _replyTo?.id,
-      replyTo: _replyTo,
       channelId: widget.channel.id,
       senderId: sender.id,
     );
 
     if (_editTo == null) {
-      message.isSending = true;
+      message.isPending = true;
       widget.onSent(message);
     }
 
@@ -139,9 +138,10 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   }
 
   void syncWidget() {
-    if (widget.edit != null) {
+    if (widget.edit != null && widget.edit!.type.startsWith('messages')) {
+      final body = EventMessageBody.fromJson(widget.edit!.body);
       _editTo = widget.edit!;
-      _textController.text = widget.edit!.content['value'];
+      _textController.text = body.text;
     }
     if (widget.reply != null) {
       _replyTo = widget.reply!;
@@ -177,7 +177,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                 .colorScheme
                 .surfaceContainerHighest
                 .withOpacity(0.5),
-            content: ChatMessage(
+            content: ChatEvent(
               item: _replyTo!,
               isContentPreviewing: true,
             ),
@@ -192,7 +192,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                 .colorScheme
                 .surfaceContainerHighest
                 .withOpacity(0.5),
-            content: ChatMessage(
+            content: ChatEvent(
               item: _editTo!,
               isContentPreviewing: true,
             ),

@@ -3,19 +3,19 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/widgets/chat/chat_message_deletion.dart';
+import 'package:solian/widgets/chat/chat_event_deletion.dart';
 
-class ChatMessageAction extends StatefulWidget {
+class ChatEventAction extends StatefulWidget {
   final Channel channel;
   final Realm? realm;
-  final Message item;
+  final Event item;
   final Function? onEdit;
   final Function? onReply;
 
-  const ChatMessageAction({
+  const ChatEventAction({
     super.key,
     required this.channel,
     required this.realm,
@@ -25,14 +25,16 @@ class ChatMessageAction extends StatefulWidget {
   });
 
   @override
-  State<ChatMessageAction> createState() => _ChatMessageActionState();
+  State<ChatEventAction> createState() => _ChatEventActionState();
 }
 
-class _ChatMessageActionState extends State<ChatMessageAction> {
+class _ChatEventActionState extends State<ChatEventAction> {
   bool _isBusy = false;
   bool _canModifyContent = false;
 
   void checkAbleToModifyContent() async {
+    if (!['messages.new'].contains(widget.item.type)) return;
+
     final AuthProvider provider = Get.find();
     if (!await provider.isAuthorized) return;
 
@@ -106,7 +108,7 @@ class _ChatMessageActionState extends State<ChatMessageAction> {
                     onTap: () async {
                       final value = await showDialog(
                         context: context,
-                        builder: (context) => ChatMessageDeletionDialog(
+                        builder: (context) => ChatEventDeletionDialog(
                           channel: widget.channel,
                           realm: widget.realm,
                           item: widget.item,
