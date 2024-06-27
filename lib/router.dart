@@ -32,10 +32,48 @@ abstract class AppRouter {
           child: child,
         ),
         routes: [
-          GoRoute(
-            path: '/',
-            name: 'social',
-            builder: (context, state) => const SocialScreen(),
+          ShellRoute(
+            builder: (context, state, child) => BasicShell(
+              state: state,
+              sidebarFirst: true,
+              showAppBar: false,
+              sidebar: const SocialScreen(),
+              child: child,
+            ),
+            routes: [
+              GoRoute(
+                path: '/',
+                name: 'social',
+                builder: (context, state) =>
+                    SolianTheme.isExtraLargeScreen(context)
+                        ? const EmptyPagePlaceholder()
+                        : const SocialScreen(),
+              ),
+              GoRoute(
+                path: '/posts/view/:alias',
+                name: 'postDetail',
+                builder: (context, state) => TitleShell(
+                  showAppBar: SolianTheme.isExtraLargeScreen(context),
+                  state: state,
+                  child: PostDetailScreen(
+                    alias: state.pathParameters['alias']!,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: '/posts/publish',
+                name: 'postPublishing',
+                builder: (context, state) {
+                  final arguments = state.extra as PostPublishingArguments?;
+                  return PostPublishingScreen(
+                    edit: arguments?.edit,
+                    reply: arguments?.reply,
+                    repost: arguments?.repost,
+                    realm: arguments?.realm,
+                  );
+                },
+              ),
+            ],
           ),
           ShellRoute(
             builder: (context, state, child) => BasicShell(
@@ -49,9 +87,10 @@ abstract class AppRouter {
               GoRoute(
                 path: '/chat',
                 name: 'chat',
-                builder: (context, state) => SolianTheme.isExtraLargeScreen(context)
-                    ? const EmptyPagePlaceholder()
-                    : const ChatScreen(),
+                builder: (context, state) =>
+                    SolianTheme.isExtraLargeScreen(context)
+                        ? const EmptyPagePlaceholder()
+                        : const ChatScreen(),
               ),
               GoRoute(
                 path: '/chat/organize',
@@ -92,97 +131,103 @@ abstract class AppRouter {
               ),
             ],
           ),
-          GoRoute(
-            path: '/realms',
-            name: 'realms',
-            builder: (context, state) => const RealmListScreen(),
-          ),
-          GoRoute(
-            path: '/account',
-            name: 'account',
-            builder: (context, state) => const AccountScreen(),
-          ),
-        ],
-      ),
-      ShellRoute(
-        builder: (context, state, child) =>
-            BasicShell(state: state, child: child),
-        routes: [
-          GoRoute(
-            path: '/posts/view/:alias',
-            name: 'postDetail',
-            builder: (context, state) => PostDetailScreen(
-              alias: state.pathParameters['alias']!,
+          ShellRoute(
+            builder: (context, state, child) => BasicShell(
+              state: state,
+              sidebarFirst: true,
+              showAppBar: false,
+              sidebar: const RealmListScreen(),
+              child: child,
             ),
+            routes: [
+              GoRoute(
+                path: '/realms',
+                name: 'realms',
+                builder: (context, state) =>
+                    SolianTheme.isExtraLargeScreen(context)
+                        ? const EmptyPagePlaceholder()
+                        : const RealmListScreen(),
+              ),
+              GoRoute(
+                path: '/realms/:alias/detail',
+                name: 'realmDetail',
+                builder: (context, state) => TitleShell(
+                  showAppBar: SolianTheme.isExtraLargeScreen(context),
+                  state: state,
+                  child: RealmDetailScreen(
+                    realm: state.extra as Realm,
+                    alias: state.pathParameters['alias']!,
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: '/realm/organize',
+                name: 'realmOrganizing',
+                builder: (context, state) {
+                  final arguments = state.extra as RealmOrganizeArguments?;
+                  return RealmOrganizeScreen(
+                    edit: arguments?.edit,
+                  );
+                },
+              ),
+              GoRoute(
+                path: '/realm/:alias',
+                name: 'realmView',
+                builder: (context, state) {
+                  return RealmViewScreen(
+                    alias: state.pathParameters['alias']!,
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/posts/publish',
-        name: 'postPublishing',
-        builder: (context, state) {
-          final arguments = state.extra as PostPublishingArguments?;
-          return PostPublishingScreen(
-            edit: arguments?.edit,
-            reply: arguments?.reply,
-            repost: arguments?.repost,
-            realm: arguments?.realm,
-          );
-        },
-      ),
-      ShellRoute(
-        builder: (context, state, child) =>
-            BasicShell(state: state, child: child),
-        routes: [
-          GoRoute(
-            path: '/account/friend',
-            name: 'accountFriend',
-            builder: (context, state) => const FriendScreen(),
-          ),
-          GoRoute(
-            path: '/account/personalize',
-            name: 'accountPersonalize',
-            builder: (context, state) => const PersonalizeScreen(),
-          ),
-          GoRoute(
-            path: '/about',
-            name: 'about',
-            builder: (context, state) => const AboutScreen(),
-          ),
-        ],
-      ),
-      ShellRoute(
-        builder: (context, state, child) =>
-            BasicShell(state: state, child: child),
-        routes: [
-          GoRoute(
-            path: '/realms/:alias/detail',
-            name: 'realmDetail',
-            builder: (context, state) => RealmDetailScreen(
-              realm: state.extra as Realm,
-              alias: state.pathParameters['alias']!,
+          ShellRoute(
+            builder: (context, state, child) => BasicShell(
+              state: state,
+              sidebarFirst: true,
+              showAppBar: false,
+              sidebar: const AccountScreen(),
+              child: child,
             ),
+            routes: [
+              GoRoute(
+                path: '/account',
+                name: 'account',
+                builder: (context, state) =>
+                    SolianTheme.isExtraLargeScreen(context)
+                        ? const EmptyPagePlaceholder()
+                        : const AccountScreen(),
+              ),
+              GoRoute(
+                path: '/account/friend',
+                name: 'accountFriend',
+                builder: (context, state) => TitleShell(
+                  showAppBar: SolianTheme.isExtraLargeScreen(context),
+                  state: state,
+                  child: const FriendScreen(),
+                ),
+              ),
+              GoRoute(
+                path: '/account/personalize',
+                name: 'accountPersonalize',
+                builder: (context, state) => TitleShell(
+                  showAppBar: SolianTheme.isExtraLargeScreen(context),
+                  state: state,
+                  child: const PersonalizeScreen(),
+                ),
+              ),
+              GoRoute(
+                path: '/about',
+                name: 'about',
+                builder: (context, state) => TitleShell(
+                  showAppBar: SolianTheme.isExtraLargeScreen(context),
+                  state: state,
+                  child: const AboutScreen(),
+                ),
+              ),
+            ],
           ),
         ],
-      ),
-      GoRoute(
-        path: '/realm/organize',
-        name: 'realmOrganizing',
-        builder: (context, state) {
-          final arguments = state.extra as RealmOrganizeArguments?;
-          return RealmOrganizeScreen(
-            edit: arguments?.edit,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/realm/:alias',
-        name: 'realmView',
-        builder: (context, state) {
-          return RealmViewScreen(
-            alias: state.pathParameters['alias']!,
-          );
-        },
       ),
     ],
   );

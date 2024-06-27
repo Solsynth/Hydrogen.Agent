@@ -76,7 +76,7 @@ class SolianMessages extends Translations {
           'postInRealm': 'In realm @realm',
           'postDetail': 'Post',
           'postReplies': 'Replies',
-          'postPublishing': 'Post post',
+          'postPublishing': 'Post a post',
           'postIdentityNotify': 'You will post this post as',
           'postContentPlaceholder': 'What\'s happened?!',
           'postReaction': 'Reactions of the Post',
