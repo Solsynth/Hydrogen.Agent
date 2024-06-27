@@ -46,7 +46,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   void showAttachments() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => AttachmentPublishingPopup(
+      builder: (context) => AttachmentPublishPopup(
         usage: 'm.attachment',
         current: _attachments,
         onUpdate: (value) => _attachments = value,

@@ -51,7 +51,7 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
   void showAttachments() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => AttachmentPublishingPopup(
+      builder: (context) => AttachmentPublishPopup(
         usage: 'i.attachment',
         current: _attachments,
         onUpdate: (value) => _attachments = value,

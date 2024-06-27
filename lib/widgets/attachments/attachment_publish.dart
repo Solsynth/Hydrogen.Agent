@@ -11,12 +11,12 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 
-class AttachmentPublishingPopup extends StatefulWidget {
+class AttachmentPublishPopup extends StatefulWidget {
   final String usage;
   final List<int> current;
   final void Function(List<int> data) onUpdate;
 
-  const AttachmentPublishingPopup({
+  const AttachmentPublishPopup({
     super.key,
     required this.usage,
     required this.current,
@@ -24,11 +24,11 @@ class AttachmentPublishingPopup extends StatefulWidget {
   });
 
   @override
-  State<AttachmentPublishingPopup> createState() =>
-      _AttachmentPublishingPopupState();
+  State<AttachmentPublishPopup> createState() =>
+      _AttachmentPublishPopupState();
 }
 
-class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
+class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
   final _imagePicker = ImagePicker();
 
   bool _isBusy = false;
@@ -273,7 +273,7 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
                               showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return AttachmentEditingDialog(
+                                  return AttachmentEditorDialog(
                                     item: element,
                                     onDelete: () {
                                       setState(
@@ -353,23 +353,23 @@ class _AttachmentPublishingPopupState extends State<AttachmentPublishingPopup> {
   }
 }
 
-class AttachmentEditingDialog extends StatefulWidget {
+class AttachmentEditorDialog extends StatefulWidget {
   final Attachment item;
   final Function onDelete;
   final Function(Attachment item) onUpdate;
 
-  const AttachmentEditingDialog(
+  const AttachmentEditorDialog(
       {super.key,
       required this.item,
       required this.onDelete,
       required this.onUpdate});
 
   @override
-  State<AttachmentEditingDialog> createState() =>
-      _AttachmentEditingDialogState();
+  State<AttachmentEditorDialog> createState() =>
+      _AttachmentEditorDialogState();
 }
 
-class _AttachmentEditingDialogState extends State<AttachmentEditingDialog> {
+class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
   final _ratioController = TextEditingController();
   final _altController = TextEditingController();
 
