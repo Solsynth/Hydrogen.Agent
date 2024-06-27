@@ -17,23 +17,80 @@ import 'package:solian/screens/social.dart';
 import 'package:solian/screens/posts/post_publish.dart';
 import 'package:solian/shells/basic_shell.dart';
 import 'package:solian/shells/nav_shell.dart';
+import 'package:solian/shells/title_shell.dart';
+import 'package:solian/theme.dart';
+import 'package:solian/widgets/sidebar/empty_placeholder.dart';
 
 abstract class AppRouter {
   static GoRouter instance = GoRouter(
     routes: [
       ShellRoute(
-        builder: (context, state, child) =>
-            NavShell(state: state, showAppBar: false, child: child),
+        builder: (context, state, child) => NavShell(
+          state: state,
+          showAppBar: false,
+          showSidebar: false,
+          child: child,
+        ),
         routes: [
           GoRoute(
             path: '/',
             name: 'social',
             builder: (context, state) => const SocialScreen(),
           ),
-          GoRoute(
-            path: '/chat',
-            name: 'chat',
-            builder: (context, state) => const ChatScreen(),
+          ShellRoute(
+            builder: (context, state, child) => BasicShell(
+              state: state,
+              sidebarFirst: true,
+              showAppBar: false,
+              sidebar: const ChatScreen(),
+              child: child,
+            ),
+            routes: [
+              GoRoute(
+                path: '/chat',
+                name: 'chat',
+                builder: (context, state) => SolianTheme.isExtraLargeScreen(context)
+                    ? const EmptyPagePlaceholder()
+                    : const ChatScreen(),
+              ),
+              GoRoute(
+                path: '/chat/organize',
+                name: 'channelOrganizing',
+                builder: (context, state) {
+                  final arguments = state.extra as ChannelOrganizeArguments?;
+                  return ChannelOrganizeScreen(
+                    edit: arguments?.edit,
+                    realm: arguments?.realm,
+                  );
+                },
+              ),
+              GoRoute(
+                path: '/chat/:alias',
+                name: 'channelChat',
+                builder: (context, state) {
+                  return ChannelChatScreen(
+                    alias: state.pathParameters['alias']!,
+                    realm: state.uri.queryParameters['realm'] ?? 'global',
+                  );
+                },
+              ),
+              GoRoute(
+                path: '/chat/:alias/detail',
+                name: 'channelDetail',
+                builder: (context, state) {
+                  final arguments = state.extra as ChannelDetailArguments;
+                  return TitleShell(
+                    showAppBar: SolianTheme.isExtraLargeScreen(context),
+                    state: state,
+                    child: ChannelDetailScreen(
+                      channel: arguments.channel,
+                      profile: arguments.profile,
+                      realm: state.uri.queryParameters['realm'] ?? 'global',
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: '/realms',
@@ -93,45 +150,6 @@ abstract class AppRouter {
             builder: (context, state) => const AboutScreen(),
           ),
         ],
-      ),
-      ShellRoute(
-        builder: (context, state, child) =>
-            BasicShell(state: state, child: child),
-        routes: [
-          GoRoute(
-            path: '/chat/:alias/detail',
-            name: 'channelDetail',
-            builder: (context, state) {
-              final arguments = state.extra as ChannelDetailArguments;
-              return ChannelDetailScreen(
-                channel: arguments.channel,
-                profile: arguments.profile,
-                realm: state.uri.queryParameters['realm'] ?? 'global',
-              );
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/chat/organize',
-        name: 'channelOrganizing',
-        builder: (context, state) {
-          final arguments = state.extra as ChannelOrganizeArguments?;
-          return ChannelOrganizeScreen(
-            edit: arguments?.edit,
-            realm: arguments?.realm,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/chat/:alias',
-        name: 'channelChat',
-        builder: (context, state) {
-          return ChannelChatScreen(
-            alias: state.pathParameters['alias']!,
-            realm: state.uri.queryParameters['realm'] ?? 'global',
-          );
-        },
       ),
       ShellRoute(
         builder: (context, state, child) =>
