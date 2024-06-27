@@ -149,6 +149,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       key: Key('m${item.uuid}'),
       item: item,
       isMerged: isMerged,
+      chatController: _chatController,
     );
   }
 
@@ -202,7 +203,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     _chatController.initialize();
 
     getChannel().then((_) {
-      _chatController.channel = _channel!;
       _chatController.getEvents(_channel!, widget.realm);
 
       listenMessages();

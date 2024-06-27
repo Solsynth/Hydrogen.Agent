@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
@@ -15,6 +18,8 @@ class ChatEvent extends StatelessWidget {
   final bool isMerged;
   final bool isHasMerged;
 
+  final ChatEventController? chatController;
+
   const ChatEvent({
     super.key,
     required this.item,
@@ -22,7 +27,27 @@ class ChatEvent extends StatelessWidget {
     this.isMerged = false,
     this.isHasMerged = false,
     this.isQuote = false,
+    this.chatController,
   });
+
+  Widget buildQuote() {
+    return FutureBuilder(
+      future: chatController!.getEvent(
+        item.body['quote_event'],
+      ),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const SizedBox();
+        }
+
+        return ChatEvent(
+          item: snapshot.data!.data,
+          isMerged: false,
+          isQuote: true,
+        ).paddingOnly(left: isMerged ? 52 : 0);
+      },
+    );
+  }
 
   Widget buildContent() {
     switch (item.type) {
@@ -40,6 +65,7 @@ class ChatEvent extends StatelessWidget {
           text: 'messageEditDesc'.trParams({'id': '#${item.id}'}),
           isMerged: isMerged,
           isHasMerged: isHasMerged,
+          isQuote: isQuote,
         );
       case 'messages.delete':
         return ChatEventMessageActionLog(
@@ -47,6 +73,7 @@ class ChatEvent extends StatelessWidget {
           text: 'messageDeleteDesc'.trParams({'id': '#${item.id}'}),
           isMerged: isMerged,
           isHasMerged: isHasMerged,
+          isQuote: isQuote,
         );
       case 'system.changes':
         return ChatEventMessageActionLog(
@@ -54,6 +81,7 @@ class ChatEvent extends StatelessWidget {
           text: item.body['text'],
           isMerged: isMerged,
           isHasMerged: isHasMerged,
+          isQuote: isQuote,
         );
       default:
         return ChatEventMessageActionLog(
@@ -61,31 +89,55 @@ class ChatEvent extends StatelessWidget {
           text: 'messageTypeUnsupported'.trParams({'type': item.type}),
           isMerged: isMerged,
           isHasMerged: isHasMerged,
+          isQuote: isQuote,
         );
     }
   }
 
   Widget buildBody(BuildContext context) {
-    if (isContentPreviewing || isMerged) {
-      return buildContent();
-    } else if (isQuote) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+    if (isContentPreviewing || (isMerged && !isQuote)) {
+      return Column(
         children: [
-          Transform.scale(
-            scaleX: -1,
-            child: const FaIcon(FontAwesomeIcons.reply, size: 14),
-          ),
-          const SizedBox(width: 12),
-          AccountAvatar(content: item.sender.account.avatar, radius: 8),
-          const SizedBox(width: 4),
-          Text(
-            item.sender.account.nick,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Expanded(child: buildContent()),
+          if (item.body['quote_event'] != null && chatController != null)
+            buildQuote(),
+          buildContent(),
         ],
       );
+    } else if (isQuote) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const Opacity(
+            opacity: 0.75,
+            child: FaIcon(FontAwesomeIcons.quoteLeft, size: 14),
+          ).paddingOnly(bottom: 4),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Card(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      AccountAvatar(
+                          content: item.sender.account.avatar, radius: 9),
+                      const SizedBox(width: 5),
+                      Text(
+                        item.sender.account.nick,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(format(item.createdAt, locale: 'en_short')),
+                    ],
+                  ),
+                  buildContent().paddingOnly(left: 0.5),
+                ],
+              ).paddingSymmetric(horizontal: 12, vertical: 4),
+            ),
+          ),
+        ],
+      ).paddingOnly(left: isMerged ? 66 : 14, right: 4);
     } else {
       return Column(
         key: Key('m${item.uuid}'),
@@ -121,6 +173,9 @@ class ChatEvent extends StatelessWidget {
                         Text(format(item.createdAt, locale: 'en_short'))
                       ],
                     ).paddingSymmetric(horizontal: 12),
+                    if (item.body['quote_event'] != null &&
+                        chatController != null)
+                      buildQuote(),
                     buildContent(),
                   ],
                 ),

@@ -14,13 +14,23 @@ class ChatEventController {
   final RxBool isLoading = false.obs;
 
   Channel? channel;
+  String? scope;
 
   initialize() async {
     database = await createHistoryDb();
     currentEvents.clear();
   }
 
+  Future<LocalEvent?> getEvent(int id) async {
+    if(channel == null || scope == null) return null;
+
+    return await database.getEvent(id, channel!, scope: scope!);
+  }
+
   Future<void> getEvents(Channel channel, String scope) async {
+    this.channel = channel;
+    this.scope = scope;
+
     syncLocal(channel);
 
     isLoading.value = true;
