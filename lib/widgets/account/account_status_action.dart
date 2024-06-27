@@ -130,7 +130,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
   int _attitude = 0;
   DateTime? _clearAt;
   bool _isInvisible = false;
-  bool _isSlient = false;
+  bool _isSilent = false;
 
   final _labelController = TextEditingController();
   final _clearAtController = TextEditingController();
@@ -169,7 +169,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
         _labelController.value.text,
         _attitude,
         clearAt: _clearAt,
-        isSilent: _isSlient,
+        isSilent: _isSilent,
         isInvisible: _isInvisible,
         isUpdate: widget.currentStatus != null,
       );
@@ -183,11 +183,14 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
   void syncWidget() {
     if (widget.currentStatus != null) {
       _clearAt = widget.currentStatus!.clearAt;
-      _clearAtController.text = DateFormat('y/M/d HH:mm').format(_clearAt!);
+      if (_clearAt != null) {
+        _clearAtController.text = DateFormat('y/M/d HH:mm').format(_clearAt!);
+      }
+
       _labelController.text = widget.currentStatus!.label;
       _attitude = widget.currentStatus!.attitude;
       _isInvisible = widget.currentStatus!.isInvisible;
-      _isSlient = widget.currentStatus!.isNoDisturb;
+      _isSilent = widget.currentStatus!.isNoDisturb;
     }
   }
 
@@ -223,7 +226,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 5),
             TextField(
               controller: _clearAtController,
               readOnly: true,
@@ -278,6 +281,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
                 ],
               ),
             ),
+            const SizedBox(height: 5),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Wrap(
@@ -285,10 +289,10 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
                 runSpacing: 0,
                 children: [
                   ChoiceChip(
-                    selected: _isSlient,
+                    selected: _isSilent,
                     label: Text('accountStatusSilent'.tr),
                     onSelected: (val) {
-                      setState(() => _isSlient = val);
+                      setState(() => _isSilent = val);
                     },
                   ),
                   ChoiceChip(

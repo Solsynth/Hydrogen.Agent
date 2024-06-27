@@ -225,7 +225,7 @@ class SolianMessages extends Translations {
           'accountStatusInvisible': 'Invisible',
           'accountStatusInvisibleDesc': 'Will show as offline, but all features still remain normal',
           'accountStatusOffline': 'Offline',
-          'accountLastSeenAt': 'Last seen at @date ago',
+          'accountLastSeenAt': '@date ago online',
           'accountStatusLabel': 'Status Text',
           'accountStatusClearAt': 'Clear At',
           'accountStatusNegative': 'Negative',
