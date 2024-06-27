@@ -24,6 +24,9 @@ abstract class AppNavigation {
       page: 'account',
     ),
   ];
+
+  static List<String> get destinationPages =>
+      AppNavigation.destinations.map((x) => x.page).toList();
 }
 
 class AppNavigationDestination {

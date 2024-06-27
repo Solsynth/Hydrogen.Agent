@@ -53,7 +53,6 @@ abstract class AppRouter {
                 path: '/posts/view/:alias',
                 name: 'postDetail',
                 builder: (context, state) => TitleShell(
-                  showAppBar: SolianTheme.isExtraLargeScreen(context),
                   state: state,
                   child: PostDetailScreen(
                     alias: state.pathParameters['alias']!,
@@ -119,7 +118,6 @@ abstract class AppRouter {
                 builder: (context, state) {
                   final arguments = state.extra as ChannelDetailArguments;
                   return TitleShell(
-                    showAppBar: SolianTheme.isExtraLargeScreen(context),
                     state: state,
                     child: ChannelDetailScreen(
                       channel: arguments.channel,
@@ -152,7 +150,6 @@ abstract class AppRouter {
                 path: '/realms/:alias/detail',
                 name: 'realmDetail',
                 builder: (context, state) => TitleShell(
-                  showAppBar: SolianTheme.isExtraLargeScreen(context),
                   state: state,
                   child: RealmDetailScreen(
                     realm: state.extra as Realm,
@@ -202,7 +199,6 @@ abstract class AppRouter {
                 path: '/account/friend',
                 name: 'accountFriend',
                 builder: (context, state) => TitleShell(
-                  showAppBar: SolianTheme.isExtraLargeScreen(context),
                   state: state,
                   child: const FriendScreen(),
                 ),
@@ -211,7 +207,6 @@ abstract class AppRouter {
                 path: '/account/personalize',
                 name: 'accountPersonalize',
                 builder: (context, state) => TitleShell(
-                  showAppBar: SolianTheme.isExtraLargeScreen(context),
                   state: state,
                   child: const PersonalizeScreen(),
                 ),
@@ -220,7 +215,6 @@ abstract class AppRouter {
                 path: '/about',
                 name: 'about',
                 builder: (context, state) => TitleShell(
-                  showAppBar: SolianTheme.isExtraLargeScreen(context),
                   state: state,
                   child: const AboutScreen(),
                 ),
