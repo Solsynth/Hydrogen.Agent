@@ -32,13 +32,13 @@ class AccountHeadingWidget extends StatelessWidget {
     this.onEditStatus,
   });
 
-  void showStatusAction(BuildContext context, bool hasStatus) {
+  void showStatusAction(BuildContext context, Status? current) {
     if (onEditStatus == null) return;
 
     showModalBottomSheet(
       useRootNavigator: true,
       context: context,
-      builder: (context) => AccountStatusAction(hasStatus: hasStatus),
+      builder: (context) => AccountStatusAction(currentStatus: current),
     ).then((val) {
       if (val == true) onEditStatus!();
     });
@@ -129,10 +129,7 @@ class AccountHeadingWidget extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
-                          showStatusAction(
-                            context,
-                            snapshot.data!.body['status'] != null,
-                          );
+                          showStatusAction(context, status.status);
                         },
                       );
                     },

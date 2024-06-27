@@ -44,7 +44,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     if (picked != null && picked != _birthday) {
       setState(() {
         _birthday = picked;
-        _birthdayController.text = DateFormat('yyyy-MM-dd').format(_birthday!);
+        _birthdayController.text = DateFormat('y/M/d').format(_birthday!);
       });
     }
   }

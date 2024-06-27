@@ -226,6 +226,11 @@ class SolianMessages extends Translations {
           'accountStatusInvisibleDesc': 'Will show as offline, but all features still remain normal',
           'accountStatusOffline': 'Offline',
           'accountLastSeenAt': 'Last seen at @date ago',
+          'accountStatusLabel': 'Status Text',
+          'accountStatusClearAt': 'Clear At',
+          'accountStatusNegative': 'Negative',
+          'accountStatusNeutral': 'Neutral',
+          'accountStatusPositive': 'Positive',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -435,6 +440,11 @@ class SolianMessages extends Translations {
           'accountStatusInvisibleDesc': '将会在他人界面显示离线，但不影响功能使用',
           'accountStatusOffline': '离线',
           'accountLastSeenAt': '最后上线于 @date 前',
+          'accountStatusLabel': '状态文字',
+          'accountStatusClearAt': '清除状态于',
+          'accountStatusNegative': '负面',
+          'accountStatusNeutral': '中性',
+          'accountStatusPositive': '积极',
         }
       };
 }

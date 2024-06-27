@@ -60,6 +60,7 @@ class StatusProvider extends GetConnect {
     final payload = {
       'type': type,
       'label': label,
+      'attitude': attitude,
       'is_no_disturb': isSilent,
       'is_invisible': isInvisible,
       'clear_at': clearAt?.toUtc().toIso8601String()
