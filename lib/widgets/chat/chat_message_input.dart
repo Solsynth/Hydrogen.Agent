@@ -65,8 +65,9 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
     // TODO Deal with the @ ping (query uid with username), and then add into related_user and replace the @ with internal link in body
 
+    const uuid = Uuid();
     final payload = {
-      'uuid': const Uuid().v4(),
+      'uuid': uuid.v4(),
       'type': _editTo == null ? 'messages.new' : 'messages.edit',
       'body': {
         'text': _textController.value.text,

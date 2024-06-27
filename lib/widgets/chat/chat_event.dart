@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -29,6 +27,14 @@ class ChatEvent extends StatelessWidget {
     this.isQuote = false,
     this.chatController,
   });
+
+  String _formatDuration(Duration duration) {
+    String negativeSign = duration.isNegative ? '-' : '';
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60).abs());
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60).abs());
+    return '$negativeSign${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
+  }
 
   Widget buildQuote() {
     return FutureBuilder(
@@ -71,6 +77,27 @@ class ChatEvent extends StatelessWidget {
         return ChatEventMessageActionLog(
           icon: const Icon(Icons.cancel_schedule_send, size: 16),
           text: 'messageDeleteDesc'.trParams({'id': '#${item.id}'}),
+          isMerged: isMerged,
+          isHasMerged: isHasMerged,
+          isQuote: isQuote,
+        );
+      case 'calls.start':
+        return ChatEventMessageActionLog(
+          icon: const Icon(Icons.call_made, size: 16),
+          text: 'messageCallStartDesc'
+              .trParams({'user': '@${item.sender.account.name}'}),
+          isMerged: isMerged,
+          isHasMerged: isHasMerged,
+          isQuote: isQuote,
+        );
+      case 'calls.end':
+        return ChatEventMessageActionLog(
+          icon: const Icon(Icons.call_received, size: 16),
+          text: 'messageCallEndDesc'.trParams({
+            'duration': _formatDuration(
+              Duration(milliseconds: item.body['last']),
+            ),
+          }),
           isMerged: isMerged,
           isHasMerged: isHasMerged,
           isQuote: isQuote,
