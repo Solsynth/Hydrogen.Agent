@@ -225,6 +225,7 @@ class SolianMessages extends Translations {
           'accountStatusInvisible': 'Invisible',
           'accountStatusInvisibleDesc': 'Will show as offline, but all features still remain normal',
           'accountStatusOffline': 'Offline',
+          'accountLastSeenAt': 'Last seen at @date ago',
         },
         'zh_CN': {
           'hide': '隐藏',
@@ -433,6 +434,7 @@ class SolianMessages extends Translations {
           'accountStatusInvisible': '隐身',
           'accountStatusInvisibleDesc': '将会在他人界面显示离线，但不影响功能使用',
           'accountStatusOffline': '离线',
+          'accountLastSeenAt': '最后上线于 @date 前',
         }
       };
 }

@@ -7,6 +7,7 @@ import 'package:solian/providers/account_status.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_badge.dart';
 import 'package:solian/widgets/account/account_status_action.dart';
+import 'package:timeago/timeago.dart';
 
 class AccountHeadingWidget extends StatelessWidget {
   final dynamic avatar;
@@ -39,7 +40,7 @@ class AccountHeadingWidget extends StatelessWidget {
       context: context,
       builder: (context) => AccountStatusAction(hasStatus: hasStatus),
     ).then((val) {
-      if(val == true) onEditStatus!();
+      if (val == true) onEditStatus!();
     });
   }
 
@@ -106,15 +107,24 @@ class AccountHeadingWidget extends StatelessWidget {
                         return Text('loading'.tr);
                       }
 
-                      final info = StatusProvider.determineStatus(
-                        AccountStatus.fromJson(snapshot.data!.body),
+                      final status = AccountStatus.fromJson(
+                        snapshot.data!.body,
                       );
+                      final info = StatusProvider.determineStatus(status);
 
                       return GestureDetector(
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(info.$2),
+                            if (!status.isOnline && status.lastSeenAt != null)
+                              Opacity(
+                                opacity: 0.75,
+                                child: Text('accountLastSeenAt'.trParams({
+                                  'date': format(status.lastSeenAt!.toLocal(),
+                                      locale: 'en_short')
+                                })).paddingOnly(left: 4),
+                              ),
                             info.$1.paddingSymmetric(horizontal: 6),
                           ],
                         ),
