@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/friendship.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_profile_popup.dart';
 
 class SliverFriendList extends StatelessWidget {
   final int accountId;
@@ -49,7 +50,20 @@ class SliverFriendList extends StatelessWidget {
       child: ListTile(
         title: Text(otherside.nick),
         subtitle: Text(otherside.name),
-        leading: AccountAvatar(content: otherside.avatar),
+        leading: GestureDetector(
+          child: AccountAvatar(content: otherside.avatar),
+          onTap: () {
+            showModalBottomSheet(
+              useRootNavigator: true,
+              isScrollControlled: true,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              context: context,
+              builder: (context) => AccountProfilePopup(
+                account: otherside,
+              ),
+            );
+          },
+        ),
       ),
       onDismissed: (direction) {
         final FriendProvider provider = Get.find();

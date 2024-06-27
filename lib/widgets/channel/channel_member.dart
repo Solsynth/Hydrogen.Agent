@@ -6,6 +6,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/account/friend_select.dart';
 
 class ChannelMemberListPopup extends StatefulWidget {
@@ -151,7 +152,20 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
                 return ListTile(
                   title: Text(element.account.nick),
                   subtitle: Text(element.account.name),
-                  leading: AccountAvatar(content: element.account.avatar),
+                  leading: GestureDetector(
+                    child: AccountAvatar(content: element.account.avatar),
+                    onTap: () {
+                      showModalBottomSheet(
+                        useRootNavigator: true,
+                        isScrollControlled: true,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        context: context,
+                        builder: (context) => AccountProfilePopup(
+                          account: element.account,
+                        ),
+                      );
+                    },
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

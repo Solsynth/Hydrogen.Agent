@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/message.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:timeago/timeago.dart' show format;
 import 'package:url_launcher/url_launcher_string.dart';
@@ -140,7 +141,20 @@ class ChatMessage extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AccountAvatar(content: item.sender.account.avatar),
+              GestureDetector(
+                child: AccountAvatar(content: item.sender.account.avatar),
+                onTap: () {
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    context: context,
+                    builder: (context) => AccountProfilePopup(
+                      account: item.sender.account,
+                    ),
+                  );
+                },
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
