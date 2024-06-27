@@ -20,8 +20,8 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
-import 'package:solian/widgets/chat/chat_message.dart';
-import 'package:solian/widgets/chat/chat_message_action.dart';
+import 'package:solian/widgets/chat/chat_event.dart';
+import 'package:solian/widgets/chat/chat_event_action.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
 import 'package:solian/widgets/current_state_action.dart';
 
@@ -125,7 +125,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   }
 
   bool checkMessageMergeable(Event? a, Event? b) {
-    if (a?.replyTo != null) return false;
     if (a == null || b == null) return false;
     if (a.sender.account.id != b.sender.account.id) return false;
     return a.createdAt.difference(b.createdAt).inMinutes <= 3;
@@ -146,24 +145,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   Event? _messageToEditing;
 
   Widget buildHistoryBody(Event item, {bool isMerged = false}) {
-    if (item.replyTo != null) {
-      return Column(
-        children: [
-          ChatMessage(
-            key: Key('m${item.replyTo!.uuid}'),
-            item: item.replyTo!,
-            isReply: true,
-          ).paddingOnly(left: 24, right: 4, bottom: 2),
-          ChatMessage(
-            key: Key('m${item.uuid}'),
-            item: item,
-            isMerged: isMerged,
-          ),
-        ],
-      );
-    }
-
-    return ChatMessage(
+    return ChatEvent(
       key: Key('m${item.uuid}'),
       item: item,
       isMerged: isMerged,
@@ -198,7 +180,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         showModalBottomSheet(
           useRootNavigator: true,
           context: context,
-          builder: (context) => ChatMessageAction(
+          builder: (context) => ChatEventAction(
             channel: _channel!,
             realm: _channel!.realm,
             item: item,

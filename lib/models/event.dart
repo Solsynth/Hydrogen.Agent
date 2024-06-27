@@ -9,15 +9,12 @@ class Event {
   DateTime? deletedAt;
   Map<String, dynamic> body;
   String type;
-  List<int>? attachments;
   Channel? channel;
   Sender sender;
-  int? replyId;
-  Event? replyTo;
   int channelId;
   int senderId;
 
-  bool isSending = false;
+  bool isPending = false;
 
   Event({
     required this.id,
@@ -27,11 +24,8 @@ class Event {
     this.deletedAt,
     required this.body,
     required this.type,
-    this.attachments,
     this.channel,
     required this.sender,
-    required this.replyId,
-    required this.replyTo,
     required this.channelId,
     required this.senderId,
   });
@@ -44,15 +38,9 @@ class Event {
         deletedAt: json['deleted_at'],
         body: json['body'],
         type: json['type'],
-        attachments: json['attachments'] != null
-            ? List<int>.from(json['attachments'])
-            : null,
         channel:
             json['channel'] != null ? Channel.fromJson(json['channel']) : null,
         sender: Sender.fromJson(json['sender']),
-        replyId: json['reply_id'],
-        replyTo:
-            json['reply_to'] != null ? Event.fromJson(json['reply_to']) : null,
         channelId: json['channel_id'],
         senderId: json['sender_id'],
       );
@@ -65,11 +53,8 @@ class Event {
         'deleted_at': deletedAt,
         'body': body,
         'type': type,
-        'attachments': attachments,
         'channel': channel?.toJson(),
         'sender': sender.toJson(),
-        'reply_id': replyId,
-        'reply_to': replyTo?.toJson(),
         'channel_id': channelId,
         'sender_id': senderId,
       };
