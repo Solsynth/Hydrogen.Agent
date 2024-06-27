@@ -4,19 +4,19 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/chat/chat_message.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatMessageInput extends StatefulWidget {
-  final Message? edit;
-  final Message? reply;
+  final Event? edit;
+  final Event? reply;
   final String? placeholder;
   final Channel channel;
   final String realm;
-  final Function(Message) onSent;
+  final Function(Event) onSent;
   final Function()? onReset;
 
   const ChatMessageInput({
@@ -40,8 +40,8 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
   List<int> _attachments = List.empty(growable: true);
 
-  Message? _editTo;
-  Message? _replyTo;
+  Event? _editTo;
+  Event? _replyTo;
 
   void showAttachments() {
     showModalBottomSheet(
@@ -89,12 +89,12 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       accountId: prof.body['id'],
       notify: 0,
     );
-    final message = Message(
+    final message = Event(
       id: 0,
       uuid: payload['uuid'] as String,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      content: payload['content'] as Map<String, dynamic>,
+      body: payload['content'] as Map<String, dynamic>,
       type: payload['type'] as String,
       attachments: _attachments,
       sender: sender,
@@ -141,7 +141,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   void syncWidget() {
     if (widget.edit != null) {
       _editTo = widget.edit!;
-      _textController.text = widget.edit!.content['value'];
+      _textController.text = widget.edit!.body['value'];
     }
     if (widget.reply != null) {
       _replyTo = widget.reply!;

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 abstract class ServiceFinder {
-  static const bool devFlag = false;
+  static const bool devFlag = true;
 
   static Map<String, String> services = {
     'paperclip':

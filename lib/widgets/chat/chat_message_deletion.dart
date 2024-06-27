@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 
 class ChatMessageDeletionDialog extends StatefulWidget {
   final Channel channel;
   final Realm? realm;
-  final Message item;
+  final Event item;
 
   const ChatMessageDeletionDialog({
     super.key,

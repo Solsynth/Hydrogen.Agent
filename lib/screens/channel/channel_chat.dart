@@ -4,11 +4,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:solian/controllers/chat_history_controller.dart';
+import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/chat.dart';
@@ -50,7 +50,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   ChannelMember? _channelProfile;
   StreamSubscription<NetworkPackage>? _subscription;
 
-  late final ChatHistoryController _chatController;
+  late final ChatEventController _chatController;
 
   getProfile() async {
     final AuthProvider auth = Get.find();
@@ -109,36 +109,22 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     final ChatProvider provider = Get.find();
     _subscription = provider.stream.stream.listen((event) {
       switch (event.method) {
-        case 'messages.new':
-          final payload = Message.fromJson(event.payload!);
-          if (payload.channelId == _channel?.id) {
-            _chatController.receiveMessage(payload);
-          }
-          break;
-        case 'messages.update':
-          final payload = Message.fromJson(event.payload!);
-          if (payload.channelId == _channel?.id) {
-            _chatController.replaceMessage(payload);
-          }
-          break;
-        case 'messages.burnt':
-          final payload = Message.fromJson(event.payload!);
-          if (payload.channelId == _channel?.id) {
-            _chatController.burnMessage(payload.id);
-          }
+        case 'events.new':
+          final payload = Event.fromJson(event.payload!);
+            _chatController.receiveEvent(payload);
           break;
         case 'calls.new':
           final payload = Call.fromJson(event.payload!);
-          _ongoingCall = payload;
+          setState(() => _ongoingCall = payload);
           break;
         case 'calls.end':
-          _ongoingCall = null;
+          setState(() => _ongoingCall = null);
           break;
       }
     });
   }
 
-  bool checkMessageMergeable(Message? a, Message? b) {
+  bool checkMessageMergeable(Event? a, Event? b) {
     if (a?.replyTo != null) return false;
     if (a == null || b == null) return false;
     if (a.sender.account.id != b.sender.account.id) return false;
@@ -156,10 +142,10 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     );
   }
 
-  Message? _messageToReplying;
-  Message? _messageToEditing;
+  Event? _messageToReplying;
+  Event? _messageToEditing;
 
-  Widget buildHistoryBody(Message item, {bool isMerged = false}) {
+  Widget buildHistoryBody(Event item, {bool isMerged = false}) {
     if (item.replyTo != null) {
       return Column(
         children: [
@@ -188,18 +174,18 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     bool isMerged = false, hasMerged = false;
     if (index > 0) {
       hasMerged = checkMessageMergeable(
-        _chatController.currentHistory[index - 1].data,
-        _chatController.currentHistory[index].data,
+        _chatController.currentEvents[index - 1].data,
+        _chatController.currentEvents[index].data,
       );
     }
-    if (index + 1 < _chatController.currentHistory.length) {
+    if (index + 1 < _chatController.currentEvents.length) {
       isMerged = checkMessageMergeable(
-        _chatController.currentHistory[index].data,
-        _chatController.currentHistory[index + 1].data,
+        _chatController.currentEvents[index].data,
+        _chatController.currentEvents[index + 1].data,
       );
     }
 
-    final item = _chatController.currentHistory[index].data;
+    final item = _chatController.currentEvents[index].data;
 
     return InkWell(
       child: Container(
@@ -230,17 +216,18 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   @override
   void initState() {
-    _chatController = ChatHistoryController();
+    _chatController = ChatEventController();
     _chatController.initialize();
 
     getChannel().then((_) {
-      _chatController.getMessages(_channel!, widget.realm);
+      _chatController.channel = _channel!;
+      _chatController.getEvents(_channel!, widget.realm);
+
+      listenMessages();
     });
 
     getProfile();
     getOngoingCall();
-
-    listenMessages();
 
     super.initState();
   }
@@ -325,13 +312,13 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                     Obx(() {
                       return SliverList.builder(
                         key: Key('chat-history#${_channel!.id}'),
-                        itemCount: _chatController.currentHistory.length,
+                        itemCount: _chatController.currentEvents.length,
                         itemBuilder: buildHistory,
                       );
                     }),
                     Obx(() {
-                      final amount = _chatController.totalHistoryCount -
-                          _chatController.currentHistory.length;
+                      final amount = _chatController.totalEvents -
+                          _chatController.currentEvents.length;
 
                       if (amount.value <= 0 ||
                           _chatController.isLoading.isTrue) {
@@ -348,7 +335,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                             'count': amount.string,
                           })),
                           onTap: () {
-                            _chatController.getMoreMessages(
+                            _chatController.loadEvents(
                               _channel!,
                               widget.realm,
                             );
@@ -378,9 +365,9 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                       realm: widget.realm,
                       placeholder: placeholder,
                       channel: _channel!,
-                      onSent: (Message item) {
+                      onSent: (Event item) {
                         setState(() {
-                          _chatController.addTemporaryMessage(item);
+                          _chatController.addPendingEvent(item);
                         });
                       },
                       onReset: () {

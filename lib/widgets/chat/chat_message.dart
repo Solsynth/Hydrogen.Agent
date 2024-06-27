@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
@@ -13,7 +13,7 @@ import 'package:timeago/timeago.dart' show format;
 import 'package:url_launcher/url_launcher_string.dart';
 
 class ChatMessage extends StatelessWidget {
-  final Message item;
+  final Event item;
   final bool isContentPreviewing;
   final bool isReply;
   final bool isMerged;
@@ -46,7 +46,7 @@ class ChatMessage extends StatelessWidget {
     final hasAttachment = item.attachments?.isNotEmpty ?? false;
 
     return FutureBuilder(
-      future: decodeContent(item.content),
+      future: decodeContent(item.body),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Opacity(

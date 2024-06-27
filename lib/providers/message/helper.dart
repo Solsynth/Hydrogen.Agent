@@ -1,71 +1,84 @@
+import 'package:floor/floor.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/models/message.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/models/pagination.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/message/history.dart';
+import 'package:solian/providers/message/events.dart';
 
 Future<MessageHistoryDb> createHistoryDb() async {
+  final migration1to2 = Migration(1, 2, (database) async {
+    await database.execute('DROP TABLE IF EXISTS LocalMessage');
+  });
+
   return await $FloorMessageHistoryDb
       .databaseBuilder('messaging_data.dart')
-      .build();
+      .addMigrations([migration1to2]).build();
 }
 
 extension MessageHistoryHelper on MessageHistoryDb {
-  receiveMessage(Message remote) async {
-    final entry = LocalMessage(
+  receiveEvent(Event remote) async {
+    final entry = LocalEvent(
       remote.id,
       remote,
       remote.channelId,
+      remote.createdAt,
     );
-    await localMessages.insert(entry);
+    await localEvents.insert(entry);
+    switch (remote.type) {
+      case 'messages.edit':
+        final body = EventMessageBody.fromJson(remote.body);
+        if (body.relatedEvent != null) {
+          final target = await localEvents.findById(body.relatedEvent!);
+          if (target != null) {
+            target.data.body = remote.body;
+            target.data.updatedAt = remote.updatedAt;
+            await localEvents.update(target);
+          }
+        }
+      case 'messages.delete':
+        final body = EventMessageBody.fromJson(remote.body);
+        if (body.relatedEvent != null) {
+          await localEvents.delete(body.relatedEvent!);
+        }
+    }
     return entry;
   }
 
-  replaceMessage(Message remote) async {
-    final entry = LocalMessage(
-      remote.id,
-      remote,
-      remote.channelId,
-    );
-    await localMessages.update(entry);
-    return entry;
-  }
+  Future<(List<Event>, int)?> syncEvents(Channel channel,
+      {String scope = 'global', depth = 10, offset = 0}) async {
+    final lastOne = await localEvents.findLastByChannel(channel.id);
 
-  burnMessage(int id) async {
-    await localMessages.delete(id);
-  }
-
-  syncMessages(Channel channel, {String scope = 'global', breath = 10, offset = 0}) async {
-    final lastOne = await localMessages.findLastByChannel(channel.id);
-
-    final data = await _getRemoteMessages(
+    final data = await _getRemoteEvents(
       channel,
       scope,
-      remainBreath: breath,
+      remainDepth: depth,
       offset: offset,
       onBrake: (items) {
         return items.any((x) => x.id == lastOne?.id);
       },
     );
-    if (data != null) {
-      await localMessages.insertBulk(
-        data.$1.map((x) => LocalMessage(x.id, x, x.channelId)).toList(),
+    if (data != null && !PlatformInfo.isWeb) {
+      await localEvents.insertBulk(
+        data.$1
+            .map((x) => LocalEvent(x.id, x, x.channelId, x.createdAt))
+            .toList(),
       );
     }
 
-    return data?.$2 ?? 0;
+    return data;
   }
 
-  Future<(List<Message>, int)?> _getRemoteMessages(
+  Future<(List<Event>, int)?> _getRemoteEvents(
     Channel channel,
     String scope, {
-    required int remainBreath,
-    bool Function(List<Message> items)? onBrake,
+    required int remainDepth,
+    bool Function(List<Event> items)? onBrake,
     take = 10,
     offset = 0,
   }) async {
-    if (remainBreath <= 0) {
+    if (remainDepth <= 0) {
       return null;
     }
 
@@ -75,7 +88,8 @@ extension MessageHistoryHelper on MessageHistoryDb {
     final client = auth.configureClient('messaging');
 
     final resp = await client.get(
-        '/api/channels/$scope/${channel.alias}/messages?take=$take&offset=$offset');
+      '/api/channels/$scope/${channel.alias}/events?take=$take&offset=$offset',
+    );
 
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
@@ -83,16 +97,16 @@ extension MessageHistoryHelper on MessageHistoryDb {
 
     final PaginationResult response = PaginationResult.fromJson(resp.body);
     final result =
-        response.data?.map((e) => Message.fromJson(e)).toList() ?? List.empty();
+        response.data?.map((e) => Event.fromJson(e)).toList() ?? List.empty();
 
     if (onBrake != null && onBrake(result)) {
       return (result, response.count);
     }
 
-    final expandResult = (await _getRemoteMessages(
+    final expandResult = (await _getRemoteEvents(
           channel,
           scope,
-          remainBreath: remainBreath - 1,
+          remainDepth: remainDepth - 1,
           take: take,
           offset: offset + result.length,
         ))
@@ -102,7 +116,7 @@ extension MessageHistoryHelper on MessageHistoryDb {
     return ([...result, ...expandResult], response.count);
   }
 
-  Future<List<LocalMessage>> listMessages(Channel channel) async {
-    return await localMessages.findAllByChannel(channel.id);
+  Future<List<LocalEvent>> listMessages(Channel channel) async {
+    return await localEvents.findAllByChannel(channel.id);
   }
 }
