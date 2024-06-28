@@ -95,7 +95,7 @@ class ChatEvent extends StatelessWidget {
           icon: const Icon(Icons.call_received, size: 16),
           text: 'messageCallEndDesc'.trParams({
             'duration': _formatDuration(
-              Duration(milliseconds: item.body['last']),
+              Duration(seconds: item.body['last']),
             ),
           }),
           isMerged: isMerged,
