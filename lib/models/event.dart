@@ -79,8 +79,8 @@ class EventMessageBody {
 
   factory EventMessageBody.fromJson(Map<String, dynamic> json) =>
       EventMessageBody(
-        text: json['text'],
-        algorithm: json['algorithm'],
+        text: json['text'] ?? '',
+        algorithm: json['algorithm'] ?? 'plain',
         attachments: json['attachments'] != null
             ? List<int>.from(json['attachments'].map((x) => x))
             : null,
