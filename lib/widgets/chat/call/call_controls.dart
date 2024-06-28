@@ -230,7 +230,9 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                       onTap: isMuted ? enableAudio : disableAudio,
                       child: ListTile(
                         leading: const Icon(Icons.mic_off),
-                        title: Text('callMicrophoneOn'.tr),
+                        title: Text(isMuted
+                            ? 'callMicrophoneOn'.tr
+                            : 'callMicrophoneOff'.tr),
                       ),
                     ),
                     if (_audioInputs != null)
