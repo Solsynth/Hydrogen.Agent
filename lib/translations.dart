@@ -163,7 +163,8 @@ class SolianMessages extends Translations {
           'channelNotifyLevelAll': 'All',
           'channelNotifyLevelMentioned': 'Only mentioned',
           'channelNotifyLevelNone': 'Ignore all',
-          'channelNotifyLevelApplied': 'Your notification settings has been applied.',
+          'channelNotifyLevelApplied':
+              'Your notification settings has been applied.',
           'messageUnsync': 'Messages Un-synced',
           'messageUnsyncCaption': '@count message(s) still in un-synced.',
           'messageEditDesc': 'Edited message @id',
@@ -224,7 +225,8 @@ class SolianMessages extends Translations {
           'accountStatusSilent': 'Do not Disturb',
           'accountStatusSilentDesc': 'The notification will stop popping up',
           'accountStatusInvisible': 'Invisible',
-          'accountStatusInvisibleDesc': 'Will show as offline, but all features still remain normal',
+          'accountStatusInvisibleDesc':
+              'Will show as offline, but all features still remain normal',
           'accountStatusOffline': 'Offline',
           'accountLastSeenAt': '@date ago online',
           'accountStatusLabel': 'Status Text',
@@ -387,7 +389,7 @@ class SolianMessages extends Translations {
           'messageDecoding': '解码信息中…',
           'messageEditDesc': '修改了消息 @id',
           'messageDeleteDesc': '删除了消息 @id',
-          'messageCallStartDesc': '@user 发起了一次童话',
+          'messageCallStartDesc': '@user 发起了一次通话',
           'messageCallEndDesc': '通话持续了 @duration',
           'messageTypeUnsupported': '不支持的消息类型 @type',
           'messageActionList': '消息的操作',
