@@ -56,14 +56,9 @@ class ChatEventController {
       );
       totalEvents.value = result?.$2 ?? 0;
       if (result != null) {
-        currentEvents.addAll(result.$1.map(
-          (x) => LocalEvent(
-            x.id,
-            x,
-            x.channelId,
-            x.createdAt,
-          ),
-        ));
+        for (final x in result.$1.reversed) {
+          applyEvent(LocalEvent(x.id, x, x.channelId, x.createdAt));
+        }
       }
     } else {
       final result = await database.syncEvents(
@@ -71,16 +66,7 @@ class ChatEventController {
         scope: scope,
       );
       totalEvents.value = result?.$2 ?? 0;
-      if (!await syncLocal(channel) && result != null) {
-        currentEvents.addAll(result.$1.map(
-          (x) => LocalEvent(
-            x.id,
-            x,
-            x.channelId,
-            x.createdAt,
-          ),
-        ));
-      }
+      await syncLocal(channel);
     }
     isLoading.value = false;
   }
@@ -96,14 +82,9 @@ class ChatEventController {
       );
       totalEvents.value = result?.$2 ?? 0;
       if (result != null) {
-        currentEvents.addAll(result.$1.map(
-          (x) => LocalEvent(
-            x.id,
-            x,
-            x.channelId,
-            x.createdAt,
-          ),
-        ));
+        for (final x in result.$1.reversed) {
+          applyEvent(LocalEvent(x.id, x, x.channelId, x.createdAt));
+        }
       }
     } else {
       final result = await database.syncEvents(
@@ -113,27 +94,17 @@ class ChatEventController {
         offset: currentEvents.length,
       );
       totalEvents.value = result?.$2 ?? 0;
-      if (!await syncLocal(channel) && result != null) {
-        currentEvents.addAll(result.$1.map(
-          (x) => LocalEvent(
-            x.id,
-            x,
-            x.channelId,
-            x.createdAt,
-          ),
-        ));
-      }
+      await syncLocal(channel);
     }
     isLoading.value = false;
   }
 
   Future<bool> syncLocal(Channel channel) async {
     if (PlatformInfo.isWeb) return false;
-    currentEvents.replaceRange(
-      0,
-      currentEvents.length,
-      await database.localEvents.findAllByChannel(channel.id),
-    );
+    final data = await database.localEvents.findAllByChannel(channel.id);
+    for (final x in data.reversed) {
+      applyEvent(x);
+    }
     return true;
   }
 
@@ -150,28 +121,32 @@ class ChatEventController {
       entry = await database.receiveEvent(remote);
     }
 
-    if (remote.channelId != channel?.id) return;
+    applyEvent(entry);
+  }
 
-    final idx = currentEvents.indexWhere((x) => x.data.uuid == remote.uuid);
+  applyEvent(LocalEvent entry) {
+    if (entry.channelId != channel?.id) return;
+
+    final idx = currentEvents.indexWhere((x) => x.data.uuid == entry.data.uuid);
     if (idx != -1) {
       currentEvents[idx] = entry;
     } else {
       currentEvents.insert(0, entry);
     }
 
-    switch (remote.type) {
+    switch (entry.data.type) {
       case 'messages.edit':
-        final body = EventMessageBody.fromJson(remote.body);
+        final body = EventMessageBody.fromJson(entry.data.body);
         if (body.relatedEvent != null) {
           final idx =
               currentEvents.indexWhere((x) => x.data.id == body.relatedEvent);
           if (idx != -1) {
-            currentEvents[idx].data.body = remote.body;
-            currentEvents[idx].data.updatedAt = remote.updatedAt;
+            currentEvents[idx].data.body = entry.data.body;
+            currentEvents[idx].data.updatedAt = entry.data.updatedAt;
           }
         }
       case 'messages.delete':
-        final body = EventMessageBody.fromJson(remote.body);
+        final body = EventMessageBody.fromJson(entry.data.body);
         if (body.relatedEvent != null) {
           currentEvents.removeWhere((x) => x.id == body.relatedEvent);
         }
