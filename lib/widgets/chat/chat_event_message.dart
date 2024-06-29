@@ -54,6 +54,7 @@ class ChatEventMessage extends StatelessWidget {
         markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
         <markdown.InlineSyntax>[
           markdown.EmojiSyntax(),
+          markdown.AutolinkExtensionSyntax(),
           ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
         ],
       ),

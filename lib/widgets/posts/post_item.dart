@@ -83,6 +83,7 @@ class _PostItemState extends State<PostItem> {
         markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
         <markdown.InlineSyntax>[
           markdown.EmojiSyntax(),
+          markdown.AutolinkExtensionSyntax(),
           ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
         ],
       ),
