@@ -179,6 +179,12 @@ class _AttachmentListState extends State<AttachmentList> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getMetadataList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.attachmentsId.isEmpty) {
       return const SizedBox();
