@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -27,12 +28,52 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- Loading styles -->
+  <style>
+    .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .loader {
+      border: 10px solid #f3f3f3;
+      border-top: 10px solid #8f94ca;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin .35s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 
   <title>Solian</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
+  <div class="loader-container">
+    <div class="loader"></div>
+  </div>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 </html>
