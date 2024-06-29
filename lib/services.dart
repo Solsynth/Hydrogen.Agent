@@ -16,7 +16,8 @@ abstract class ServiceFinder {
       {timeout = const Duration(seconds: 5)}) {
     final client = GetConnect(
       timeout: timeout,
-      allowAutoSignedCert: true,
+      userAgent: 'Solian/1.1',
+      sendUserAgent: true,
     );
     client.httpClient.baseUrl = ServiceFinder.services[service];
 

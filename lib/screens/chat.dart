@@ -29,11 +29,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   getProfile() async {
     final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) return;
+    
     final prof = await auth.getProfile();
     _accountId = prof.body['id'];
   }
 
   getChannels() async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) return;
+
     setState(() => _isBusy = true);
 
     final ChannelProvider provider = Get.find();

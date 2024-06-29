@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
-import 'package:solian/widgets/account/push_notify_register_dialog.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInPopup extends StatefulWidget {
@@ -14,56 +14,54 @@ class SignInPopup extends StatefulWidget {
 }
 
 class _SignInPopupState extends State<SignInPopup> {
+  bool _isBusy = false;
+
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void performAction(BuildContext context) {
+  void performAction(BuildContext context) async {
     final AuthProvider provider = Get.find();
 
     final username = _usernameController.value.text;
     final password = _passwordController.value.text;
     if (username.isEmpty || password.isEmpty) return;
-    provider.signin(context, username, password).then((_) async {
-      await showDialog(
-        useRootNavigator: true,
-        context: context,
-        builder: (context) => const PushNotifyRegisterDialog(),
-      );
 
-      Navigator.pop(context, true);
-    }).catchError((e) {
-      List<String> messages = e.toString().split('\n');
-      if (messages.last.contains('risk')) {
-        final ticketId = RegExp(r'ticketId=(\d+)').firstMatch(messages.last);
-        if (ticketId == null) {
-          context.showErrorDialog(
-            'Requested to multi-factor authenticate, but the ticket id was not found',
+    setState(() => _isBusy = true);
+
+    try {
+      await provider.signin(context, username, password);
+    } on RiskyAuthenticateException catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('riskDetection'.tr),
+            content: Text('signinRiskDetected'.tr),
+            actions: [
+              TextButton(
+                child: Text('next'.tr),
+                onPressed: () {
+                  launchUrlString(
+                    '${ServiceFinder.services['passport']}/mfa?close=yes&ticketId=${e.ticketId}',
+                  );
+                  Navigator.pop(context);
+                },
+              )
+            ],
           );
-        }
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('riskDetection'.tr),
-              content: Text('signinRiskDetected'.tr),
-              actions: [
-                TextButton(
-                  child: Text('next'.tr),
-                  onPressed: () {
-                    launchUrlString(
-                      '${ServiceFinder.services['passport']}/mfa?ticket=${ticketId!.group(1)}',
-                    );
-                    Navigator.pop(context);
-                  },
-                )
-              ],
-            );
-          },
-        );
-      } else {
-        context.showErrorDialog(messages.last);
-      }
-    });
+        },
+      );
+      return;
+    } catch (e) {
+      context.showErrorDialog(e);
+      return;
+    } finally {
+      setState(() => _isBusy = false);
+    }
+
+    Get.find<AccountProvider>().registerPushNotifications();
+
+    Navigator.pop(context, true);
   }
 
   @override
@@ -120,6 +118,7 @@ class _SignInPopupState extends State<SignInPopup> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
+                  onPressed: _isBusy ? null : () => performAction(context),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -127,7 +126,6 @@ class _SignInPopupState extends State<SignInPopup> {
                       const Icon(Icons.chevron_right),
                     ],
                   ),
-                  onPressed: () => performAction(context),
                 ),
               )
             ],

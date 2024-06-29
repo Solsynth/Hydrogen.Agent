@@ -25,6 +25,9 @@ class _RealmListScreenState extends State<RealmListScreen> {
   final List<Realm> _realms = List.empty(growable: true);
 
   getRealms() async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) return;
+
     setState(() => _isBusy = true);
 
     final RealmProvider provider = Get.find();

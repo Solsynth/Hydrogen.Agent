@@ -36,7 +36,11 @@ class _AccountScreenState extends State<AccountScreen> {
         child: FutureBuilder(
           future: provider.isAuthorized,
           builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data == false) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasData && snapshot.data == false) {
               return Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -52,9 +56,11 @@ class _AccountScreenState extends State<AccountScreen> {
                           isScrollControlled: true,
                           context: context,
                           builder: (context) => const SignInPopup(),
-                        ).then((_) async {
-                          await provider.getProfile(noCache: true);
-                          setState(() {});
+                        ).then((val) async {
+                          if (val == true) {
+                            await provider.getProfile(noCache: true);
+                            setState(() {});
+                          }
                         });
                       },
                     ),
@@ -136,7 +142,7 @@ class _AccountHeadingState extends State<AccountHeading> {
       future: provider.getProfile(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Container();
+          return const LinearProgressIndicator();
         }
 
         final prof = snapshot.data!;
