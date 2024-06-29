@@ -41,8 +41,10 @@ class _SignInPopupState extends State<SignInPopup> {
               TextButton(
                 child: Text('next'.tr),
                 onPressed: () {
+                  const redirect = 'solink://auth?status=done';
                   launchUrlString(
-                    '${ServiceFinder.services['passport']}/mfa?close=yes&ticketId=${e.ticketId}',
+                    '${ServiceFinder.services['passport']}/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}',
+                    mode: LaunchMode.inAppWebView,
                   );
                   Navigator.pop(context);
                 },

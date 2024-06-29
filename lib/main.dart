@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
+import 'package:protocol_handler/protocol_handler.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/firebase_options.dart';
@@ -17,6 +18,7 @@ import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
+import 'package:solian/shells/listener_shell.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
 
@@ -30,6 +32,8 @@ void main() async {
     },
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
+
+      await protocolHandler.register('solink');
 
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
@@ -101,8 +105,10 @@ class SolianApp extends StatelessWidget {
         });
       },
       builder: (context, child) {
-        return ScaffoldMessenger(
-          child: child ?? Container(),
+        return ListenerShell(
+          child: ScaffoldMessenger(
+            child: child ?? Container(),
+          ),
         );
       },
     );
