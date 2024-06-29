@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:markdown/markdown.dart' as markdown;
 
 class ChatEventMessage extends StatelessWidget {
   final Event item;
@@ -27,6 +28,7 @@ class ChatEventMessage extends StatelessWidget {
     final body = EventMessageBody.fromJson(item.body);
 
     return SizedBox(
+      key: Key('m${item.uuid}attachments-box'),
       width: min(MediaQuery.of(context).size.width, 640),
       child: AttachmentList(
         key: Key('m${item.uuid}attachments'),
@@ -48,6 +50,13 @@ class ChatEventMessage extends StatelessWidget {
       data: body.text,
       selectable: true,
       padding: const EdgeInsets.all(0),
+      extensionSet: markdown.ExtensionSet(
+        markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
+        <markdown.InlineSyntax>[
+          markdown.EmojiSyntax(),
+          ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
+        ],
+      ),
       onTapLink: (text, href, title) async {
         if (href == null) return;
         await launchUrlString(

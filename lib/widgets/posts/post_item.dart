@@ -11,6 +11,7 @@ import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:timeago/timeago.dart' show format;
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:markdown/markdown.dart' as markdown;
 
 class PostItem extends StatefulWidget {
   final Post item;
@@ -78,6 +79,13 @@ class _PostItemState extends State<PostItem> {
       physics: const NeverScrollableScrollPhysics(),
       data: item.content,
       padding: const EdgeInsets.all(0),
+      extensionSet: markdown.ExtensionSet(
+        markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
+        <markdown.InlineSyntax>[
+          markdown.EmojiSyntax(),
+          ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
+        ],
+      ),
       onTapLink: (text, href, title) async {
         if (href == null) return;
         await launchUrlString(
