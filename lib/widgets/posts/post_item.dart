@@ -134,15 +134,17 @@ class _PostItemState extends State<PostItem> {
               size: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
             ),
-            Text(
-              'postRepliedNotify'.trParams(
-                {'username': '@${widget.item.replyTo!.author.name}'},
-              ),
-              style: TextStyle(
-                color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
-              ),
-            ).paddingOnly(left: 6),
+            Expanded(
+              child: Text(
+                'postRepliedNotify'.trParams(
+                  {'username': '@${widget.item.replyTo!.author.name}'},
+                ),
+                style: TextStyle(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+                ),
+              ).paddingOnly(left: 6),
+            ),
           ],
         ).paddingOnly(left: 12),
         Card(
@@ -167,15 +169,17 @@ class _PostItemState extends State<PostItem> {
               size: 16,
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
             ),
-            Text(
-              'postRepostedNotify'.trParams(
-                {'username': '@${widget.item.repostTo!.author.name}'},
-              ),
-              style: TextStyle(
-                color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
-              ),
-            ).paddingOnly(left: 6),
+            Expanded(
+              child: Text(
+                'postRepostedNotify'.trParams(
+                  {'username': '@${widget.item.repostTo!.author.name}'},
+                ),
+                style: TextStyle(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+                ),
+              ).paddingOnly(left: 6),
+            ),
           ],
         ).paddingOnly(left: 12),
         Card(

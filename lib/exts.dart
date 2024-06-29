@@ -8,6 +8,10 @@ extension SolianExtenions on BuildContext {
     ));
   }
 
+  void clearSnackbar() {
+    ScaffoldMessenger.of(this).clearSnackBars();
+  }
+
   Future<void> showErrorDialog(dynamic exception) {
     return showDialog<void>(
       useRootNavigator: true,

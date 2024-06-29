@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' show basename;
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
+import 'package:super_clipboard/super_clipboard.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 class AttachmentPublishPopup extends StatefulWidget {
@@ -153,10 +154,48 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     setState(() => _isBusy = false);
   }
 
+  void pasteFileToUpload() async {
+    final clipboard = SystemClipboard.instance;
+    if (clipboard == null) return;
+    final reader = await clipboard.read();
+    for (final format in Formats.standardFormats.whereType<FileFormat>()) {
+      if (reader.canProvide(format)) {
+        reader.getFile(format, (file) async {
+          final data = await file.readAll();
+          await uploadAttachment(
+            data,
+            file.fileName ?? 'unknown',
+            await calculateBytesSha256(data),
+          );
+        });
+      }
+    }
+  }
+
+  void handlePasteFile(ClipboardReadEvent event) async {
+    final reader = await event.getClipboardReader();
+    for (final format in Formats.standardFormats.whereType<FileFormat>()) {
+      if (reader.canProvide(format)) {
+        reader.getFile(format, (file) async {
+          final data = await file.readAll();
+          await uploadAttachment(
+            data,
+            file.fileName ?? 'unknown',
+            await calculateBytesSha256(data),
+          );
+        });
+      }
+    }
+  }
+
   Future<void> uploadAttachment(Uint8List data, String path, String hash,
       {double? ratio}) async {
     final AttachmentProvider provider = Get.find();
     try {
+      context.showSnackbar((PlatformInfo.isWeb
+              ? 'attachmentUploadingWebMode'
+              : 'attachmentUploading')
+          .trParams({'name': basename(path)}));
       final resp = await provider.createAttachment(
         data,
         path,
@@ -167,6 +206,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
       var result = Attachment.fromJson(resp.body);
       setState(() => _attachments.add(result));
       widget.onUpdate(_attachments.map((e) => e!.id).toList());
+      context.clearSnackbar();
     } catch (err) {
       rethrow;
     }
@@ -222,11 +262,13 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
   void initState() {
     super.initState();
     revertMetadataList();
+    ClipboardEvents.instance?.registerPasteEventListener(handlePasteFile);
   }
 
   @override
   void dispose() {
     super.dispose();
+    ClipboardEvents.instance?.unregisterPasteEventListener(handlePasteFile);
   }
 
   @override
@@ -256,11 +298,9 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
                     final data = await file.readAll();
                     await uploadAttachment(
                       data,
-                      file.fileName ?? 'attachment',
+                      file.fileName ?? 'unknown',
                       await calculateBytesSha256(data),
                     );
-                  }, onError: (error) {
-                    print('Error reading value $error');
                   });
                 }
               }
@@ -359,6 +399,13 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
                     alignment: WrapAlignment.center,
                     runAlignment: WrapAlignment.center,
                     children: [
+                      if (PlatformInfo.isDesktop)
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.paste),
+                          label: Text('attachmentAddClipboard'.tr),
+                          style: const ButtonStyle(visualDensity: density),
+                          onPressed: () => pasteFileToUpload(),
+                        ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.add_photo_alternate),
                         label: Text('attachmentAddGalleryPhoto'.tr),
