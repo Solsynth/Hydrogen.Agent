@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
@@ -124,12 +125,24 @@ class ChatEvent extends StatelessWidget {
   Widget buildBody(BuildContext context) {
     if (isContentPreviewing || (isMerged && !isQuote)) {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (item.body['quote_event'] != null && chatController != null)
             buildQuote(),
-          buildContent(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(child: buildContent()),
+              if (item.isPending)
+                const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
+          ),
         ],
-      );
+      ).paddingOnly(right: 12);
     } else if (isQuote) {
       return Card(
         child: Row(
@@ -203,7 +216,18 @@ class ChatEvent extends StatelessWidget {
                     if (item.body['quote_event'] != null &&
                         chatController != null)
                       buildQuote(),
-                    buildContent(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(child: buildContent()),
+                        if (item.isPending)
+                          const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
