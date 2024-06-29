@@ -33,7 +33,9 @@ void main() async {
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      await protocolHandler.register('solink');
+      if (!PlatformInfo.isWeb) {
+        await protocolHandler.register('solink');
+      }
 
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,

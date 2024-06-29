@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -10,6 +14,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 class AttachmentPublishPopup extends StatefulWidget {
   final String usage;
@@ -24,8 +29,7 @@ class AttachmentPublishPopup extends StatefulWidget {
   });
 
   @override
-  State<AttachmentPublishPopup> createState() =>
-      _AttachmentPublishPopupState();
+  State<AttachmentPublishPopup> createState() => _AttachmentPublishPopupState();
 }
 
 class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
@@ -51,7 +55,8 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
       try {
         await uploadAttachment(
-          file,
+          await file.readAsBytes(),
+          file.path,
           hash,
           ratio: await calculateFileAspectRatio(file),
         );
@@ -77,7 +82,8 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     const ratio = 16 / 9;
 
     try {
-      await uploadAttachment(file, hash, ratio: ratio);
+      await uploadAttachment(await file.readAsBytes(), file.path, hash,
+          ratio: ratio);
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -100,7 +106,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     for (final file in files) {
       final hash = await calculateFileSha256(file);
       try {
-        await uploadAttachment(file, hash);
+        await uploadAttachment(await file.readAsBytes(), file.path, hash);
       } catch (err) {
         context.showErrorDialog(err);
       }
@@ -134,7 +140,12 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     }
 
     try {
-      await uploadAttachment(file, hash, ratio: ratio);
+      await uploadAttachment(
+        await file.readAsBytes(),
+        file.path,
+        hash,
+        ratio: ratio,
+      );
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -142,11 +153,13 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> uploadAttachment(File file, String hash, {double? ratio}) async {
+  Future<void> uploadAttachment(Uint8List data, String path, String hash,
+      {double? ratio}) async {
     final AttachmentProvider provider = Get.find();
     try {
       final resp = await provider.createAttachment(
-        file,
+        data,
+        path,
         hash,
         widget.usage,
         ratio: ratio,
@@ -208,8 +221,12 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
   @override
   void initState() {
     super.initState();
-
     revertMetadataList();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -219,134 +236,165 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     return SafeArea(
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'attachmentAdd'.tr,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-            if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-            Expanded(
-              child: Builder(builder: (context) {
-                if (_isFirstTimeBusy && _isBusy) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: _attachments.length,
-                  itemBuilder: (context, index) {
-                    final element = _attachments[index];
-                    var fileType = element!.mimetype.split('/').firstOrNull;
-                    fileType ??= 'unknown';
-                    return Container(
-                      padding:
-                          const EdgeInsets.only(left: 16, right: 8, bottom: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  element.alt,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            style: TextButton.styleFrom(
-                              shape: const CircleBorder(),
-                              foregroundColor: Theme.of(context).primaryColor,
-                            ),
-                            icon: const Icon(Icons.more_horiz),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AttachmentEditorDialog(
-                                    item: element,
-                                    onDelete: () {
-                                      setState(
-                                          () => _attachments.removeAt(index));
-                                      widget.onUpdate(_attachments
-                                          .map((e) => e!.id)
-                                          .toList());
-                                    },
-                                    onUpdate: (item) {
-                                      setState(
-                                          () => _attachments[index] = item);
-                                      widget.onUpdate(_attachments
-                                          .map((e) => e!.id)
-                                          .toList());
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+        child: DropRegion(
+          formats: Formats.standardFormats,
+          hitTestBehavior: HitTestBehavior.opaque,
+          onDropOver: (event) {
+            if (event.session.allowedOperations.contains(DropOperation.copy)) {
+              return DropOperation.copy;
+            } else {
+              return DropOperation.none;
+            }
+          },
+          onPerformDrop: (event) async {
+            for (final item in event.session.items) {
+              final reader = item.dataReader!;
+              for (final format
+                  in Formats.standardFormats.whereType<FileFormat>()) {
+                if (reader.canProvide(format)) {
+                  reader.getFile(format, (file) async {
+                    final data = await file.readAll();
+                    await uploadAttachment(
+                      data,
+                      file.fileName ?? 'attachment',
+                      await calculateBytesSha256(data),
                     );
-                  },
-                );
-              }),
-            ),
-            const Divider(thickness: 0.3, height: 0.3),
-            SizedBox(
-              height: 64,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 0,
-                  alignment: WrapAlignment.center,
-                  runAlignment: WrapAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.add_photo_alternate),
-                      label: Text('attachmentAddGalleryPhoto'.tr),
-                      style: const ButtonStyle(visualDensity: density),
-                      onPressed: () => pickPhotoToUpload(),
-                    ),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.add_road),
-                      label: Text('attachmentAddGalleryVideo'.tr),
-                      style: const ButtonStyle(visualDensity: density),
-                      onPressed: () => pickVideoToUpload(),
-                    ),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.photo_camera_back),
-                      label: Text('attachmentAddCameraPhoto'.tr),
-                      style: const ButtonStyle(visualDensity: density),
-                      onPressed: () => takeMediaToUpload(false),
-                    ),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.video_camera_back_outlined),
-                      label: Text('attachmentAddCameraVideo'.tr),
-                      style: const ButtonStyle(visualDensity: density),
-                      onPressed: () => takeMediaToUpload(true),
-                    ),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.file_present_rounded),
-                      label: Text('attachmentAddFile'.tr),
-                      style: const ButtonStyle(visualDensity: density),
-                      onPressed: () => pickFileToUpload(),
-                    ),
-                  ],
-                ).paddingSymmetric(horizontal: 12),
+                  }, onError: (error) {
+                    print('Error reading value $error');
+                  });
+                }
+              }
+            }
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'attachmentAdd'.tr,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
+              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+              Expanded(
+                child: Builder(builder: (context) {
+                  if (_isFirstTimeBusy && _isBusy) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: _attachments.length,
+                    itemBuilder: (context, index) {
+                      final element = _attachments[index];
+                      var fileType = element!.mimetype.split('/').firstOrNull;
+                      fileType ??= 'unknown';
+                      return Container(
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 8, bottom: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    element.alt,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              style: TextButton.styleFrom(
+                                shape: const CircleBorder(),
+                                foregroundColor: Theme.of(context).primaryColor,
+                              ),
+                              icon: const Icon(Icons.more_horiz),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AttachmentEditorDialog(
+                                      item: element,
+                                      onDelete: () {
+                                        setState(
+                                            () => _attachments.removeAt(index));
+                                        widget.onUpdate(_attachments
+                                            .map((e) => e!.id)
+                                            .toList());
+                                      },
+                                      onUpdate: (item) {
+                                        setState(
+                                            () => _attachments[index] = item);
+                                        widget.onUpdate(_attachments
+                                            .map((e) => e!.id)
+                                            .toList());
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }),
               ),
-            )
-          ],
+              const Divider(thickness: 0.3, height: 0.3),
+              SizedBox(
+                height: 64,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 0,
+                    alignment: WrapAlignment.center,
+                    runAlignment: WrapAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add_photo_alternate),
+                        label: Text('attachmentAddGalleryPhoto'.tr),
+                        style: const ButtonStyle(visualDensity: density),
+                        onPressed: () => pickPhotoToUpload(),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add_road),
+                        label: Text('attachmentAddGalleryVideo'.tr),
+                        style: const ButtonStyle(visualDensity: density),
+                        onPressed: () => pickVideoToUpload(),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.photo_camera_back),
+                        label: Text('attachmentAddCameraPhoto'.tr),
+                        style: const ButtonStyle(visualDensity: density),
+                        onPressed: () => takeMediaToUpload(false),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.video_camera_back_outlined),
+                        label: Text('attachmentAddCameraVideo'.tr),
+                        style: const ButtonStyle(visualDensity: density),
+                        onPressed: () => takeMediaToUpload(true),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.file_present_rounded),
+                        label: Text('attachmentAddFile'.tr),
+                        style: const ButtonStyle(visualDensity: density),
+                        onPressed: () => pickFileToUpload(),
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 12),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -365,8 +413,7 @@ class AttachmentEditorDialog extends StatefulWidget {
       required this.onUpdate});
 
   @override
-  State<AttachmentEditorDialog> createState() =>
-      _AttachmentEditorDialogState();
+  State<AttachmentEditorDialog> createState() => _AttachmentEditorDialogState();
 }
 
 class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {

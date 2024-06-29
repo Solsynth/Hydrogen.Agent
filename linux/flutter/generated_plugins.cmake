@@ -7,7 +7,9 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
   flutter_secure_storage_linux
   flutter_webrtc
+  irondash_engine_context
   sentry_flutter
+  super_native_extensions
   url_launcher_linux
 )
 

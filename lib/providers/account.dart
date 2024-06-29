@@ -179,7 +179,7 @@ class AccountProvider extends GetxController {
 
   Future<void> registerPushNotifications() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
+    if (!await auth.isAuthorized) return;
 
     late final String? token;
     late final String provider;

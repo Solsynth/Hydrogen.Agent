@@ -1,21 +1,40 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:image/image.dart' as img;
 
-Future<String> calculateFileSha256(File file) async {
-  final bytes = await Isolate.run(() => file.readAsBytesSync());
-  final digest = await Isolate.run(() => sha256.convert(bytes));
+Future<String> calculateBytesSha256(Uint8List data) async {
+  Digest digest;
+  if (PlatformInfo.isWeb) {
+    digest = sha256.convert(data);
+  } else {
+    digest = await Isolate.run(() => sha256.convert(data));
+  }
   return digest.toString();
 }
 
+Future<String> calculateFileSha256(File file) async {
+  Uint8List bytes;
+  if (PlatformInfo.isWeb) {
+    bytes = await file.readAsBytes();
+  } else {
+    bytes = await Isolate.run(() => file.readAsBytesSync());
+  }
+  return await calculateBytesSha256(bytes);
+}
+
 Future<double> calculateFileAspectRatio(File file) async {
+  if (PlatformInfo.isWeb) {
+    return 1;
+  }
   final bytes = await Isolate.run(() => file.readAsBytesSync());
   final decoder = await Isolate.run(() => img.findDecoderForData(bytes));
   if (decoder == null) return 1;
@@ -25,7 +44,10 @@ Future<double> calculateFileAspectRatio(File file) async {
 }
 
 class AttachmentProvider extends GetConnect {
-  static Map<String, String> mimetypeOverrides = {'mov': 'video/quicktime'};
+  static Map<String, String> mimetypeOverrides = {
+    'mov': 'video/quicktime',
+    'mp4': 'video/mp4'
+  };
 
   @override
   void onInit() {
@@ -45,7 +67,8 @@ class AttachmentProvider extends GetConnect {
     return resp;
   }
 
-  Future<Response> createAttachment(File file, String hash, String usage,
+  Future<Response> createAttachment(
+      Uint8List data, String path, String hash, String usage,
       {double? ratio}) async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
@@ -55,13 +78,12 @@ class AttachmentProvider extends GetConnect {
       timeout: const Duration(minutes: 3),
     );
 
-    final filePayload =
-        MultipartFile(await file.readAsBytes(), filename: basename(file.path));
-    final fileAlt = basename(file.path).contains('.')
-        ? basename(file.path).substring(0, basename(file.path).lastIndexOf('.'))
-        : basename(file.path);
-    final fileExt = basename(file.path)
-        .substring(basename(file.path).lastIndexOf('.') + 1)
+    final filePayload = MultipartFile(data, filename: basename(path));
+    final fileAlt = basename(path).contains('.')
+        ? basename(path).substring(0, basename(path).lastIndexOf('.'))
+        : basename(path);
+    final fileExt = basename(path)
+        .substring(basename(path).lastIndexOf('.') + 1)
         .toLowerCase();
 
     // Override for some files cannot be detected mimetype by server-side

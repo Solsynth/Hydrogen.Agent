@@ -179,12 +179,6 @@ class _AttachmentListState extends State<AttachmentList> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    getMetadataList();
-  }
-
-  @override
   Widget build(BuildContext context) {
     if (widget.attachmentsId.isEmpty) {
       return const SizedBox();
@@ -236,7 +230,8 @@ class _AttachmentListState extends State<AttachmentList> {
           const radius = BorderRadius.all(Radius.circular(16));
           return Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor, width: 1),
+              border:
+                  Border.all(color: Theme.of(context).dividerColor, width: 1),
               borderRadius: radius,
             ),
             child: ClipRRect(

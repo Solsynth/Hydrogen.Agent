@@ -88,7 +88,8 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       final file = File(image.path);
       final hash = await calculateFileSha256(file);
       attachResp = await provider.createAttachment(
-        file,
+        await file.readAsBytes(),
+        file.path,
         hash,
         'p.$position',
         ratio: await calculateFileAspectRatio(file),

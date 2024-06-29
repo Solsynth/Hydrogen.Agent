@@ -9,10 +9,12 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
   flutter_secure_storage_windows
   flutter_webrtc
+  irondash_engine_context
   livekit_client
   permission_handler_windows
   protocol_handler_windows
   sentry_flutter
+  super_native_extensions
   url_launcher_windows
   video_player_win
 )

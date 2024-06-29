@@ -30,6 +30,13 @@
             </intent-filter>
         </receiver>
 
+        <provider
+                android:name="com.superlist.super_native_extensions.DataProvider"
+                android:authorities="dev.solsynth.solian.SuperClipboardDataProvider"
+                android:exported="true"
+                android:grantUriPermissions="true" >
+        </provider>
+
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
