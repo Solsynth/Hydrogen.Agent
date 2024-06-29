@@ -43,10 +43,6 @@ void main() async {
 
       if (PlatformInfo.isDesktop) {
         await Window.initialize();
-        await Window.setEffect(
-          effect: WindowEffect.transparent,
-          dark: true,
-        );
 
         if (PlatformInfo.isMacOS) {
           await Window.hideTitle();
