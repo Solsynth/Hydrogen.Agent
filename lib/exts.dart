@@ -12,6 +12,23 @@ extension SolianExtenions on BuildContext {
     ScaffoldMessenger.of(this).clearSnackBars();
   }
 
+  Future<void> showModalDialog(String title, desc) {
+    return showDialog<void>(
+      useRootNavigator: true,
+      context: this,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(desc),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('okay'.tr),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> showErrorDialog(dynamic exception) {
     return showDialog<void>(
       useRootNavigator: true,

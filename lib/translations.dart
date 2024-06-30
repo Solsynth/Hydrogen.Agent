@@ -4,6 +4,7 @@ class SolianMessages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'en_US': {
+          'done': 'Done',
           'hide': 'Hide',
           'okay': 'Okay',
           'next': 'Next',
@@ -25,6 +26,7 @@ class SolianMessages extends Translations {
           'openInBrowser': 'Open in browser',
           'notification': 'Notification',
           'errorHappened': 'An error occurred',
+          'forgotPassword': 'Forgot password',
           'email': 'Email',
           'username': 'Username',
           'nickname': 'Nickname',
@@ -56,6 +58,8 @@ class SolianMessages extends Translations {
               'Sign in to create post, start a realm, message your friend and more!',
           'signinRiskDetected':
               'Risk detected, click Next to open a webpage and signin through it to pass security check.',
+          'signinResetPasswordHint': 'Please enter username to request reset password.',
+          'signinResetPasswordSent': 'Reset password request sent, check your inbox!',
           'signup': 'Sign up',
           'signupGreeting': 'Welcome onboard',
           'signupCaption':
@@ -241,6 +245,7 @@ class SolianMessages extends Translations {
           'accountStatusPositive': 'Positive',
         },
         'zh_CN': {
+          'done': '完成',
           'hide': '隐藏',
           'okay': '确认',
           'next': '下一步',
@@ -262,6 +267,7 @@ class SolianMessages extends Translations {
           'openInBrowser': '在浏览器中打开',
           'notification': '通知',
           'errorHappened': '发生错误了',
+          'forgotPassword': '忘记密码',
           'email': '邮件地址',
           'username': '用户名',
           'nickname': '显示名',
@@ -289,6 +295,8 @@ class SolianMessages extends Translations {
           'signinGreeting': '欢迎回来\nSolar Network',
           'signinCaption': '登录以发表帖子、文章、创建领域、和你的朋友聊天，以及获取更多功能！',
           'signinRiskDetected': '检测到风险，点击下一步按钮来打开一个网页，并通过在其上面登录来通过安全检查。',
+          'signinResetPasswordHint': '请先填写用户名以发送重置密码请求。',
+          'signinResetPasswordSent': '重置密码请求已发送，在绑定邮件收件箱可收取一份包含重置密码链接的邮件。',
           'signup': '注册',
           'signupGreeting': '欢迎加入\nSolar Network',
           'signupCaption': '在 Solarpass 注册一个账号以获得整个 Solar Network 的存取权！',

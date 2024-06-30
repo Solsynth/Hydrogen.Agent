@@ -19,6 +19,36 @@ class _SignInPopupState extends State<SignInPopup> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  void requestResetPassword(BuildContext context) async {
+    final username = _usernameController.value.text;
+    if (username.isEmpty) {
+      context.showErrorDialog('signinResetPasswordHint'.tr);
+      return;
+    }
+
+    setState(() => _isBusy = true);
+
+    final client = ServiceFinder.configureClient('passport');
+    final lookupResp = await client.get('/api/users/lookup?probe=$username');
+    if (lookupResp.statusCode != 200) {
+      context.showErrorDialog(lookupResp.bodyString);
+      setState(() => _isBusy = false);
+      return;
+    }
+
+    final resp = await client.post('/api/users/me/password-reset', {
+      'user_id': lookupResp.body['id'],
+    });
+    if (resp.statusCode != 200) {
+      context.showErrorDialog(resp.bodyString);
+      setState(() => _isBusy = false);
+      return;
+    }
+
+    setState(() => _isBusy = false);
+    context.showModalDialog('done'.tr, 'signinResetPasswordSent'.tr);
+  }
+
   void performAction(BuildContext context) async {
     final AuthProvider provider = Get.find();
 
@@ -117,19 +147,27 @@ class _SignInPopupState extends State<SignInPopup> {
                 onSubmitted: (_) => performAction(context),
               ),
               const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _isBusy ? null : () => performAction(context),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('next'.tr),
-                      const Icon(Icons.chevron_right),
-                    ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed:
+                        _isBusy ? null : () => requestResetPassword(context),
+                    style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                    child: Text('forgotPassword'.tr),
                   ),
-                ),
-              )
+                  TextButton(
+                    onPressed: _isBusy ? null : () => performAction(context),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('next'.tr),
+                        const Icon(Icons.chevron_right),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
