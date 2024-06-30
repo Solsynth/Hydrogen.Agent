@@ -158,30 +158,44 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     final clipboard = SystemClipboard.instance;
     if (clipboard == null) return;
     final reader = await clipboard.read();
-    for (final format in Formats.standardFormats.whereType<FileFormat>()) {
-      if (reader.canProvide(format)) {
-        reader.getFile(format, (file) async {
-          final data = await file.readAll();
-          await uploadAttachment(
-            data,
-            file.fileName ?? 'unknown',
-            await calculateBytesSha256(data),
-          );
-        });
-      }
-    }
+    handleNativeReader(reader);
   }
 
-  void handlePasteFile(ClipboardReadEvent event) async {
+  void handlePasteEvent(ClipboardReadEvent event) async {
     final reader = await event.getClipboardReader();
-    for (final format in Formats.standardFormats.whereType<FileFormat>()) {
+    handleNativeReader(reader);
+  }
+
+  void handleNativeReader(DataReader reader) async {
+    var read = false;
+    for (final format in Formats.standardFormats
+        .whereType<FileFormat>()
+        .where((x) => ![Formats.tiff].contains(x))) {
+      if (read) break;
       if (reader.canProvide(format)) {
         reader.getFile(format, (file) async {
+          if (read) return;
+
           final data = await file.readAll();
+          read = true;
+
+          // Calculate ratio if available
+          double? ratio;
+          if ([
+            Formats.png,
+            Formats.jpeg,
+            Formats.gif,
+            Formats.ico,
+            Formats.webp
+          ].contains(format)) {
+            ratio = await calculateDataAspectRatio(data);
+          }
+
           await uploadAttachment(
             data,
             file.fileName ?? 'unknown',
             await calculateBytesSha256(data),
+            ratio: ratio,
           );
         });
       }
@@ -262,13 +276,13 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
   void initState() {
     super.initState();
     revertMetadataList();
-    ClipboardEvents.instance?.registerPasteEventListener(handlePasteFile);
+    ClipboardEvents.instance?.registerPasteEventListener(handlePasteEvent);
   }
 
   @override
   void dispose() {
     super.dispose();
-    ClipboardEvents.instance?.unregisterPasteEventListener(handlePasteFile);
+    ClipboardEvents.instance?.unregisterPasteEventListener(handlePasteEvent);
   }
 
   @override
@@ -291,19 +305,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
           onPerformDrop: (event) async {
             for (final item in event.session.items) {
               final reader = item.dataReader!;
-              for (final format
-                  in Formats.standardFormats.whereType<FileFormat>()) {
-                if (reader.canProvide(format)) {
-                  reader.getFile(format, (file) async {
-                    final data = await file.readAll();
-                    await uploadAttachment(
-                      data,
-                      file.fileName ?? 'unknown',
-                      await calculateBytesSha256(data),
-                    );
-                  });
-                }
-              }
+              handleNativeReader(reader);
             }
           },
           child: Column(

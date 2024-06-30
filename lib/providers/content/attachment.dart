@@ -31,16 +31,23 @@ Future<String> calculateFileSha256(File file) async {
   return await calculateBytesSha256(bytes);
 }
 
+Future<double> calculateDataAspectRatio(Uint8List data) async {
+  if (PlatformInfo.isWeb) {
+    return 1;
+  }
+  final decoder = await Isolate.run(() => img.findDecoderForData(data));
+  if (decoder == null) return 1;
+  final image = await Isolate.run(() => decoder.decode(data));
+  if (image == null) return 1;
+  return image.width / image.height;
+}
+
 Future<double> calculateFileAspectRatio(File file) async {
   if (PlatformInfo.isWeb) {
     return 1;
   }
   final bytes = await Isolate.run(() => file.readAsBytesSync());
-  final decoder = await Isolate.run(() => img.findDecoderForData(bytes));
-  if (decoder == null) return 1;
-  final image = await Isolate.run(() => decoder.decode(bytes));
-  if (image == null) return 1;
-  return image.width / image.height;
+  return await calculateDataAspectRatio(bytes);
 }
 
 class AttachmentProvider extends GetConnect {

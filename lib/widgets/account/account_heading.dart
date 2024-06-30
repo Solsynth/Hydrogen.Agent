@@ -82,17 +82,25 @@ class AccountHeadingWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  Text(
-                    nick,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ).paddingOnly(right: 4),
-                  Text(
-                    '@$name',
-                    style: const TextStyle(
-                      fontSize: 15,
+                  Flexible(
+                    child: Text(
+                      nick,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ).paddingOnly(right: 4),
+                  ),
+                  Flexible(
+                    child: Text(
+                      '@$name',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ],
