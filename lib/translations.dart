@@ -58,12 +58,17 @@ class SolianMessages extends Translations {
               'Sign in to create post, start a realm, message your friend and more!',
           'signinRiskDetected':
               'Risk detected, click Next to open a webpage and signin through it to pass security check.',
-          'signinResetPasswordHint': 'Please enter username to request reset password.',
-          'signinResetPasswordSent': 'Reset password request sent, check your inbox!',
+          'signinResetPasswordHint':
+              'Please enter username to request reset password.',
+          'signinResetPasswordSent':
+              'Reset password request sent, check your inbox!',
           'signup': 'Sign up',
           'signupGreeting': 'Welcome onboard',
           'signupCaption':
               'Create an account on Solarpass and then get the access of entire Solar Network!',
+          'signupDone': 'Sign up successfully.',
+          'signupDoneCaption':
+              'You successfully created an account on Solar Network. Now go sign in!',
           'signout': 'Sign out',
           'joinedAt': 'Joined at @date',
           'riskDetection': 'Risk Detected',
@@ -300,6 +305,8 @@ class SolianMessages extends Translations {
           'signup': '注册',
           'signupGreeting': '欢迎加入\nSolar Network',
           'signupCaption': '在 Solarpass 注册一个账号以获得整个 Solar Network 的存取权！',
+          'signupDone': '注册成功',
+          'signupDoneCaption': '你成功地注册了一个帐户，现在去尝试登陆吧！',
           'signout': '登出',
           'joinedAt': '加入于 @date',
           'riskDetection': '检测到风险',

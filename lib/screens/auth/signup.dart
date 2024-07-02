@@ -20,7 +20,7 @@ class _SignUpPopupState extends State<SignUpPopup> {
   void performAction(BuildContext context) async {
     final email = _emailController.value.text;
     final username = _usernameController.value.text;
-    final nickname = _passwordController.value.text;
+    final nickname = _nicknameController.value.text;
     final password = _passwordController.value.text;
     if (email.isEmpty ||
         username.isEmpty ||
@@ -45,14 +45,14 @@ class _SignUpPopupState extends State<SignUpPopup> {
             content: Text('signupDoneCaption'.tr),
             actions: [
               TextButton(
-                child: Text('confirmOkay'.tr),
+                child: Text('okay'.tr),
                 onPressed: () => Navigator.pop(context),
               ),
             ],
           );
         },
       ).then((_) {
-        AppRouter.instance.replaceNamed('auth.sign-in');
+        Navigator.pop(context);
       });
     } else {
       context.showErrorDialog(resp.bodyString);
