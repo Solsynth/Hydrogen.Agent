@@ -33,30 +33,37 @@ void main() async {
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      if (!PlatformInfo.isWeb) {
-        await protocolHandler.register('solink');
-      }
-
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-
-      if (PlatformInfo.isDesktop) {
-        await Window.initialize();
-
-        if (PlatformInfo.isMacOS) {
-          await Window.hideTitle();
-          await Window.hideCloseButton();
-          await Window.hideMiniaturizeButton();
-          await Window.hideZoomButton();
-          await Window.makeTitlebarTransparent();
-          await Window.enableFullSizeContentView();
-        }
-      }
+      _initializeFirebase();
+      _initializePlatformComponents();
 
       runApp(const SolianApp());
     },
   );
+}
+
+Future<void> _initializeFirebase() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+}
+
+Future<void> _initializePlatformComponents() async {
+  if (!PlatformInfo.isWeb) {
+    await protocolHandler.register('solink');
+  }
+
+  if (PlatformInfo.isDesktop) {
+    await Window.initialize();
+
+    if (PlatformInfo.isMacOS) {
+      await Future.wait([
+        Window.hideTitle(),
+        Window.hideCloseButton(),
+        Window.hideMiniaturizeButton(),
+        Window.hideZoomButton(),
+        Window.makeTitlebarTransparent(),
+        Window.enableFullSizeContentView(),
+      ]);
+    }
+  }
 }
 
 class SolianApp extends StatelessWidget {
@@ -75,33 +82,7 @@ class SolianApp extends StatelessWidget {
       translations: SolianMessages(),
       locale: Get.deviceLocale,
       fallbackLocale: const Locale('en', 'US'),
-      onInit: () {
-        Get.lazyPut(() => AuthProvider());
-        Get.lazyPut(() => FriendProvider());
-        Get.lazyPut(() => PostProvider());
-        Get.lazyPut(() => AttachmentProvider());
-        Get.lazyPut(() => ChatProvider());
-        Get.lazyPut(() => AccountProvider());
-        Get.lazyPut(() => StatusProvider());
-        Get.lazyPut(() => ChannelProvider());
-        Get.lazyPut(() => RealmProvider());
-        Get.lazyPut(() => ChatCallProvider());
-
-        final AuthProvider auth = Get.find();
-        auth.isAuthorized.then((value) async {
-          if (value) {
-            Get.find<AccountProvider>().connect();
-            Get.find<ChatProvider>().connect();
-
-            try {
-              Get.find<AccountProvider>().registerPushNotifications();
-            } catch (err) {
-              context.showSnackbar('pushNotifyRegisterFailed'
-                  .trParams({'reason': err.toString()}));
-            }
-          }
-        });
-      },
+      onInit: () => _initializeProviders(context),
       builder: (context, child) {
         return ListenerShell(
           child: ScaffoldMessenger(
@@ -110,5 +91,34 @@ class SolianApp extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _initializeProviders(BuildContext context) {
+    Get.lazyPut(() => AuthProvider());
+    Get.lazyPut(() => FriendProvider());
+    Get.lazyPut(() => PostProvider());
+    Get.lazyPut(() => AttachmentProvider());
+    Get.lazyPut(() => ChatProvider());
+    Get.lazyPut(() => AccountProvider());
+    Get.lazyPut(() => StatusProvider());
+    Get.lazyPut(() => ChannelProvider());
+    Get.lazyPut(() => RealmProvider());
+    Get.lazyPut(() => ChatCallProvider());
+
+    final AuthProvider auth = Get.find();
+    auth.isAuthorized.then((value) async {
+      if (value) {
+        Get.find<AccountProvider>().connect();
+        Get.find<ChatProvider>().connect();
+
+        try {
+          Get.find<AccountProvider>().registerPushNotifications();
+        } catch (err) {
+          context.showSnackbar(
+            'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),
+          );
+        }
+      }
+    });
   }
 }

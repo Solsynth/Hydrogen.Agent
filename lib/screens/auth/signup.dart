@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 
 class SignUpPopup extends StatefulWidget {

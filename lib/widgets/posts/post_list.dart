@@ -26,29 +26,31 @@ class PostListWidget extends StatelessWidget {
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
-          return GestureDetector(
-            child: PostItem(
-              key: Key('p${item.alias}'),
-              item: item,
-              isShowEmbed: isShowEmbed,
-              isClickable: isNestedClickable,
-            ).paddingSymmetric(vertical: 8),
-            onTap: () {
-              if (!isClickable) return;
-              AppRouter.instance.pushNamed(
-                'postDetail',
-                pathParameters: {'alias': item.alias},
-              );
-            },
-            onLongPress: () {
-              showModalBottomSheet(
-                useRootNavigator: true,
-                context: context,
-                builder: (context) => PostAction(item: item),
-              ).then((value) {
-                if (value != null) controller.refresh();
-              });
-            },
+          return RepaintBoundary(
+            child: GestureDetector(
+              child: PostItem(
+                key: Key('p${item.alias}'),
+                item: item,
+                isShowEmbed: isShowEmbed,
+                isClickable: isNestedClickable,
+              ).paddingSymmetric(vertical: 8),
+              onTap: () {
+                if (!isClickable) return;
+                AppRouter.instance.pushNamed(
+                  'postDetail',
+                  pathParameters: {'alias': item.alias},
+                );
+              },
+              onLongPress: () {
+                showModalBottomSheet(
+                  useRootNavigator: true,
+                  context: context,
+                  builder: (context) => PostAction(item: item),
+                ).then((value) {
+                  if (value != null) controller.refresh();
+                });
+              },
+            ),
           );
         },
       ),

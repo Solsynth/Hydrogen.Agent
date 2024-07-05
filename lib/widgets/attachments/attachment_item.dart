@@ -46,7 +46,9 @@ class _AttachmentItemState extends State<AttachmentItem> {
     _chewieController = ChewieController(
       aspectRatio: widget.item.metadata?['ratio'] ?? 16 / 9,
       videoPlayerController: _videoPlayerController!,
-      customControls: const MaterialControls(showPlayButton: true),
+      customControls: PlatformInfo.isMobile
+          ? const MaterialControls()
+          : const MaterialDesktopControls(),
       materialProgressColors: ChewieProgressColors(
         playedColor: Theme.of(context).colorScheme.primary,
         handleColor: Theme.of(context).colorScheme.primary,
