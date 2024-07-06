@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/exts.dart';
@@ -32,6 +33,7 @@ void main() async {
     },
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
+      MediaKit.ensureInitialized();
 
       await Future.wait([
         _initializeFirebase(),

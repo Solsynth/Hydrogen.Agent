@@ -11,15 +11,18 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_webrtc
   irondash_engine_context
   livekit_client
+  media_kit_libs_windows_video
+  media_kit_video
   permission_handler_windows
   protocol_handler_windows
+  screen_brightness_windows
   sentry_flutter
   super_native_extensions
   url_launcher_windows
-  video_player_win
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  media_kit_native_event_loop
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

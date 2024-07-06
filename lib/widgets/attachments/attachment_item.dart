@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
   final String parentId;
@@ -195,38 +195,33 @@ class _AttachmentItemVideo extends StatefulWidget {
 }
 
 class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
-  VideoPlayerController? _videoPlayerController;
-  ChewieController? _chewieController;
+  late final _player = Player(
+    configuration: const PlayerConfiguration(logLevel: MPVLogLevel.error),
+  );
+  late final _controller = VideoController(_player);
 
-  void ensureInitVideo() {
-    if (_videoPlayerController != null) return;
-    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
-      '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
-    ));
-    _videoPlayerController!.initialize();
-    _chewieController = ChewieController(
-      aspectRatio: widget.item.metadata?['ratio'] ?? 16 / 9,
-      videoPlayerController: _videoPlayerController!,
-      customControls: PlatformInfo.isMobile
-          ? const MaterialControls()
-          : const MaterialDesktopControls(),
-      materialProgressColors: ChewieProgressColors(
-        playedColor: Theme.of(context).colorScheme.primary,
-        handleColor: Theme.of(context).colorScheme.primary,
+  @override
+  void initState() {
+    super.initState();
+    _player.open(
+      Media(
+        '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
       ),
+      play: false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    ensureInitVideo();
-    return Chewie(controller: _chewieController!);
+    return Video(
+      aspectRatio: widget.item.metadata?['ratio'] ?? 16 / 9,
+      controller: _controller,
+    );
   }
 
   @override
   void dispose() {
-    _videoPlayerController?.dispose();
-    _chewieController?.dispose();
+    _player.dispose();
     super.dispose();
   }
 }

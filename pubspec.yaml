@@ -33,9 +33,6 @@ dependencies:
   permission_handler: ^11.3.1
   uuid: ^4.4.0
   dropdown_button2: ^2.3.9
-  video_player: ^2.8.6
-  video_player_win: ^2.3.6
-  chewie: ^1.8.1
   livekit_client: ^2.1.5
   flutter_webrtc: ^0.10.7
   wakelock_plus: ^1.2.5
@@ -45,7 +42,6 @@ dependencies:
   firebase_messaging: ^15.0.0
   package_info_plus: ^8.0.0
   device_info_plus: ^10.1.0
-  shared_preferences: ^2.2.3
   flutter_acrylic: ^1.1.4
   floor: ^1.5.0
   sqflite: ^2.3.3+1
@@ -53,6 +49,9 @@ dependencies:
   markdown: ^7.2.2
   super_drag_and_drop: ^0.8.17
   super_clipboard: ^0.8.17
+  media_kit: ^1.1.10+1
+  media_kit_video: ^1.2.4
+  media_kit_libs_video: ^1.0.4
 
 dev_dependencies:
   flutter_test:
