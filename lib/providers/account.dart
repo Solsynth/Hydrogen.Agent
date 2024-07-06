@@ -13,7 +13,7 @@ import 'package:solian/models/pagination.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
-import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class AccountProvider extends GetxController {
@@ -27,7 +27,7 @@ class AccountProvider extends GetxController {
   RxList<Notification> notifications =
       List<Notification>.empty(growable: true).obs;
 
-  IOWebSocketChannel? websocket;
+  WebSocketChannel? websocket;
 
   @override
   onInit() {
@@ -66,7 +66,7 @@ class AccountProvider extends GetxController {
     isConnecting.value = true;
 
     try {
-      websocket = IOWebSocketChannel.connect(uri);
+      websocket = WebSocketChannel.connect(uri);
       await websocket?.ready;
     } catch (e) {
       if (!noRetry) {

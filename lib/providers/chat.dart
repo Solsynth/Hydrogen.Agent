@@ -6,13 +6,13 @@ import 'package:get/get.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
-import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatProvider extends GetxController {
   RxBool isConnected = false.obs;
   RxBool isConnecting = false.obs;
 
-  IOWebSocketChannel? websocket;
+  WebSocketChannel? websocket;
 
   StreamController<NetworkPackage> stream = StreamController.broadcast();
 
@@ -36,7 +36,7 @@ class ChatProvider extends GetxController {
     isConnecting.value = true;
 
     try {
-      websocket = IOWebSocketChannel.connect(uri);
+      websocket = WebSocketChannel.connect(uri);
       await websocket?.ready;
     } catch (e) {
       if (!noRetry) {
