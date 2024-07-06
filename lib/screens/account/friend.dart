@@ -186,13 +186,14 @@ class _FriendScreenState extends State<FriendScreen> {
                       showScopedListPopup('accountFriendBlocked'.tr, 2),
                 ),
               ),
-              SliverFriendList(
-                accountId: _accountId!,
-                items: filterWithStatus(1),
-                onUpdate: () {
-                  getFriendship();
-                },
-              ),
+              if (_accountId != null)
+                SliverFriendList(
+                  accountId: _accountId!,
+                  items: filterWithStatus(1),
+                  onUpdate: () {
+                    getFriendship();
+                  },
+                ),
               const SliverToBoxAdapter(
                 child: Divider(thickness: 0.3, height: 0.3),
               ),

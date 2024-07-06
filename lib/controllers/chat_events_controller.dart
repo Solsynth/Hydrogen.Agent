@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/platform.dart';
-import 'package:solian/providers/message/helper.dart';
+import 'package:solian/providers/message/adaptor.dart';
 import 'package:solian/providers/message/events.dart';
 
 class ChatEventController {
@@ -57,11 +57,13 @@ class ChatEventController {
       totalEvents.value = result?.$2 ?? 0;
       if (result != null) {
         for (final x in result.$1.reversed) {
-          applyEvent(LocalEvent(x.id, x, x.channelId, x.createdAt));
+          final entry = LocalEvent(x.id, x, x.channelId, x.createdAt);
+          insertEvent(entry);
+          applyEvent(entry);
         }
       }
     } else {
-      final result = await database.syncEvents(
+      final result = await database.syncRemoteEvents(
         channel,
         scope: scope,
       );
@@ -80,14 +82,16 @@ class ChatEventController {
         remainDepth: 3,
         offset: currentEvents.length,
       );
-      totalEvents.value = result?.$2 ?? 0;
       if (result != null) {
+        totalEvents.value = result.$2;
         for (final x in result.$1.reversed) {
-          applyEvent(LocalEvent(x.id, x, x.channelId, x.createdAt));
+          final entry = LocalEvent(x.id, x, x.channelId, x.createdAt);
+          currentEvents.add(entry);
+          applyEvent(entry);
         }
       }
     } else {
-      final result = await database.syncEvents(
+      final result = await database.syncRemoteEvents(
         channel,
         depth: 3,
         scope: scope,
@@ -102,6 +106,7 @@ class ChatEventController {
   Future<bool> syncLocal(Channel channel) async {
     if (PlatformInfo.isWeb) return false;
     final data = await database.localEvents.findAllByChannel(channel.id);
+    currentEvents.replaceRange(0, currentEvents.length, data);
     for (final x in data.reversed) {
       applyEvent(x);
     }
@@ -121,18 +126,21 @@ class ChatEventController {
       entry = await database.receiveEvent(remote);
     }
 
+    insertEvent(entry);
     applyEvent(entry);
   }
 
-  applyEvent(LocalEvent entry) {
-    if (entry.channelId != channel?.id) return;
-
+  insertEvent(LocalEvent entry) {
     final idx = currentEvents.indexWhere((x) => x.data.uuid == entry.data.uuid);
     if (idx != -1) {
       currentEvents[idx] = entry;
     } else {
       currentEvents.insert(0, entry);
     }
+  }
+
+  applyEvent(LocalEvent entry) {
+    if (entry.channelId != channel?.id) return;
 
     switch (entry.data.type) {
       case 'messages.edit':

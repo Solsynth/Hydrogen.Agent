@@ -81,7 +81,7 @@ Future<(List<Event>, int)?> getRemoteEvents(
   return ([...result, ...expandResult], response.count);
 }
 
-extension MessageHistoryHelper on MessageHistoryDb {
+extension MessageHistoryAdaptor on MessageHistoryDb {
   Future<LocalEvent> receiveEvent(Event remote) async {
     final entry = LocalEvent(
       remote.id,
@@ -121,7 +121,7 @@ extension MessageHistoryHelper on MessageHistoryDb {
     return await receiveEvent(remoteRecord);
   }
 
-  Future<(List<Event>, int)?> syncEvents(Channel channel,
+  Future<(List<Event>, int)?> syncRemoteEvents(Channel channel,
       {String scope = 'global', depth = 10, offset = 0}) async {
     final lastOne = await localEvents.findLastByChannel(channel.id);
 
@@ -145,7 +145,7 @@ extension MessageHistoryHelper on MessageHistoryDb {
     return data;
   }
 
-  Future<List<LocalEvent>> listMessages(Channel channel) async {
+  Future<List<LocalEvent>> listEvents(Channel channel) async {
     return await localEvents.findAllByChannel(channel.id);
   }
 }

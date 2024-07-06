@@ -21,7 +21,7 @@ import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
-import 'package:solian/widgets/chat/chat_event_action.dart';
+import 'package:solian/widgets/chat/chat_event_list.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
 import 'package:solian/widgets/current_state_action.dart';
 
@@ -111,7 +111,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       switch (event.method) {
         case 'events.new':
           final payload = Event.fromJson(event.payload!);
-            _chatController.receiveEvent(payload);
+          _chatController.receiveEvent(payload);
           break;
         case 'calls.new':
           final payload = Call.fromJson(event.payload!);
@@ -122,12 +122,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           break;
       }
     });
-  }
-
-  bool checkMessageMergeable(Event? a, Event? b) {
-    if (a == null || b == null) return false;
-    if (a.sender.account.id != b.sender.account.id) return false;
-    return a.createdAt.difference(b.createdAt).inMinutes <= 3;
   }
 
   void showCallPrejoin() {
@@ -150,50 +144,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       item: item,
       isMerged: isMerged,
       chatController: _chatController,
-    );
-  }
-
-  Widget buildHistory(context, index) {
-    bool isMerged = false, hasMerged = false;
-    if (index > 0) {
-      hasMerged = checkMessageMergeable(
-        _chatController.currentEvents[index - 1].data,
-        _chatController.currentEvents[index].data,
-      );
-    }
-    if (index + 1 < _chatController.currentEvents.length) {
-      isMerged = checkMessageMergeable(
-        _chatController.currentEvents[index].data,
-        _chatController.currentEvents[index + 1].data,
-      );
-    }
-
-    final item = _chatController.currentEvents[index].data;
-
-    return InkWell(
-      child: Container(
-        child: buildHistoryBody(item, isMerged: isMerged).paddingOnly(
-          top: !isMerged ? 8 : 0,
-          bottom: !hasMerged ? 8 : 0,
-        ),
-      ),
-      onLongPress: () {
-        showModalBottomSheet(
-          useRootNavigator: true,
-          context: context,
-          builder: (context) => ChatEventAction(
-            channel: _channel!,
-            realm: _channel!.realm,
-            item: item,
-            onEdit: () {
-              setState(() => _messageToEditing = item);
-            },
-            onReply: () {
-              setState(() => _messageToReplying = item);
-            },
-          ),
-        );
-      },
     );
   }
 
@@ -283,120 +233,81 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            children: [
-              Expanded(
-                child: CustomScrollView(
-                  reverse: true,
-                  slivers: [
-                    Obx(() {
-                      return SliverList.builder(
-                        key: Key('chat-history#${_channel!.id}'),
-                        itemCount: _chatController.currentEvents.length,
-                        itemBuilder: buildHistory,
-                      );
-                    }),
-                    Obx(() {
-                      final amount = _chatController.totalEvents -
-                          _chatController.currentEvents.length;
-
-                      if (amount.value <= 0 ||
-                          _chatController.isLoading.isTrue) {
-                        return const SliverToBoxAdapter(child: SizedBox());
-                      }
-
-                      return SliverToBoxAdapter(
-                        child: ListTile(
-                          tileColor:
-                              Theme.of(context).colorScheme.surfaceContainerLow,
-                          leading: const Icon(Icons.sync_disabled),
-                          title: Text('messageUnsync'.tr),
-                          subtitle: Text('messageUnsyncCaption'.trParams({
-                            'count': amount.string,
-                          })),
-                          onTap: () {
-                            _chatController.loadEvents(
-                              _channel!,
-                              widget.realm,
-                            );
-                          },
-                        ),
-                      );
-                    }),
-                    Obx(() {
-                      if (_chatController.isLoading.isFalse) {
-                        return const SliverToBoxAdapter(child: SizedBox());
-                      }
-
-                      return SliverToBoxAdapter(
-                        child: const LinearProgressIndicator().animate().slideY(),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-              ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                  child: SafeArea(
-                    child: ChatMessageInput(
-                      edit: _messageToEditing,
-                      reply: _messageToReplying,
-                      realm: widget.realm,
-                      placeholder: placeholder,
-                      channel: _channel!,
-                      onSent: (Event item) {
-                        setState(() {
-                          _chatController.addPendingEvent(item);
-                        });
-                      },
-                      onReset: () {
-                        setState(() {
-                          _messageToReplying = null;
-                          _messageToEditing = null;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
           if (_ongoingCall != null)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: MaterialBanner(
-                padding: const EdgeInsets.only(left: 16, top: 4, bottom: 4),
-                leading: const Icon(Icons.call_received),
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-                dividerColor: Colors.transparent,
-                content: Text('callOngoing'.tr),
-                actions: [
-                  Obx(() {
-                    if (call.current.value == null) {
-                      return TextButton(
-                        onPressed: showCallPrejoin,
-                        child: Text('callJoin'.tr),
-                      );
-                    } else if (call.channel.value?.id == _channel?.id) {
-                      return TextButton(
-                        onPressed: () => call.gotoScreen(context),
-                        child: Text('callResume'.tr),
-                      );
-                    } else {
-                      return TextButton(
-                        onPressed: null,
-                        child: Text('callJoin'.tr),
-                      );
-                    }
-                  })
-                ],
+            MaterialBanner(
+              padding: const EdgeInsets.only(left: 16, top: 4, bottom: 4),
+              leading: const Icon(Icons.call_received),
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+              dividerColor: Colors.transparent,
+              content: Text('callOngoing'.tr),
+              actions: [
+                Obx(() {
+                  if (call.current.value == null) {
+                    return TextButton(
+                      onPressed: showCallPrejoin,
+                      child: Text('callJoin'.tr),
+                    );
+                  } else if (call.channel.value?.id == _channel?.id) {
+                    return TextButton(
+                      onPressed: () => call.gotoScreen(context),
+                      child: Text('callResume'.tr),
+                    );
+                  } else {
+                    return TextButton(
+                      onPressed: null,
+                      child: Text('callJoin'.tr),
+                    );
+                  }
+                })
+              ],
+            ),
+          Expanded(
+            child: ChatEventList(
+              scope: widget.realm,
+              channel: _channel!,
+              chatController: _chatController,
+              onEdit: (item) {
+                setState(() => _messageToEditing = item);
+              },
+              onReply: (item) {
+                setState(() => _messageToReplying = item);
+              },
+            ),
+          ),
+          Obx(() {
+            if (_chatController.isLoading.isTrue) {
+              return const LinearProgressIndicator().animate().slideY();
+            } else {
+              return const SizedBox();
+            }
+          }),
+          ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+              child: SafeArea(
+                child: ChatMessageInput(
+                  edit: _messageToEditing,
+                  reply: _messageToReplying,
+                  realm: widget.realm,
+                  placeholder: placeholder,
+                  channel: _channel!,
+                  onSent: (Event item) {
+                    setState(() {
+                      _chatController.addPendingEvent(item);
+                    });
+                  },
+                  onReset: () {
+                    setState(() {
+                      _messageToReplying = null;
+                      _messageToEditing = null;
+                    });
+                  },
+                ),
               ),
             ),
+          ),
         ],
       ),
     );
