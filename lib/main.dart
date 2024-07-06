@@ -19,7 +19,6 @@ import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
-import 'package:solian/shells/listener_shell.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
 
@@ -83,15 +82,14 @@ class SolianApp extends StatelessWidget {
       routerDelegate: AppRouter.instance.routerDelegate,
       routeInformationParser: AppRouter.instance.routeInformationParser,
       routeInformationProvider: AppRouter.instance.routeInformationProvider,
+      backButtonDispatcher: AppRouter.instance.backButtonDispatcher,
       translations: SolianMessages(),
       locale: Get.deviceLocale,
       fallbackLocale: const Locale('en', 'US'),
       onInit: () => _initializeProviders(context),
       builder: (context, child) {
-        return ListenerShell(
-          child: ScaffoldMessenger(
-            child: child ?? Container(),
-          ),
+        return ScaffoldMessenger(
+          child: child ?? const SizedBox(),
         );
       },
     );

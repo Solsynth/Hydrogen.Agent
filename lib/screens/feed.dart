@@ -12,14 +12,14 @@ import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
-class SocialScreen extends StatefulWidget {
-  const SocialScreen({super.key});
+class FeedScreen extends StatefulWidget {
+  const FeedScreen({super.key});
 
   @override
-  State<SocialScreen> createState() => _SocialScreenState();
+  State<FeedScreen> createState() => _FeedScreenState();
 }
 
-class _SocialScreenState extends State<SocialScreen> {
+class _FeedScreenState extends State<FeedScreen> {
   final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 
@@ -52,26 +52,7 @@ class _SocialScreenState extends State<SocialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthProvider auth = Get.find();
-
     return Scaffold(
-      floatingActionButton: FutureBuilder(
-          future: auth.isAuthorized,
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data == true) {
-              return FloatingActionButton(
-                child: const Icon(Icons.add),
-                onPressed: () async {
-                  final value =
-                      await AppRouter.instance.pushNamed('postPublishing');
-                  if (value != null) {
-                    _pagingController.refresh();
-                  }
-                },
-              );
-            }
-            return Container();
-          }),
       body: Material(
         color: Theme.of(context).colorScheme.surface,
         child: RefreshIndicator(
@@ -79,7 +60,7 @@ class _SocialScreenState extends State<SocialScreen> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                title: AppBarTitle('social'.tr),
+                title: AppBarTitle('feed'.tr),
                 centerTitle: false,
                 floating: true,
                 titleSpacing: SolianTheme.titleSpacing(context),
@@ -87,6 +68,7 @@ class _SocialScreenState extends State<SocialScreen> {
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),
+                  const FeedCreationButton(),
                   SizedBox(
                     width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                   ),
@@ -98,5 +80,28 @@ class _SocialScreenState extends State<SocialScreen> {
         ),
       ),
     );
+  }
+}
+
+class FeedCreationButton extends StatelessWidget {
+  const FeedCreationButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthProvider auth = Get.find();
+
+    return FutureBuilder(
+        future: auth.isAuthorized,
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data == true) {
+            return IconButton(
+              icon: const Icon(Icons.add_circle),
+              onPressed: () {
+                AppRouter.instance.pushNamed('postPublishing');
+              },
+            );
+          }
+          return const SizedBox();
+        });
   }
 }

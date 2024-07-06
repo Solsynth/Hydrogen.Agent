@@ -4,9 +4,9 @@ import 'package:get/utils.dart';
 abstract class AppNavigation {
   static List<AppNavigationDestination> destinations = [
     AppNavigationDestination(
-      icon: const Icon(Icons.public),
-      label: 'social'.tr,
-      page: 'social',
+      icon: const Icon(Icons.feed),
+      label: 'feed'.tr,
+      page: 'feed',
     ),
     AppNavigationDestination(
       icon: const Icon(Icons.forum),

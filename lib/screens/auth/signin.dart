@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:protocol_handler/protocol_handler.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInPopup extends StatefulWidget {
@@ -13,13 +15,13 @@ class SignInPopup extends StatefulWidget {
   State<SignInPopup> createState() => _SignInPopupState();
 }
 
-class _SignInPopupState extends State<SignInPopup> {
+class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
   bool _isBusy = false;
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void requestResetPassword(BuildContext context) async {
+  void requestResetPassword() async {
     final username = _usernameController.value.text;
     if (username.isEmpty) {
       context.showErrorDialog('signinResetPasswordHint'.tr);
@@ -49,7 +51,7 @@ class _SignInPopupState extends State<SignInPopup> {
     context.showModalDialog('done'.tr, 'signinResetPasswordSent'.tr);
   }
 
-  void performAction(BuildContext context) async {
+  void performAction() async {
     final AuthProvider provider = Get.find();
 
     final username = _usernameController.value.text;
@@ -94,6 +96,27 @@ class _SignInPopupState extends State<SignInPopup> {
     Get.find<AccountProvider>().registerPushNotifications();
 
     Navigator.pop(context, true);
+  }
+
+  @override
+  void initState() {
+    protocolHandler.addListener(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    protocolHandler.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onProtocolUrlReceived(String url) {
+    final uri = url.replaceFirst('solink://', '');
+    if (uri == 'auth?status=done') {
+      closeInAppWebView();
+      performAction();
+    }
   }
 
   @override
@@ -144,20 +167,19 @@ class _SignInPopupState extends State<SignInPopup> {
                 ),
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
-                onSubmitted: (_) => performAction(context),
+                onSubmitted: (_) => performAction(),
               ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed:
-                        _isBusy ? null : () => requestResetPassword(context),
+                    onPressed: _isBusy ? null : () => requestResetPassword(),
                     style: TextButton.styleFrom(foregroundColor: Colors.grey),
                     child: Text('forgotPassword'.tr),
                   ),
                   TextButton(
-                    onPressed: _isBusy ? null : () => performAction(context),
+                    onPressed: _isBusy ? null : () => performAction(),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

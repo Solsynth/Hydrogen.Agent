@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/navigation/app_navigation.dart';
@@ -14,7 +13,6 @@ class NavShell extends StatelessWidget {
   final bool showSidebar;
   final bool showNavigation;
   final bool? showBottomNavigation;
-  final GoRouterState state;
   final Widget child;
 
   final bool sidebarFirst;
@@ -23,7 +21,6 @@ class NavShell extends StatelessWidget {
   const NavShell({
     super.key,
     required this.child,
-    required this.state,
     this.showAppBar = true,
     this.showSidebar = true,
     this.showNavigation = true,
@@ -60,7 +57,7 @@ class NavShell extends StatelessWidget {
     return Scaffold(
       appBar: showAppBar
           ? AppBar(
-              title: Text(state.topRoute?.name?.tr ?? 'page'.tr),
+              title: Text(routeName ?? 'page'.tr),
               centerTitle: false,
               titleSpacing: canPop ? null : 24,
               elevation: SolianTheme.isLargeScreen(context) ? 1 : 0,
