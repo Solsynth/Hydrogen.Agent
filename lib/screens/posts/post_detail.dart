@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/post.dart';
+import 'package:solian/widgets/centered_container.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
 
@@ -47,21 +48,29 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: PostItem(
-                  item: item!,
-                  isClickable: true,
-                  isFullDate: true,
-                  isShowReply: false,
+                child: CenteredContainer(
+                  child: PostItem(
+                    item: item!,
+                    isClickable: true,
+                    isFullDate: true,
+                    isShowReply: false,
+                  ),
                 ),
               ),
-              const SliverToBoxAdapter(
-                child: Divider(thickness: 0.3, height: 0.3),
+              SliverToBoxAdapter(
+                child: const Divider(thickness: 0.3, height: 1)
+                    .paddingOnly(top: 4),
               ),
               SliverToBoxAdapter(
-                child: Text(
-                  'postReplies'.tr,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ).paddingOnly(left: 24, right: 24, top: 16),
+                child: CenteredContainer(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'postReplies'.tr,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ).paddingOnly(left: 24, right: 24, top: 16),
+                  ),
+                ),
               ),
               PostReplyList(item: item!),
               SliverToBoxAdapter(

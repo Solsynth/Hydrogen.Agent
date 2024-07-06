@@ -40,20 +40,12 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _feedRoute = ShellRoute(
-    builder: (context, state, child) => BasicShell(
-      state: state,
-      sidebarFirst: true,
-      showAppBar: false,
-      sidebar: const FeedScreen(),
-      child: child,
-    ),
+    builder: (context, state, child) => child,
     routes: [
       GoRoute(
         path: '/',
         name: 'feed',
-        builder: (context, state) => SolianTheme.isExtraLargeScreen(context)
-            ? const EmptyPagePlaceholder()
-            : const FeedScreen(),
+        builder: (context, state) => const FeedScreen(),
       ),
       GoRoute(
         path: '/posts/view/:alias',

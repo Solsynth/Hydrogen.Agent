@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/router.dart';
+import 'package:solian/widgets/centered_container.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
@@ -27,29 +28,31 @@ class PostListWidget extends StatelessWidget {
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
           return RepaintBoundary(
-            child: GestureDetector(
-              child: PostItem(
-                key: Key('p${item.alias}'),
-                item: item,
-                isShowEmbed: isShowEmbed,
-                isClickable: isNestedClickable,
-              ).paddingSymmetric(vertical: 8),
-              onTap: () {
-                if (!isClickable) return;
-                AppRouter.instance.pushNamed(
-                  'postDetail',
-                  pathParameters: {'alias': item.alias},
-                );
-              },
-              onLongPress: () {
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  context: context,
-                  builder: (context) => PostAction(item: item),
-                ).then((value) {
-                  if (value != null) controller.refresh();
-                });
-              },
+            child: CenteredContainer(
+              child: GestureDetector(
+                child: PostItem(
+                  key: Key('p${item.alias}'),
+                  item: item,
+                  isShowEmbed: isShowEmbed,
+                  isClickable: isNestedClickable,
+                ).paddingSymmetric(vertical: 8),
+                onTap: () {
+                  if (!isClickable) return;
+                  AppRouter.instance.pushNamed(
+                    'postDetail',
+                    pathParameters: {'alias': item.alias},
+                  );
+                },
+                onLongPress: () {
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    context: context,
+                    builder: (context) => PostAction(item: item),
+                  ).then((value) {
+                    if (value != null) controller.refresh();
+                  });
+                },
+              ),
             ),
           );
         },
