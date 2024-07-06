@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
@@ -30,7 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
   getProfile() async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
-    
+
     final prof = await auth.getProfile();
     _accountId = prof.body['id'];
   }
@@ -65,7 +64,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
-    final ChatCallProvider call = Get.find();
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -83,18 +81,6 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             );
           }
-
-          final prefixSlivers = [
-            Obx(() {
-              if (call.current.value != null) {
-                return const SliverToBoxAdapter(
-                  child: ChatCallCurrentIndicator(),
-                );
-              } else {
-                return const SliverToBoxAdapter();
-              }
-            }),
-          ];
 
           return DefaultTabController(
             length: 2,
@@ -183,32 +169,35 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 return TabBarView(
                   children: [
-                    RefreshIndicator(
-                      onRefresh: () => getChannels(),
-                      child: CustomScrollView(
-                        slivers: [
-                          ...prefixSlivers,
-                          ChannelListWidget(
-                            channels:
-                                _channels.where((x) => x.type == 0).toList(),
-                            selfId: _accountId ?? 0,
+                    Column(
+                      children: [
+                        const ChatCallCurrentIndicator(),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () => getChannels(),
+                            child: ChannelListWidget(
+                              channels:
+                                  _channels.where((x) => x.type == 0).toList(),
+                              selfId: _accountId ?? 0,
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    RefreshIndicator(
-                      onRefresh: () => getChannels(),
-                      child: CustomScrollView(
-                        slivers: [
-                          ...prefixSlivers,
-                          ChannelListWidget(
-                            channels:
-                                _channels.where((x) => x.type == 1).toList(),
-                            selfId: _accountId ?? 0,
-                            noCategory: true,
+                    Column(
+                      children: [
+                        const ChatCallCurrentIndicator(),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: () => getChannels(),
+                            child: ChannelListWidget(
+                              channels: _channels.where((x) => x.type == 1).toList(),
+                              selfId: _accountId ?? 0,
+                              noCategory: true,
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 );

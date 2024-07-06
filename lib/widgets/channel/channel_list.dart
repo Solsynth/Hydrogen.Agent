@@ -115,28 +115,45 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget.noCategory) {
-      return SliverList.builder(
-        itemCount: _globalChannels.length,
-        itemBuilder: (context, index) {
-          final element = _globalChannels[index];
-          return buildItem(element);
-        },
+      return CustomScrollView(
+        slivers: [
+          SliverList.builder(
+            itemCount: _globalChannels.length,
+            itemBuilder: (context, index) {
+              final element = _globalChannels[index];
+              return buildItem(element);
+            },
+          ),
+        ],
       );
     }
 
-    return SliverList.list(
-      children: [
-        ..._globalChannels.map((e) => buildItem(e)),
+    return CustomScrollView(
+      slivers: [
+        SliverList.builder(
+          itemCount: _globalChannels.length,
+          itemBuilder: (context, index) {
+            final element = _globalChannels[index];
+            return buildItem(element);
+          },
+        ),
         ..._inRealms.entries.map((element) {
-          return ExpansionTile(
-            tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-            title: Text(element.value.first.realm!.name),
-            subtitle: Text(
-              element.value.first.realm!.description,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            children: element.value.map((e) => buildItem(e)).toList(),
+          return SliverList.builder(
+            itemCount: element.value.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+                  leading: const Icon(Icons.workspaces, size: 20)
+                      .paddingOnly(left: 6, right: 10),
+                  tileColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  title: Text(element.value.first.realm!.name),
+                );
+              }
+
+              final item = element.value[index - 1];
+              return buildItem(item);
+            },
           );
         }),
       ],

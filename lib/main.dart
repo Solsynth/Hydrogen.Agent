@@ -33,8 +33,10 @@ void main() async {
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      _initializeFirebase();
-      _initializePlatformComponents();
+      await Future.wait([
+        _initializeFirebase(),
+        _initializePlatformComponents(),
+      ]);
 
       runApp(const SolianApp());
     },

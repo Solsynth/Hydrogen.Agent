@@ -247,34 +247,34 @@ class RealmChannelListWidget extends StatelessWidget {
       builder: (context, snapshot) {
         return RefreshIndicator(
           onRefresh: onRefresh,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: ListTile(
-                  leading: const Icon(Icons.add_box),
-                  contentPadding: const EdgeInsets.only(left: 32, right: 8),
-                  tileColor: Theme.of(context).colorScheme.surfaceContainer,
-                  title: Text('channelNew'.tr),
-                  subtitle: Text(
-                    'channelNewInRealmHint'
-                        .trParams({'realm': '#${realm.alias}'}),
-                  ),
-                  onTap: () {
-                    AppRouter.instance
-                        .pushNamed(
-                      'channelOrganizing',
-                      extra: ChannelOrganizeArguments(realm: realm),
-                    )
-                        .then((value) {
-                      if (value != null) onRefresh();
-                    });
-                  },
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.add_box),
+                contentPadding: const EdgeInsets.only(left: 32, right: 8),
+                tileColor: Theme.of(context).colorScheme.surfaceContainer,
+                title: Text('channelNew'.tr),
+                subtitle: Text(
+                  'channelNewInRealmHint'
+                      .trParams({'realm': '#${realm.alias}'}),
                 ),
+                onTap: () {
+                  AppRouter.instance
+                      .pushNamed(
+                    'channelOrganizing',
+                    extra: ChannelOrganizeArguments(realm: realm),
+                  )
+                      .then((value) {
+                    if (value != null) onRefresh();
+                  });
+                },
               ),
-              ChannelListWidget(
-                channels: channels,
-                selfId: snapshot.data?.body['id'] ?? 0,
-                noCategory: true,
+              Expanded(
+                child: ChannelListWidget(
+                  channels: channels,
+                  selfId: snapshot.data?.body['id'] ?? 0,
+                  noCategory: true,
+                ),
               )
             ],
           ),
