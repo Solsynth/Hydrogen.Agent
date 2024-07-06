@@ -59,9 +59,6 @@ Future<void> _initializePlatformComponents() async {
     if (PlatformInfo.isMacOS) {
       await Future.wait([
         Window.hideTitle(),
-        Window.hideCloseButton(),
-        Window.hideMiniaturizeButton(),
-        Window.hideZoomButton(),
         Window.makeTitlebarTransparent(),
         Window.enableFullSizeContentView(),
       ]);
