@@ -137,139 +137,126 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
         ),
         body: SafeArea(
           top: false,
-          child: Column(
+          child: Stack(
             children: [
-              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-              if (widget.edit != null)
-                MaterialBanner(
-                  leading: const Icon(Icons.edit),
-                  leadingPadding: const EdgeInsets.only(left: 10, right: 20),
-                  dividerColor: Colors.transparent,
-                  content: Text('postEditingNotify'.tr),
-                  actions: notifyBannerActions,
-                ),
-              if (widget.reply != null)
-                Container(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  child: Column(
-                    children: [
-                      MaterialBanner(
-                        leading: const FaIcon(
-                          FontAwesomeIcons.reply,
-                          size: 18,
-                        ),
-                        leadingPadding:
-                            const EdgeInsets.only(left: 10, right: 20),
-                        backgroundColor: Colors.transparent,
-                        dividerColor: Colors.transparent,
-                        content: Text(
-                          'postReplyingNotify'.trParams(
-                            {'username': '@${widget.reply!.author.name}'},
-                          ),
-                        ),
-                        actions: notifyBannerActions,
-                      ),
-                      const Divider(thickness: 0.3, height: 0.3),
-                      Container(
-                        constraints: const BoxConstraints(maxHeight: 280),
-                        child: SingleChildScrollView(
-                          child: PostItem(
-                            item: widget.reply!,
-                            isReactable: false,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              if (widget.repost != null)
-                Container(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  child: Column(
-                    children: [
-                      MaterialBanner(
-                        leading: const FaIcon(
-                          FontAwesomeIcons.retweet,
-                          size: 18,
-                        ),
-                        leadingPadding:
-                            const EdgeInsets.only(left: 10, right: 20),
-                        dividerColor: Colors.transparent,
-                        content: Text(
-                          'postRepostingNotify'.trParams(
-                            {'username': '@${widget.repost!.author.name}'},
-                          ),
-                        ),
-                        actions: notifyBannerActions,
-                      ),
-                      const Divider(thickness: 0.3, height: 0.3),
-                      Container(
-                        constraints: const BoxConstraints(maxHeight: 280),
-                        child: SingleChildScrollView(
-                          child: PostItem(
-                            item: widget.repost!,
-                            isReactable: false,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              FutureBuilder(
-                future: auth.getProfile(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListTile(
-                      leading: AccountAvatar(
-                          content: snapshot.data?.body!['avatar'], radius: 22),
-                      title: Text(snapshot.data?.body!['nick']),
-                      subtitle: Text('postIdentityNotify'.tr),
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
-              if (widget.realm != null)
-                MaterialBanner(
-                  leading: const Icon(Icons.group),
-                  leadingPadding: const EdgeInsets.only(left: 10, right: 20),
-                  dividerColor: Colors.transparent,
-                  content: Text(
-                    'postInRealmNotify'
-                        .trParams({'realm': '#${widget.realm!.alias}'}),
-                  ),
-                  actions: notifyBannerActions,
-                ),
-              const Divider(thickness: 0.3, height: 0.3).paddingOnly(bottom: 8),
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TextField(
-                    maxLines: null,
-                    autofocus: true,
-                    autocorrect: true,
-                    keyboardType: TextInputType.multiline,
-                    controller: _contentController,
-                    decoration: InputDecoration.collapsed(
-                      hintText: 'postContentPlaceholder'.tr,
+              ListView(
+                children: [
+                  if (_isBusy)
+                    const LinearProgressIndicator().animate().scaleX(),
+                  if (widget.edit != null)
+                    MaterialBanner(
+                      leading: const Icon(Icons.edit),
+                      leadingPadding:
+                          const EdgeInsets.only(left: 10, right: 20),
+                      dividerColor: Colors.transparent,
+                      content: Text('postEditingNotify'.tr),
+                      actions: notifyBannerActions,
                     ),
-                    onTapOutside: (_) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
+                  if (widget.reply != null)
+                    ExpansionTile(
+                      leading: const FaIcon(
+                        FontAwesomeIcons.reply,
+                        size: 18,
+                      ).paddingOnly(left: 2),
+                      title: Text('postReplyingNotify'.trParams(
+                        {'username': '@${widget.reply!.author.name}'},
+                      )),
+                      collapsedBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainer,
+                      children: [
+                        PostItem(
+                          item: widget.reply!,
+                          isReactable: false,
+                        ).paddingOnly(bottom: 8),
+                      ],
+                    ),
+                  if (widget.repost != null)
+                    ExpansionTile(
+                      leading: const FaIcon(
+                        FontAwesomeIcons.retweet,
+                        size: 18,
+                      ).paddingOnly(left: 2),
+                      title: Text('postRepostingNotify'.trParams(
+                        {'username': '@${widget.repost!.author.name}'},
+                      )),
+                      collapsedBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainer,
+                      children: [
+                        PostItem(
+                          item: widget.repost!,
+                          isReactable: false,
+                        ).paddingOnly(bottom: 8),
+                      ],
+                    ),
+                  FutureBuilder(
+                    future: auth.getProfile(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListTile(
+                          leading: AccountAvatar(
+                              content: snapshot.data?.body!['avatar'],
+                              radius: 22),
+                          title: Text(snapshot.data?.body!['nick']),
+                          subtitle: Text('postIdentityNotify'.tr),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
                   ),
-                ),
+                  if (widget.realm != null)
+                    MaterialBanner(
+                      leading: const Icon(Icons.group),
+                      leadingPadding:
+                          const EdgeInsets.only(left: 10, right: 20),
+                      dividerColor: Colors.transparent,
+                      content: Text(
+                        'postInRealmNotify'
+                            .trParams({'realm': '#${widget.realm!.alias}'}),
+                      ),
+                      actions: notifyBannerActions,
+                    ),
+                  const Divider(thickness: 0.3, height: 0.3)
+                      .paddingOnly(bottom: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TextField(
+                      maxLines: null,
+                      autofocus: true,
+                      autocorrect: true,
+                      keyboardType: TextInputType.multiline,
+                      controller: _contentController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'postContentPlaceholder'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    ),
+                  ),
+                ],
               ),
-              const Divider(thickness: 0.3, height: 0.3),
-              SizedBox(
-                height: 56,
-                child: Row(
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Column(
                   children: [
-                    TextButton(
-                      style: TextButton.styleFrom(shape: const CircleBorder()),
-                      child: const Icon(Icons.camera_alt),
-                      onPressed: () => showAttachments(),
-                    )
+                    const Divider(thickness: 0.3, height: 0.3),
+                    SizedBox(
+                      height: 56,
+                      child: Row(
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              shape: const CircleBorder(),
+                            ),
+                            child: const Icon(Icons.camera_alt),
+                            onPressed: () => showAttachments(),
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

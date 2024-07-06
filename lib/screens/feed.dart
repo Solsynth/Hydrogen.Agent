@@ -68,7 +68,11 @@ class _FeedScreenState extends State<FeedScreen> {
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),
-                  const FeedCreationButton(),
+                  FeedCreationButton(
+                    onCreated: () {
+                      _pagingController.refresh();
+                    },
+                  ),
                   SizedBox(
                     width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                   ),
@@ -84,7 +88,9 @@ class _FeedScreenState extends State<FeedScreen> {
 }
 
 class FeedCreationButton extends StatelessWidget {
-  const FeedCreationButton({super.key});
+  final Function? onCreated;
+
+  const FeedCreationButton({super.key, this.onCreated});
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +103,11 @@ class FeedCreationButton extends StatelessWidget {
             return IconButton(
               icon: const Icon(Icons.add_circle),
               onPressed: () {
-                AppRouter.instance.pushNamed('postPublishing');
+                AppRouter.instance.pushNamed('postPublishing').then((val) {
+                  if (val == true && onCreated != null) {
+                    onCreated!();
+                  }
+                });
               },
             );
           }
