@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
 class TagsField extends StatelessWidget {
+  final List<String>? initialTags;
   final String hintText;
 
   const TagsField({
     super.key,
+    this.initialTags,
     required this.hintText,
     required StringTagController<String> tagsController,
   }) : _tagsController = tagsController;
@@ -20,6 +22,7 @@ class TagsField extends StatelessWidget {
         vertical: 8,
       ),
       child: TextFieldTags<String>(
+        initialTags: initialTags,
         letterCase: LetterCase.small,
         textfieldTagsController: _tagsController,
         textSeparators: const [' ', ','],
@@ -39,44 +42,45 @@ class TagsField extends StatelessWidget {
                       controller: inputFieldValues.tagScrollController,
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                          children: inputFieldValues.tags.map((String tag) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(20.0),
-                            ),
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          margin: const EdgeInsets.only(right: 10.0),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                child: Text(
-                                  '#$tag',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                onTap: () {
-                                  //print("$tag selected");
-                                },
+                        children: inputFieldValues.tags.map((String tag) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(20.0),
                               ),
-                              const SizedBox(width: 4.0),
-                              InkWell(
-                                child: const Icon(
-                                  Icons.cancel,
-                                  size: 14.0,
-                                  color: Color.fromARGB(255, 233, 233, 233),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            margin: const EdgeInsets.only(right: 10.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 4.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  child: Text(
+                                    '#$tag',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  onTap: () {
+                                    //print("$tag selected");
+                                  },
                                 ),
-                                onTap: () {
-                                  inputFieldValues.onTagRemoved(tag);
-                                },
-                              )
-                            ],
-                          ),
-                        );
-                      }).toList()),
+                                const SizedBox(width: 4.0),
+                                InkWell(
+                                  child: const Icon(
+                                    Icons.cancel,
+                                    size: 14.0,
+                                    color: Color.fromARGB(255, 233, 233, 233),
+                                  ),
+                                  onTap: () {
+                                    inputFieldValues.onTagRemoved(tag);
+                                  },
+                                )
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     )
                   : null,
             ),

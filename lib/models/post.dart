@@ -1,4 +1,5 @@
 import 'package:solian/models/account.dart';
+import 'package:solian/models/feed.dart';
 import 'package:solian/models/realm.dart';
 
 class Post {
@@ -8,9 +9,8 @@ class Post {
   DateTime? deletedAt;
   String alias;
   String content;
-  dynamic tags;
-  dynamic categories;
-  dynamic reactions;
+  List<Tag>? tags;
+  List<Category>? categories;
   List<Post>? replies;
   List<int>? attachments;
   int? replyId;
@@ -35,7 +35,6 @@ class Post {
     required this.content,
     required this.tags,
     required this.categories,
-    required this.reactions,
     required this.replies,
     required this.attachments,
     required this.replyId,
@@ -61,9 +60,11 @@ class Post {
             : null,
         alias: json['alias'],
         content: json['content'],
-        tags: json['tags'],
-        categories: json['categories'],
-        reactions: json['reactions'],
+        tags: json['tags']?.map((x) => Tag.fromJson(x)).toList().cast<Tag>(),
+        categories: json['categories']
+            ?.map((x) => Category.fromJson(x))
+            .toList()
+            .cast<Category>(),
         replies: json['replies'],
         attachments: json['attachments'] != null
             ? List<int>.from(json['attachments'])
@@ -76,7 +77,9 @@ class Post {
         repostTo:
             json['repost_to'] != null ? Post.fromJson(json['repost_to']) : null,
         realm: json['realm'] != null ? Realm.fromJson(json['realm']) : null,
-        publishedAt: json['published_at'] != null ? DateTime.parse(json['published_at']) : null,
+        publishedAt: json['published_at'] != null
+            ? DateTime.parse(json['published_at'])
+            : null,
         authorId: json['author_id'],
         author: Account.fromJson(json['author']),
         replyCount: json['reply_count'],
@@ -100,7 +103,6 @@ class Post {
         'content': content,
         'tags': tags,
         'categories': categories,
-        'reactions': reactions,
         'replies': replies,
         'attachments': attachments,
         'reply_id': replyId,

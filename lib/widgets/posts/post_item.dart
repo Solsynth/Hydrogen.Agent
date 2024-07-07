@@ -8,6 +8,7 @@ import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
+import 'package:solian/widgets/posts/feed_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:timeago/timeago.dart' show format;
 import 'package:url_launcher/url_launcher_string.dart';
@@ -118,7 +119,7 @@ class _PostItemState extends State<PostItem> {
           fontSize: 12,
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
         ),
-      ).paddingOnly(top: 8);
+      ).paddingOnly(top: 2);
     } else {
       return const SizedBox();
     }
@@ -210,6 +211,9 @@ class _PostItemState extends State<PostItem> {
             bottom: hasAttachment ? 4 : 0,
           ),
           buildFooter().paddingOnly(left: 16),
+          if (widget.item.tags?.isNotEmpty ?? false)
+            FeedTagsList(tags: widget.item.tags!)
+                .paddingOnly(left: 12, top: 6, bottom: 2),
           AttachmentList(
             parentId: widget.overrideAttachmentParent ?? widget.item.alias,
             attachmentsId: item.attachments ?? List.empty(),
@@ -220,6 +224,7 @@ class _PostItemState extends State<PostItem> {
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,6 +276,9 @@ class _PostItemState extends State<PostItem> {
                       },
                     ),
                   buildFooter().paddingOnly(left: 12),
+                  if (widget.item.tags?.isNotEmpty ?? false)
+                    FeedTagsList(tags: widget.item.tags!)
+                        .paddingOnly(left: 4, top: 6, bottom: 2),
                 ],
               ),
             )

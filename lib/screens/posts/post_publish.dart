@@ -248,6 +248,8 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                 child: Column(
                   children: [
                     TagsField(
+                      initialTags:
+                          widget.edit?.tags?.map((x) => x.alias).toList(),
                       tagsController: _tagsController,
                       hintText: 'postTagsPlaceholder'.tr,
                     ),
