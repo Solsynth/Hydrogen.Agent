@@ -34,7 +34,7 @@ class ChatCallProvider extends GetxController {
   late Room room;
   late EventsListener<RoomEvent> listener;
 
-  RxList participantTracks = [].obs;
+  RxList<ParticipantTrack> participantTracks = RxList.empty(growable: true);
   Rx<ParticipantTrack?> focusTrack = Rx(null);
 
   Future<void> checkPermissions() async {
@@ -194,7 +194,7 @@ class ChatCallProvider extends GetxController {
       }
     }
 
-    final newTracks = List.empty(growable: true);
+    final newTracks = List<ParticipantTrack>.empty(growable: true);
 
     final mediaTrackList = mediaTracks.values.toList();
     mediaTrackList.sort((a, b) {
@@ -247,6 +247,15 @@ class ChatCallProvider extends GetxController {
     }
 
     participantTracks.value = newTracks;
+
+    if (focusTrack.value != null) {
+      final idx = participantTracks.indexWhere(
+          (x) => x.participant.sid == focusTrack.value!.participant.sid);
+      if (idx == -1) {
+        focusTrack.value = null;
+      }
+    }
+
     if (focusTrack.value == null) {
       focusTrack.value = participantTracks.firstOrNull;
     } else {
