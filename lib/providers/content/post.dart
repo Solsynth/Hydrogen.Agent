@@ -7,10 +7,13 @@ class PostProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.services['interactive'];
   }
 
-  Future<Response> listFeed(int page, {int? realm}) async {
+  Future<Response> listFeed(int page,
+      {int? realm, String? tag, category}) async {
     final queries = [
       'take=${10}',
       'offset=$page',
+      if (tag != null) 'tag=$tag',
+      if (category != null) 'category=$category',
       if (realm != null) 'realmId=$realm',
     ];
     final resp = await get('/api/feed?${queries.join('&')}');

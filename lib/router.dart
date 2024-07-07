@@ -8,6 +8,7 @@ import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/chat.dart';
+import 'package:solian/screens/feed_search.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
@@ -46,6 +47,17 @@ abstract class AppRouter {
         path: '/',
         name: 'feed',
         builder: (context, state) => const FeedScreen(),
+      ),
+      GoRoute(
+        path: '/feed/search',
+        name: 'feedSearch',
+        builder: (context, state) => TitleShell(
+          state: state,
+          child: FeedSearchScreen(
+            tag: state.uri.queryParameters['tag'],
+            category: state.uri.queryParameters['category'],
+          ),
+        ),
       ),
       GoRoute(
         path: '/posts/view/:alias',

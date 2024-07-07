@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solian/models/feed.dart';
+import 'package:solian/router.dart';
 
 class FeedTagsList extends StatelessWidget {
   final List<Tag> tags;
@@ -36,7 +37,11 @@ class FeedTagsList extends StatelessWidget {
                   ),
                 ),
               ),
-              onTap: () {},
+              onTap: () {
+                AppRouter.instance.pushNamed('feedSearch', queryParameters: {
+                  'tag': x.alias,
+                });
+              },
             ),
           )
           .toList(),
