@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:mutex/mutex.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/providers/account.dart';
 import 'package:solian/providers/chat.dart';
@@ -39,8 +40,6 @@ class TokenSet {
   bool get isExpired => expiredAt?.isBefore(DateTime.now()) ?? true;
 }
 
-TokenSet? globalCredentials;
-
 class RiskyAuthenticateException implements Exception {
   final int ticketId;
 
@@ -56,6 +55,9 @@ class AuthProvider extends GetConnect {
 
   static const storage = FlutterSecureStorage();
 
+  TokenSet? credentials;
+  Mutex credentialsRefreshMutex = Mutex();
+
   @override
   void onInit() {
     httpClient.baseUrl = ServiceFinder.services['passport'];
@@ -63,28 +65,36 @@ class AuthProvider extends GetConnect {
   }
 
   Future<void> refreshCredentials() async {
-    final resp = await post('/api/auth/token', {
-      'refresh_token': globalCredentials!.refreshToken,
-      'grant_type': 'refresh_token',
-    });
-    if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+    try {
+      credentialsRefreshMutex.acquire();
+      if (!credentials!.isExpired) return;
+      final resp = await post('/api/auth/token', {
+        'refresh_token': credentials!.refreshToken,
+        'grant_type': 'refresh_token',
+      });
+      if (resp.statusCode != 200) {
+        throw Exception(resp.bodyString);
+      }
+      credentials = TokenSet(
+        accessToken: resp.body['access_token'],
+        refreshToken: resp.body['refresh_token'],
+        expiredAt: DateTime.now().add(const Duration(minutes: 3)),
+      );
+      storage.write(
+        key: 'auth_credentials',
+        value: jsonEncode(credentials!.toJson()),
+      );
+    } catch (_) {
+      rethrow;
+    } finally {
+      credentialsRefreshMutex.release();
     }
-    globalCredentials = TokenSet(
-      accessToken: resp.body['access_token'],
-      refreshToken: resp.body['refresh_token'],
-      expiredAt: DateTime.now().add(const Duration(minutes: 3)),
-    );
-    storage.write(
-      key: 'auth_credentials',
-      value: jsonEncode(globalCredentials!.toJson()),
-    );
   }
 
   Future<Request<T?>> requestAuthenticator<T>(Request<T?> request) async {
     try {
       await ensureCredentials();
-      request.headers['Authorization'] = 'Bearer ${globalCredentials!.accessToken}';
+      request.headers['Authorization'] = 'Bearer ${credentials!.accessToken}';
     } catch (_) {}
 
     return request;
@@ -108,9 +118,9 @@ class AuthProvider extends GetConnect {
 
   Future<void> ensureCredentials() async {
     if (!await isAuthorized) throw Exception('unauthorized');
-    if (globalCredentials == null) await loadCredentials();
+    if (credentials == null) await loadCredentials();
 
-    if (globalCredentials!.isExpired) {
+    if (credentials!.isExpired) {
       await refreshCredentials();
       log('Refreshed credentials at ${DateTime.now()}');
     }
@@ -119,7 +129,7 @@ class AuthProvider extends GetConnect {
   Future<void> loadCredentials() async {
     if (await isAuthorized) {
       final content = await storage.read(key: 'auth_credentials');
-      globalCredentials = TokenSet.fromJson(jsonDecode(content!));
+      credentials = TokenSet.fromJson(jsonDecode(content!));
     }
   }
 
@@ -152,7 +162,7 @@ class AuthProvider extends GetConnect {
       throw Exception(tokenResp.bodyString);
     }
 
-    globalCredentials = TokenSet(
+    credentials = TokenSet(
       accessToken: tokenResp.body['access_token'],
       refreshToken: tokenResp.body['refresh_token'],
       expiredAt: DateTime.now().add(const Duration(minutes: 3)),
@@ -160,14 +170,14 @@ class AuthProvider extends GetConnect {
 
     storage.write(
       key: 'auth_credentials',
-      value: jsonEncode(globalCredentials!.toJson()),
+      value: jsonEncode(credentials!.toJson()),
     );
 
     Get.find<AccountProvider>().connect();
     Get.find<AccountProvider>().notifyPrefetch();
     Get.find<ChatProvider>().connect();
 
-    return globalCredentials!;
+    return credentials!;
   }
 
   void signout() {

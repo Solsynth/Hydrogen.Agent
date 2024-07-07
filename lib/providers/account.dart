@@ -56,10 +56,10 @@ class AccountProvider extends GetxController {
     final AuthProvider auth = Get.find();
     await auth.ensureCredentials();
 
-    if (globalCredentials == null) await auth.loadCredentials();
+    if (auth.credentials == null) await auth.loadCredentials();
 
     final uri = Uri.parse(
-      '${ServiceFinder.services['passport']}/api/ws?tk=${globalCredentials!.accessToken}'
+      '${ServiceFinder.services['passport']}/api/ws?tk=${auth.credentials!.accessToken}'
           .replaceFirst('http', 'ws'),
     );
 
