@@ -19,6 +19,7 @@ import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/friend.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
+import 'package:solian/shells/system_shell.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
 
@@ -85,8 +86,10 @@ class SolianApp extends StatelessWidget {
       fallbackLocale: const Locale('en', 'US'),
       onInit: () => _initializeProviders(context),
       builder: (context, child) {
-        return ScaffoldMessenger(
-          child: child ?? const SizedBox(),
+        return SystemShell(
+          child: ScaffoldMessenger(
+            child: child ?? const SizedBox(),
+          ),
         );
       },
     );
