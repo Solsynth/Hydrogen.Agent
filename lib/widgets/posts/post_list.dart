@@ -29,28 +29,13 @@ class PostListWidget extends StatelessWidget {
         itemBuilder: (context, item, index) {
           return RepaintBoundary(
             child: CenteredContainer(
-              child: GestureDetector(
-                child: PostItem(
-                  key: Key('p${item.alias}'),
-                  item: item,
-                  isShowEmbed: isShowEmbed,
-                  isClickable: isNestedClickable,
-                ).paddingSymmetric(vertical: 8),
-                onTap: () {
-                  if (!isClickable) return;
-                  AppRouter.instance.pushNamed(
-                    'postDetail',
-                    pathParameters: {'alias': item.alias},
-                  );
-                },
-                onLongPress: () {
-                  showModalBottomSheet(
-                    useRootNavigator: true,
-                    context: context,
-                    builder: (context) => PostAction(item: item),
-                  ).then((value) {
-                    if (value != null) controller.refresh();
-                  });
+              child: PostListEntryWidget(
+                isShowEmbed: isShowEmbed,
+                isNestedClickable: isNestedClickable,
+                isClickable: isClickable,
+                item: item,
+                onUpdate: () {
+                  controller.refresh();
                 },
               ),
             ),
@@ -58,6 +43,51 @@ class PostListWidget extends StatelessWidget {
         },
       ),
       separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
+    );
+  }
+}
+
+class PostListEntryWidget extends StatelessWidget {
+  final bool isShowEmbed;
+  final bool isNestedClickable;
+  final bool isClickable;
+  final Post item;
+  final Function onUpdate;
+
+  const PostListEntryWidget({
+    super.key,
+    required this.isShowEmbed,
+    required this.isNestedClickable,
+    required this.isClickable,
+    required this.item,
+    required this.onUpdate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: PostItem(
+        key: Key('p${item.alias}'),
+        item: item,
+        isShowEmbed: isShowEmbed,
+        isClickable: isNestedClickable,
+      ).paddingSymmetric(vertical: 8),
+      onTap: () {
+        if (!isClickable) return;
+        AppRouter.instance.pushNamed(
+          'postDetail',
+          pathParameters: {'alias': item.alias},
+        );
+      },
+      onLongPress: () {
+        showModalBottomSheet(
+          useRootNavigator: true,
+          context: context,
+          builder: (context) => PostAction(item: item),
+        ).then((value) {
+          if (value != null) onUpdate();
+        });
+      },
     );
   }
 }

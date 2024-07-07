@@ -12,7 +12,9 @@ import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
+import 'package:solian/widgets/posts/tags_field.dart';
 import 'package:solian/widgets/prev_page.dart';
+import 'package:textfield_tags/textfield_tags.dart';
 
 class PostPublishingArguments {
   final Post? edit;
@@ -43,6 +45,7 @@ class PostPublishingScreen extends StatefulWidget {
 
 class _PostPublishingScreenState extends State<PostPublishingScreen> {
   final _contentController = TextEditingController();
+  final _tagsController = StringTagController();
 
   bool _isBusy = false;
 
@@ -70,6 +73,8 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
 
     final payload = {
       'content': _contentController.value.text,
+      'tags': _tagsController.getTags?.map((x) => {'alias': x}).toList() ??
+          List.empty(),
       'attachments': _attachments,
       if (widget.edit != null) 'alias': widget.edit!.alias,
       if (widget.reply != null) 'reply_to': widget.reply!.id,
@@ -242,6 +247,10 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
                 right: 0,
                 child: Column(
                   children: [
+                    TagsField(
+                      tagsController: _tagsController,
+                      hintText: 'postTagsPlaceholder'.tr,
+                    ),
                     const Divider(thickness: 0.3, height: 0.3),
                     SizedBox(
                       height: 56,
@@ -265,5 +274,12 @@ class _PostPublishingScreenState extends State<PostPublishingScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _contentController.dispose();
+    _tagsController.dispose();
+    super.dispose();
   }
 }
