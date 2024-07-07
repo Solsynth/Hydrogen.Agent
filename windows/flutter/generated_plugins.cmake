@@ -4,20 +4,20 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
+  desktop_drop
   file_selector_windows
   firebase_core
   flutter_acrylic
   flutter_secure_storage_windows
   flutter_webrtc
-  irondash_engine_context
   livekit_client
   media_kit_libs_windows_video
   media_kit_video
+  pasteboard
   permission_handler_windows
   protocol_handler_windows
   screen_brightness_windows
   sentry_flutter
-  super_native_extensions
   url_launcher_windows
 )
 

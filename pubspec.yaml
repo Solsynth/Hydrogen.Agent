@@ -47,13 +47,13 @@ dependencies:
   sqflite: ^2.3.3+1
   protocol_handler: ^0.2.0
   markdown: ^7.2.2
-  super_drag_and_drop: ^0.8.17
-  super_clipboard: ^0.8.17
   media_kit: ^1.1.10+1
   media_kit_video: ^1.2.4
   media_kit_libs_video: ^1.0.4
   textfield_tags: ^3.0.1
   mutex: ^3.1.0
+  pasteboard: ^0.2.0
+  desktop_drop: ^0.4.4
 
 dev_dependencies:
   flutter_test:

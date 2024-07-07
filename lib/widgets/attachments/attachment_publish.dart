@@ -3,19 +3,19 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' show basename;
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
-import 'package:super_clipboard/super_clipboard.dart';
-import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 class AttachmentPublishPopup extends StatefulWidget {
   final String usage;
@@ -155,51 +155,16 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
   }
 
   void pasteFileToUpload() async {
-    final clipboard = SystemClipboard.instance;
-    if (clipboard == null) return;
-    final reader = await clipboard.read();
-    handleNativeReader(reader);
-  }
+    final data = await Pasteboard.image;
+    if(data == null) return;
 
-  void handlePasteEvent(ClipboardReadEvent event) async {
-    final reader = await event.getClipboardReader();
-    handleNativeReader(reader);
-  }
+    setState(() => _isBusy = true);
 
-  void handleNativeReader(DataReader reader) async {
-    var read = false;
-    for (final format in Formats.standardFormats
-        .whereType<FileFormat>()
-        .where((x) => ![Formats.tiff].contains(x))) {
-      if (read) break;
-      if (reader.canProvide(format)) {
-        reader.getFile(format, (file) async {
-          if (read) return;
+    final hash = await calculateBytesSha256(data);
+    final ratio = await calculateDataAspectRatio(data);
+    uploadAttachment(data, 'pasted image', hash, ratio: ratio);
 
-          final data = await file.readAll();
-          read = true;
-
-          // Calculate ratio if available
-          double? ratio;
-          if ([
-            Formats.png,
-            Formats.jpeg,
-            Formats.gif,
-            Formats.ico,
-            Formats.webp
-          ].contains(format)) {
-            ratio = await calculateDataAspectRatio(data);
-          }
-
-          await uploadAttachment(
-            data,
-            file.fileName ?? 'unknown',
-            await calculateBytesSha256(data),
-            ratio: ratio,
-          );
-        });
-      }
-    }
+    setState(() => _isBusy = false);
   }
 
   Future<void> uploadAttachment(Uint8List data, String path, String hash,
@@ -276,13 +241,11 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
   void initState() {
     super.initState();
     revertMetadataList();
-    ClipboardEvents.instance?.registerPasteEventListener(handlePasteEvent);
   }
 
   @override
   void dispose() {
     super.dispose();
-    ClipboardEvents.instance?.unregisterPasteEventListener(handlePasteEvent);
   }
 
   @override
@@ -292,21 +255,19 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     return SafeArea(
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.85,
-        child: DropRegion(
-          formats: Formats.standardFormats,
-          hitTestBehavior: HitTestBehavior.opaque,
-          onDropOver: (event) {
-            if (event.session.allowedOperations.contains(DropOperation.copy)) {
-              return DropOperation.copy;
-            } else {
-              return DropOperation.none;
+        child: DropTarget(
+          onDragDone: (detail) async {
+            setState(() => _isBusy = true);
+            for (final file in detail.files) {
+              final data = await file.readAsBytes();
+              final hash = await calculateBytesSha256(data);
+              double? ratio;
+              if (file.mimeType?.split('/').firstOrNull == 'image') {
+                ratio = await calculateDataAspectRatio(data);
+              }
+              uploadAttachment(data, file.path, hash, ratio: ratio);
             }
-          },
-          onPerformDrop: (event) async {
-            for (final item in event.session.items) {
-              final reader = item.dataReader!;
-              handleNativeReader(reader);
-            }
+            setState(() => _isBusy = false);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
