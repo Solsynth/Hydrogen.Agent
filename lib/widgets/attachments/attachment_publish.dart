@@ -16,6 +16,7 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
+import 'package:solian/widgets/attachments/attachment_item.dart';
 
 class AttachmentPublishPopup extends StatefulWidget {
   final String usage;
@@ -156,7 +157,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
   void pasteFileToUpload() async {
     final data = await Pasteboard.image;
-    if(data == null) return;
+    if (data == null) return;
 
     setState(() => _isBusy = true);
 
@@ -237,6 +238,25 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     }
   }
 
+  void showEdit(Attachment element, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AttachmentEditorDialog(
+          item: element,
+          onDelete: () {
+            setState(() => _attachments.removeAt(index));
+            widget.onUpdate(_attachments.map((e) => e!.id).toList());
+          },
+          onUpdate: (item) {
+            setState(() => _attachments[index] = item);
+            widget.onUpdate(_attachments.map((e) => e!.id).toList());
+          },
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -294,57 +314,65 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
                       return Container(
                         padding: const EdgeInsets.only(
                             left: 16, right: 8, bottom: 16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    element.alt,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold),
+                        child: Card(
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 280,
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    topRight: Radius.circular(8),
                                   ),
-                                  Text(
-                                    '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
+                                  child: AttachmentItem(
+                                    parentId: 'attachment-editor',
+                                    item: element,
+                                    showBadge: false,
+                                    showHideButton: false,
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              style: TextButton.styleFrom(
-                                shape: const CircleBorder(),
-                                foregroundColor: Theme.of(context).primaryColor,
+                              SizedBox(
+                                height: 54,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            element.alt,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'monospace'
+                                            ),
+                                          ),
+                                          Text(
+                                            '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
+                                            style:
+                                                const TextStyle(fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      style: TextButton.styleFrom(
+                                        shape: const CircleBorder(),
+                                        foregroundColor:
+                                            Theme.of(context).primaryColor,
+                                      ),
+                                      icon: const Icon(Icons.more_horiz),
+                                      onPressed: () => showEdit(element, index),
+                                    ),
+                                  ],
+                                ).paddingSymmetric(vertical: 8, horizontal: 16),
                               ),
-                              icon: const Icon(Icons.more_horiz),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AttachmentEditorDialog(
-                                      item: element,
-                                      onDelete: () {
-                                        setState(
-                                            () => _attachments.removeAt(index));
-                                        widget.onUpdate(_attachments
-                                            .map((e) => e!.id)
-                                            .toList());
-                                      },
-                                      onUpdate: (item) {
-                                        setState(
-                                            () => _attachments[index] = item);
-                                        widget.onUpdate(_attachments
-                                            .map((e) => e!.id)
-                                            .toList());
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },
