@@ -100,15 +100,40 @@ class FeedCreationButton extends StatelessWidget {
         future: auth.isAuthorized,
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data == true) {
-            return IconButton(
+            return PopupMenuButton(
               icon: const Icon(Icons.add_circle),
-              onPressed: () {
-                AppRouter.instance.pushNamed('postPublishing').then((val) {
-                  if (val != null && onCreated != null) {
-                    onCreated!();
-                  }
-                });
-              },
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem(
+                  child: ListTile(
+                    title: Text('postCreate'.tr),
+                    leading: const Icon(Icons.article),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                  onTap: () {
+                    AppRouter.instance.pushNamed('postPublishing').then((val) {
+                      if (val != null && onCreated != null) {
+                        onCreated!();
+                      }
+                    });
+                  },
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: Text('articleCreate'.tr),
+                    leading: const Icon(Icons.newspaper),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                  onTap: () {},
+                ),
+                PopupMenuItem(
+                  child: ListTile(
+                    title: Text('draftBoxOpen'.tr),
+                    leading: const Icon(Icons.drafts),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                  onTap: () {},
+                ),
+              ],
             );
           }
           return const SizedBox();

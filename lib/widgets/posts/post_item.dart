@@ -111,17 +111,29 @@ class _PostItemState extends State<PostItem> {
       }));
     }
 
+    List<Widget> widgets = List.empty(growable: true);
+
+    if (widget.item.tags?.isNotEmpty ?? false) {
+      widgets.add(FeedTagsList(tags: widget.item.tags!));
+    }
     if (labels.isNotEmpty) {
-      return Text(
+      widgets.add(Text(
         labels.join(' · '),
         textAlign: TextAlign.left,
         style: TextStyle(
           fontSize: 12,
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
         ),
-      ).paddingOnly(top: 2);
-    } else {
+      ));
+    }
+
+    if (widgets.isEmpty) {
       return const SizedBox();
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
+      );
     }
   }
 
@@ -210,10 +222,7 @@ class _PostItemState extends State<PostItem> {
             top: 2,
             bottom: hasAttachment ? 4 : 0,
           ),
-          buildFooter().paddingOnly(left: 16),
-          if (widget.item.tags?.isNotEmpty ?? false)
-            FeedTagsList(tags: widget.item.tags!)
-                .paddingOnly(left: 12, top: 6, bottom: 2),
+          buildFooter().paddingOnly(left: 16, top: 2),
           AttachmentList(
             parentId: widget.overrideAttachmentParent ?? widget.item.alias,
             attachmentsId: item.attachments ?? List.empty(),
@@ -275,10 +284,7 @@ class _PostItemState extends State<PostItem> {
                         );
                       },
                     ),
-                  buildFooter().paddingOnly(left: 12),
-                  if (widget.item.tags?.isNotEmpty ?? false)
-                    FeedTagsList(tags: widget.item.tags!)
-                        .paddingOnly(left: 4, top: 6, bottom: 2),
+                  buildFooter().paddingOnly(left: 12, top: 2),
                 ],
               ),
             )
