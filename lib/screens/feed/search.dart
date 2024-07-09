@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
-import 'package:solian/providers/content/post.dart';
-import 'package:solian/widgets/posts/feed_list.dart';
+import 'package:solian/providers/content/feed.dart';
+import 'package:solian/widgets/feed/feed_list.dart';
 
 class FeedSearchScreen extends StatefulWidget {
   final String? tag;
@@ -21,7 +21,7 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final PostProvider provider = Get.find();
+    final FeedProvider provider = Get.find();
 
     Response resp;
     try {
@@ -68,7 +68,8 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
               ListTile(
                 leading: const Icon(Icons.category),
                 tileColor: Theme.of(context).colorScheme.surfaceContainer,
-                title: Text('feedSearchWithCategory'.trParams({'key': widget.category!})),
+                title: Text('feedSearchWithCategory'
+                    .trParams({'key': widget.category!})),
               ),
             Expanded(
               child: RefreshIndicator(
@@ -84,5 +85,11 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 }

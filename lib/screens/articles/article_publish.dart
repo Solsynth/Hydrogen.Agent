@@ -9,7 +9,7 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
-import 'package:solian/widgets/posts/tags_field.dart';
+import 'package:solian/widgets/feed/feed_tags_field.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 

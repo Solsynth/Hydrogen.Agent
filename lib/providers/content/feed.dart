@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
-class PostProvider extends GetConnect {
+class FeedProvider extends GetConnect {
   @override
   void onInit() {
     httpClient.baseUrl = ServiceFinder.services['interactive'];
@@ -17,6 +18,23 @@ class PostProvider extends GetConnect {
       if (realm != null) 'realmId=$realm',
     ];
     final resp = await get('/api/feed?${queries.join('&')}');
+    if (resp.statusCode != 200) {
+      throw Exception(resp.body);
+    }
+
+    return resp;
+  }
+
+  Future<Response> listDraft(int page) async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) throw Exception('unauthorized');
+
+    final queries = [
+      'take=${10}',
+      'offset=$page',
+    ];
+    final client = auth.configureClient('interactive');
+    final resp = await client.get('/api/drafts?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:intl/intl.dart';
@@ -8,11 +7,10 @@ import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
-import 'package:solian/widgets/posts/feed_tags.dart';
+import 'package:solian/widgets/feed/feed_content.dart';
+import 'package:solian/widgets/feed/feed_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:timeago/timeago.dart' show format;
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:markdown/markdown.dart' as markdown;
 
 class PostItem extends StatefulWidget {
   final Post item;
@@ -71,30 +69,6 @@ class _PostItemState extends State<PostItem> {
         ).paddingOnly(left: widget.isCompact ? 6 : 12),
         buildDate().paddingOnly(left: 4),
       ],
-    );
-  }
-
-  Widget buildBody() {
-    return Markdown(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      data: item.content,
-      padding: const EdgeInsets.all(0),
-      extensionSet: markdown.ExtensionSet(
-        markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
-        <markdown.InlineSyntax>[
-          markdown.EmojiSyntax(),
-          markdown.AutolinkExtensionSyntax(),
-          ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
-        ],
-      ),
-      onTapLink: (text, href, title) async {
-        if (href == null) return;
-        await launchUrlString(
-          href,
-          mode: LaunchMode.externalApplication,
-        );
-      },
     );
   }
 
@@ -216,7 +190,7 @@ class _PostItemState extends State<PostItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildHeader().paddingSymmetric(horizontal: 12),
-          buildBody().paddingOnly(
+          FeedContent(content: item.content).paddingOnly(
             left: 16,
             right: 12,
             top: 2,
@@ -257,7 +231,8 @@ class _PostItemState extends State<PostItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildHeader(),
-                  buildBody().paddingOnly(left: 12, right: 8),
+                  FeedContent(content: item.content)
+                      .paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
                       child: buildReply(context).paddingOnly(top: 4),

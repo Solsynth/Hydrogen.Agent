@@ -315,4 +315,15 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _nicknameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _descriptionController.dispose();
+    _birthdayController.dispose();
+    super.dispose();
+  }
 }

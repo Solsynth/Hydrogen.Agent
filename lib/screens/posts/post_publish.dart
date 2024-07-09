@@ -11,7 +11,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
-import 'package:solian/widgets/posts/tags_field.dart';
+import 'package:solian/widgets/feed/feed_tags_field.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 import 'package:badges/badges.dart' as badges;
@@ -147,95 +147,94 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
             )
           ],
         ),
-        body: SafeArea(
-          top: false,
-          child: Stack(
-            children: [
-              ListView(
-                children: [
-                  if (_isBusy)
-                    const LinearProgressIndicator().animate().scaleX(),
-                  if (widget.edit != null)
-                    MaterialBanner(
-                      leading: const Icon(Icons.edit),
-                      leadingPadding:
-                          const EdgeInsets.only(left: 10, right: 20),
-                      dividerColor: Colors.transparent,
-                      content: Text('postEditingNotify'.tr),
-                      actions: notifyBannerActions,
-                    ),
-                  if (widget.reply != null)
-                    ExpansionTile(
-                      leading: const FaIcon(
-                        FontAwesomeIcons.reply,
-                        size: 18,
-                      ).paddingOnly(left: 2),
-                      title: Text('postReplyingNotify'.trParams(
-                        {'username': '@${widget.reply!.author.name}'},
-                      )),
-                      collapsedBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainer,
-                      children: [
-                        PostItem(
-                          item: widget.reply!,
-                          isReactable: false,
-                        ).paddingOnly(bottom: 8),
-                      ],
-                    ),
-                  if (widget.repost != null)
-                    ExpansionTile(
-                      leading: const FaIcon(
-                        FontAwesomeIcons.retweet,
-                        size: 18,
-                      ).paddingOnly(left: 2),
-                      title: Text('postRepostingNotify'.trParams(
-                        {'username': '@${widget.repost!.author.name}'},
-                      )),
-                      collapsedBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainer,
-                      children: [
-                        PostItem(
-                          item: widget.repost!,
-                          isReactable: false,
-                        ).paddingOnly(bottom: 8),
-                      ],
-                    ),
-                  if (widget.realm != null)
-                    MaterialBanner(
-                      leading: const Icon(Icons.group),
-                      leadingPadding:
-                          const EdgeInsets.only(left: 10, right: 20),
-                      dividerColor: Colors.transparent,
-                      content: Text(
-                        'postInRealmNotify'
-                            .trParams({'realm': '#${widget.realm!.alias}'}),
-                      ),
-                      actions: notifyBannerActions,
-                    ),
-                  const Divider(thickness: 0.3, height: 0.3)
-                      .paddingOnly(bottom: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: TextField(
-                      maxLines: null,
-                      autofocus: true,
-                      autocorrect: true,
-                      keyboardType: TextInputType.multiline,
-                      controller: _contentController,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'postContentPlaceholder'.tr,
-                      ),
-                      onTapOutside: (_) =>
-                          FocusManager.instance.primaryFocus?.unfocus(),
-                    ),
+        body: Stack(
+          children: [
+            ListView(
+              children: [
+                if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+                if (widget.edit != null && widget.edit!.isDraft != true)
+                  MaterialBanner(
+                    leading: const Icon(Icons.edit),
+                    leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                    dividerColor: Colors.transparent,
+                    content: Text('postEditingNotify'.tr),
+                    actions: notifyBannerActions,
                   ),
-                ],
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
+                if (widget.reply != null)
+                  ExpansionTile(
+                    leading: const FaIcon(
+                      FontAwesomeIcons.reply,
+                      size: 18,
+                    ).paddingOnly(left: 2),
+                    title: Text('postReplyingNotify'.trParams(
+                      {'username': '@${widget.reply!.author.name}'},
+                    )),
+                    collapsedBackgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainer,
+                    children: [
+                      PostItem(
+                        item: widget.reply!,
+                        isReactable: false,
+                      ).paddingOnly(bottom: 8),
+                    ],
+                  ),
+                if (widget.repost != null)
+                  ExpansionTile(
+                    leading: const FaIcon(
+                      FontAwesomeIcons.retweet,
+                      size: 18,
+                    ).paddingOnly(left: 2),
+                    title: Text('postRepostingNotify'.trParams(
+                      {'username': '@${widget.repost!.author.name}'},
+                    )),
+                    collapsedBackgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainer,
+                    children: [
+                      PostItem(
+                        item: widget.repost!,
+                        isReactable: false,
+                      ).paddingOnly(bottom: 8),
+                    ],
+                  ),
+                if (widget.realm != null)
+                  MaterialBanner(
+                    leading: const Icon(Icons.group),
+                    leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                    dividerColor: Colors.transparent,
+                    content: Text(
+                      'postInRealmNotify'
+                          .trParams({'realm': '#${widget.realm!.alias}'}),
+                    ),
+                    actions: notifyBannerActions,
+                  ),
+                const Divider(thickness: 0.3, height: 0.3)
+                    .paddingOnly(bottom: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    maxLines: null,
+                    autofocus: true,
+                    autocorrect: true,
+                    keyboardType: TextInputType.multiline,
+                    controller: _contentController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'postContentPlaceholder'.tr,
+                    ),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+                const SizedBox(height: 120)
+              ],
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Material(
+                elevation: 8,
+                color: Theme.of(context).colorScheme.surface,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -274,10 +273,10 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       ).paddingSymmetric(horizontal: 6, vertical: 8),
                     ),
                   ],
-                ),
+                ).paddingOnly(bottom: MediaQuery.of(context).padding.bottom),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

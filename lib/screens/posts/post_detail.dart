@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/providers/content/post.dart';
+import 'package:solian/providers/content/feed.dart';
 import 'package:solian/widgets/centered_container.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
@@ -20,7 +20,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Post? item;
 
   Future<Post?> getDetail() async {
-    final PostProvider provider = Get.find();
+    final FeedProvider provider = Get.find();
 
     try {
       final resp = await provider.getPost(widget.alias);

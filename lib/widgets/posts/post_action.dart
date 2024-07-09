@@ -12,8 +12,9 @@ import 'package:solian/screens/posts/post_publish.dart';
 
 class PostAction extends StatefulWidget {
   final Post item;
+  final bool noReact;
 
-  const PostAction({super.key, required this.item});
+  const PostAction({super.key, required this.item, this.noReact = false});
 
   @override
   State<PostAction> createState() => _PostActionState();
@@ -39,7 +40,6 @@ class _PostActionState extends State<PostAction> {
   @override
   void initState() {
     super.initState();
-
     checkAbleToModifyContent();
   }
 
@@ -66,35 +66,37 @@ class _PostActionState extends State<PostAction> {
           Expanded(
             child: ListView(
               children: [
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  leading: const FaIcon(FontAwesomeIcons.reply, size: 20),
-                  title: Text('reply'.tr),
-                  onTap: () async {
-                    final value = await AppRouter.instance.pushNamed(
-                      'postCreate',
-                      extra: PostPublishArguments(reply: widget.item),
-                    );
-                    if (value != null) {
-                      Navigator.pop(context, true);
-                    }
-                  },
-                ),
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  leading: const FaIcon(FontAwesomeIcons.retweet, size: 20),
-                  title: Text('repost'.tr),
-                  onTap: () async {
-                    final value = await AppRouter.instance.pushNamed(
-                      'postCreate',
-                      extra: PostPublishArguments(repost: widget.item),
-                    );
-                    if (value != null) {
-                      Navigator.pop(context, true);
-                    }
-                  },
-                ),
-                if (_canModifyContent)
+                if (!widget.noReact)
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                    leading: const FaIcon(FontAwesomeIcons.reply, size: 20),
+                    title: Text('reply'.tr),
+                    onTap: () async {
+                      final value = await AppRouter.instance.pushNamed(
+                        'postCreate',
+                        extra: PostPublishArguments(reply: widget.item),
+                      );
+                      if (value != null) {
+                        Navigator.pop(context, true);
+                      }
+                    },
+                  ),
+                if (!widget.noReact)
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                    leading: const FaIcon(FontAwesomeIcons.retweet, size: 20),
+                    title: Text('repost'.tr),
+                    onTap: () async {
+                      final value = await AppRouter.instance.pushNamed(
+                        'postCreate',
+                        extra: PostPublishArguments(repost: widget.item),
+                      );
+                      if (value != null) {
+                        Navigator.pop(context, true);
+                      }
+                    },
+                  ),
+                if (_canModifyContent && !widget.noReact)
                   const Divider(thickness: 0.3, height: 0.3)
                       .paddingSymmetric(vertical: 16),
                 if (_canModifyContent)

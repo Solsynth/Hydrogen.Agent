@@ -4,13 +4,13 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/post.dart';
+import 'package:solian/providers/content/feed.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
-import 'package:solian/widgets/posts/feed_list.dart';
+import 'package:solian/widgets/feed/feed_list.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({super.key});
@@ -24,7 +24,7 @@ class _FeedScreenState extends State<FeedScreen> {
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final PostProvider provider = Get.find();
+    final FeedProvider provider = Get.find();
 
     Response resp;
     try {
@@ -46,7 +46,6 @@ class _FeedScreenState extends State<FeedScreen> {
   @override
   void initState() {
     super.initState();
-
     _pagingController.addPageRequestListener(getPosts);
   }
 
@@ -85,12 +84,23 @@ class _FeedScreenState extends State<FeedScreen> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
 }
 
 class FeedCreationButton extends StatelessWidget {
+  final bool hideDraftBox;
   final Function? onCreated;
 
-  const FeedCreationButton({super.key, this.onCreated});
+  const FeedCreationButton({
+    super.key,
+    this.hideDraftBox = false,
+    this.onCreated,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -131,16 +141,17 @@ class FeedCreationButton extends StatelessWidget {
                     });
                   },
                 ),
-                PopupMenuItem(
-                  child: ListTile(
-                    title: Text('draftBoxOpen'.tr),
-                    leading: const Icon(Icons.drafts),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                if (!hideDraftBox)
+                  PopupMenuItem(
+                    child: ListTile(
+                      title: Text('draftBoxOpen'.tr),
+                      leading: const Icon(Icons.drafts),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    onTap: () {
+                      AppRouter.instance.pushNamed('draftBox');
+                    },
                   ),
-                  onTap: () {
-                    AppRouter.instance.goNamed('draftBox');
-                  },
-                ),
               ],
             );
           }
