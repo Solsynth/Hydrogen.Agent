@@ -12,6 +12,7 @@ import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/feed/feed_tags_field.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:textfield_tags/textfield_tags.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ArticlePublishArguments {
   final Post? edit;
@@ -44,6 +45,8 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
 
   List<int> _attachments = List.empty();
 
+  bool _isDraft = false;
+
   void showAttachments() {
     showModalBottomSheet(
       context: context,
@@ -51,7 +54,9 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
       builder: (context) => AttachmentPublishPopup(
         usage: 'i.attachment',
         current: _attachments,
-        onUpdate: (value) => _attachments = value,
+        onUpdate: (value) {
+          setState(() => _attachments = value);
+        },
       ),
     );
   }
@@ -72,6 +77,7 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
       'tags': _tagsController.getTags?.map((x) => {'alias': x}).toList() ??
           List.empty(),
       'attachments': _attachments,
+      'is_draft': _isDraft,
       if (widget.edit != null) 'alias': widget.edit!.alias,
       if (widget.realm != null) 'realm': widget.realm!.alias,
     };
@@ -95,6 +101,7 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
     if (widget.edit != null) {
       _contentController.text = widget.edit!.content;
       _attachments = widget.edit!.attachments ?? List.empty();
+      _isDraft = widget.edit!.isDraft ?? false;
     }
   }
 
@@ -128,81 +135,102 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyPost(),
-              child: Text('postAction'.tr.toUpperCase()),
+              child: Text(
+                _isDraft
+                    ? 'draftSave'.tr.toUpperCase()
+                    : 'postAction'.tr.toUpperCase(),
+              ),
             )
           ],
         ),
-        body: SafeArea(
-          top: false,
-          child: Stack(
-            children: [
-              ListView(
-                children: [
-                  if (_isBusy)
-                    const LinearProgressIndicator().animate().scaleX(),
-                  if (widget.edit != null)
-                    MaterialBanner(
-                      leading: const Icon(Icons.edit),
-                      leadingPadding:
-                          const EdgeInsets.only(left: 10, right: 20),
-                      dividerColor: Colors.transparent,
-                      content: Text('postEditingNotify'.tr),
-                      actions: notifyBannerActions,
-                    ),
-                  if (widget.realm != null)
-                    MaterialBanner(
-                      leading: const Icon(Icons.group),
-                      leadingPadding:
-                          const EdgeInsets.only(left: 10, right: 20),
-                      dividerColor: Colors.transparent,
-                      content: Text(
-                        'postInRealmNotify'
-                            .trParams({'realm': '#${widget.realm!.alias}'}),
-                      ),
-                      actions: notifyBannerActions,
-                    ),
-                  const Divider(thickness: 0.3, height: 0.3)
-                      .paddingOnly(bottom: 6),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: TextField(
-                      maxLines: null,
-                      autofocus: true,
-                      autocorrect: true,
-                      keyboardType: TextInputType.multiline,
-                      controller: _titleController,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'articleTitlePlaceholder'.tr,
-                      ),
-                      onTapOutside: (_) =>
-                          FocusManager.instance.primaryFocus?.unfocus(),
-                    ),
+        body: Stack(
+          children: [
+            ListView(
+              children: [
+                if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+                if (widget.edit != null)
+                  MaterialBanner(
+                    leading: const Icon(Icons.edit),
+                    leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                    dividerColor: Colors.transparent,
+                    content: Text('postEditingNotify'.tr),
+                    actions: notifyBannerActions,
                   ),
-                  const Divider(thickness: 0.3, height: 0.3)
-                      .paddingSymmetric(vertical: 6),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: TextField(
-                      maxLines: null,
-                      autofocus: true,
-                      autocorrect: true,
-                      keyboardType: TextInputType.multiline,
-                      controller: _contentController,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'articleContentPlaceholder'.tr,
-                      ),
-                      onTapOutside: (_) =>
-                          FocusManager.instance.primaryFocus?.unfocus(),
+                if (widget.realm != null)
+                  MaterialBanner(
+                    leading: const Icon(Icons.group),
+                    leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                    dividerColor: Colors.transparent,
+                    content: Text(
+                      'postInRealmNotify'
+                          .trParams({'realm': '#${widget.realm!.alias}'}),
                     ),
+                    actions: notifyBannerActions,
                   ),
-                ],
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
+                const Divider(thickness: 0.3, height: 0.3)
+                    .paddingOnly(bottom: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    maxLines: null,
+                    autofocus: true,
+                    autocorrect: true,
+                    controller: _titleController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'articleTitlePlaceholder'.tr,
+                    ),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+                const Divider(thickness: 0.3, height: 0.3)
+                    .paddingOnly(bottom: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    minLines: 1,
+                    maxLines: 3,
+                    autofocus: true,
+                    autocorrect: true,
+                    keyboardType: TextInputType.multiline,
+                    controller: _descriptionController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'articleDescriptionPlaceholder'.tr,
+                    ),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+                const Divider(thickness: 0.3, height: 0.3)
+                    .paddingSymmetric(vertical: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    maxLines: null,
+                    autofocus: true,
+                    autocorrect: true,
+                    keyboardType: TextInputType.multiline,
+                    controller: _contentController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: 'articleContentPlaceholder'.tr,
+                    ),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                  ),
+                ),
+                const SizedBox(height: 120),
+              ],
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Material(
+                elevation: 8,
+                color: Theme.of(context).colorScheme.surface,
                 child: Column(
                   children: [
                     TagsField(
@@ -214,23 +242,44 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
                     const Divider(thickness: 0.3, height: 0.3),
                     SizedBox(
                       height: 56,
-                      child: Row(
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
                         children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              shape: const CircleBorder(),
+                          IconButton(
+                            icon: _isDraft
+                                ? const Icon(Icons.drive_file_rename_outline)
+                                : const Icon(Icons.public),
+                            color: _isDraft
+                                ? Colors.grey.shade600
+                                : Colors.green.shade700,
+                            onPressed: () {
+                              setState(() => _isDraft = !_isDraft);
+                            },
+                          ),
+                          IconButton(
+                            icon: badges.Badge(
+                              badgeContent: Text(
+                                _attachments.length.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              showBadge: _attachments.isNotEmpty,
+                              position: badges.BadgePosition.topEnd(
+                                top: -12,
+                                end: -8,
+                              ),
+                              child: const Icon(Icons.camera_alt),
                             ),
-                            child: const Icon(Icons.camera_alt),
+                            color: Theme.of(context).colorScheme.primary,
                             onPressed: () => showAttachments(),
-                          )
+                          ),
                         ],
-                      ),
+                      ).paddingSymmetric(horizontal: 6, vertical: 8),
                     ),
                   ],
-                ),
+                ).paddingOnly(bottom: MediaQuery.of(context).padding.bottom),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

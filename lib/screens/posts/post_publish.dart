@@ -60,7 +60,9 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       builder: (context) => AttachmentPublishPopup(
         usage: 'i.attachment',
         current: _attachments,
-        onUpdate: (value) => _attachments = value,
+        onUpdate: (value) {
+          setState(() => _attachments = value);
+        },
       ),
     );
   }
@@ -261,14 +263,22 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                               setState(() => _isDraft = !_isDraft);
                             },
                           ),
-                          badges.Badge(
-                            badgeContent: Text(_attachments.length.toString()),
-                            showBadge: _attachments.isNotEmpty,
-                            child: IconButton(
-                              icon: const Icon(Icons.camera_alt),
-                              onPressed: () => showAttachments(),
+                          IconButton(
+                            icon: badges.Badge(
+                              badgeContent: Text(
+                                _attachments.length.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              showBadge: _attachments.isNotEmpty,
+                              position: badges.BadgePosition.topEnd(
+                                top: -12,
+                                end: -8,
+                              ),
+                              child: const Icon(Icons.camera_alt),
                             ),
-                          )
+                            color: Theme.of(context).colorScheme.primary,
+                            onPressed: () => showAttachments(),
+                          ),
                         ],
                       ).paddingSymmetric(horizontal: 6, vertical: 8),
                     ),

@@ -91,6 +91,7 @@ const messagesEnglish = {
   'postPublish': 'Post a post',
   'articlePublish': 'Write an article',
   'articleTitlePlaceholder': 'Title',
+  'articleDescriptionPlaceholder': 'Description',
   'articleContentPlaceholder': 'Content',
   'postIdentityNotify': 'You will post this post as',
   'postContentPlaceholder': 'What\'s happened?!',

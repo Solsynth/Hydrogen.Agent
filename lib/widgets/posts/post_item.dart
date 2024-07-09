@@ -275,22 +275,25 @@ class _PostItemState extends State<PostItem> {
           attachmentsId: item.attachments ?? List.empty(),
           divided: true,
         ),
-        PostQuickAction(
-          isShowReply: widget.isShowReply,
-          isReactable: widget.isReactable,
-          item: widget.item,
-          onReact: (symbol, changes) {
-            setState(() {
-              item.reactionList[symbol] =
-                  (item.reactionList[symbol] ?? 0) + changes;
-            });
-          },
-        ).paddingOnly(
-          top: hasAttachment ? 10 : 6,
-          left: hasAttachment ? 24 : 60,
-          right: 16,
-          bottom: 10,
-        ),
+        if (!widget.isShowReply && widget.isReactable)
+          PostQuickAction(
+            isShowReply: widget.isShowReply,
+            isReactable: widget.isReactable,
+            item: widget.item,
+            onReact: (symbol, changes) {
+              setState(() {
+                item.reactionList[symbol] =
+                    (item.reactionList[symbol] ?? 0) + changes;
+              });
+            },
+          ).paddingOnly(
+            top: hasAttachment ? 10 : 6,
+            left: hasAttachment ? 24 : 60,
+            right: 16,
+            bottom: 10,
+          )
+        else
+          const SizedBox(height: 10),
       ],
     );
   }
