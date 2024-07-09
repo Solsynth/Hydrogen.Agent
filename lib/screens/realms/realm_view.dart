@@ -210,8 +210,8 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
               onTap: () {
                 AppRouter.instance
                     .pushNamed(
-                  'postPublishing',
-                  extra: PostPublishingArguments(realm: widget.realm),
+                  'postCreate',
+                  extra: PostPublishArguments(realm: widget.realm),
                 )
                     .then((value) {
                   if (value != null) _pagingController.refresh();

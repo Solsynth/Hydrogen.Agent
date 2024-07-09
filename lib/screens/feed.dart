@@ -101,7 +101,7 @@ class FeedCreationButton extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data == true) {
             return PopupMenuButton(
-              icon: const Icon(Icons.add_circle),
+              icon: const Icon(Icons.edit_square),
               itemBuilder: (BuildContext context) => [
                 PopupMenuItem(
                   child: ListTile(
@@ -110,7 +110,7 @@ class FeedCreationButton extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                   onTap: () {
-                    AppRouter.instance.pushNamed('postPublishing').then((val) {
+                    AppRouter.instance.pushNamed('postCreate').then((val) {
                       if (val != null && onCreated != null) {
                         onCreated!();
                       }
@@ -123,7 +123,13 @@ class FeedCreationButton extends StatelessWidget {
                     leading: const Icon(Icons.newspaper),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    AppRouter.instance.pushNamed('articleCreate').then((val) {
+                      if (val != null && onCreated != null) {
+                        onCreated!();
+                      }
+                    });
+                  },
                 ),
                 PopupMenuItem(
                   child: ListTile(
@@ -131,7 +137,9 @@ class FeedCreationButton extends StatelessWidget {
                     leading: const Icon(Icons.drafts),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    AppRouter.instance.goNamed('draftBox');
+                  },
                 ),
               ],
             );

@@ -29,8 +29,7 @@ class _AppNavigationBottomBarState extends State<AppNavigationBottomBar> {
       showUnselectedLabels: false,
       onTap: (idx) {
         setState(() => _selectedIndex = idx);
-        AppRouter.instance
-            .pushReplacementNamed(AppNavigation.destinations[idx].page);
+        AppRouter.instance.goNamed(AppNavigation.destinations[idx].page);
       },
     );
   }

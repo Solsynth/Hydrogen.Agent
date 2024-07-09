@@ -20,6 +20,7 @@ class Post {
   Post? repostTo;
   Realm? realm;
   DateTime? publishedAt;
+  bool? isDraft;
   int authorId;
   Account author;
   int replyCount;
@@ -44,6 +45,7 @@ class Post {
     required this.repostTo,
     required this.realm,
     required this.publishedAt,
+    required this.isDraft,
     required this.authorId,
     required this.author,
     required this.replyCount,
@@ -80,6 +82,7 @@ class Post {
         publishedAt: json['published_at'] != null
             ? DateTime.parse(json['published_at'])
             : null,
+        isDraft: json['is_draft'],
         authorId: json['author_id'],
         author: Account.fromJson(json['author']),
         replyCount: json['reply_count'],
@@ -112,6 +115,7 @@ class Post {
         'repost_to': repostTo?.toJson(),
         'realm': realm?.toJson(),
         'published_at': publishedAt?.toIso8601String(),
+        'is_draft': isDraft,
         'author_id': authorId,
         'author': author.toJson(),
         'reply_count': replyCount,

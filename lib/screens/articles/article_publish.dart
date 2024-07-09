@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
@@ -10,48 +9,40 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
-import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/tags_field.dart';
 import 'package:solian/widgets/prev_page.dart';
 import 'package:textfield_tags/textfield_tags.dart';
-import 'package:badges/badges.dart' as badges;
 
-class PostPublishArguments {
+class ArticlePublishArguments {
   final Post? edit;
-  final Post? reply;
-  final Post? repost;
   final Realm? realm;
 
-  PostPublishArguments({this.edit, this.reply, this.repost, this.realm});
+  ArticlePublishArguments({this.edit, this.realm});
 }
 
-class PostPublishScreen extends StatefulWidget {
+class ArticlePublishScreen extends StatefulWidget {
   final Post? edit;
-  final Post? reply;
-  final Post? repost;
   final Realm? realm;
 
-  const PostPublishScreen({
+  const ArticlePublishScreen({
     super.key,
     this.edit,
-    this.reply,
-    this.repost,
     this.realm,
   });
 
   @override
-  State<PostPublishScreen> createState() => _PostPublishScreenState();
+  State<ArticlePublishScreen> createState() => _ArticlePublishScreenState();
 }
 
-class _PostPublishScreenState extends State<PostPublishScreen> {
+class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
   final _contentController = TextEditingController();
   final _tagsController = StringTagController();
 
   bool _isBusy = false;
 
   List<int> _attachments = List.empty();
-
-  bool _isDraft = false;
 
   void showAttachments() {
     showModalBottomSheet(
@@ -75,22 +66,21 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     final client = auth.configureClient('interactive');
 
     final payload = {
+      'title': _titleController.value.text,
+      'description': _descriptionController.value.text,
       'content': _contentController.value.text,
       'tags': _tagsController.getTags?.map((x) => {'alias': x}).toList() ??
           List.empty(),
       'attachments': _attachments,
-      'is_draft': _isDraft,
       if (widget.edit != null) 'alias': widget.edit!.alias,
-      if (widget.reply != null) 'reply_to': widget.reply!.id,
-      if (widget.repost != null) 'repost_to': widget.repost!.id,
       if (widget.realm != null) 'realm': widget.realm!.alias,
     };
 
     Response resp;
     if (widget.edit != null) {
-      resp = await client.put('/api/posts/${widget.edit!.id}', payload);
+      resp = await client.put('/api/articles/${widget.edit!.id}', payload);
     } else {
-      resp = await client.post('/api/posts', payload);
+      resp = await client.post('/api/articles', payload);
     }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
@@ -105,7 +95,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     if (widget.edit != null) {
       _contentController.text = widget.edit!.content;
       _attachments = widget.edit!.attachments ?? List.empty();
-      _isDraft = widget.edit!.isDraft ?? false;
     }
   }
 
@@ -132,18 +121,14 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          title: AppBarTitle('postPublish'.tr),
+          title: AppBarTitle('articlePublish'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           leading: const PrevPageButton(),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyPost(),
-              child: Text(
-                _isDraft
-                    ? 'draftSave'.tr.toUpperCase()
-                    : 'postAction'.tr.toUpperCase(),
-              ),
+              child: Text('postAction'.tr.toUpperCase()),
             )
           ],
         ),
@@ -164,42 +149,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       content: Text('postEditingNotify'.tr),
                       actions: notifyBannerActions,
                     ),
-                  if (widget.reply != null)
-                    ExpansionTile(
-                      leading: const FaIcon(
-                        FontAwesomeIcons.reply,
-                        size: 18,
-                      ).paddingOnly(left: 2),
-                      title: Text('postReplyingNotify'.trParams(
-                        {'username': '@${widget.reply!.author.name}'},
-                      )),
-                      collapsedBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainer,
-                      children: [
-                        PostItem(
-                          item: widget.reply!,
-                          isReactable: false,
-                        ).paddingOnly(bottom: 8),
-                      ],
-                    ),
-                  if (widget.repost != null)
-                    ExpansionTile(
-                      leading: const FaIcon(
-                        FontAwesomeIcons.retweet,
-                        size: 18,
-                      ).paddingOnly(left: 2),
-                      title: Text('postRepostingNotify'.trParams(
-                        {'username': '@${widget.repost!.author.name}'},
-                      )),
-                      collapsedBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainer,
-                      children: [
-                        PostItem(
-                          item: widget.repost!,
-                          isReactable: false,
-                        ).paddingOnly(bottom: 8),
-                      ],
-                    ),
                   if (widget.realm != null)
                     MaterialBanner(
                       leading: const Icon(Icons.group),
@@ -213,7 +162,25 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       actions: notifyBannerActions,
                     ),
                   const Divider(thickness: 0.3, height: 0.3)
-                      .paddingOnly(bottom: 8),
+                      .paddingOnly(bottom: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TextField(
+                      maxLines: null,
+                      autofocus: true,
+                      autocorrect: true,
+                      keyboardType: TextInputType.multiline,
+                      controller: _titleController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'articleTitlePlaceholder'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    ),
+                  ),
+                  const Divider(thickness: 0.3, height: 0.3)
+                      .paddingSymmetric(vertical: 6),
                   Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -224,7 +191,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       keyboardType: TextInputType.multiline,
                       controller: _contentController,
                       decoration: InputDecoration.collapsed(
-                        hintText: 'postContentPlaceholder'.tr,
+                        hintText: 'articleContentPlaceholder'.tr,
                       ),
                       onTapOutside: (_) =>
                           FocusManager.instance.primaryFocus?.unfocus(),
@@ -237,7 +204,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 left: 0,
                 right: 0,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TagsField(
                       initialTags:
@@ -248,30 +214,17 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                     const Divider(thickness: 0.3, height: 0.3),
                     SizedBox(
                       height: 56,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
+                      child: Row(
                         children: [
-                          IconButton(
-                            icon: _isDraft
-                                ? const Icon(Icons.drive_file_rename_outline)
-                                : const Icon(Icons.public),
-                            color: _isDraft
-                                ? Colors.grey.shade600
-                                : Colors.green.shade700,
-                            onPressed: () {
-                              setState(() => _isDraft = !_isDraft);
-                            },
-                          ),
-                          badges.Badge(
-                            badgeContent: Text(_attachments.length.toString()),
-                            showBadge: _attachments.isNotEmpty,
-                            child: IconButton(
-                              icon: const Icon(Icons.camera_alt),
-                              onPressed: () => showAttachments(),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              shape: const CircleBorder(),
                             ),
+                            child: const Icon(Icons.camera_alt),
+                            onPressed: () => showAttachments(),
                           )
                         ],
-                      ).paddingSymmetric(horizontal: 6, vertical: 8),
+                      ),
                     ),
                   ],
                 ),
@@ -285,6 +238,8 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   @override
   void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
     _contentController.dispose();
     _tagsController.dispose();
     super.dispose();

@@ -4,12 +4,14 @@ import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
+import 'package:solian/screens/articles/article_publish.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/chat.dart';
-import 'package:solian/screens/feed_search.dart';
+import 'package:solian/screens/feed/search.dart';
 import 'package:solian/screens/posts/post_detail.dart';
+import 'package:solian/screens/feed/draft_box.dart';
 import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
@@ -60,6 +62,11 @@ abstract class AppRouter {
         ),
       ),
       GoRoute(
+        path: '/drafts',
+        name: 'draftBox',
+        builder: (context, state) => const DraftBoxScreen(),
+      ),
+      GoRoute(
         path: '/posts/view/:alias',
         name: 'postDetail',
         builder: (context, state) => TitleShell(
@@ -71,10 +78,10 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: '/posts/publish',
-        name: 'postPublishing',
+        name: 'postCreate',
         builder: (context, state) {
-          final arguments = state.extra as PostPublishingArguments?;
-          return PostPublishingScreen(
+          final arguments = state.extra as PostPublishArguments?;
+          return PostPublishScreen(
             edit: arguments?.edit,
             reply: arguments?.reply,
             repost: arguments?.repost,
@@ -82,6 +89,17 @@ abstract class AppRouter {
           );
         },
       ),
+      GoRoute(
+        path: '/articles/publish',
+        name: 'articleCreate',
+        builder: (context, state) {
+          final arguments = state.extra as ArticlePublishArguments?;
+          return ArticlePublishScreen(
+            edit: arguments?.edit,
+            realm: arguments?.realm,
+          );
+        },
+      )
     ],
   );
 

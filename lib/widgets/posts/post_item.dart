@@ -133,7 +133,7 @@ class _PostItemState extends State<PostItem> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: widgets,
-      );
+      ).paddingOnly(top: 4);
     }
   }
 
@@ -222,7 +222,7 @@ class _PostItemState extends State<PostItem> {
             top: 2,
             bottom: hasAttachment ? 4 : 0,
           ),
-          buildFooter().paddingOnly(left: 16, top: 2),
+          buildFooter().paddingOnly(left: 16),
           AttachmentList(
             parentId: widget.overrideAttachmentParent ?? widget.item.alias,
             attachmentsId: item.attachments ?? List.empty(),
@@ -284,7 +284,7 @@ class _PostItemState extends State<PostItem> {
                         );
                       },
                     ),
-                  buildFooter().paddingOnly(left: 12, top: 2),
+                  buildFooter().paddingOnly(left: 12),
                 ],
               ),
             )

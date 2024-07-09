@@ -72,8 +72,8 @@ class _PostActionState extends State<PostAction> {
                   title: Text('reply'.tr),
                   onTap: () async {
                     final value = await AppRouter.instance.pushNamed(
-                      'postPublishing',
-                      extra: PostPublishingArguments(reply: widget.item),
+                      'postCreate',
+                      extra: PostPublishArguments(reply: widget.item),
                     );
                     if (value != null) {
                       Navigator.pop(context, true);
@@ -86,8 +86,8 @@ class _PostActionState extends State<PostAction> {
                   title: Text('repost'.tr),
                   onTap: () async {
                     final value = await AppRouter.instance.pushNamed(
-                      'postPublishing',
-                      extra: PostPublishingArguments(repost: widget.item),
+                      'postCreate',
+                      extra: PostPublishArguments(repost: widget.item),
                     );
                     if (value != null) {
                       Navigator.pop(context, true);
@@ -104,8 +104,8 @@ class _PostActionState extends State<PostAction> {
                     title: Text('edit'.tr),
                     onTap: () async {
                       final value = await AppRouter.instance.pushNamed(
-                        'postPublishing',
-                        extra: PostPublishingArguments(edit: widget.item),
+                        'postCreate',
+                        extra: PostPublishArguments(edit: widget.item),
                       );
                       if (value != null) {
                         Navigator.pop(context, true);
