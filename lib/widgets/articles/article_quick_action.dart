@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/models/post.dart';
+import 'package:solian/models/articles.dart';
 import 'package:solian/models/reaction.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/posts/post_reaction.dart';
-import 'package:solian/widgets/posts/post_replies.dart';
 
-class PostQuickAction extends StatefulWidget {
-  final Post item;
+class ArticleQuickAction extends StatefulWidget {
+  final Article item;
   final bool isReactable;
-  final bool isShowReply;
   final void Function(String symbol, int num) onReact;
 
-  const PostQuickAction({
+  const ArticleQuickAction({
     super.key,
     required this.item,
-    this.isShowReply = true,
     this.isReactable = true,
     required this.onReact,
   });
 
   @override
-  State<PostQuickAction> createState() => _PostQuickActionState();
+  State<ArticleQuickAction> createState() => _ArticleQuickActionState();
 }
 
-class _PostQuickActionState extends State<PostQuickAction> {
+class _ArticleQuickActionState extends State<ArticleQuickAction> {
   bool _isSubmitting = false;
 
   void showReactMenu() {
@@ -92,28 +89,6 @@ class _PostQuickActionState extends State<PostQuickAction> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (widget.isReactable && widget.isShowReply)
-            ActionChip(
-              avatar: const Icon(Icons.comment),
-              label: Text(widget.item.replyCount.toString()),
-              visualDensity: density,
-              onPressed: () {
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  context: context,
-                  builder: (context) {
-                    return PostReplyListPopup(item: widget.item);
-                  },
-                );
-              },
-            ),
-          if (widget.isReactable && widget.isShowReply)
-            const VerticalDivider(
-              thickness: 0.3,
-              width: 0.3,
-              indent: 8,
-              endIndent: 8,
-            ).paddingSymmetric(horizontal: 8),
           Expanded(
             child: ListView(
               shrinkWrap: true,

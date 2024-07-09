@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solian/models/post.dart';
 import 'package:solian/models/reaction.dart';
 
 class PostReactionPopup extends StatelessWidget {
-  final Post item;
+  final Map<String, int> reactionList;
   final void Function(String key, ReactInfo info) onReact;
 
-  const PostReactionPopup({super.key, required this.item, required this.onReact});
+  const PostReactionPopup({
+    super.key,
+    required this.reactionList,
+    required this.onReact,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +33,12 @@ class PostReactionPopup extends StatelessWidget {
                     label: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(e.key, style: const TextStyle(fontFamily: 'monospace')),
+                        Text(e.key,
+                            style: const TextStyle(fontFamily: 'monospace')),
                         const SizedBox(width: 6),
-                        Text('x${item.reactionList[e.key]?.toString() ?? '0'}',
-                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('x${reactionList[e.key]?.toString() ?? '0'}',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                     onPressed: () {

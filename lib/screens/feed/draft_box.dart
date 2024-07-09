@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:solian/models/articles.dart';
 import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
@@ -8,6 +9,8 @@ import 'package:solian/providers/content/feed.dart';
 import 'package:solian/screens/feed.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/articles/article_action.dart';
+import 'package:solian/widgets/articles/article_owned_list.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_owned_list.dart';
 import 'package:solian/widgets/prev_page.dart';
@@ -93,6 +96,20 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
                             item: data,
                             noReact: true,
                           ),
+                        ).then((value) {
+                          if (value != null) _pagingController.refresh();
+                        });
+                      },
+                    ).paddingOnly(left: 12, right: 12, bottom: 4);
+                  case 'article':
+                    final data = Article.fromJson(item.data);
+                    return ArticleOwnedListEntry(
+                      item: data,
+                      onTap: () async {
+                        showModalBottomSheet(
+                          useRootNavigator: true,
+                          context: context,
+                          builder: (context) => ArticleAction(item: data),
                         ).then((value) {
                           if (value != null) _pagingController.refresh();
                         });

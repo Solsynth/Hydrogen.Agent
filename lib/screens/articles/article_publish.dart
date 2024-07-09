@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/models/post.dart';
+import 'package:solian/models/articles.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
@@ -15,14 +15,14 @@ import 'package:textfield_tags/textfield_tags.dart';
 import 'package:badges/badges.dart' as badges;
 
 class ArticlePublishArguments {
-  final Post? edit;
+  final Article? edit;
   final Realm? realm;
 
   ArticlePublishArguments({this.edit, this.realm});
 }
 
 class ArticlePublishScreen extends StatefulWidget {
-  final Post? edit;
+  final Article? edit;
   final Realm? realm;
 
   const ArticlePublishScreen({
