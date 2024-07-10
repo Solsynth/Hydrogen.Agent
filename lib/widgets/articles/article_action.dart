@@ -7,7 +7,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/articles.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/screens/articles/article_publish.dart';
+import 'package:solian/screens/articles/article_editor.dart';
 
 class ArticleAction extends StatefulWidget {
   final Article item;
@@ -71,7 +71,7 @@ class _ArticleActionState extends State<ArticleAction> {
                     title: Text('edit'.tr),
                     onTap: () async {
                       final value = await AppRouter.instance.pushNamed(
-                        'articleCreate',
+                        'articleEditor',
                         extra: ArticlePublishArguments(edit: widget.item),
                       );
                       if (value != null) {

@@ -5,7 +5,6 @@ import 'package:solian/models/articles.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/articles/article_quick_action.dart';
-import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/feed/feed_content.dart';
 import 'package:solian/widgets/feed/feed_tags.dart';
 import 'package:timeago/timeago.dart' show format;
@@ -55,14 +54,14 @@ class _ArticleItemState extends State<ArticleItem> {
         Text(
           item.author.nick,
           style: const TextStyle(fontWeight: FontWeight.bold),
-        ).paddingOnly(left: 12),
+        ),
         buildDate().paddingOnly(left: 4),
       ],
     );
   }
 
   Widget buildFooter() {
-    List<String> labels = List.empty(growable: true);
+    List<String> labels = List.from(['article'.tr], growable: true);
     if (widget.item.createdAt != widget.item.updatedAt) {
       labels.add('postEdited'.trParams({
         'date': DateFormat('yy/M/d H:m').format(item.updatedAt.toLocal()),
@@ -103,10 +102,36 @@ class _ArticleItemState extends State<ArticleItem> {
   @override
   Widget build(BuildContext context) {
     if (!widget.isFullContent) {
-      return ListTile(
-        leading: AccountAvatar(content: item.author.avatar.toString()),
-        title: Text(item.title),
-        subtitle: Text(item.description),
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AccountAvatar(content: item.author.avatar.toString()),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildHeader(),
+                Text(item.title, style: const TextStyle(fontSize: 15)),
+                Text(
+                  item.description,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.8),
+                  ),
+                ),
+                buildFooter(),
+              ],
+            ).paddingOnly(left: 12),
+          ),
+        ],
+      ).paddingOnly(
+        top: 10,
+        bottom: 10,
+        right: 16,
+        left: 16,
       );
     }
 
@@ -135,13 +160,18 @@ class _ArticleItemState extends State<ArticleItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildHeader(),
-                  FeedContent(content: item.content).paddingOnly(
-                    left: 12,
-                    right: 8,
+                  Text(item.title),
+                  Text(
+                    item.description,
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.8),
+                    ),
                   ),
-                  buildFooter().paddingOnly(left: 12),
                 ],
-              ),
+              ).paddingOnly(left: 12),
             )
           ],
         ).paddingOnly(
@@ -149,11 +179,17 @@ class _ArticleItemState extends State<ArticleItem> {
           right: 16,
           left: 16,
         ),
-        AttachmentList(
-          parentId: widget.item.alias,
-          attachmentsId: item.attachments ?? List.empty(),
-          divided: true,
+        const Divider(thickness: 0.3, height: 0.3).paddingSymmetric(
+          vertical: 10,
         ),
+        FeedContent(content: item.content).paddingSymmetric(
+          horizontal: 20,
+        ),
+        const Divider(thickness: 0.3, height: 0.3).paddingOnly(
+          top: 10,
+          bottom: 6,
+        ),
+        buildFooter().paddingOnly(left: 20),
         if (widget.isReactable)
           ArticleQuickAction(
             isReactable: widget.isReactable,
@@ -166,7 +202,7 @@ class _ArticleItemState extends State<ArticleItem> {
             },
           ).paddingOnly(
             top: 6,
-            left: 60,
+            left: 16,
             right: 16,
             bottom: 10,
           )

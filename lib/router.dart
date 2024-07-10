@@ -4,7 +4,8 @@ import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
-import 'package:solian/screens/articles/article_publish.dart';
+import 'package:solian/screens/articles/article_detail.dart';
+import 'package:solian/screens/articles/article_editor.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
@@ -17,7 +18,7 @@ import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
 import 'package:solian/screens/feed.dart';
-import 'package:solian/screens/posts/post_publish.dart';
+import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/shells/basic_shell.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/shells/title_shell.dart';
@@ -77,8 +78,18 @@ abstract class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/posts/publish',
-        name: 'postCreate',
+        path: '/articles/view/:alias',
+        name: 'articleDetail',
+        builder: (context, state) => TitleShell(
+          state: state,
+          child: ArticleDetailScreen(
+            alias: state.pathParameters['alias']!,
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/posts/editor',
+        name: 'postEditor',
         builder: (context, state) {
           final arguments = state.extra as PostPublishArguments?;
           return PostPublishScreen(
@@ -90,8 +101,8 @@ abstract class AppRouter {
         },
       ),
       GoRoute(
-        path: '/articles/publish',
-        name: 'articleCreate',
+        path: '/articles/editor',
+        name: 'articleEditor',
         builder: (context, state) {
           final arguments = state.extra as ArticlePublishArguments?;
           return ArticlePublishScreen(

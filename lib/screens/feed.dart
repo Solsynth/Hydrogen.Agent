@@ -115,12 +115,12 @@ class FeedCreationButton extends StatelessWidget {
               itemBuilder: (BuildContext context) => [
                 PopupMenuItem(
                   child: ListTile(
-                    title: Text('postCreate'.tr),
+                    title: Text('postEditor'.tr),
                     leading: const Icon(Icons.article),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                   onTap: () {
-                    AppRouter.instance.pushNamed('postCreate').then((val) {
+                    AppRouter.instance.pushNamed('postEditor').then((val) {
                       if (val != null && onCreated != null) {
                         onCreated!();
                       }
@@ -129,12 +129,12 @@ class FeedCreationButton extends StatelessWidget {
                 ),
                 PopupMenuItem(
                   child: ListTile(
-                    title: Text('articleCreate'.tr),
+                    title: Text('articleEditor'.tr),
                     leading: const Icon(Icons.newspaper),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                   onTap: () {
-                    AppRouter.instance.pushNamed('articleCreate').then((val) {
+                    AppRouter.instance.pushNamed('articleEditor').then((val) {
                       if (val != null && onCreated != null) {
                         onCreated!();
                       }

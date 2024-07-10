@@ -73,4 +73,13 @@ class FeedProvider extends GetConnect {
 
     return resp;
   }
+
+  Future<Response> getArticle(String alias) async {
+    final resp = await get('/api/articles/$alias');
+    if (resp.statusCode != 200) {
+      throw Exception(resp.body);
+    }
+
+    return resp;
+  }
 }

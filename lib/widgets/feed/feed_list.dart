@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:solian/models/articles.dart';
 import 'package:solian/models/feed.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/widgets/articles/article_list.dart';
 import 'package:solian/widgets/centered_container.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
@@ -35,6 +37,15 @@ class FeedListWidget extends StatelessWidget {
                       return PostListEntryWidget(
                         isShowEmbed: isShowEmbed,
                         isNestedClickable: isNestedClickable,
+                        isClickable: isClickable,
+                        item: data,
+                        onUpdate: () {
+                          controller.refresh();
+                        },
+                      );
+                    case 'article':
+                      final data = Article.fromJson(item.data);
+                      return ArticleListEntryWidget(
                         isClickable: isClickable,
                         item: data,
                         onUpdate: () {

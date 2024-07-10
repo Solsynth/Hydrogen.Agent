@@ -99,6 +99,8 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
 
   void syncWidget() {
     if (widget.edit != null) {
+      _titleController.text = widget.edit!.title;
+      _descriptionController.text = widget.edit!.description;
       _contentController.text = widget.edit!.content;
       _attachments = widget.edit!.attachments ?? List.empty();
       _isDraft = widget.edit!.isDraft ?? false;

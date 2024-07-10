@@ -12,7 +12,7 @@ import 'package:solian/providers/content/feed.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
-import 'package:solian/screens/posts/post_publish.dart';
+import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
@@ -210,7 +210,7 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
               onTap: () {
                 AppRouter.instance
                     .pushNamed(
-                  'postCreate',
+                  'postEditor',
                   extra: PostPublishArguments(realm: widget.realm),
                 )
                     .then((value) {

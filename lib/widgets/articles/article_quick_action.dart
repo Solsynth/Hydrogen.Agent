@@ -50,7 +50,7 @@ class _ArticleQuickActionState extends State<ArticleQuickAction> {
 
     setState(() => _isSubmitting = true);
 
-    final resp = await client.post('/api/posts/${widget.item.alias}/react', {
+    final resp = await client.post('/api/articles/${widget.item.alias}/react', {
       'symbol': symbol,
       'attitude': attitude,
     });

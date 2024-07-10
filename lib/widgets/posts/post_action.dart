@@ -8,7 +8,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/screens/posts/post_publish.dart';
+import 'package:solian/screens/posts/post_editor.dart';
 
 class PostAction extends StatefulWidget {
   final Post item;
@@ -73,7 +73,7 @@ class _PostActionState extends State<PostAction> {
                     title: Text('reply'.tr),
                     onTap: () async {
                       final value = await AppRouter.instance.pushNamed(
-                        'postCreate',
+                        'postEditor',
                         extra: PostPublishArguments(reply: widget.item),
                       );
                       if (value != null) {
@@ -88,7 +88,7 @@ class _PostActionState extends State<PostAction> {
                     title: Text('repost'.tr),
                     onTap: () async {
                       final value = await AppRouter.instance.pushNamed(
-                        'postCreate',
+                        'postEditor',
                         extra: PostPublishArguments(repost: widget.item),
                       );
                       if (value != null) {
@@ -106,7 +106,7 @@ class _PostActionState extends State<PostAction> {
                     title: Text('edit'.tr),
                     onTap: () async {
                       final value = await AppRouter.instance.pushNamed(
-                        'postCreate',
+                        'postEditor',
                         extra: PostPublishArguments(edit: widget.item),
                       );
                       if (value != null) {
