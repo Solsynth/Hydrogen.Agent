@@ -7,7 +7,7 @@ import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
-import 'package:solian/widgets/feed/feed_content.dart';
+import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/feed/feed_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:timeago/timeago.dart' show format;
@@ -190,7 +190,7 @@ class _PostItemState extends State<PostItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildHeader().paddingSymmetric(horizontal: 12),
-          FeedContent(content: item.content).paddingOnly(
+          MarkdownTextContent(content: item.content).paddingOnly(
             left: 16,
             right: 12,
             top: 2,
@@ -231,7 +231,7 @@ class _PostItemState extends State<PostItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildHeader(),
-                  FeedContent(content: item.content)
+                  MarkdownTextContent(content: item.content)
                       .paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
@@ -275,7 +275,7 @@ class _PostItemState extends State<PostItem> {
           attachmentsId: item.attachments ?? List.empty(),
           divided: true,
         ),
-        if (!widget.isShowReply && widget.isReactable)
+        if (widget.isShowReply && widget.isReactable)
           PostQuickAction(
             isShowReply: widget.isShowReply,
             isReactable: widget.isReactable,

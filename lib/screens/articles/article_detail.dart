@@ -57,10 +57,6 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
                 ),
               ),
               SliverToBoxAdapter(
-                child: const Divider(thickness: 0.3, height: 1)
-                    .paddingOnly(top: 4),
-              ),
-              SliverToBoxAdapter(
                 child: SizedBox(height: MediaQuery.of(context).padding.bottom),
               ),
             ],

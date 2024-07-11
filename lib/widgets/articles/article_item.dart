@@ -5,7 +5,7 @@ import 'package:solian/models/articles.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/articles/article_quick_action.dart';
-import 'package:solian/widgets/feed/feed_content.dart';
+import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/feed/feed_tags.dart';
 import 'package:timeago/timeago.dart' show format;
 
@@ -179,15 +179,11 @@ class _ArticleItemState extends State<ArticleItem> {
           right: 16,
           left: 16,
         ),
-        const Divider(thickness: 0.3, height: 0.3).paddingSymmetric(
-          vertical: 10,
-        ),
-        FeedContent(content: item.content).paddingSymmetric(
-          horizontal: 20,
-        ),
-        const Divider(thickness: 0.3, height: 0.3).paddingOnly(
+        MarkdownTextContent(content: item.content).paddingOnly(
+          left: 20,
+          right: 20,
           top: 10,
-          bottom: 6,
+          bottom: 8,
         ),
         buildFooter().paddingOnly(left: 20),
         if (widget.isReactable)

@@ -24,18 +24,17 @@ class ArticleListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PagedSliverList<int, Article>.separated(
+      addRepaintBoundaries: true,
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Article>(
         itemBuilder: (context, item, index) {
-          return RepaintBoundary(
-            child: CenteredContainer(
-              child: ArticleListEntryWidget(
-                isClickable: isClickable,
-                item: item,
-                onUpdate: () {
-                  controller.refresh();
-                },
-              ),
+          return CenteredContainer(
+            child: ArticleListEntryWidget(
+              isClickable: isClickable,
+              item: item,
+              onUpdate: () {
+                controller.refresh();
+              },
             ),
           );
         },

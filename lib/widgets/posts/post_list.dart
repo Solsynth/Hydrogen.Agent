@@ -24,20 +24,19 @@ class PostListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PagedSliverList<int, Post>.separated(
+      addRepaintBoundaries: true,
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
-          return RepaintBoundary(
-            child: CenteredContainer(
-              child: PostListEntryWidget(
-                isShowEmbed: isShowEmbed,
-                isNestedClickable: isNestedClickable,
-                isClickable: isClickable,
-                item: item,
-                onUpdate: () {
-                  controller.refresh();
-                },
-              ),
+          return CenteredContainer(
+            child: PostListEntryWidget(
+              isShowEmbed: isShowEmbed,
+              isNestedClickable: isNestedClickable,
+              isClickable: isClickable,
+              item: item,
+              onUpdate: () {
+                controller.refresh();
+              },
             ),
           );
         },

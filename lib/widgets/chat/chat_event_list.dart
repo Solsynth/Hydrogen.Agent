@@ -56,16 +56,14 @@ class ChatEventList extends StatelessWidget {
               final item = chatController.currentEvents[index].data;
 
               return InkWell(
-                child: RepaintBoundary(
-                  child: ChatEvent(
-                    key: Key('m${item.uuid}'),
-                    item: item,
-                    isMerged: isMerged,
-                    chatController: chatController,
-                  ).paddingOnly(
-                    top: !isMerged ? 8 : 0,
-                    bottom: !hasMerged ? 8 : 0,
-                  ),
+                child: ChatEvent(
+                  key: Key('m${item.uuid}'),
+                  item: item,
+                  isMerged: isMerged,
+                  chatController: chatController,
+                ).paddingOnly(
+                  top: !isMerged ? 8 : 0,
+                  bottom: !hasMerged ? 8 : 0,
                 ),
                 onLongPress: () {
                   showModalBottomSheet(

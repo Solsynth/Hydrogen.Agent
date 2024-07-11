@@ -3,10 +3,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:url_launcher/url_launcher_string.dart';
 
-class FeedContent extends StatelessWidget {
+class MarkdownTextContent extends StatelessWidget {
   final String content;
 
-  const FeedContent({super.key, required this.content});
+  const MarkdownTextContent({super.key, required this.content});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +15,16 @@ class FeedContent extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       data: content,
       padding: EdgeInsets.zero,
+      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+        horizontalRuleDecoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              width: 1.0,
+              color: Theme.of(context).dividerColor,
+            ),
+          ),
+        ),
+      ),
       extensionSet: markdown.ExtensionSet(
         markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
         <markdown.InlineSyntax>[

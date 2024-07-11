@@ -1,12 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:markdown/markdown.dart' as markdown;
+import 'package:solian/widgets/markdown_text_content.dart';
 
 class ChatEventMessage extends StatelessWidget {
   final Event item;
@@ -44,28 +42,7 @@ class ChatEventMessage extends StatelessWidget {
     final body = EventMessageBody.fromJson(item.body);
     final hasAttachment = body.attachments?.isNotEmpty ?? false;
 
-    return Markdown(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      data: body.text,
-      selectable: true,
-      padding: const EdgeInsets.all(0),
-      extensionSet: markdown.ExtensionSet(
-        markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
-        <markdown.InlineSyntax>[
-          markdown.EmojiSyntax(),
-          markdown.AutolinkExtensionSyntax(),
-          ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
-        ],
-      ),
-      onTapLink: (text, href, title) async {
-        if (href == null) return;
-        await launchUrlString(
-          href,
-          mode: LaunchMode.externalApplication,
-        );
-      },
-    ).paddingOnly(
+    return MarkdownTextContent(content: body.text).paddingOnly(
       left: isQuote ? 0 : 12,
       right: isQuote ? 0 : 12,
       top: body.quoteEvent == null ? 2 : 0,

@@ -24,39 +24,38 @@ class FeedListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PagedSliverList<int, FeedRecord>.separated(
+      addRepaintBoundaries: true,
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<FeedRecord>(
         itemBuilder: (context, item, index) {
-          return RepaintBoundary(
-            child: CenteredContainer(
-              child: Builder(
-                builder: (context) {
-                  switch (item.type) {
-                    case 'post':
-                      final data = Post.fromJson(item.data);
-                      return PostListEntryWidget(
-                        isShowEmbed: isShowEmbed,
-                        isNestedClickable: isNestedClickable,
-                        isClickable: isClickable,
-                        item: data,
-                        onUpdate: () {
-                          controller.refresh();
-                        },
-                      );
-                    case 'article':
-                      final data = Article.fromJson(item.data);
-                      return ArticleListEntryWidget(
-                        isClickable: isClickable,
-                        item: data,
-                        onUpdate: () {
-                          controller.refresh();
-                        },
-                      );
-                    default:
-                      return const SizedBox();
-                  }
-                },
-              ),
+          return CenteredContainer(
+            child: Builder(
+              builder: (context) {
+                switch (item.type) {
+                  case 'post':
+                    final data = Post.fromJson(item.data);
+                    return PostListEntryWidget(
+                      isShowEmbed: isShowEmbed,
+                      isNestedClickable: isNestedClickable,
+                      isClickable: isClickable,
+                      item: data,
+                      onUpdate: () {
+                        controller.refresh();
+                      },
+                    );
+                  case 'article':
+                    final data = Article.fromJson(item.data);
+                    return ArticleListEntryWidget(
+                      isClickable: isClickable,
+                      item: data,
+                      onUpdate: () {
+                        controller.refresh();
+                      },
+                    );
+                  default:
+                    return const SizedBox();
+                }
+              },
             ),
           );
         },
