@@ -11,6 +11,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
+import 'package:solian/widgets/drawer_button.dart' as drawer;
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({super.key});
@@ -62,8 +63,8 @@ class _FeedScreenState extends State<FeedScreen> {
                 title: AppBarTitle('feed'.tr),
                 centerTitle: false,
                 floating: true,
-                titleSpacing: SolianTheme.titleSpacing(context),
                 toolbarHeight: SolianTheme.toolbarHeight(context),
+                leading: const drawer.DrawerButton(),
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),
