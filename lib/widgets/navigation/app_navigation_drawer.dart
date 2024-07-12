@@ -6,6 +6,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/shells/root_shell.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_status_action.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
@@ -73,6 +74,8 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     final AuthProvider auth = Get.find();
 
     return NavigationDrawer(
+      backgroundColor:
+          SolianTheme.isLargeScreen(context) ? Colors.transparent : null,
       selectedIndex: _selectedIndex,
       onDestinationSelected: (idx) {
         setState(() => _selectedIndex = idx);
