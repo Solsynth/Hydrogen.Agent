@@ -44,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          leading: const AppBarLeadingButton(),
+          leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('chat'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

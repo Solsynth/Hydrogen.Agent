@@ -22,7 +22,7 @@ class TitleShell extends StatelessWidget {
     return Scaffold(
       appBar: showAppBar
           ? AppBar(
-              leading: const AppBarLeadingButton(),
+              leading: AppBarLeadingButton.adaptive(context),
               title: AppBarTitle(state.topRoute?.name?.tr ?? 'page'.tr),
               centerTitle: false,
               toolbarHeight: SolianTheme.toolbarHeight(context),

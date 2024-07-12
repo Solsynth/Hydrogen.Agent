@@ -193,7 +193,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const AppBarLeadingButton(),
+        leading: AppBarLeadingButton.adaptive(context),
         title: AppBarTitle(title),
         centerTitle: false,
         titleSpacing: SolianTheme.titleSpacing(context),

@@ -59,7 +59,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          leading: const AppBarLeadingButton(),
+          leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('realm'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

@@ -63,7 +63,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          leading: const AppBarLeadingButton(),
+          leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('draftBox'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

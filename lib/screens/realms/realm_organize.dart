@@ -99,7 +99,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          leading: const AppBarLeadingButton(),
+          leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('realmOrganizing'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

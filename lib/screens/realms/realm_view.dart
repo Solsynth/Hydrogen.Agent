@@ -91,7 +91,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 sliver: SliverAppBar(
-                  leading: const AppBarLeadingButton(),
+                  leading: AppBarLeadingButton.adaptive(context),
                   title: Text(_realm?.name ?? 'loading'.tr),
                   centerTitle: false,
                   actions: [

@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 centerTitle: false,
                 floating: true,
                 toolbarHeight: SolianTheme.toolbarHeight(context),
-                leading: const AppBarLeadingButton(),
+                leading: AppBarLeadingButton.adaptive(context),
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),

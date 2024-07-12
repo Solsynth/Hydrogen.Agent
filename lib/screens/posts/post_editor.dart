@@ -134,7 +134,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          leading: const AppBarLeadingButton(),
+          leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('postPublish'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
