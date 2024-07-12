@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/account/friend_select.dart';
 import 'package:uuid/uuid.dart';
 
 class ChannelProvider extends GetxController {
+  RxBool isLoading = false.obs;
+  RxList<Channel> availableChannels = RxList.empty(growable: true);
+
+  List<Channel> get groupChannels =>
+      availableChannels.where((x) => x.type == 0).toList();
+  List<Channel> get directChannels =>
+      availableChannels.where((x) => x.type == 1).toList();
+
+  Future<void> refreshAvailableChannel() async {
+    final AuthProvider auth = Get.find();
+    if (!await auth.isAuthorized) throw Exception('unauthorized');
+
+    isLoading.value = true;
+    final resp = await listAvailableChannel();
+    isLoading.value = false;
+
+    availableChannels.value =
+        resp.body.map((x) => Channel.fromJson(x)).toList().cast<Channel>();
+    availableChannels.refresh();
+  }
+
   Future<Response> getChannel(String alias, {String realm = 'global'}) async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
@@ -19,7 +41,8 @@ class ChannelProvider extends GetxController {
     return resp;
   }
 
-  Future<Response> getMyChannelProfile(String alias, {String realm = 'global'}) async {
+  Future<Response> getMyChannelProfile(String alias,
+      {String realm = 'global'}) async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 

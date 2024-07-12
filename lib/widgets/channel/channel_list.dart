@@ -8,13 +8,17 @@ import 'package:solian/widgets/account/account_avatar.dart';
 class ChannelListWidget extends StatefulWidget {
   final List<Channel> channels;
   final int selfId;
+  final bool isDense;
   final bool noCategory;
+  final bool useReplace;
 
   const ChannelListWidget({
     super.key,
     required this.channels,
     required this.selfId,
+    this.isDense = false,
     this.noCategory = false,
+    this.useReplace = false,
   });
 
   @override
@@ -48,68 +52,87 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
 
   @override
   void didUpdateWidget(covariant ChannelListWidget oldWidget) {
-    setState(() => mapChannels());
     super.didUpdateWidget(oldWidget);
+    setState(() => mapChannels());
   }
 
   @override
   void initState() {
-    mapChannels();
     super.initState();
+    mapChannels();
   }
 
-  Widget buildItem(Channel element) {
-    if (element.type == 1) {
-      final otherside = element.members!
+  void gotoChannel(Channel item) {
+    if (widget.useReplace) {
+      AppRouter.instance.pushReplacementNamed(
+        'channelChat',
+        pathParameters: {'alias': item.alias},
+        queryParameters: {
+          if (item.realmId != null) 'realm': item.realm!.alias,
+        },
+      );
+    } else {
+      AppRouter.instance.pushNamed(
+        'channelChat',
+        pathParameters: {'alias': item.alias},
+        queryParameters: {
+          if (item.realmId != null) 'realm': item.realm!.alias,
+        },
+      );
+    }
+  }
+
+  Widget buildItem(Channel item) {
+    final padding = widget.isDense
+        ? const EdgeInsets.symmetric(horizontal: 20)
+        : const EdgeInsets.symmetric(horizontal: 24);
+
+    if (item.type == 1) {
+      final otherside = item.members!
           .where((e) => e.account.externalId != widget.selfId)
           .first;
 
       return ListTile(
         leading: AccountAvatar(
           content: otherside.account.avatar,
+          radius: widget.isDense ? 12 : 24,
           bgColor: Colors.indigo,
           feColor: Colors.white,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+        contentPadding: padding,
         title: Text(otherside.account.nick),
-        subtitle: Text(
-          'channelDirectDescription'
-              .trParams({'username': '@${otherside.account.name}'}),
+        subtitle: !widget.isDense
+            ? Text(
+                'channelDirectDescription'.trParams(
+                  {'username': '@${otherside.account.name}'},
+                ),
+              )
+            : null,
+        onTap: () => gotoChannel(item),
+      );
+    } else {
+      return ListTile(
+        minTileHeight: item.realmId == null
+            ? 48
+            : widget.isDense
+                ? 24
+                : null,
+        leading: CircleAvatar(
+          backgroundColor:
+              item.realmId == null ? Colors.indigo : Colors.transparent,
+          radius: widget.isDense ? 12 : 24,
+          child: FaIcon(
+            FontAwesomeIcons.hashtag,
+            color: item.realmId == null ? Colors.white : Colors.indigo,
+            size: widget.isDense ? 12 : 16,
+          ),
         ),
-        onTap: () {
-          AppRouter.instance.pushNamed(
-            'channelChat',
-            pathParameters: {'alias': element.alias},
-            queryParameters: {
-              if (element.realmId != null) 'realm': element.realm!.alias,
-            },
-          );
-        },
+        contentPadding: padding,
+        title: Text(item.name),
+        subtitle: !widget.isDense ? Text(item.description) : null,
+        onTap: () => gotoChannel(item),
       );
     }
-
-    return ListTile(
-      leading: const CircleAvatar(
-        backgroundColor: Colors.indigo,
-        child: FaIcon(
-          FontAwesomeIcons.hashtag,
-          color: Colors.white,
-          size: 16,
-        ),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-      title: Text(element.name),
-      subtitle: Text(element.description),
-      onTap: () {
-        AppRouter.instance.pushNamed(
-          'channelChat',
-          pathParameters: {'alias': element.alias},
-          queryParameters: {
-            if (element.realmId != null) 'realm': element.realm!.alias,
-          },
-        );
-      },
-    );
   }
 
   @override
@@ -137,25 +160,16 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
             return buildItem(element);
           },
         ),
-        ..._inRealms.entries.map((element) {
-          return SliverList.builder(
-            itemCount: element.value.length + 1,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 28),
-                  leading: const Icon(Icons.workspaces, size: 20)
-                      .paddingOnly(left: 6, right: 10),
-                  tileColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-                  title: Text(element.value.first.realm!.name),
-                );
-              }
-
-              final item = element.value[index - 1];
-              return buildItem(item);
-            },
-          );
-        }),
+        SliverList.list(
+          children: _inRealms.entries.map((element) {
+            return ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+              minTileHeight: 48,
+              title: Text(element.value.first.realm!.name),
+              children: element.value.map((x) => buildItem(x)).toList(),
+            );
+          }).toList(),
+        ),
       ],
     );
   }

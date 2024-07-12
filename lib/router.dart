@@ -19,7 +19,7 @@ import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/screens/posts/post_editor.dart';
-import 'package:solian/shells/basic_shell.dart';
+import 'package:solian/shells/sidebar_shell.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/shells/title_shell.dart';
 import 'package:solian/theme.dart';
@@ -115,20 +115,12 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _chatRoute = ShellRoute(
-    builder: (context, state, child) => BasicShell(
-      state: state,
-      sidebarFirst: true,
-      showAppBar: false,
-      sidebar: const ChatScreen(),
-      child: child,
-    ),
+    builder: (context, state, child) => child,
     routes: [
       GoRoute(
         path: '/chat',
         name: 'chat',
-        builder: (context, state) => SolianTheme.isExtraLargeScreen(context)
-            ? const EmptyPagePlaceholder()
-            : const ChatScreen(),
+        builder: (context, state) => const ChatScreen(),
       ),
       GoRoute(
         path: '/chat/organize',
@@ -170,20 +162,12 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _realmRoute = ShellRoute(
-    builder: (context, state, child) => BasicShell(
-      state: state,
-      sidebarFirst: true,
-      showAppBar: false,
-      sidebar: const RealmListScreen(),
-      child: child,
-    ),
+    builder: (context, state, child) => child,
     routes: [
       GoRoute(
         path: '/realms',
         name: 'realms',
-        builder: (context, state) => SolianTheme.isExtraLargeScreen(context)
-            ? const EmptyPagePlaceholder()
-            : const RealmListScreen(),
+        builder: (context, state) => const RealmListScreen(),
       ),
       GoRoute(
         path: '/realms/:alias/detail',
@@ -219,7 +203,7 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _accountRoute = ShellRoute(
-    builder: (context, state, child) => BasicShell(
+    builder: (context, state, child) => SidebarShell(
       state: state,
       sidebarFirst: true,
       showAppBar: false,

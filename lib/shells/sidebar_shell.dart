@@ -5,7 +5,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/sidebar/sidebar_placeholder.dart';
 
-class BasicShell extends StatelessWidget {
+class SidebarShell extends StatelessWidget {
   final bool showAppBar;
   final GoRouterState state;
   final Widget child;
@@ -13,7 +13,7 @@ class BasicShell extends StatelessWidget {
   final bool sidebarFirst;
   final Widget? sidebar;
 
-  const BasicShell({
+  const SidebarShell({
     super.key,
     required this.child,
     required this.state,

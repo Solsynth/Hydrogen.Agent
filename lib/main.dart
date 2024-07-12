@@ -95,7 +95,7 @@ class SolianApp extends StatelessWidget {
     );
   }
 
-  void _initializeProviders(BuildContext context) {
+  void _initializeProviders(BuildContext context) async {
     Get.lazyPut(() => AuthProvider());
     Get.lazyPut(() => FriendProvider());
     Get.lazyPut(() => FeedProvider());
@@ -108,19 +108,19 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => ChatCallProvider());
 
     final AuthProvider auth = Get.find();
-    auth.isAuthorized.then((value) async {
-      if (value) {
-        Get.find<AccountProvider>().connect();
-        Get.find<ChatProvider>().connect();
+    if (await auth.isAuthorized) {
+      Get.find<AccountProvider>().connect();
+      Get.find<ChatProvider>().connect();
 
-        try {
-          Get.find<AccountProvider>().registerPushNotifications();
-        } catch (err) {
-          context.showSnackbar(
-            'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),
-          );
-        }
+      Get.find<ChannelProvider>().refreshAvailableChannel();
+
+      try {
+        Get.find<AccountProvider>().registerPushNotifications();
+      } catch (err) {
+        context.showSnackbar(
+          'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),
+        );
       }
-    });
+    }
   }
 }

@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import 'package:solian/models/account_status.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_status_action.dart';
+import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/navigation/app_navigation.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -21,7 +23,11 @@ class AppNavigationDrawer extends StatefulWidget {
 
 class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
   int? _selectedIndex = 0;
+
   AccountStatus? _accountStatus;
+
+  late final AuthProvider _auth;
+  late final ChannelProvider _channels;
 
   void getStatus() async {
     final StatusProvider provider = Get.find();
@@ -50,6 +56,8 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
   @override
   void initState() {
     super.initState();
+    _auth = Get.find();
+    _channels = Get.find();
     detectSelectedIndex();
     getStatus();
   }
@@ -145,7 +153,38 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
         ),
         const Divider(thickness: 0.3, height: 1).paddingOnly(
           top: 12,
-          bottom: 8,
+        ),
+        FutureBuilder(
+          future: _auth.getProfileWithCheck(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const SizedBox();
+            }
+
+            final selfId = snapshot.data!.body['id'];
+
+            return Column(
+              children: [
+                ExpansionTile(
+                  title: Text('chat'.tr),
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+                  children: [
+                    Obx(
+                      () => SizedBox(
+                        height: 360,
+                        child: ChannelListWidget(
+                          channels: _channels.groupChannels,
+                          selfId: selfId,
+                          isDense: true,
+                          useReplace: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         ),
       ],
     );

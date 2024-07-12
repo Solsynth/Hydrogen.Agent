@@ -11,6 +11,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class RealmListScreen extends StatefulWidget {
   const RealmListScreen({super.key});
@@ -56,63 +57,65 @@ class _RealmListScreenState extends State<RealmListScreen> {
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
-      child: FutureBuilder(
-        future: auth.isAuthorized,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.data == false) {
-            return SigninRequiredOverlay(
-              onSignedIn: () {
-                getRealms();
-              },
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () => getRealms(),
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  title: AppBarTitle('realm'.tr),
-                  centerTitle: false,
-                  floating: true,
-                  toolbarHeight: SolianTheme.toolbarHeight(context),
-                  actions: [
-                    const BackgroundStateWidget(),
-                    const NotificationButton(),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle),
-                      onPressed: () {
-                        AppRouter.instance.pushNamed('realmOrganizing').then(
-                          (value) {
-                            if (value != null) getRealms();
-                          },
-                        );
-                      },
-                    ),
-                    SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                    ),
-                  ],
-                ),
-                if (_isBusy)
-                  SliverToBoxAdapter(
-                    child: const LinearProgressIndicator().animate().scaleX(),
-                  ),
-                SliverList.builder(
-                  itemCount: _realms.length,
-                  itemBuilder: (context, index) {
-                    final element = _realms[index];
-                    return buildRealm(element);
+      child: Scaffold(
+        appBar: AppBar(
+          title: AppBarTitle('realm'.tr),
+          centerTitle: false,
+          toolbarHeight: SolianTheme.toolbarHeight(context),
+          actions: [
+            const BackgroundStateWidget(),
+            const NotificationButton(),
+            IconButton(
+              icon: const Icon(Icons.add_circle),
+              onPressed: () {
+                AppRouter.instance.pushNamed('realmOrganizing').then(
+                  (value) {
+                    if (value != null) getRealms();
                   },
-                )
-              ],
+                );
+              },
             ),
-          );
-        },
+            SizedBox(
+              width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+          future: auth.isAuthorized,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.data == false) {
+              return SigninRequiredOverlay(
+                onSignedIn: () {
+                  getRealms();
+                },
+              );
+            }
+
+            return Column(
+              children: [
+                if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+                Expanded(
+                  child: CenteredContainer(
+                    child: RefreshIndicator(
+                      onRefresh: () => getRealms(),
+                      child: ListView.builder(
+                        itemCount: _realms.length,
+                        itemBuilder: (context, index) {
+                          final element = _realms[index];
+                          return buildRealm(element);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
