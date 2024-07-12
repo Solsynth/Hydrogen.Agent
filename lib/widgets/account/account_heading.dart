@@ -124,7 +124,7 @@ class AccountHeadingWidget extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(info.$2),
+                            Text(info.$3),
                             if (!status.isOnline && status.lastSeenAt != null)
                               Opacity(
                                 opacity: 0.75,

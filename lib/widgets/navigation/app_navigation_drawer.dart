@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:solian/models/account_status.dart';
+import 'package:solian/providers/account_status.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/shells/root_shell.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_status_action.dart';
 import 'package:solian/widgets/navigation/app_navigation.dart';
+import 'package:badges/badges.dart' as badges;
 
 class AppNavigationDrawer extends StatefulWidget {
-  const AppNavigationDrawer({super.key});
+  final String? routeName;
+
+  const AppNavigationDrawer({super.key, this.routeName});
 
   @override
   State<AppNavigationDrawer> createState() => _AppNavigationDrawerState();
@@ -12,9 +21,45 @@ class AppNavigationDrawer extends StatefulWidget {
 
 class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
   int _selectedIndex = 0;
+  AccountStatus? _accountStatus;
+
+  void getStatus() async {
+    final StatusProvider provider = Get.find();
+
+    final resp = await provider.getCurrentStatus();
+    final status = AccountStatus.fromJson(resp.body);
+
+    setState(() {
+      _accountStatus = status;
+    });
+  }
+
+  void detectSelectedIndex() {
+    if (widget.routeName == null) return;
+
+    final nameList = AppNavigation.destinations.map((x) => x.page).toList();
+    final idx = nameList.indexOf(widget.routeName!);
+
+    _selectedIndex = idx != -1 ? idx : 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    detectSelectedIndex();
+    getStatus();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    detectSelectedIndex();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final AuthProvider auth = Get.find();
+
     return NavigationDrawer(
       selectedIndex: _selectedIndex,
       onDestinationSelected: (idx) {
@@ -23,6 +68,68 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
         rootScaffoldKey.currentState!.closeDrawer();
       },
       children: [
+        FutureBuilder(
+          future: auth.getProfileWithCheck(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const SizedBox();
+            }
+
+            return Column(
+              children: [
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  title: Text(snapshot.data!.body['nick']),
+                  subtitle: Builder(
+                    builder: (context) {
+                      if (_accountStatus == null) {
+                        return Text('loading'.tr);
+                      }
+                      final info = StatusProvider.determineStatus(
+                        _accountStatus!,
+                      );
+                      return Text(info.$3);
+                    },
+                  ),
+                  leading: Builder(builder: (context) {
+                    final badgeColor = _accountStatus != null
+                        ? StatusProvider.determineStatus(
+                            _accountStatus!,
+                          ).$2
+                        : Colors.grey;
+
+                    return badges.Badge(
+                      showBadge: _accountStatus != null,
+                      badgeStyle: badges.BadgeStyle(badgeColor: badgeColor),
+                      position: badges.BadgePosition.bottomEnd(
+                        bottom: 0,
+                        end: -2,
+                      ),
+                      child: AccountAvatar(
+                        content: snapshot.data!.body['avatar'],
+                      ),
+                    );
+                  }),
+                  onTap: () {
+                    showModalBottomSheet(
+                      useRootNavigator: true,
+                      context: context,
+                      builder: (context) => AccountStatusAction(
+                        currentStatus: _accountStatus!.status,
+                      ),
+                    ).then((val) {
+                      if (val == true) getStatus();
+                    });
+                  },
+                ),
+                const Divider(thickness: 0.3, height: 1).paddingOnly(
+                  bottom: 16,
+                  top: 8,
+                ),
+              ],
+            );
+          },
+        ),
         ...AppNavigation.destinations.map(
           (e) => NavigationDrawerDestination(
             icon: e.icon,

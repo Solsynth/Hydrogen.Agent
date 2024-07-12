@@ -20,6 +20,7 @@ import 'package:solian/screens/realms/realm_view.dart';
 import 'package:solian/screens/feed.dart';
 import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/shells/basic_shell.dart';
+import 'package:solian/shells/root_shell.dart';
 import 'package:solian/shells/title_shell.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/sidebar/empty_placeholder.dart';
@@ -27,10 +28,18 @@ import 'package:solian/widgets/sidebar/empty_placeholder.dart';
 abstract class AppRouter {
   static GoRouter instance = GoRouter(
     routes: [
-      _feedRoute,
-      _chatRoute,
-      _realmRoute,
-      _accountRoute,
+      ShellRoute(
+        builder: (context, state, child) => RootShell(
+          state: state,
+          child: child,
+        ),
+        routes: [
+          _feedRoute,
+          _chatRoute,
+          _realmRoute,
+          _accountRoute,
+        ],
+      ),
     ],
   );
 

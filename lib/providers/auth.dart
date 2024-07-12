@@ -218,4 +218,10 @@ class AuthProvider extends GetConnect {
 
     return resp;
   }
+
+  Future<Response?> getProfileWithCheck({noCache = false}) async {
+    if (!await isAuthorized) return null;
+
+    return await getProfile(noCache: noCache);
+  }
 }

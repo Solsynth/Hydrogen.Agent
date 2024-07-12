@@ -94,9 +94,10 @@ class StatusProvider extends GetConnect {
     return resp;
   }
 
-  static (Widget, String) determineStatus(AccountStatus status,
+  static (Widget, Color, String) determineStatus(AccountStatus status,
       {double size = 14}) {
     Widget icon;
+    Color color;
     String? text;
 
     if (!presetStatuses.keys.contains(status.status?.type)) {
@@ -104,15 +105,18 @@ class StatusProvider extends GetConnect {
     }
 
     if (status.isDisturbable && status.isOnline) {
-      icon = Icon(Icons.circle, color: Colors.green, size: size);
+      color = Colors.green;
+      icon = Icon(Icons.circle, color: color, size: size);
       text ??= 'accountStatusOnline'.tr;
     } else if (!status.isDisturbable && status.isOnline) {
-      icon = Icon(Icons.do_not_disturb_on, color: Colors.red, size: size);
+      color = Colors.red;
+      icon = Icon(Icons.do_not_disturb_on, color: color, size: size);
       text ??= 'accountStatusSilent'.tr;
     } else {
-      icon = Icon(Icons.circle, color: Colors.grey, size: size);
+      color = Colors.grey;
+      icon = Icon(Icons.circle, color: color, size: size);
       text ??= 'accountStatusOffline'.tr;
     }
-    return (icon, text);
+    return (icon, color, text);
   }
 }
