@@ -11,6 +11,7 @@ class ChannelListWidget extends StatefulWidget {
   final bool isDense;
   final bool noCategory;
   final bool useReplace;
+  final Function(Channel)? onSelected;
 
   const ChannelListWidget({
     super.key,
@@ -19,6 +20,7 @@ class ChannelListWidget extends StatefulWidget {
     this.isDense = false,
     this.noCategory = false,
     this.useReplace = false,
+    this.onSelected,
   });
 
   @override
@@ -80,12 +82,16 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         },
       );
     }
+
+    if (widget.onSelected != null) {
+      widget.onSelected!(item);
+    }
   }
 
   Widget buildItem(Channel item) {
     final padding = widget.isDense
         ? const EdgeInsets.symmetric(horizontal: 20)
-        : const EdgeInsets.symmetric(horizontal: 24);
+        : const EdgeInsets.symmetric(horizontal: 16);
 
     if (item.type == 1) {
       final otherside = item.members!
@@ -95,7 +101,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
       return ListTile(
         leading: AccountAvatar(
           content: otherside.account.avatar,
-          radius: widget.isDense ? 12 : 24,
+          radius: widget.isDense ? 12 : 20,
           bgColor: Colors.indigo,
           feColor: Colors.white,
         ),
@@ -120,7 +126,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         leading: CircleAvatar(
           backgroundColor:
               item.realmId == null ? Colors.indigo : Colors.transparent,
-          radius: widget.isDense ? 12 : 24,
+          radius: widget.isDense ? 12 : 20,
           child: FaIcon(
             FontAwesomeIcons.hashtag,
             color: item.realmId == null ? Colors.white : Colors.indigo,
@@ -163,9 +169,18 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         SliverList.list(
           children: _inRealms.entries.map((element) {
             return ExpansionTile(
-              tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+              tilePadding: const EdgeInsets.symmetric(horizontal: 20),
               minTileHeight: 48,
               title: Text(element.value.first.realm!.name),
+              leading: CircleAvatar(
+                backgroundColor: Colors.teal,
+                radius: widget.isDense ? 12 : 24,
+                child: Icon(
+                  Icons.workspaces,
+                  color: Colors.white,
+                  size: widget.isDense ? 12 : 16,
+                ),
+              ),
               children: element.value.map((x) => buildItem(x)).toList(),
             );
           }).toList(),

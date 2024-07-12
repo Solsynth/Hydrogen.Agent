@@ -14,6 +14,7 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
@@ -90,6 +91,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 sliver: SliverAppBar(
+                  leading: const AppBarLeadingButton(),
                   title: Text(_realm?.name ?? 'loading'.tr),
                   centerTitle: false,
                   actions: [

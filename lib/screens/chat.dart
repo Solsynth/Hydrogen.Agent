@@ -8,6 +8,7 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
@@ -43,6 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
+          leading: const AppBarLeadingButton(),
           title: AppBarTitle('chat'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

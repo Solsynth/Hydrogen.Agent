@@ -89,7 +89,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
 
             return ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              title: Text(snapshot.data!.body['nick']),
+              title: Text(
+                snapshot.data!.body['nick'],
+                maxLines: 1,
+                overflow: TextOverflow.fade,
+              ),
               subtitle: Builder(
                 builder: (context) {
                   if (_accountStatus == null) {
@@ -98,7 +102,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                   final info = StatusProvider.determineStatus(
                     _accountStatus!,
                   );
-                  return Text(info.$3);
+                  return Text(
+                    info.$3,
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                  );
                 },
               ),
               leading: Builder(builder: (context) {
@@ -177,6 +185,9 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                           selfId: selfId,
                           isDense: true,
                           useReplace: true,
+                          onSelected: (_) {
+                            closeDrawer();
+                          },
                         ),
                       ),
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/sidebar/sidebar_placeholder.dart';
 
@@ -43,6 +44,7 @@ class SidebarShell extends StatelessWidget {
     return Scaffold(
       appBar: showAppBar
           ? AppBar(
+              leading: const AppBarLeadingButton(),
               title: AppBarTitle(state.topRoute?.name?.tr ?? 'page'.tr),
               centerTitle: false,
               toolbarHeight: SolianTheme.toolbarHeight(context),

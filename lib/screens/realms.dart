@@ -9,6 +9,7 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/sized_container.dart';
@@ -47,7 +48,6 @@ class _RealmListScreenState extends State<RealmListScreen> {
   @override
   void initState() {
     super.initState();
-
     getRealms();
   }
 
@@ -59,6 +59,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
+          leading: const AppBarLeadingButton(),
           title: AppBarTitle('realm'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

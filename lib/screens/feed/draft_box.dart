@@ -8,6 +8,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/feed.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/articles/article_action.dart';
 import 'package:solian/widgets/articles/article_owned_list.dart';
@@ -62,6 +63,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
+          leading: const AppBarLeadingButton(),
           title: AppBarTitle('draftBox'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),

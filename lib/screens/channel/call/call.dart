@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/content/call.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/chat/call/call_controls.dart';
 import 'package:solian/widgets/chat/call/call_participant.dart';
 
@@ -55,6 +56,7 @@ class _CallScreenState extends State<CallScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
+          leading: const AppBarLeadingButton(),
           centerTitle: true,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           title: RichText(

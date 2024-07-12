@@ -10,6 +10,7 @@ import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -63,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 centerTitle: false,
                 floating: true,
                 toolbarHeight: SolianTheme.toolbarHeight(context),
+                leading: const AppBarLeadingButton(),
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),

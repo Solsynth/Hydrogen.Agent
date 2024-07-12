@@ -8,6 +8,7 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
@@ -133,6 +134,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
+          leading: const AppBarLeadingButton(),
           title: AppBarTitle('postPublish'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
