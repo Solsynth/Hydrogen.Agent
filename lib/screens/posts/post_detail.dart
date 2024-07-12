@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/feed.dart';
-import 'package:solian/widgets/centered_container.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
 

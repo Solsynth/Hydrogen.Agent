@@ -1,5 +1,27 @@
 import 'package:flutter/material.dart';
 
+class SizedContainer extends StatelessWidget {
+  final Widget child;
+  final double maxWidth;
+
+  const SizedContainer({
+    super.key,
+    required this.child,
+    this.maxWidth = 720,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      ),
+    );
+  }
+}
+
 class CenteredContainer extends StatelessWidget {
   final Widget child;
   final double maxWidth;

@@ -10,7 +10,6 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/feed/feed_tags_field.dart';
-import 'package:solian/widgets/prev_page.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -133,7 +132,6 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
           title: AppBarTitle('articlePublish'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
-          leading: const PrevPageButton(),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyPost(),

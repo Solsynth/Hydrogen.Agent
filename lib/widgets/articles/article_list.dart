@@ -5,7 +5,7 @@ import 'package:solian/models/articles.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/articles/article_action.dart';
 import 'package:solian/widgets/articles/article_item.dart';
-import 'package:solian/widgets/centered_container.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class ArticleListWidget extends StatelessWidget {
   final bool isShowEmbed;

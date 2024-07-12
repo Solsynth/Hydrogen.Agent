@@ -7,7 +7,6 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
-import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
 class RealmOrganizeArguments {
@@ -102,7 +101,6 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
           title: AppBarTitle('realmOrganizing'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
-          leading: const PrevPageButton(),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyRealm(),

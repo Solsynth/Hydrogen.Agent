@@ -9,7 +9,6 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
-import 'package:solian/widgets/prev_page.dart';
 import 'package:uuid/uuid.dart';
 
 class ChannelOrganizeArguments {
@@ -112,7 +111,6 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
           title: AppBarTitle('channelOrganizing'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
-          leading: const PrevPageButton(),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyChannel(),

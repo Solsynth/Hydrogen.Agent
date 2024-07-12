@@ -11,16 +11,15 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
-import 'package:solian/widgets/drawer_button.dart' as drawer;
 
-class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<FeedScreen> createState() => _FeedScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _FeedScreenState extends State<FeedScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   final PagingController<int, FeedRecord> _pagingController =
       PagingController(firstPageKey: 0);
 
@@ -60,11 +59,10 @@ class _FeedScreenState extends State<FeedScreen> {
           child: CustomScrollView(
             slivers: [
               SliverAppBar(
-                title: AppBarTitle('feed'.tr),
+                title: AppBarTitle('home'.tr),
                 centerTitle: false,
                 floating: true,
                 toolbarHeight: SolianTheme.toolbarHeight(context),
-                leading: const drawer.DrawerButton(),
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),

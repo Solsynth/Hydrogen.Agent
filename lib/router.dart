@@ -17,7 +17,7 @@ import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
-import 'package:solian/screens/feed.dart';
+import 'package:solian/screens/home.dart';
 import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/shells/basic_shell.dart';
 import 'package:solian/shells/root_shell.dart';
@@ -48,8 +48,8 @@ abstract class AppRouter {
     routes: [
       GoRoute(
         path: '/',
-        name: 'feed',
-        builder: (context, state) => const FeedScreen(),
+        name: 'home',
+        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: '/feed/search',

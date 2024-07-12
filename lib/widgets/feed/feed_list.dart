@@ -4,7 +4,7 @@ import 'package:solian/models/articles.dart';
 import 'package:solian/models/feed.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/widgets/articles/article_list.dart';
-import 'package:solian/widgets/centered_container.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class FeedListWidget extends StatelessWidget {
@@ -28,7 +28,7 @@ class FeedListWidget extends StatelessWidget {
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<FeedRecord>(
         itemBuilder: (context, item, index) {
-          return CenteredContainer(
+          return SizedContainer(
             child: Builder(
               builder: (context) {
                 switch (item.type) {

@@ -5,6 +5,7 @@ const messagesEnglish = {
   'next': 'Next',
   'reset': 'Reset',
   'page': 'Page',
+  'home': 'Home',
   'draft': 'Draft',
   'draftSave': 'Save',
   'draftBox': 'Draft Box',

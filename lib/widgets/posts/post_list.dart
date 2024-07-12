@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/router.dart';
-import 'package:solian/widgets/centered_container.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 

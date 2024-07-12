@@ -2,6 +2,7 @@ const simplifiedChineseMessages = {
   'done': '完成',
   'hide': '隐藏',
   'okay': '确认',
+  'home': '首页',
   'next': '下一步',
   'reset': '重置',
   'cancel': '取消',

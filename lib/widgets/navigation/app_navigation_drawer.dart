@@ -20,7 +20,7 @@ class AppNavigationDrawer extends StatefulWidget {
 }
 
 class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
-  int _selectedIndex = 0;
+  int? _selectedIndex = 0;
   AccountStatus? _accountStatus;
 
   void getStatus() async {
@@ -40,7 +40,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     final nameList = AppNavigation.destinations.map((x) => x.page).toList();
     final idx = nameList.indexOf(widget.routeName!);
 
-    _selectedIndex = idx != -1 ? idx : 0;
+    _selectedIndex = idx != -1 ? idx : null;
+  }
+
+  void closeDrawer() {
+    rootScaffoldKey.currentState!.closeDrawer();
   }
 
   @override
@@ -65,7 +69,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
       onDestinationSelected: (idx) {
         setState(() => _selectedIndex = idx);
         AppRouter.instance.goNamed(AppNavigation.destinations[idx].page);
-        rootScaffoldKey.currentState!.closeDrawer();
+        closeDrawer();
       },
       children: [
         FutureBuilder(
@@ -75,67 +79,74 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               return const SizedBox();
             }
 
-            return Column(
-              children: [
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  title: Text(snapshot.data!.body['nick']),
-                  subtitle: Builder(
-                    builder: (context) {
-                      if (_accountStatus == null) {
-                        return Text('loading'.tr);
-                      }
-                      final info = StatusProvider.determineStatus(
+            return ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+              title: Text(snapshot.data!.body['nick']),
+              subtitle: Builder(
+                builder: (context) {
+                  if (_accountStatus == null) {
+                    return Text('loading'.tr);
+                  }
+                  final info = StatusProvider.determineStatus(
+                    _accountStatus!,
+                  );
+                  return Text(info.$3);
+                },
+              ),
+              leading: Builder(builder: (context) {
+                final badgeColor = _accountStatus != null
+                    ? StatusProvider.determineStatus(
                         _accountStatus!,
-                      );
-                      return Text(info.$3);
-                    },
-                  ),
-                  leading: Builder(builder: (context) {
-                    final badgeColor = _accountStatus != null
-                        ? StatusProvider.determineStatus(
-                            _accountStatus!,
-                          ).$2
-                        : Colors.grey;
+                      ).$2
+                    : Colors.grey;
 
-                    return badges.Badge(
-                      showBadge: _accountStatus != null,
-                      badgeStyle: badges.BadgeStyle(badgeColor: badgeColor),
-                      position: badges.BadgePosition.bottomEnd(
-                        bottom: 0,
-                        end: -2,
-                      ),
-                      child: AccountAvatar(
-                        content: snapshot.data!.body['avatar'],
-                      ),
-                    );
-                  }),
-                  onTap: () {
-                    showModalBottomSheet(
-                      useRootNavigator: true,
-                      context: context,
-                      builder: (context) => AccountStatusAction(
-                        currentStatus: _accountStatus!.status,
-                      ),
-                    ).then((val) {
-                      if (val == true) getStatus();
-                    });
-                  },
-                ),
-                const Divider(thickness: 0.3, height: 1).paddingOnly(
-                  bottom: 16,
-                  top: 8,
-                ),
-              ],
-            );
+                return badges.Badge(
+                  showBadge: _accountStatus != null,
+                  badgeStyle: badges.BadgeStyle(badgeColor: badgeColor),
+                  position: badges.BadgePosition.bottomEnd(
+                    bottom: 0,
+                    end: -2,
+                  ),
+                  child: AccountAvatar(
+                    content: snapshot.data!.body['avatar'],
+                  ),
+                );
+              }),
+              trailing: IconButton(
+                icon: const Icon(Icons.face_retouching_natural),
+                onPressed: () {
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    context: context,
+                    builder: (context) => AccountStatusAction(
+                      currentStatus: _accountStatus!.status,
+                    ),
+                  ).then((val) {
+                    if (val == true) getStatus();
+                  });
+                },
+              ),
+              onTap: () {
+                AppRouter.instance.goNamed('account');
+                closeDrawer();
+              },
+            ).paddingOnly(top: 8);
           },
+        ),
+        const Divider(thickness: 0.3, height: 1).paddingOnly(
+          bottom: 12,
+          top: 8,
         ),
         ...AppNavigation.destinations.map(
           (e) => NavigationDrawerDestination(
             icon: e.icon,
             label: Text(e.label),
           ),
-        )
+        ),
+        const Divider(thickness: 0.3, height: 1).paddingOnly(
+          top: 12,
+          bottom: 8,
+        ),
       ],
     );
   }

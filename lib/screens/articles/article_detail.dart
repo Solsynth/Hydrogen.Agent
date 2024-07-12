@@ -4,7 +4,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/articles.dart';
 import 'package:solian/providers/content/feed.dart';
 import 'package:solian/widgets/articles/article_item.dart';
-import 'package:solian/widgets/centered_container.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class ArticleDetailScreen extends StatefulWidget {
   final String alias;

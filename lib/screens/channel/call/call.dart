@@ -7,7 +7,6 @@ import 'package:solian/providers/content/call.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/call/call_controls.dart';
 import 'package:solian/widgets/chat/call/call_participant.dart';
-import 'package:solian/widgets/prev_page.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
@@ -72,7 +71,6 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ]),
           ),
-          leading: const PrevPageButton(),
         ),
         body: SafeArea(
           child: Obx(

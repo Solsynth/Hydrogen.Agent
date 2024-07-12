@@ -12,7 +12,6 @@ import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
-import 'package:solian/widgets/drawer_button.dart' as drawer;
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -95,7 +94,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       title: AppBarTitle('chat'.tr),
                       centerTitle: false,
                       floating: true,
-                      leading: const drawer.DrawerButton(),
                       toolbarHeight: SolianTheme.toolbarHeight(context),
                       actions: [
                         const BackgroundStateWidget(),

@@ -6,14 +6,13 @@ import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/feed.dart';
-import 'package:solian/screens/feed.dart';
+import 'package:solian/screens/home.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/articles/article_action.dart';
 import 'package:solian/widgets/articles/article_owned_list.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_owned_list.dart';
-import 'package:solian/widgets/prev_page.dart';
 
 class DraftBoxScreen extends StatefulWidget {
   const DraftBoxScreen({super.key});
@@ -66,7 +65,6 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
           title: AppBarTitle('draftBox'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
-          leading: const PrevPageButton(),
           actions: [
             FeedCreationButton(
               hideDraftBox: true,

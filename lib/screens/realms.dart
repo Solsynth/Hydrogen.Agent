@@ -11,7 +11,6 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
-import 'package:solian/widgets/drawer_button.dart' as drawer;
 
 class RealmListScreen extends StatefulWidget {
   const RealmListScreen({super.key});
@@ -80,7 +79,6 @@ class _RealmListScreenState extends State<RealmListScreen> {
                   title: AppBarTitle('realm'.tr),
                   centerTitle: false,
                   floating: true,
-                  leading: const drawer.DrawerButton(),
                   toolbarHeight: SolianTheme.toolbarHeight(context),
                   actions: [
                     const BackgroundStateWidget(),

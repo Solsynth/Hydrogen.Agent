@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/navigation/app_navigation_drawer.dart';
-import 'package:solian/widgets/navigation/app_navigation_rail.dart';
 
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -32,14 +31,16 @@ class RootShell extends StatelessWidget {
 
     return Scaffold(
       key: rootScaffoldKey,
-      drawer: AppNavigationDrawer(
-        key: const ValueKey('navigation-drawer'),
-        routeName: routeName,
-      ),
+      drawer: SolianTheme.isLargeScreen(context)
+          ? null
+          : AppNavigationDrawer(
+              key: const ValueKey('navigation-drawer'),
+              routeName: routeName,
+            ),
       body: SolianTheme.isLargeScreen(context)
           ? Row(
               children: [
-                if (showNavigation) const AppNavigationRail(),
+                if (showNavigation) AppNavigationDrawer(routeName: routeName),
                 if (showNavigation)
                   const VerticalDivider(thickness: 0.3, width: 1),
                 Expanded(child: child),
