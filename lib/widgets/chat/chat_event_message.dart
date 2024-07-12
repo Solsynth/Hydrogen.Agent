@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/event.dart';
@@ -25,9 +23,13 @@ class ChatEventMessage extends StatelessWidget {
   Widget buildAttachment(BuildContext context) {
     final body = EventMessageBody.fromJson(item.body);
 
-    return SizedBox(
+    return Container(
       key: Key('m${item.uuid}attachments-box'),
-      width: min(MediaQuery.of(context).size.width, 640),
+      width: MediaQuery.of(context).size.width,
+      constraints: const BoxConstraints(
+        maxHeight: 720,
+        maxWidth: 640,
+      ),
       child: AttachmentList(
         key: Key('m${item.uuid}attachments'),
         parentId: item.uuid,
