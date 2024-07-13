@@ -86,8 +86,18 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
         FutureBuilder(
           future: auth.getProfileWithCheck(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data == null) {
-              return const SizedBox();
+            if (snapshot.data == null) {
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+                leading: const Icon(Icons.account_circle),
+                title: Text('guest'.tr),
+                subtitle: Text('unsignedIn'.tr),
+                onTap: () {
+                  AppRouter.instance.goNamed('account');
+                  setState(() => _selectedIndex = null);
+                  closeDrawer();
+                },
+              );
             }
 
             return ListTile(
@@ -147,11 +157,12 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               ),
               onTap: () {
                 AppRouter.instance.goNamed('account');
+                setState(() => _selectedIndex = null);
                 closeDrawer();
               },
-            ).paddingOnly(top: 8);
+            );
           },
-        ),
+        ).paddingOnly(top: 8),
         const Divider(thickness: 0.3, height: 1).paddingOnly(
           bottom: 12,
           top: 8,
@@ -176,25 +187,33 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
 
             return Column(
               children: [
-                ExpansionTile(
-                  title: Text('chat'.tr),
-                  tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-                  children: [
-                    Obx(
-                      () => SizedBox(
-                        height: 360,
-                        child: ChannelListWidget(
-                          channels: _channels.groupChannels,
-                          selfId: selfId,
-                          isDense: true,
-                          useReplace: true,
-                          onSelected: (_) {
-                            closeDrawer();
-                          },
+                Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    title: Text('channels'.tr),
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+                    children: [
+                      Obx(
+                        () => SizedBox(
+                          height: 360,
+                          child: RefreshIndicator(
+                            onRefresh: () =>
+                                _channels.refreshAvailableChannel(),
+                            child: ChannelListWidget(
+                              channels: _channels.groupChannels,
+                              selfId: selfId,
+                              isDense: true,
+                              useReplace: true,
+                              onSelected: (_) {
+                                setState(() => _selectedIndex = null);
+                                closeDrawer();
+                              },
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             );

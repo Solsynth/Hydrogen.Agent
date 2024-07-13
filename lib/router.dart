@@ -19,11 +19,8 @@ import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/screens/posts/post_editor.dart';
-import 'package:solian/shells/sidebar_shell.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/shells/title_shell.dart';
-import 'package:solian/theme.dart';
-import 'package:solian/widgets/sidebar/empty_placeholder.dart';
 
 abstract class AppRouter {
   static GoRouter instance = GoRouter(
@@ -203,20 +200,16 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _accountRoute = ShellRoute(
-    builder: (context, state, child) => SidebarShell(
-      state: state,
-      sidebarFirst: true,
-      showAppBar: false,
-      sidebar: const AccountScreen(),
-      child: child,
-    ),
+    builder: (context, state, child) => child,
     routes: [
       GoRoute(
         path: '/account',
         name: 'account',
-        builder: (context, state) => SolianTheme.isExtraLargeScreen(context)
-            ? const EmptyPagePlaceholder()
-            : TitleShell(state: state, child: const AccountScreen()),
+        builder: (context, state) => TitleShell(
+          state: state,
+          isCenteredTitle: true,
+          child: const AccountScreen(),
+        ),
       ),
       GoRoute(
         path: '/account/friend',

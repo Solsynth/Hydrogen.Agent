@@ -61,7 +61,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('realm'.tr),
-          centerTitle: false,
+          centerTitle: true,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           actions: [
             const BackgroundStateWidget(),

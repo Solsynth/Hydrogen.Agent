@@ -54,6 +54,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     isClickable: true,
                     isFullDate: true,
                     isShowReply: false,
+                    isContentSelectable: true,
                   ),
                 ),
               ),

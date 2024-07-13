@@ -46,7 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('chat'.tr),
-          centerTitle: false,
+          centerTitle: true,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           actions: [
             const BackgroundStateWidget(),

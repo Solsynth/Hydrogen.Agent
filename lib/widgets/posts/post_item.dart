@@ -20,6 +20,7 @@ class PostItem extends StatefulWidget {
   final bool isShowReply;
   final bool isShowEmbed;
   final bool isFullDate;
+  final bool isContentSelectable;
   final String? overrideAttachmentParent;
 
   const PostItem({
@@ -31,6 +32,7 @@ class PostItem extends StatefulWidget {
     this.isShowReply = true,
     this.isShowEmbed = true,
     this.isFullDate = false,
+    this.isContentSelectable = false,
     this.overrideAttachmentParent,
   });
 
@@ -40,6 +42,9 @@ class PostItem extends StatefulWidget {
 
 class _PostItemState extends State<PostItem> {
   late final Post item;
+
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   @override
   void initState() {
@@ -96,7 +101,7 @@ class _PostItemState extends State<PostItem> {
         textAlign: TextAlign.left,
         style: TextStyle(
           fontSize: 12,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+          color: _unFocusColor,
         ),
       ));
     }
@@ -119,17 +124,14 @@ class _PostItemState extends State<PostItem> {
             FaIcon(
               FontAwesomeIcons.reply,
               size: 16,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+              color: _unFocusColor,
             ),
             Expanded(
               child: Text(
                 'postRepliedNotify'.trParams(
                   {'username': '@${widget.item.replyTo!.author.name}'},
                 ),
-                style: TextStyle(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
-                ),
+                style: TextStyle(color: _unFocusColor),
               ).paddingOnly(left: 6),
             ),
           ],
@@ -154,17 +156,14 @@ class _PostItemState extends State<PostItem> {
             FaIcon(
               FontAwesomeIcons.retweet,
               size: 16,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+              color: _unFocusColor,
             ),
             Expanded(
               child: Text(
                 'postRepostedNotify'.trParams(
                   {'username': '@${widget.item.repostTo!.author.name}'},
                 ),
-                style: TextStyle(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
-                ),
+                style: TextStyle(color: _unFocusColor),
               ).paddingOnly(left: 6),
             ),
           ],
@@ -190,18 +189,32 @@ class _PostItemState extends State<PostItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           buildHeader().paddingSymmetric(horizontal: 12),
-          MarkdownTextContent(content: item.content).paddingOnly(
+          MarkdownTextContent(
+            content: item.content,
+            isSelectable: widget.isContentSelectable,
+          ).paddingOnly(
             left: 16,
             right: 12,
             top: 2,
             bottom: hasAttachment ? 4 : 0,
           ),
           buildFooter().paddingOnly(left: 16),
-          AttachmentList(
-            parentId: widget.overrideAttachmentParent ?? widget.item.alias,
-            attachmentsId: item.attachments ?? List.empty(),
-            divided: true,
-          ),
+          if (item.attachments?.isNotEmpty ?? false)
+            Row(
+              children: [
+                Icon(
+                  Icons.attachment,
+                  size: 18,
+                  color: _unFocusColor,
+                ).paddingOnly(right: 6),
+                Text(
+                  'postAttachmentTip'.trParams(
+                    {'count': item.attachments!.length.toString()},
+                  ),
+                  style: TextStyle(color: _unFocusColor),
+                )
+              ],
+            ).paddingOnly(left: 16, top: 4),
         ],
       );
     }
@@ -231,8 +244,10 @@ class _PostItemState extends State<PostItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildHeader(),
-                  MarkdownTextContent(content: item.content)
-                      .paddingOnly(left: 12, right: 8),
+                  MarkdownTextContent(
+                    content: item.content,
+                    isSelectable: widget.isContentSelectable,
+                  ).paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
                       child: buildReply(context).paddingOnly(top: 4),

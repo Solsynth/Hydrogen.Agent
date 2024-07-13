@@ -29,6 +29,8 @@ abstract class PlatformInfo {
 
   static bool get canRecord => (isMobile || isMacOS);
 
+  static bool get canPushNotification => isAndroid || isIOS || isMacOS;
+
   static Future<String> getVersion() async {
     var version = kIsWeb ? 'Web' : 'Unknown';
     try {

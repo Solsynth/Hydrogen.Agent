@@ -96,7 +96,9 @@ class AccountProvider extends GetxController {
             final notification = Notification.fromJson(packet.payload!);
             notificationUnread++;
             notifications.add(notification);
-            notifyMessage(notification.subject, notification.content);
+            if (!PlatformInfo.canPushNotification) {
+              notifyMessage(notification.subject, notification.content);
+            }
             break;
         }
       },
@@ -212,26 +214,30 @@ class AccountProvider extends GetxController {
   Future<String?> _getDeviceUuid() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (PlatformInfo.isWeb) {
-      final WebBrowserInfo webInfo = await deviceInfo.webBrowserInfo;
+      final webInfo = await deviceInfo.webBrowserInfo;
       return webInfo.vendor! +
           webInfo.userAgent! +
           webInfo.hardwareConcurrency.toString();
     }
     if (PlatformInfo.isAndroid) {
-      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      final androidInfo = await deviceInfo.androidInfo;
       return androidInfo.id;
     }
     if (PlatformInfo.isIOS) {
-      final IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      final iosInfo = await deviceInfo.iosInfo;
       return iosInfo.identifierForVendor!;
     }
     if (PlatformInfo.isLinux) {
-      final LinuxDeviceInfo linuxInfo = await deviceInfo.linuxInfo;
+      final linuxInfo = await deviceInfo.linuxInfo;
       return linuxInfo.machineId!;
     }
     if (PlatformInfo.isWindows) {
-      final WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+      final windowsInfo = await deviceInfo.windowsInfo;
       return windowsInfo.deviceId;
+    }
+    if (PlatformInfo.isMacOS) {
+      final macosInfo = await deviceInfo.macOsInfo;
+      return macosInfo.systemGUID;
     }
     return null;
   }

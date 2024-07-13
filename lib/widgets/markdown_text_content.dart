@@ -5,8 +5,13 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 class MarkdownTextContent extends StatelessWidget {
   final String content;
+  final bool isSelectable;
 
-  const MarkdownTextContent({super.key, required this.content});
+  const MarkdownTextContent({
+    super.key,
+    required this.content,
+    this.isSelectable = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +20,7 @@ class MarkdownTextContent extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       data: content,
       padding: EdgeInsets.zero,
+      selectable: isSelectable,
       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
         horizontalRuleDecoration: BoxDecoration(
           border: Border(

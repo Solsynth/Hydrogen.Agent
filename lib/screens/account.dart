@@ -7,6 +7,7 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/widgets/account/account_heading.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -85,31 +86,33 @@ class _AccountScreenState extends State<AccountScreen> {
               );
             }
 
-            return ListView(
-              children: [
-                const AccountHeading().paddingOnly(bottom: 8, top: 8),
-                ...(actionItems.map(
-                  (x) => ListTile(
+            return CenteredContainer(
+              child: ListView(
+                children: [
+                  const AccountHeading().paddingOnly(bottom: 8, top: 8),
+                  ...(actionItems.map(
+                    (x) => ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                      leading: x.$1,
+                      title: Text(x.$2),
+                      onTap: () {
+                        AppRouter.instance
+                            .pushNamed(x.$3)
+                            .then((_) => setState(() {}));
+                      },
+                    ),
+                  )),
+                  ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                    leading: x.$1,
-                    title: Text(x.$2),
+                    leading: const Icon(Icons.logout),
+                    title: Text('signout'.tr),
                     onTap: () {
-                      AppRouter.instance
-                          .pushNamed(x.$3)
-                          .then((_) => setState(() {}));
+                      provider.signout();
+                      setState(() {});
                     },
                   ),
-                )),
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                  leading: const Icon(Icons.logout),
-                  title: Text('signout'.tr),
-                  onTap: () {
-                    provider.signout();
-                    setState(() {});
-                  },
-                ),
-              ],
+                ],
+              ),
             );
           },
         ),

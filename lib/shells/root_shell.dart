@@ -33,10 +33,7 @@ class RootShell extends StatelessWidget {
       key: rootScaffoldKey,
       drawer: SolianTheme.isLargeScreen(context)
           ? null
-          : AppNavigationDrawer(
-              key: const ValueKey('navigation-drawer'),
-              routeName: routeName,
-            ),
+          : AppNavigationDrawer(routeName: routeName),
       body: SolianTheme.isLargeScreen(context)
           ? Row(
               children: [
