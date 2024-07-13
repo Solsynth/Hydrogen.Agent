@@ -60,6 +60,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
             name: _userinfo!.name,
             nick: _userinfo!.nick,
             desc: _userinfo!.description,
+            detail: _userinfo!,
             badges: _userinfo!.badges,
             status: Get.find<StatusProvider>().getSomeoneStatus(_userinfo!.name),
           ).paddingOnly(top: 16),

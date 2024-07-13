@@ -50,6 +50,8 @@ const messagesEnglish = {
   'accountFriendPending': 'Friend requests',
   'accountFriendBlocked': 'Friend blocklist',
   'accountFriendListHint': 'Swipe left to decline, right to approve',
+  'accountSuspended': 'Account was suspended',
+  'accountSuspendedAt': 'Account was suspended since @date',
   'aspectRatio': 'Aspect Ratio',
   'aspectRatioSquare': 'Square',
   'aspectRatioPortrait': 'Portrait',

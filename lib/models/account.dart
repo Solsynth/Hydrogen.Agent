@@ -3,6 +3,8 @@ class Account {
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
+  DateTime? confirmedAt;
+  DateTime? suspendedAt;
   String name;
   String nick;
   dynamic avatar;
@@ -17,6 +19,8 @@ class Account {
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
+    required this.confirmedAt,
+    required this.suspendedAt,
     required this.name,
     required this.nick,
     required this.avatar,
@@ -31,7 +35,15 @@ class Account {
         id: json['id'],
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'],
+        deletedAt: json['deleted_at'] != null
+            ? DateTime.parse(json['deleted_at'])
+            : null,
+        confirmedAt: json['confirmed_at'] != null
+            ? DateTime.parse(json['confirmed_at'])
+            : null,
+        suspendedAt: json['suspended_at'] != null
+            ? DateTime.parse(json['suspended_at'])
+            : null,
         name: json['name'],
         nick: json['nick'],
         avatar: json['avatar'],
@@ -49,7 +61,9 @@ class Account {
         'id': id,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
+        'deleted_at': deletedAt?.toIso8601String(),
+        'confirmed_at': confirmedAt?.toIso8601String(),
+        'suspended_at': suspendedAt?.toIso8601String(),
         'name': name,
         'nick': nick,
         'avatar': avatar,

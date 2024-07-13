@@ -49,6 +49,8 @@ const simplifiedChineseMessages = {
   'accountFriendPending': '好友请求',
   'accountFriendBlocked': '好友黑名单',
   'accountFriendListHint': '左滑来拒绝，右滑来接受',
+  'accountSuspended': '帐号被停用',
+  'accountSuspendedAt': '该帐号自 @date 起被停用',
   'aspectRatio': '纵横比',
   'aspectRatioSquare': '方型',
   'aspectRatioPortrait': '竖型',

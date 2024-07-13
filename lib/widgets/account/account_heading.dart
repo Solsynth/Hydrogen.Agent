@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/account_status.dart';
 import 'package:solian/platform.dart';
@@ -15,6 +16,7 @@ class AccountHeadingWidget extends StatelessWidget {
   final String name;
   final String nick;
   final String? desc;
+  final Account? detail;
   final List<AccountBadge>? badges;
 
   final Future<Response>? status;
@@ -28,6 +30,7 @@ class AccountHeadingWidget extends StatelessWidget {
     required this.nick,
     required this.desc,
     required this.badges,
+    this.detail,
     this.status,
     this.onEditStatus,
   });
@@ -146,6 +149,19 @@ class AccountHeadingWidget extends StatelessWidget {
             ],
           ).paddingOnly(left: 116, top: 6),
           const SizedBox(height: 4),
+          if (detail?.suspendedAt != null)
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                child: ListTile(
+                  title: Text('accountSuspended'.tr),
+                  subtitle: Text('accountSuspendedAt'.trParams({
+                    'date': DateFormat('y/M/d').format(detail!.suspendedAt!),
+                  })),
+                  trailing: const Icon(Icons.block),
+                ),
+              ),
+            ).paddingOnly(left: 16, right: 16),
           if (badges?.isNotEmpty ?? false)
             SizedBox(
               width: double.infinity,
