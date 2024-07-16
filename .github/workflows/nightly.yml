@@ -59,4 +59,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output-windows
-          path: build/windows
+          path: build/windows/x64/runner/Release
