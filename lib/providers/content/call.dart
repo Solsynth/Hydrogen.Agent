@@ -60,7 +60,7 @@ class ChatCallProvider extends GetxController {
     final client = auth.configureClient('messaging');
 
     final resp = await client.post(
-      '/api/channels/global/${channel.value!.alias}/calls/ongoing/token',
+      '/channels/global/${channel.value!.alias}/calls/ongoing/token',
       {},
     );
     if (resp.statusCode == 200) {

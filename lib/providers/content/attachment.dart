@@ -58,7 +58,7 @@ class AttachmentProvider extends GetConnect {
 
   @override
   void onInit() {
-    httpClient.baseUrl = ServiceFinder.services['paperclip'];
+    httpClient.baseUrl = ServiceFinder.buildUrl('files', null);
   }
 
   final Map<int, Response> _cachedResponses = {};
@@ -68,7 +68,7 @@ class AttachmentProvider extends GetConnect {
       return _cachedResponses[id]!;
     }
 
-    final resp = await get('/api/attachments/$id/meta');
+    final resp = await get('/attachments/$id/meta');
     _cachedResponses[id] = resp;
 
     return resp;
@@ -81,7 +81,7 @@ class AttachmentProvider extends GetConnect {
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
     final client = auth.configureClient(
-      'paperclip',
+      'files',
       timeout: const Duration(minutes: 3),
     );
 
@@ -108,7 +108,7 @@ class AttachmentProvider extends GetConnect {
         if (ratio != null) 'ratio': ratio,
       }),
     });
-    final resp = await client.post('/api/attachments', payload);
+    final resp = await client.post('/attachments', payload);
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -126,9 +126,9 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient('paperclip');
+    final client = auth.configureClient('files');
 
-    var resp = await client.put('/api/attachments/$id', {
+    var resp = await client.put('/attachments/$id', {
       'metadata': {
         if (ratio != null) 'ratio': ratio,
       },
@@ -148,9 +148,9 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient('paperclip');
+    final client = auth.configureClient('files');
 
-    var resp = await client.delete('/api/attachments/$id');
+    var resp = await client.delete('/attachments/$id');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }

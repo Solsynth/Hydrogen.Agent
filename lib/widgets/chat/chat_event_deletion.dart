@@ -38,7 +38,7 @@ class _ChatEventDeletionDialogState extends State<ChatEventDeletionDialog> {
         ? widget.realm?.alias
         : 'global';
     final resp = await client.delete(
-      '/api/channels/$scope/${widget.channel.alias}/messages/${widget.item.id}',
+      '/channels/$scope/${widget.channel.alias}/messages/${widget.item.id}',
     );
     if (resp.statusCode == 200) {
       Navigator.pop(context, resp.body);

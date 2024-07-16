@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/providers/account.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,15 +30,15 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
 
     setState(() => _isBusy = true);
 
-    final client = ServiceFinder.configureClient('passport');
-    final lookupResp = await client.get('/api/users/lookup?probe=$username');
+    final client = ServiceFinder.configureClient('auth');
+    final lookupResp = await client.get('/users/lookup?probe=$username');
     if (lookupResp.statusCode != 200) {
       context.showErrorDialog(lookupResp.bodyString);
       setState(() => _isBusy = false);
       return;
     }
 
-    final resp = await client.post('/api/users/me/password-reset', {
+    final resp = await client.post('/users/me/password-reset', {
       'user_id': lookupResp.body['id'],
     });
     if (resp.statusCode != 200) {
@@ -75,7 +75,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
                 onPressed: () {
                   const redirect = 'solink://auth?status=done';
                   launchUrlString(
-                    '${ServiceFinder.services['passport']}/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}',
+                    ServiceFinder.buildUrl('passport', '/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}'),
                     mode: LaunchMode.inAppWebView,
                   );
                   Navigator.pop(context);
@@ -93,7 +93,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
       setState(() => _isBusy = false);
     }
 
-    Get.find<AccountProvider>().registerPushNotifications();
+    Get.find<WebSocketProvider>().registerPushNotifications();
 
     Navigator.pop(context, true);
   }

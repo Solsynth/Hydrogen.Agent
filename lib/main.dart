@@ -8,9 +8,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
-import 'package:solian/providers/account.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
@@ -100,8 +99,7 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => FriendProvider());
     Get.lazyPut(() => FeedProvider());
     Get.lazyPut(() => AttachmentProvider());
-    Get.lazyPut(() => ChatProvider());
-    Get.lazyPut(() => AccountProvider());
+    Get.lazyPut(() => WebSocketProvider());
     Get.lazyPut(() => StatusProvider());
     Get.lazyPut(() => ChannelProvider());
     Get.lazyPut(() => RealmProvider());
@@ -109,13 +107,12 @@ class SolianApp extends StatelessWidget {
 
     final AuthProvider auth = Get.find();
     if (await auth.isAuthorized) {
-      Get.find<AccountProvider>().connect();
-      Get.find<ChatProvider>().connect();
+      Get.find<WebSocketProvider>().connect();
 
       Get.find<ChannelProvider>().refreshAvailableChannel();
 
       try {
-        Get.find<AccountProvider>().registerPushNotifications();
+        Get.find<WebSocketProvider>().registerPushNotifications();
       } catch (err) {
         context.showSnackbar(
           'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),

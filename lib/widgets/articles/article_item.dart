@@ -192,8 +192,8 @@ class _ArticleItemState extends State<ArticleItem> {
             item: widget.item,
             onReact: (symbol, changes) {
               setState(() {
-                item.reactionList[symbol] =
-                    (item.reactionList[symbol] ?? 0) + changes;
+                item.metric!.reactionList[symbol] =
+                    (item.metric!.reactionList[symbol] ?? 0) + changes;
               });
             },
           ).paddingOnly(

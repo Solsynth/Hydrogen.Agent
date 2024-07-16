@@ -16,7 +16,7 @@ import 'package:solian/services.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class AccountProvider extends GetxController {
+class WebSocketProvider extends GetxController {
   final FlutterLocalNotificationsPlugin localNotify =
       FlutterLocalNotificationsPlugin();
 
@@ -28,6 +28,8 @@ class AccountProvider extends GetxController {
       List<Notification>.empty(growable: true).obs;
 
   WebSocketChannel? websocket;
+
+  StreamController<NetworkPackage> stream = StreamController.broadcast();
 
   @override
   onInit() {
@@ -58,10 +60,10 @@ class AccountProvider extends GetxController {
 
     if (auth.credentials == null) await auth.loadCredentials();
 
-    final uri = Uri.parse(
-      '${ServiceFinder.services['passport']}/api/ws?tk=${auth.credentials!.accessToken}'
-          .replaceFirst('http', 'ws'),
-    );
+    final uri = Uri.parse(ServiceFinder.buildUrl(
+      'dealer',
+      '/api/ws?tk=${auth.credentials!.accessToken}',
+    ).replaceFirst('http', 'ws'));
 
     isConnecting.value = true;
 
@@ -91,6 +93,8 @@ class AccountProvider extends GetxController {
     websocket?.stream.listen(
       (event) {
         final packet = NetworkPackage.fromJson(jsonDecode(event));
+        stream.sink.add(packet);
+
         switch (packet.method) {
           case 'notifications.new':
             final notification = Notification.fromJson(packet.payload!);
@@ -166,9 +170,9 @@ class AccountProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
-    final resp = await client.get('/api/notifications?skip=0&take=100');
+    final resp = await client.get('/notifications?skip=0&take=100');
     if (resp.statusCode == 200) {
       final result = PaginationResult.fromJson(resp.body);
       final data = result.data?.map((x) => Notification.fromJson(x)).toList();
@@ -199,9 +203,9 @@ class AccountProvider extends GetxController {
       token = await FirebaseMessaging.instance.getToken();
     }
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
-    final resp = await client.post('/api/notifications/subscribe', {
+    final resp = await client.post('/notifications/subscribe', {
       'provider': provider,
       'device_token': token,
       'device_id': deviceUuid,

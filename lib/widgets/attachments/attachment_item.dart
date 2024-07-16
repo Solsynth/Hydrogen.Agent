@@ -82,7 +82,8 @@ class _AttachmentItemState extends State<AttachmentItem> {
                   ),
                   onPressed: () {
                     launchUrlString(
-                      '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
+                      ServiceFinder.buildUrl(
+                          'files', '/attachments/${widget.item.id}'),
                     );
                   },
                 ),
@@ -117,7 +118,7 @@ class _AttachmentItemImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: Key('a${item.uuid}p${parentId}'),
+      tag: Key('a${item.uuid}p$parentId'),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -125,7 +126,7 @@ class _AttachmentItemImage extends StatelessWidget {
             CachedNetworkImage(
               fit: fit,
               imageUrl:
-                  '${ServiceFinder.services['paperclip']}/api/attachments/${item.id}',
+                  ServiceFinder.buildUrl('files', '/attachments/${item.id}'),
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   Center(
                 child: CircularProgressIndicator(
@@ -135,7 +136,7 @@ class _AttachmentItemImage extends StatelessWidget {
             )
           else
             Image.network(
-              '${ServiceFinder.services['paperclip']}/api/attachments/${item.id}',
+              ServiceFinder.buildUrl('files', '/attachments/${item.id}'),
               fit: fit,
               loadingBuilder: (BuildContext context, Widget child,
                   ImageChunkEvent? loadingProgress) {
@@ -205,7 +206,7 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
     super.initState();
     _player.open(
       Media(
-        '${ServiceFinder.services['paperclip']}/api/attachments/${widget.item.id}',
+        ServiceFinder.buildUrl('files', '/attachments/${widget.item.id}'),
       ),
       play: false,
     );

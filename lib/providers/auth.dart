@@ -8,8 +8,7 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:mutex/mutex.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
-import 'package:solian/providers/account.dart';
-import 'package:solian/providers/chat.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 
 class TokenSet {
@@ -48,7 +47,7 @@ class RiskyAuthenticateException implements Exception {
 
 class AuthProvider extends GetConnect {
   final tokenEndpoint =
-      Uri.parse('${ServiceFinder.services['passport']}/api/auth/token');
+      Uri.parse(ServiceFinder.buildUrl('auth', '/auth/token'));
 
   static const clientId = 'solian';
   static const clientSecret = '_F4%q2Eea3';
@@ -60,7 +59,7 @@ class AuthProvider extends GetConnect {
 
   @override
   void onInit() {
-    httpClient.baseUrl = ServiceFinder.services['passport'];
+    httpClient.baseUrl = ServiceFinder.buildUrl('auth', null);
     loadCredentials();
   }
 
@@ -68,7 +67,7 @@ class AuthProvider extends GetConnect {
     try {
       credentialsRefreshMutex.acquire();
       if (!credentials!.isExpired) return;
-      final resp = await post('/api/auth/token', {
+      final resp = await post('/auth/token', {
         'refresh_token': credentials!.refreshToken,
         'grant_type': 'refresh_token',
       });
@@ -111,7 +110,7 @@ class AuthProvider extends GetConnect {
       sendUserAgent: true,
     );
     client.httpClient.addAuthenticator(requestAuthenticator);
-    client.httpClient.baseUrl = ServiceFinder.services[service];
+    client.httpClient.baseUrl = ServiceFinder.buildUrl(service, null);
 
     return client;
   }
@@ -140,10 +139,10 @@ class AuthProvider extends GetConnect {
   ) async {
     _cachedUserProfileResponse = null;
 
-    final client = ServiceFinder.configureClient('passport');
+    final client = ServiceFinder.configureClient('auth');
 
     // Create ticket
-    final resp = await client.post('/api/auth', {
+    final resp = await client.post('/auth', {
       'username': username,
       'password': password,
     });
@@ -154,7 +153,7 @@ class AuthProvider extends GetConnect {
     }
 
     // Assign token
-    final tokenResp = await post('/api/auth/token', {
+    final tokenResp = await post('/auth/token', {
       'code': resp.body['ticket']['grant_token'],
       'grant_type': 'grant_token',
     });
@@ -173,9 +172,8 @@ class AuthProvider extends GetConnect {
       value: jsonEncode(credentials!.toJson()),
     );
 
-    Get.find<AccountProvider>().connect();
-    Get.find<AccountProvider>().notifyPrefetch();
-    Get.find<ChatProvider>().connect();
+    Get.find<WebSocketProvider>().connect();
+    Get.find<WebSocketProvider>().notifyPrefetch();
 
     return credentials!;
   }
@@ -183,10 +181,9 @@ class AuthProvider extends GetConnect {
   void signout() {
     _cachedUserProfileResponse = null;
 
-    Get.find<ChatProvider>().disconnect();
-    Get.find<AccountProvider>().disconnect();
-    Get.find<AccountProvider>().notifications.clear();
-    Get.find<AccountProvider>().notificationUnread.value = 0;
+    Get.find<WebSocketProvider>().disconnect();
+    Get.find<WebSocketProvider>().notifications.clear();
+    Get.find<WebSocketProvider>().notificationUnread.value = 0;
 
     final chatHistory = ChatEventController();
     chatHistory.initialize().then((_) async {
@@ -207,9 +204,9 @@ class AuthProvider extends GetConnect {
       return _cachedUserProfileResponse!;
     }
 
-    final client = configureClient('passport');
+    final client = configureClient('auth');
 
-    final resp = await client.get('/api/users/me');
+    final resp = await client.get('/users/me');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     } else {

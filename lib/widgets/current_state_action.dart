@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:solian/providers/account.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/chat.dart';
 
 class BackgroundStateWidget extends StatelessWidget {
   const BackgroundStateWidget({super.key});
@@ -11,14 +10,11 @@ class BackgroundStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
-    final AccountProvider account = Get.find();
-    final ChatProvider chat = Get.find();
+    final WebSocketProvider ws = Get.find();
 
     return Obx(() {
-      final disconnected =
-          chat.isConnected.isFalse || account.isConnected.isFalse;
-      final connecting =
-          chat.isConnecting.isTrue || account.isConnecting.isTrue;
+      final disconnected = ws.isConnected.isFalse;
+      final connecting = ws.isConnecting.isTrue;
 
       return Row(children: [
         if (disconnected && !connecting)
@@ -30,10 +26,8 @@ class BackgroundStateWidget extends StatelessWidget {
               }
               return IconButton(
                 tooltip: [
-                  if (account.isConnected.isFalse)
-                    'Lost Connection with Passport Server...',
-                  if (chat.isConnected.isFalse)
-                    'Lost Connection with Messaging Server...',
+                  if (ws.isConnected.isFalse)
+                    'Lost Connection with Solar Network...',
                 ].join('\n'),
                 icon: const Icon(Icons.wifi_off)
                     .animate(onPlay: (c) => c.repeat())
@@ -41,8 +35,7 @@ class BackgroundStateWidget extends StatelessWidget {
                     .then()
                     .fadeOut(duration: 800.ms),
                 onPressed: () {
-                  if (account.isConnected.isFalse) account.connect();
-                  if (chat.isConnected.isFalse) chat.connect();
+                  if (ws.isConnected.isFalse) ws.connect();
                 },
               );
             },
@@ -56,10 +49,8 @@ class BackgroundStateWidget extends StatelessWidget {
               }
               return IconButton(
                 tooltip: [
-                  if (account.isConnecting.isTrue)
-                    'Waiting Passport Server Response...',
-                  if (chat.isConnecting.isTrue)
-                    'Waiting Messaging Server Response...',
+                  if (ws.isConnecting.isTrue)
+                    'Waiting Solar Network Connection...',
                 ].join('\n'),
                 icon: const Icon(Icons.sync)
                     .animate(onPlay: (c) => c.repeat())

@@ -11,9 +11,9 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/chat.dart';
 import 'package:solian/providers/content/call.dart';
 import 'package:solian/providers/content/channel.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/theme.dart';
@@ -107,7 +107,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   }
 
   void listenMessages() {
-    final ChatProvider provider = Get.find();
+    final WebSocketProvider provider = Get.find();
     _subscription = provider.stream.stream.listen((event) {
       switch (event.method) {
         case 'events.new':

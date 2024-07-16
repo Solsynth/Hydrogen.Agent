@@ -114,12 +114,12 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     Response resp;
     if (_editTo != null) {
       resp = await client.put(
-        '/api/channels/${widget.realm}/${widget.channel.alias}/messages/${_editTo!.id}',
+        '/channels/${widget.realm}/${widget.channel.alias}/messages/${_editTo!.id}',
         payload,
       );
     } else {
       resp = await client.post(
-        '/api/channels/${widget.realm}/${widget.channel.alias}/messages',
+        '/channels/${widget.realm}/${widget.channel.alias}/messages',
         payload,
       );
     }

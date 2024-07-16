@@ -90,9 +90,9 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
     Response resp;
     if (widget.edit != null) {
-      resp = await client.put('/api/posts/${widget.edit!.id}', payload);
+      resp = await client.put('/posts/${widget.edit!.id}', payload);
     } else {
-      resp = await client.post('/api/posts', payload);
+      resp = await client.post('/posts', payload);
     }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);

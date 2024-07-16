@@ -23,7 +23,7 @@ Future<Event?> getRemoteEvent(int id, Channel channel, String scope) async {
   final client = auth.configureClient('messaging');
 
   final resp = await client.get(
-    '/api/channels/$scope/${channel.alias}/events/$id',
+    '/channels/$scope/${channel.alias}/events/$id',
   );
 
   if (resp.statusCode == 404) {
@@ -53,7 +53,7 @@ Future<(List<Event>, int)?> getRemoteEvents(
   final client = auth.configureClient('messaging');
 
   final resp = await client.get(
-    '/api/channels/$scope/${channel.alias}/events?take=$take&offset=$offset',
+    '/channels/$scope/${channel.alias}/events?take=$take&offset=$offset',
   );
 
   if (resp.statusCode != 200) {

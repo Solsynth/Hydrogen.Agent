@@ -24,9 +24,9 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
     setState(() => _isBusy = true);
 
     final client = GetConnect();
-    client.httpClient.baseUrl = ServiceFinder.services['passport'];
+    client.httpClient.baseUrl = ServiceFinder.buildUrl('auth', null);
 
-    final resp = await client.get('/api/users/${widget.account.name}');
+    final resp = await client.get('/users/${widget.account.name}');
     if (resp.statusCode == 200) {
       _userinfo = Account.fromJson(resp.body);
       setState(() => _isBusy = false);

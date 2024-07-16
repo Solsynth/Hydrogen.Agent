@@ -84,9 +84,9 @@ class _ArticlePublishScreenState extends State<ArticlePublishScreen> {
 
     Response resp;
     if (widget.edit != null) {
-      resp = await client.put('/api/articles/${widget.edit!.id}', payload);
+      resp = await client.put('/articles/${widget.edit!.id}', payload);
     } else {
-      resp = await client.post('/api/articles', payload);
+      resp = await client.post('/articles', payload);
     }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);

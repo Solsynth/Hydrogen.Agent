@@ -118,11 +118,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
       );
     } else {
       return ListTile(
-        minTileHeight: item.realmId == null
-            ? 48
-            : widget.isDense
-                ? 24
-                : null,
+        minTileHeight: widget.isDense ? 48 : null,
         leading: CircleAvatar(
           backgroundColor:
               item.realmId == null ? Colors.indigo : Colors.transparent,

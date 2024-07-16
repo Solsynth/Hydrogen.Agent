@@ -43,7 +43,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
     final client = ServiceFinder.configureClient('messaging');
 
     final resp = await client
-        .get('/api/channels/${widget.realm}/${widget.channel.alias}/members');
+        .get('/channels/${widget.realm}/${widget.channel.alias}/members');
     if (resp.statusCode == 200) {
       setState(() {
         _members = resp.body
@@ -79,7 +79,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
     final client = auth.configureClient('messaging');
 
     final resp = await client.post(
-      '/api/channels/${widget.realm}/${widget.channel.alias}/members',
+      '/channels/${widget.realm}/${widget.channel.alias}/members',
       {'target': username},
     );
     if (resp.statusCode == 200) {
@@ -100,7 +100,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
     final client = auth.configureClient('messaging');
 
     final resp = await client.request(
-      '/api/channels/${widget.realm}/${widget.channel.alias}/members',
+      '/channels/${widget.realm}/${widget.channel.alias}/members',
       'delete',
       body: {'target': item.account.name},
     );

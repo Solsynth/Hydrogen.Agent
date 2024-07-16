@@ -43,7 +43,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     final payload = {
       'alias': _aliasController.value.text.toLowerCase(),
@@ -55,9 +55,9 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
 
     Response resp;
     if (widget.edit != null) {
-      resp = await client.put('/api/realms/${widget.edit!.id}', payload);
+      resp = await client.put('/realms/${widget.edit!.id}', payload);
     } else {
-      resp = await client.post('/api/realms', payload);
+      resp = await client.post('/realms', payload);
     }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);

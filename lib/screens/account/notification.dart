@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:solian/providers/account.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/models/notification.dart' as notify;
 import 'package:url_launcher/url_launcher_string.dart';
@@ -23,7 +23,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     setState(() => _isBusy = true);
 
-    final AccountProvider provider = Get.find();
+    final WebSocketProvider provider = Get.find();
 
     List<int> markList = List.empty(growable: true);
     for (final element in provider.notifications) {
@@ -32,8 +32,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     if (markList.isNotEmpty) {
-      final client = auth.configureClient('passport');
-      await client.put('/api/notifications/batch/read', {'messages': markList});
+      final client = auth.configureClient('auth');
+      await client.put('/notifications/batch/read', {'messages': markList});
     }
 
     provider.notifications.clear();
@@ -45,7 +45,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    final AccountProvider provider = Get.find();
+    final WebSocketProvider provider = Get.find();
 
     if (element.id <= 0) {
       provider.notifications.removeAt(index);
@@ -54,9 +54,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
-    await client.put('/api/notifications/${element.id}/read', {});
+    await client.put('/notifications/${element.id}/read', {});
 
     provider.notifications.removeAt(index);
 
@@ -65,7 +65,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AccountProvider provider = Get.find();
+    final WebSocketProvider provider = Get.find();
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -175,7 +175,7 @@ class NotificationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AccountProvider provider = Get.find();
+    final WebSocketProvider provider = Get.find();
 
     final button = IconButton(
       icon: const Icon(Icons.notifications),

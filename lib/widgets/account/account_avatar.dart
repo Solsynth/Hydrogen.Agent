@@ -24,12 +24,12 @@ class AccountAvatar extends StatelessWidget {
     if (content is String) {
       direct = content.startsWith('http');
       if (!isEmpty) isEmpty = content.isEmpty;
-      if (!isEmpty) isEmpty = content.endsWith('/api/attachments/0');
+      if (!isEmpty) isEmpty = content.endsWith('/attachments/0');
     }
 
     final url = direct
         ? content
-        : '${ServiceFinder.services['paperclip']}/api/attachments/$content';
+        : ServiceFinder.buildUrl('files', '/attachments/$content');
 
     return CircleAvatar(
       key: Key('a$content'),
@@ -68,12 +68,12 @@ class AccountProfileImage extends StatelessWidget {
     if (content is String) {
       direct = content.startsWith('http');
       if (!isEmpty) isEmpty = content.isEmpty;
-      if (!isEmpty) isEmpty = content.endsWith('/api/attachments/0');
+      if (!isEmpty) isEmpty = content.endsWith('/attachments/0');
     }
 
     final url = direct
         ? content
-        : '${ServiceFinder.services['paperclip']}/api/attachments/$content';
+        : ServiceFinder.buildUrl('files', '/attachments/$content');
 
     if (PlatformInfo.canCacheImage) {
       return CachedNetworkImage(

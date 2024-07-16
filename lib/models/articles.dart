@@ -1,5 +1,6 @@
 import 'package:solian/models/account.dart';
 import 'package:solian/models/feed.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 
 class Article {
@@ -20,8 +21,7 @@ class Article {
   bool? isDraft;
   int authorId;
   Account author;
-  int reactionCount;
-  Map<String, int> reactionList;
+  PostMetric? metric;
 
   Article({
     required this.id,
@@ -41,8 +41,7 @@ class Article {
     required this.isDraft,
     required this.authorId,
     required this.author,
-    required this.reactionCount,
-    required this.reactionList,
+    required this.metric,
   });
 
   factory Article.fromJson(Map<String, dynamic> json) => Article(
@@ -72,15 +71,8 @@ class Article {
         isDraft: json['is_draft'],
         authorId: json['author_id'],
         author: Account.fromJson(json['author']),
-        reactionCount: json['reaction_count'],
-        reactionList: json['reaction_list'] != null
-            ? json['reaction_list']
-                .map((key, value) => MapEntry(
-                    key,
-                    int.tryParse(value.toString()) ??
-                        (value is double ? value.toInt() : null)))
-                .cast<String, int>()
-            : {},
+        metric:
+            json['metric'] != null ? PostMetric.fromJson(json['metric']) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -101,7 +93,6 @@ class Article {
         'is_draft': isDraft,
         'author_id': authorId,
         'author': author.toJson(),
-        'reaction_count': reactionCount,
-        'reaction_list': reactionList,
+        'metric': metric?.toJson(),
       };
 }

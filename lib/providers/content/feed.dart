@@ -5,7 +5,7 @@ import 'package:solian/services.dart';
 class FeedProvider extends GetConnect {
   @override
   void onInit() {
-    httpClient.baseUrl = ServiceFinder.services['interactive'];
+    httpClient.baseUrl = ServiceFinder.buildUrl('interactive', null);
   }
 
   Future<Response> listFeed(int page,
@@ -17,7 +17,7 @@ class FeedProvider extends GetConnect {
       if (category != null) 'category=$category',
       if (realm != null) 'realmId=$realm',
     ];
-    final resp = await get('/api/feed?${queries.join('&')}');
+    final resp = await get('/feed?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }
@@ -34,7 +34,7 @@ class FeedProvider extends GetConnect {
       'offset=$page',
     ];
     final client = auth.configureClient('interactive');
-    final resp = await client.get('/api/drafts?${queries.join('&')}');
+    final resp = await client.get('/drafts?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }
@@ -48,7 +48,7 @@ class FeedProvider extends GetConnect {
       'offset=$page',
       if (realm != null) 'realmId=$realm',
     ];
-    final resp = await get('/api/posts?${queries.join('&')}');
+    final resp = await get('/posts?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }
@@ -57,7 +57,7 @@ class FeedProvider extends GetConnect {
   }
 
   Future<Response> listPostReplies(String alias, int page) async {
-    final resp = await get('/api/posts/$alias/replies?take=${10}&offset=$page');
+    final resp = await get('/posts/$alias/replies?take=${10}&offset=$page');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }
@@ -66,7 +66,7 @@ class FeedProvider extends GetConnect {
   }
 
   Future<Response> getPost(String alias) async {
-    final resp = await get('/api/posts/$alias');
+    final resp = await get('/posts/$alias');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }
@@ -75,7 +75,7 @@ class FeedProvider extends GetConnect {
   }
 
   Future<Response> getArticle(String alias) async {
-    final resp = await get('/api/articles/$alias');
+    final resp = await get('/articles/$alias');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }

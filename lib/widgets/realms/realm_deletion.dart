@@ -27,9 +27,9 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
-    final resp = await client.delete('/api/realms/${widget.realm.id}');
+    final resp = await client.delete('/realms/${widget.realm.id}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else if (Navigator.canPop(context)) {
@@ -45,10 +45,10 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     final resp =
-        await client.delete('/api/realms/${widget.realm.id}/members/me');
+        await client.delete('/realms/${widget.realm.id}/members/me');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else if (Navigator.canPop(context)) {

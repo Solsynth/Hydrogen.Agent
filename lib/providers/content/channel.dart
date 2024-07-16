@@ -33,7 +33,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.get('/api/channels/$realm/$alias');
+    final resp = await client.get('/channels/$realm/$alias');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -48,7 +48,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.get('/api/channels/$realm/$alias/me');
+    final resp = await client.get('/channels/$realm/$alias/me');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -63,7 +63,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.get('/api/channels/$realm/$alias/calls/ongoing');
+    final resp = await client.get('/channels/$realm/$alias/calls/ongoing');
     if (resp.statusCode == 404) {
       return null;
     } else if (resp.statusCode != 200) {
@@ -79,7 +79,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.get('/api/channels/$scope');
+    final resp = await client.get('/channels/$scope');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -93,7 +93,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.get('/api/channels/$realm/me/available');
+    final resp = await client.get('/channels/$realm/me/available');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -107,7 +107,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.post('/api/channels/$scope', payload);
+    final resp = await client.post('/channels/$scope', payload);
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -132,7 +132,7 @@ class ChannelProvider extends GetxController {
     final prof = await auth.getProfile();
     final client = auth.configureClient('messaging');
 
-    final resp = await client.post('/api/channels/$scope/dm', {
+    final resp = await client.post('/channels/$scope/dm', {
       'alias': const Uuid().v4().replaceAll('-', '').substring(0, 12),
       'name': 'DM',
       'description':
@@ -153,7 +153,7 @@ class ChannelProvider extends GetxController {
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.put('/api/channels/$scope/$id', payload);
+    final resp = await client.put('/channels/$scope/$id', payload);
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }

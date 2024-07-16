@@ -82,7 +82,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
     final client = auth.configureClient('messaging');
 
     final resp = await client.put(
-        '/api/channels/${widget.realm}/${widget.channel.alias}/members/me', {
+        '/channels/${widget.realm}/${widget.channel.alias}/members/me', {
       'nick': null,
       'notify_level': _notifyLevel,
     });

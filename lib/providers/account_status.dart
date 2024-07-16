@@ -27,7 +27,7 @@ class StatusProvider extends GetConnect {
   void onInit() {
     final AuthProvider auth = Get.find();
 
-    httpClient.baseUrl = ServiceFinder.services['passport'];
+    httpClient.baseUrl = ServiceFinder.buildUrl('auth', null);
     httpClient.addAuthenticator(auth.requestAuthenticator);
   }
 
@@ -35,13 +35,13 @@ class StatusProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
-    return await client.get('/api/users/me/status');
+    return await client.get('/users/me/status');
   }
 
   Future<Response> getSomeoneStatus(String name) =>
-      get('/api/users/$name/status');
+      get('/users/$name/status');
 
   Future<Response> setStatus(
     String type,
@@ -55,7 +55,7 @@ class StatusProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     final payload = {
       'type': type,
@@ -68,9 +68,9 @@ class StatusProvider extends GetConnect {
 
     Response resp;
     if (!isUpdate) {
-      resp = await client.post('/api/users/me/status', payload);
+      resp = await client.post('/users/me/status', payload);
     } else {
-      resp = await client.put('/api/users/me/status', payload);
+      resp = await client.put('/users/me/status', payload);
     }
 
     if (resp.statusCode != 200) {
@@ -84,9 +84,9 @@ class StatusProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
-    final resp = await client.delete('/api/users/me/status');
+    final resp = await client.delete('/users/me/status');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }

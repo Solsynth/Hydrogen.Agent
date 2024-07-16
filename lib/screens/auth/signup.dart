@@ -26,9 +26,9 @@ class _SignUpPopupState extends State<SignUpPopup> {
         nickname.isEmpty ||
         password.isEmpty) return;
 
-    final client = ServiceFinder.configureClient('passport');
+    final client = ServiceFinder.configureClient('auth');
 
-    final resp = await client.post('/api/users', {
+    final resp = await client.post('/users', {
       'name': username,
       'nick': nickname,
       'email': email,

@@ -30,7 +30,7 @@ class _ArticleQuickActionState extends State<ArticleQuickAction> {
       useRootNavigator: true,
       context: context,
       builder: (context) => PostReactionPopup(
-        reactionList: widget.item.reactionList,
+        reactionList: widget.item.metric!.reactionList,
         onReact: (key, value) {
           doWidgetReact(key, value.attitude);
         },
@@ -50,7 +50,7 @@ class _ArticleQuickActionState extends State<ArticleQuickAction> {
 
     setState(() => _isSubmitting = true);
 
-    final resp = await client.post('/api/articles/${widget.item.alias}/react', {
+    final resp = await client.post('/articles/${widget.item.alias}/react', {
       'symbol': symbol,
       'attitude': attitude,
     });
@@ -71,7 +71,7 @@ class _ArticleQuickActionState extends State<ArticleQuickAction> {
   void initState() {
     super.initState();
 
-    if (!widget.isReactable && widget.item.reactionList.isEmpty) {
+    if (!widget.isReactable && widget.item.metric!.reactionList.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onReact('thumb_up', 0);
       });
@@ -94,7 +94,7 @@ class _ArticleQuickActionState extends State<ArticleQuickAction> {
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               children: [
-                ...widget.item.reactionList.entries.map((x) {
+                ...widget.item.metric!.reactionList.entries.map((x) {
                   final info = reactions[x.key];
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),

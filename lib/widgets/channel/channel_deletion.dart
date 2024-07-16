@@ -32,7 +32,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
     final client = auth.configureClient('messaging');
 
     final resp = await client
-        .delete('/api/channels/${widget.realm}/${widget.channel.id}');
+        .delete('/channels/${widget.realm}/${widget.channel.id}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else if (Navigator.canPop(context)) {
@@ -51,7 +51,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
     final client = auth.configureClient('messaging');
 
     final resp = await client.delete(
-      '/api/channels/${widget.realm}/${widget.channel.alias}/members/me',
+      '/channels/${widget.realm}/${widget.channel.alias}/members/me',
     );
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);

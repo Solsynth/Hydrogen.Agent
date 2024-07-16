@@ -123,7 +123,7 @@ class _ArticleDeletionDialogState extends State<ArticleDeletionDialog> {
     final client = auth.configureClient('interactive');
 
     setState(() => _isBusy = true);
-    final resp = await client.delete('/api/articles/${widget.item.id}');
+    final resp = await client.delete('/articles/${widget.item.id}');
     setState(() => _isBusy = false);
 
     if (resp.statusCode != 200) {

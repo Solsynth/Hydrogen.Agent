@@ -23,9 +23,7 @@ class Post {
   bool? isDraft;
   int authorId;
   Account author;
-  int replyCount;
-  int reactionCount;
-  Map<String, int> reactionList;
+  PostMetric? metric;
 
   Post({
     required this.id,
@@ -48,9 +46,7 @@ class Post {
     required this.isDraft,
     required this.authorId,
     required this.author,
-    required this.replyCount,
-    required this.reactionCount,
-    required this.reactionList,
+    required this.metric,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
@@ -85,16 +81,8 @@ class Post {
         isDraft: json['is_draft'],
         authorId: json['author_id'],
         author: Account.fromJson(json['author']),
-        replyCount: json['reply_count'],
-        reactionCount: json['reaction_count'],
-        reactionList: json['reaction_list'] != null
-            ? json['reaction_list']
-                .map((key, value) => MapEntry(
-                    key,
-                    int.tryParse(value.toString()) ??
-                        (value is double ? value.toInt() : null)))
-                .cast<String, int>()
-            : {},
+        metric:
+            json['metric'] != null ? PostMetric.fromJson(json['metric']) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -118,8 +106,37 @@ class Post {
         'is_draft': isDraft,
         'author_id': authorId,
         'author': author.toJson(),
-        'reply_count': replyCount,
+        'metric': metric?.toJson(),
+      };
+}
+
+class PostMetric {
+  int reactionCount;
+  Map<String, int> reactionList;
+  int replyCount;
+
+  PostMetric({
+    required this.reactionCount,
+    required this.reactionList,
+    required this.replyCount,
+  });
+
+  factory PostMetric.fromJson(Map<String, dynamic> json) => PostMetric(
+        reactionCount: json['reaction_count'],
+        replyCount: json['reply_count'],
+        reactionList: json['reaction_list'] != null
+            ? json['reaction_list']
+                .map((key, value) => MapEntry(
+                    key,
+                    int.tryParse(value.toString()) ??
+                        (value is double ? value.toInt() : null)))
+                .cast<String, int>()
+            : {},
+      );
+
+  Map<String, dynamic> toJson() => {
         'reaction_count': reactionCount,
+        'reply_count': replyCount,
         'reaction_list': reactionList,
       };
 }

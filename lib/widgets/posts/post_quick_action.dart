@@ -33,7 +33,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
       useRootNavigator: true,
       context: context,
       builder: (context) => PostReactionPopup(
-        reactionList: widget.item.reactionList,
+        reactionList: widget.item.metric!.reactionList,
         onReact: (key, value) {
           doWidgetReact(key, value.attitude);
         },
@@ -53,7 +53,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
 
     setState(() => _isSubmitting = true);
 
-    final resp = await client.post('/api/posts/${widget.item.alias}/react', {
+    final resp = await client.post('/posts/${widget.item.alias}/react', {
       'symbol': symbol,
       'attitude': attitude,
     });
@@ -74,7 +74,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
   void initState() {
     super.initState();
 
-    if (!widget.isReactable && widget.item.reactionList.isEmpty) {
+    if (!widget.isReactable && widget.item.metric!.reactionList.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onReact('thumb_up', 0);
       });
@@ -95,7 +95,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
           if (widget.isReactable && widget.isShowReply)
             ActionChip(
               avatar: const Icon(Icons.comment),
-              label: Text(widget.item.replyCount.toString()),
+              label: Text(widget.item.metric!.replyCount.toString()),
               visualDensity: density,
               onPressed: () {
                 showModalBottomSheet(
@@ -119,7 +119,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               children: [
-                ...widget.item.reactionList.entries.map((x) {
+                ...widget.item.metric!.reactionList.entries.map((x) {
                   final info = reactions[x.key];
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),

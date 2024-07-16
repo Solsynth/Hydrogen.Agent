@@ -3,23 +3,29 @@ import 'package:get/get.dart';
 abstract class ServiceFinder {
   static const bool devFlag = false;
 
-  static Map<String, String> services = {
-    'paperclip':
-        devFlag ? 'http://localhost:8443' : 'https://usercontent.solsynth.dev',
-    'passport': devFlag ? 'http://localhost:8444' : 'https://id.solsynth.dev',
-    'interactive':
-        devFlag ? 'http://localhost:8445' : 'https://co.solsynth.dev',
-    'messaging': devFlag ? 'http://localhost:8447' : 'https://im.solsynth.dev',
-  };
+  static const String dealerUrl =
+      devFlag ? 'http://localhost:8442' : 'https://api.sn.solsynth.dev';
+  static const String passportUrl =
+      devFlag ? 'http://localhost:8444' : 'https://id.solsynth.dev';
 
-  static GetConnect configureClient(String service,
+  static String buildUrl(String serviceName, String? append) {
+    append ??= '';
+    if (serviceName == 'dealer') {
+      return '$dealerUrl$append';
+    } else if (serviceName == 'passport') {
+      return '$passportUrl$append';
+    }
+    return '$dealerUrl/srv/$serviceName$append';
+  }
+
+  static GetConnect configureClient(String serviceName,
       {timeout = const Duration(seconds: 5)}) {
     final client = GetConnect(
       timeout: timeout,
       userAgent: 'Solian/1.1',
       sendUserAgent: true,
     );
-    client.httpClient.baseUrl = ServiceFinder.services[service];
+    client.httpClient.baseUrl = buildUrl(serviceName, null);
 
     return client;
   }

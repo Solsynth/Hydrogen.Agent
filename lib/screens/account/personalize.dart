@@ -100,10 +100,10 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       return;
     }
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     final resp = await client.put(
-      '/api/users/me/$position',
+      '/users/me/$position',
       {'attachment': attachResp.body['id']},
     );
     if (resp.statusCode == 200) {
@@ -122,11 +122,11 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     _birthday?.toIso8601String();
     final resp = await client.put(
-      '/api/users/me',
+      '/users/me',
       {
         'nick': _nicknameController.value.text,
         'description': _descriptionController.value.text,
@@ -189,7 +189,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                     color: Theme.of(context).colorScheme.surfaceContainerHigh,
                     child: _banner != null
                         ? Image.network(
-                            '${ServiceFinder.services['paperclip']}/api/attachments/$_banner',
+                            ServiceFinder.buildUrl('files', '/attachments/$_banner'),
                             fit: BoxFit.cover,
                             loadingBuilder: (BuildContext context, Widget child,
                                 ImageChunkEvent? loadingProgress) {

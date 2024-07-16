@@ -38,9 +38,9 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
   void getMembers() async {
     setState(() => _isBusy = true);
 
-    final client = ServiceFinder.configureClient('passport');
+    final client = ServiceFinder.configureClient('auth');
 
-    final resp = await client.get('/api/realms/${widget.realm.alias}/members');
+    final resp = await client.get('/realms/${widget.realm.alias}/members');
     if (resp.statusCode == 200) {
       setState(() {
         _members = resp.body
@@ -73,10 +73,10 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     final resp = await client.post(
-      '/api/realms/${widget.realm.alias}/members',
+      '/realms/${widget.realm.alias}/members',
       {'target': username},
     );
     if (resp.statusCode == 200) {
@@ -94,10 +94,10 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('passport');
+    final client = auth.configureClient('auth');
 
     final resp = await client.request(
-      '/api/realms/${widget.realm.alias}/members',
+      '/realms/${widget.realm.alias}/members',
       'delete',
       body: {'target': item.account.name},
     );
