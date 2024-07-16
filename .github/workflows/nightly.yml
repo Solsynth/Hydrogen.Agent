@@ -32,6 +32,10 @@ jobs:
         with:
           channel: stable
           cache: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
       - run: flutter pub get
       - run: flutter build apk --split-per-abi
       - name: Archive production artifacts
@@ -56,4 +60,3 @@ jobs:
         with:
           name: build-output-windows
           path: build/windows
-
