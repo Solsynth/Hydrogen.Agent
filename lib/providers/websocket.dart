@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -14,12 +13,8 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class WebSocketProvider extends GetxController {
-  final FlutterLocalNotificationsPlugin localNotify =
-      FlutterLocalNotificationsPlugin();
-
   RxBool isConnected = false.obs;
   RxBool isConnecting = false.obs;
 
@@ -41,7 +36,6 @@ class WebSocketProvider extends GetxController {
             badge: true,
             sound: true)
         .then((status) {
-      notifyInitialization();
       notifyPrefetch();
     });
 
@@ -94,17 +88,6 @@ class WebSocketProvider extends GetxController {
       (event) {
         final packet = NetworkPackage.fromJson(jsonDecode(event));
         stream.sink.add(packet);
-
-        switch (packet.method) {
-          case 'notifications.new':
-            final notification = Notification.fromJson(packet.payload!);
-            notificationUnread++;
-            notifications.add(notification);
-            if (!PlatformInfo.canPushNotification) {
-              notifyMessage(notification.subject, notification.content);
-            }
-            break;
-        }
       },
       onDone: () {
         isConnected.value = false;
@@ -114,55 +97,6 @@ class WebSocketProvider extends GetxController {
         isConnected.value = false;
         Future.delayed(const Duration(seconds: 3), () => connect());
       },
-    );
-  }
-
-  void notifyInitialization() {
-    const androidSettings = AndroidInitializationSettings('app_icon');
-    const darwinSettings = DarwinInitializationSettings(
-      notificationCategories: [
-        DarwinNotificationCategory('general'),
-      ],
-    );
-    const linuxSettings =
-        LinuxInitializationSettings(defaultActionName: 'Open notification');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: androidSettings,
-      iOS: darwinSettings,
-      macOS: darwinSettings,
-      linux: linuxSettings,
-    );
-
-    localNotify.initialize(initializationSettings);
-  }
-
-  void notifyMessage(String title, String body) {
-    const androidSettings = AndroidNotificationDetails(
-      'general',
-      'General',
-      importance: Importance.high,
-      priority: Priority.high,
-      silent: true,
-    );
-    const darwinSettings = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBanner: true,
-      presentBadge: true,
-      presentSound: false,
-    );
-    const linuxSettings = LinuxNotificationDetails();
-
-    localNotify.show(
-      math.max(1, math.Random().nextInt(100000000)),
-      title,
-      body,
-      const NotificationDetails(
-        android: androidSettings,
-        iOS: darwinSettings,
-        macOS: darwinSettings,
-        linux: linuxSettings,
-      ),
     );
   }
 

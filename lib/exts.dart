@@ -30,12 +30,15 @@ extension SolianExtenions on BuildContext {
   }
 
   Future<void> showErrorDialog(dynamic exception) {
+    var stack = StackTrace.current;
+    var stackTrace = '$stack';
+
     return showDialog<void>(
       useRootNavigator: true,
       context: this,
       builder: (ctx) => AlertDialog(
         title: Text('errorHappened'.tr),
-        content: Text(exception.toString().capitalize!),
+        content: Text('${exception.toString().capitalize!}\n\nStack Trace: $stackTrace'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
