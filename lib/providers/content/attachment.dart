@@ -31,23 +31,27 @@ Future<String> calculateFileSha256(File file) async {
   return await calculateBytesSha256(bytes);
 }
 
-Future<double> calculateDataAspectRatio(Uint8List data) async {
+Future<Map<String, dynamic>> calculateImageData(Uint8List data) async {
   if (PlatformInfo.isWeb) {
-    return 1;
+    return {};
   }
   final decoder = await Isolate.run(() => img.findDecoderForData(data));
-  if (decoder == null) return 1;
+  if (decoder == null) return {};
   final image = await Isolate.run(() => decoder.decode(data));
-  if (image == null) return 1;
-  return image.width / image.height;
+  if (image == null) return {};
+  return {
+    'width': image.width,
+    'height': image.height,
+    'ratio': image.width / image.height
+  };
 }
 
-Future<double> calculateFileAspectRatio(File file) async {
+Future<Map<String, dynamic>> calculateImageMetaFromFile(File file) async {
   if (PlatformInfo.isWeb) {
-    return 1;
+    return {};
   }
   final bytes = await Isolate.run(() => file.readAsBytesSync());
-  return await calculateDataAspectRatio(bytes);
+  return await calculateImageData(bytes);
 }
 
 class AttachmentProvider extends GetConnect {
@@ -75,8 +79,12 @@ class AttachmentProvider extends GetConnect {
   }
 
   Future<Response> createAttachment(
-      Uint8List data, String path, String hash, String usage,
-      {double? ratio}) async {
+    Uint8List data,
+    String path,
+    String hash,
+    String usage,
+    Map<String, dynamic>? metadata,
+  ) async {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) throw Exception('unauthorized');
 
@@ -104,9 +112,7 @@ class AttachmentProvider extends GetConnect {
       'hash': hash,
       'usage': usage,
       if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
-      'metadata': jsonEncode({
-        if (ratio != null) 'ratio': ratio,
-      }),
+      'metadata': jsonEncode(metadata),
     });
     final resp = await client.post('/attachments', payload);
     if (resp.statusCode != 200) {

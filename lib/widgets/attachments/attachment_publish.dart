@@ -54,13 +54,14 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     for (final media in medias) {
       final file = File(media.path);
       final hash = await calculateFileSha256(file);
+      final meta = await calculateImageMetaFromFile(file);
 
       try {
         await uploadAttachment(
           await file.readAsBytes(),
           file.path,
           hash,
-          ratio: await calculateFileAspectRatio(file),
+          {...meta},
         );
       } catch (err) {
         context.showErrorDialog(err);
@@ -81,11 +82,11 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
     final file = File(media.path);
     final hash = await calculateFileSha256(file);
-    const ratio = 16 / 9;
 
     try {
-      await uploadAttachment(await file.readAsBytes(), file.path, hash,
-          ratio: ratio);
+      await uploadAttachment(await file.readAsBytes(), file.path, hash, {
+        'ratio': 16 / 9,
+      });
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -97,8 +98,9 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     final AuthProvider auth = Get.find();
     if (!await auth.isAuthorized) return;
 
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+    );
     if (result == null) return;
 
     setState(() => _isBusy = true);
@@ -108,7 +110,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     for (final file in files) {
       final hash = await calculateFileSha256(file);
       try {
-        await uploadAttachment(await file.readAsBytes(), file.path, hash);
+        await uploadAttachment(await file.readAsBytes(), file.path, hash, null);
       } catch (err) {
         context.showErrorDialog(err);
       }
@@ -131,23 +133,20 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
     setState(() => _isBusy = true);
 
-    double? ratio;
+    Map<String, dynamic> metadata;
     final file = File(media.path);
     final hash = await calculateFileSha256(file);
 
     if (isVideo) {
-      ratio = 16 / 9;
+      metadata = {'ratio': 16 / 9};
     } else {
-      ratio = await calculateFileAspectRatio(file);
+      metadata = await calculateImageMetaFromFile(file);
     }
 
     try {
-      await uploadAttachment(
-        await file.readAsBytes(),
-        file.path,
-        hash,
-        ratio: ratio,
-      );
+      await uploadAttachment(await file.readAsBytes(), file.path, hash, {
+        ...metadata,
+      });
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -162,14 +161,14 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     setState(() => _isBusy = true);
 
     final hash = await calculateBytesSha256(data);
-    final ratio = await calculateDataAspectRatio(data);
-    uploadAttachment(data, 'pasted image', hash, ratio: ratio);
+    final meta = await calculateImageData(data);
+    uploadAttachment(data, 'Pasted Image', hash, {...meta});
 
     setState(() => _isBusy = false);
   }
 
   Future<void> uploadAttachment(Uint8List data, String path, String hash,
-      {double? ratio}) async {
+      Map<String, dynamic>? metadata) async {
     final AttachmentProvider provider = Get.find();
     try {
       context.showSnackbar((PlatformInfo.isWeb
@@ -181,7 +180,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
         path,
         hash,
         widget.usage,
-        ratio: ratio,
+        metadata,
       );
       var result = Attachment.fromJson(resp.body);
       setState(() => _attachments.add(result));
@@ -281,11 +280,14 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
             for (final file in detail.files) {
               final data = await file.readAsBytes();
               final hash = await calculateBytesSha256(data);
-              double? ratio;
+
+              Map<String, dynamic> meta = {};
+
               if (file.mimeType?.split('/').firstOrNull == 'image') {
-                ratio = await calculateDataAspectRatio(data);
+                meta = await calculateImageData(data);
               }
-              uploadAttachment(data, file.path, hash, ratio: ratio);
+
+              uploadAttachment(data, file.path, hash, {...meta});
             }
             setState(() => _isBusy = false);
           },
@@ -347,9 +349,8 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'monospace'
-                                            ),
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'monospace'),
                                           ),
                                           Text(
                                             '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
@@ -506,7 +507,7 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
     _isMature = widget.item.isMature;
     _altController.text = widget.item.alt;
 
-    if (['image', 'video'].contains(widget.item.mimetype.split('/').first)) {
+    if (['image', 'video'].contains(widget.item.mimetype.split('/').firstOrNull)) {
       _ratioController.text =
           widget.item.metadata?['ratio']?.toString() ?? 1.toString();
       _hasAspectRatio = true;
