@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/models/notification.dart' as notify;
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:uuid/uuid.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -126,31 +125,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             horizontal: 24,
                             vertical: 8,
                           ),
-                          title: Text(element.subject),
+                          title: Text(element.title),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(element.content),
-                              if (element.links != null)
-                                Row(
-                                  children: element.links!
-                                      .map((e) => InkWell(
-                                            child: Text(
-                                              e.label,
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondaryContainer,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                              ),
-                                            ),
-                                            onTap: () {
-                                              launchUrlString(e.url);
-                                            },
-                                          ).paddingOnly(right: 5))
-                                      .toList(),
-                                ),
+                              if (element.subtitle != null)
+                                Text(element.subtitle!),
+                              Text(element.body),
                             ],
                           ),
                         ),

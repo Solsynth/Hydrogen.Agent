@@ -3,10 +3,11 @@ class Notification {
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
-  String subject;
-  String content;
-  List<Link>? links;
-  DateTime? readAt;
+  String title;
+  String? subtitle;
+  String body;
+  String? avatar;
+  String? picture;
   int? senderId;
   int recipientId;
 
@@ -15,10 +16,11 @@ class Notification {
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
-    required this.subject,
-    required this.content,
-    required this.links,
-    required this.readAt,
+    required this.title,
+    required this.subtitle,
+    required this.body,
+    required this.avatar,
+    required this.picture,
     required this.senderId,
     required this.recipientId,
   });
@@ -32,12 +34,11 @@ class Notification {
             ? DateTime.now()
             : DateTime.parse(json['updated_at']),
         deletedAt: json['deleted_at'],
-        subject: json['subject'],
-        content: json['content'],
-        links: json['links'] != null
-            ? List<Link>.from(json['links'].map((x) => Link.fromJson(x)))
-            : List.empty(),
-        readAt: json['read_at'],
+        title: json['title'],
+        subtitle: json['subtitle'],
+        body: json['body'],
+        avatar: json['avatar'],
+        picture: json['picture'],
         senderId: json['sender_id'],
         recipientId: json['recipient_id'],
       );
@@ -47,33 +48,12 @@ class Notification {
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
         'deleted_at': deletedAt,
-        'subject': subject,
-        'content': content,
-        'links': links != null
-            ? List<dynamic>.from(links!.map((x) => x.toJson()))
-            : List.empty(),
-        'read_at': readAt,
+        'title': title,
+        'subtitle': subtitle,
+        'body': body,
+        'avatar': avatar,
+        'picture': picture,
         'sender_id': senderId,
         'recipient_id': recipientId,
-      };
-}
-
-class Link {
-  String label;
-  String url;
-
-  Link({
-    required this.label,
-    required this.url,
-  });
-
-  factory Link.fromJson(Map<String, dynamic> json) => Link(
-        label: json['label'],
-        url: json['url'],
-      );
-
-  Map<String, dynamic> toJson() => {
-        'label': label,
-        'url': url,
       };
 }
