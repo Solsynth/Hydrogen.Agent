@@ -9,5 +9,7 @@
 		<string>webcredentials:solsynth.dev</string>
 		<string>applinks:solsynth.dev</string>
 	</array>
+	<key>com.apple.developer.usernotifications.communication</key>
+	<true/>
 </dict>
 </plist>
