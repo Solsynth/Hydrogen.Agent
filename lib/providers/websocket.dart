@@ -127,6 +127,8 @@ class WebSocketProvider extends GetxController {
 
     if (deviceUuid == null || deviceUuid.isEmpty) {
       log("Unable to active push notifications, couldn't get device uuid");
+    } else {
+      log('Device UUID is $deviceUuid');
     }
 
     if (PlatformInfo.isIOS || PlatformInfo.isMacOS) {
@@ -136,6 +138,7 @@ class WebSocketProvider extends GetxController {
       provider = 'firebase';
       token = await FirebaseMessaging.instance.getToken();
     }
+    log('Device Push Token is $token');
 
     final client = auth.configureClient('auth');
 

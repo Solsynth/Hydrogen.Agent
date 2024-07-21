@@ -9,7 +9,7 @@ class Notification {
   String? avatar;
   String? picture;
   int? senderId;
-  int recipientId;
+  int accountId;
 
   Notification({
     required this.id,
@@ -22,7 +22,7 @@ class Notification {
     required this.avatar,
     required this.picture,
     required this.senderId,
-    required this.recipientId,
+    required this.accountId,
   });
 
   factory Notification.fromJson(Map<String, dynamic> json) => Notification(
@@ -40,7 +40,7 @@ class Notification {
         avatar: json['avatar'],
         picture: json['picture'],
         senderId: json['sender_id'],
-        recipientId: json['recipient_id'],
+        accountId: json['account_id'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +54,6 @@ class Notification {
         'avatar': avatar,
         'picture': picture,
         'sender_id': senderId,
-        'recipient_id': recipientId,
+        'account_id': accountId,
       };
 }
