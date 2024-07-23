@@ -29,14 +29,12 @@ class NotificationService: UNNotificationServiceExtension {
                     guard let metadata = bestAttemptContent.userInfo["metadata"] as? [AnyHashable : Any] else {
                         throw ParseNotificationPayloadError.noMetadata("The notification has no metadata.")
                     }
-                    let userId = metadata["user_id"] as! Int
-                    let userName = metadata["user_name"] as? String
                     
                     guard let avatarUrl = bestAttemptContent.userInfo["avatar"] as? String else {
                         throw ParseNotificationPayloadError.noMetadata("The notification has no avatar url.")
                     }
                     
-                    let handle = INPersonHandle(value: String(userId), type: .unknown)
+                    let handle = INPersonHandle(value: String(metadata["user_id"] as! Int), type: .unknown)
                     let avatar = INImage(
                         url: URL(string: avatarUrl)!
                     )!
@@ -45,19 +43,22 @@ class NotificationService: UNNotificationServiceExtension {
                                           displayName: bestAttemptContent.title,
                                           image: avatar,
                                           contactIdentifier: nil,
-                                          customIdentifier: userName)
+                                          customIdentifier: nil)
                     let intent = INSendMessageIntent(recipients: nil,
                                                      outgoingMessageType: .outgoingMessageText,
                                                      content: bestAttemptContent.body,
                                                      speakableGroupName: nil,
                                                      conversationIdentifier: String(metadata["channel_id"] as! Int),
-                                                     serviceName: "PostPigeon",
+                                                     serviceName: nil,
                                                      sender: sender,
                                                      attachments: nil)
                     
                     let interaction = INInteraction(intent: intent, response: nil)
                     interaction.direction = .incoming
                     interaction.donate(completion: nil)
+                    
+                    let updatedContent = try request.content.updating(from: intent)
+                    contentHandler(updatedContent)
                     break
                 default:
                     contentHandler(bestAttemptContent)
