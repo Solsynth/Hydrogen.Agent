@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
-import 'package:solian/models/friendship.dart';
+import 'package:solian/models/relations.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/friend.dart';
+import 'package:solian/providers/relation.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
-class FriendSelect extends StatefulWidget {
+class RelativeSelector extends StatefulWidget {
   final String title;
   final Widget? Function(Account item)? trailingBuilder;
 
-  const FriendSelect({super.key, required this.title, this.trailingBuilder});
+  const RelativeSelector({super.key, required this.title, this.trailingBuilder});
 
   @override
-  State<FriendSelect> createState() => _FriendSelectState();
+  State<RelativeSelector> createState() => _RelativeSelectorState();
 }
 
-class _FriendSelectState extends State<FriendSelect> {
+class _RelativeSelectorState extends State<RelativeSelector> {
   int _accountId = 0;
 
-  final List<Friendship> _friends = List.empty(growable: true);
+  final List<Relationship> _friends = List.empty(growable: true);
 
   getFriends() async {
     final AuthProvider auth = Get.find();
     final prof = await auth.getProfile();
     _accountId = prof.body['id'];
 
-    final FriendProvider provider = Get.find();
-    final resp = await provider.listFriendshipWithStatus(1);
+    final RelationshipProvider provider = Get.find();
+    final resp = await provider.listRelationWithStatus(1);
 
     setState(() {
       _friends.addAll(resp.body
-          .map((e) => Friendship.fromJson(e))
+          .map((e) => Relationship.fromJson(e))
           .toList()
-          .cast<Friendship>());
+          .cast<Relationship>());
     });
   }
 

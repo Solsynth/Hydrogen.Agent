@@ -11,11 +11,11 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
-import 'package:solian/providers/content/call.dart';
+import 'package:solian/providers/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/content/realm.dart';
-import 'package:solian/providers/friend.dart';
+import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
 import 'package:solian/shells/system_shell.dart';
@@ -96,7 +96,7 @@ class SolianApp extends StatelessWidget {
 
   void _initializeProviders(BuildContext context) async {
     Get.lazyPut(() => AuthProvider());
-    Get.lazyPut(() => FriendProvider());
+    Get.lazyPut(() => RelationshipProvider());
     Get.lazyPut(() => PostProvider());
     Get.lazyPut(() => AttachmentProvider());
     Get.lazyPut(() => WebSocketProvider());

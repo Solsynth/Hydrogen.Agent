@@ -11,7 +11,7 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/call.dart';
+import 'package:solian/providers/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';

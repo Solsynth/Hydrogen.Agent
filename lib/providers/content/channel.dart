@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/widgets/account/friend_select.dart';
+import 'package:solian/widgets/account/relative_select.dart';
 import 'package:uuid/uuid.dart';
 
 class ChannelProvider extends GetxController {
@@ -123,7 +123,7 @@ class ChannelProvider extends GetxController {
     final related = await showModalBottomSheet(
       useRootNavigator: true,
       context: context,
-      builder: (context) => FriendSelect(
+      builder: (context) => RelativeSelector(
         title: 'channelOrganizeDirectHint'.tr,
       ),
     );

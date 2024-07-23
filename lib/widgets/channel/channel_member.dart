@@ -7,7 +7,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
-import 'package:solian/widgets/account/friend_select.dart';
+import 'package:solian/widgets/account/relative_select.dart';
 
 class ChannelMemberListPopup extends StatefulWidget {
   final Channel channel;
@@ -62,7 +62,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
     final input = await showModalBottomSheet(
       context: context,
       builder: (context) {
-        return FriendSelect(title: 'channelMembersAdd'.tr);
+        return RelativeSelector(title: 'channelMembersAdd'.tr);
       },
     );
     if (input == null) return;

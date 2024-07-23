@@ -1,38 +1,35 @@
 import 'package:solian/models/account.dart';
 
-class Friendship {
+class Relationship {
   int id;
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
   int accountId;
   int relatedId;
-  int? blockedBy;
   Account account;
   Account related;
   int status;
 
-  Friendship({
+  Relationship({
     required this.id,
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
     required this.accountId,
     required this.relatedId,
-    required this.blockedBy,
     required this.account,
     required this.related,
     required this.status,
   });
 
-  factory Friendship.fromJson(Map<String, dynamic> json) => Friendship(
+  factory Relationship.fromJson(Map<String, dynamic> json) => Relationship(
         id: json['id'],
         createdAt: DateTime.parse(json['created_at']),
         updatedAt: DateTime.parse(json['updated_at']),
         deletedAt: json['deleted_at'],
         accountId: json['account_id'],
         relatedId: json['related_id'],
-        blockedBy: json['blocked_by'],
         account: Account.fromJson(json['account']),
         related: Account.fromJson(json['related']),
         status: json['status'],
@@ -45,7 +42,6 @@ class Friendship {
         'deleted_at': deletedAt,
         'account_id': accountId,
         'related_id': relatedId,
-        'blocked_by': blockedBy,
         'account': account.toJson(),
         'related': related.toJson(),
         'status': status,

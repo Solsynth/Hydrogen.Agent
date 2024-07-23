@@ -191,10 +191,7 @@ abstract class AppRouter {
       GoRoute(
         path: '/account/friend',
         name: 'accountFriend',
-        builder: (context, state) => TitleShell(
-          state: state,
-          child: const FriendScreen(),
-        ),
+        builder: (context, state) => const FriendScreen(),
       ),
       GoRoute(
         path: '/account/personalize',

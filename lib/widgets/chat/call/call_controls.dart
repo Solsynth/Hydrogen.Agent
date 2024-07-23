@@ -6,7 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/providers/content/call.dart';
+import 'package:solian/providers/call.dart';
 
 class ControlsWidget extends StatefulWidget {
   final Room room;

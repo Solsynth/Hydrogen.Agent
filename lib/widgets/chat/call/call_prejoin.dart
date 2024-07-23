@@ -6,7 +6,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/call.dart';
+import 'package:solian/providers/call.dart';
 
 class ChatCallPrejoinPopup extends StatefulWidget {
   final Call ongoingCall;

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/models/friendship.dart';
-import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/friend.dart';
-import 'package:solian/widgets/account/friend_list.dart';
+import 'package:solian/models/relations.dart';
+import 'package:solian/providers/relation.dart';
+import 'package:solian/widgets/account/relative_list.dart';
 
 class FriendScreen extends StatefulWidget {
   const FriendScreen({super.key});
@@ -14,71 +13,38 @@ class FriendScreen extends StatefulWidget {
   State<FriendScreen> createState() => _FriendScreenState();
 }
 
-class _FriendScreenState extends State<FriendScreen> {
+class _FriendScreenState extends State<FriendScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
   bool _isBusy = false;
-  int? _accountId;
 
-  List<Friendship> _friendships = List.empty();
+  List<Relationship> _relations = List.empty();
 
-  List<Friendship> filterWithStatus(int status) {
-    return _friendships.where((x) => x.status == status).toList();
+  List<Relationship> filterByStatus(int status) {
+    return _relations.where((x) => x.status == status).toList();
   }
 
-  Future<void> getFriendship() async {
+  Future<void> loadRelations() async {
     setState(() => _isBusy = true);
 
-    final FriendProvider provider = Get.find();
-    final resp = await provider.listFriendship();
+    final RelationshipProvider provider = Get.find();
+    final resp = await provider.listRelation();
 
     setState(() {
-      _friendships = resp.body
-          .map((e) => Friendship.fromJson(e))
+      _relations = resp.body
+          .map((e) => Relationship.fromJson(e))
           .toList()
-          .cast<Friendship>();
+          .cast<Relationship>();
       _isBusy = false;
     });
   }
 
-  void showScopedListPopup(String title, int status) {
-    showModalBottomSheet(
-      useRootNavigator: true,
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-              Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverFriendList(
-                      accountId: _accountId!,
-                      items: filterWithStatus(status),
-                      onUpdate: () {
-                        getFriendship();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   void promptAddFriend() async {
-    final FriendProvider provider = Get.find();
+    final RelationshipProvider provider = Get.find();
 
     final controller = TextEditingController();
-    final input = await showDialog(
+    final input = await showDialog<String?>(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -125,7 +91,7 @@ class _FriendScreenState extends State<FriendScreen> {
 
     try {
       setState(() => _isBusy = true);
-      await provider.createFriendship(input);
+      await provider.makeFriend(input);
     } catch (e) {
       context.showErrorDialog(e);
     } finally {
@@ -135,12 +101,14 @@ class _FriendScreenState extends State<FriendScreen> {
 
   @override
   void initState() {
-    Get.find<AuthProvider>().getProfile().then((value) {
-      _accountId = value.body['id'];
-    });
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
 
-    Future.delayed(Duration.zero, () => getFriendship());
+    loadRelations().then((_) {
+      if (filterByStatus(0).isEmpty) {
+        _tabController.animateTo(1);
+      }
+    });
   }
 
   @override
@@ -148,64 +116,71 @@ class _FriendScreenState extends State<FriendScreen> {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
+        appBar: AppBar(
+          centerTitle: false,
+          title: Text('accountFriend'.tr),
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(icon: Icon(Icons.call_received)),
+              Tab(icon: Icon(Icons.people)),
+              Tab(icon: Icon(Icons.call_made)),
+            ],
+          ),
+        ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () => promptAddFriend(),
         ),
-        body: RefreshIndicator(
-          onRefresh: () => getFriendship(),
-          child: CustomScrollView(
-            slivers: [
-              if (_isBusy)
-                SliverToBoxAdapter(
-                  child: const LinearProgressIndicator().animate().scaleX(),
-                ),
-              SliverToBoxAdapter(
-                child: ListTile(
-                  tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  leading: const Icon(Icons.person_add),
-                  trailing: const Icon(Icons.chevron_right),
-                  title: Text(
-                    '${'accountFriendPending'.tr} (${filterWithStatus(0).length})',
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            RefreshIndicator(
+              onRefresh: () => loadRelations(),
+              child: CustomScrollView(
+                slivers: [
+                  if (_isBusy)
+                    SliverToBoxAdapter(
+                      child: const LinearProgressIndicator().animate().scaleX(),
+                    ),
+                  SilverRelativeList(
+                    items: filterByStatus(0),
+                    onUpdate: () => loadRelations(),
                   ),
-                  onTap: () =>
-                      showScopedListPopup('accountFriendPending'.tr, 0),
-                ),
+                ],
               ),
-              SliverToBoxAdapter(
-                child: ListTile(
-                  tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                  leading: const Icon(Icons.block),
-                  trailing: const Icon(Icons.chevron_right),
-                  title: Text(
-                    '${'accountFriendBlocked'.tr} (${filterWithStatus(2).length})',
+            ),
+            RefreshIndicator(
+              onRefresh: () => loadRelations(),
+              child: CustomScrollView(
+                slivers: [
+                  if (_isBusy)
+                    SliverToBoxAdapter(
+                      child: const LinearProgressIndicator().animate().scaleX(),
+                    ),
+                  SilverRelativeList(
+                    items: filterByStatus(1),
+                    onUpdate: () => loadRelations(),
                   ),
-                  onTap: () =>
-                      showScopedListPopup('accountFriendBlocked'.tr, 2),
-                ),
+                ],
               ),
-              if (_accountId != null)
-                SliverFriendList(
-                  accountId: _accountId!,
-                  items: filterWithStatus(1),
-                  onUpdate: () {
-                    getFriendship();
-                  },
-                ),
-              const SliverToBoxAdapter(
-                child: Divider(thickness: 0.3, height: 0.3),
+            ),
+            RefreshIndicator(
+              onRefresh: () => loadRelations(),
+              child: CustomScrollView(
+                slivers: [
+                  if (_isBusy)
+                    SliverToBoxAdapter(
+                      child: const LinearProgressIndicator().animate().scaleX(),
+                    ),
+                  SilverRelativeList(
+                    items: filterByStatus(3),
+                    onUpdate: () => loadRelations(),
+                  ),
+                ],
               ),
-              SliverToBoxAdapter(
-                child: Text(
-                  'accountFriendListHint'.tr,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ).paddingOnly(top: 16, bottom: 32),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

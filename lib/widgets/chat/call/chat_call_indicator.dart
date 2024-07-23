@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solian/providers/content/call.dart';
+import 'package:solian/providers/call.dart';
 
 class ChatCallCurrentIndicator extends StatelessWidget {
   const ChatCallCurrentIndicator({super.key});
