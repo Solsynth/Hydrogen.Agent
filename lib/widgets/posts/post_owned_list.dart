@@ -22,7 +22,7 @@ class PostOwnedListEntry extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PostItem(
-              key: Key('p${item.alias}'),
+              key: Key('p${item.id}'),
               item: item,
               isShowEmbed: false,
               isClickable: false,

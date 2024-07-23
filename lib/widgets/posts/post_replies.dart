@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/providers/content/feed.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class PostReplyList extends StatefulWidget {
@@ -23,11 +23,11 @@ class _PostReplyListState extends State<PostReplyList> {
       PagingController(firstPageKey: 0);
 
   Future<void> getReplies(int pageKey) async {
-    final FeedProvider provider = Get.find();
+    final PostProvider provider = Get.find();
 
     Response resp;
     try {
-      resp = await provider.listPostReplies(widget.item.alias, pageKey);
+      resp = await provider.listPostReplies(widget.item.id.toString(), pageKey);
     } catch (e) {
       _pagingController.error = e;
       return;

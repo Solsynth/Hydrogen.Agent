@@ -66,7 +66,7 @@ class PostListEntryWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: PostItem(
-        key: Key('p${item.alias}'),
+        key: Key('p${item.id}'),
         item: item,
         isShowEmbed: isShowEmbed,
         isClickable: isNestedClickable,
@@ -75,7 +75,7 @@ class PostListEntryWidget extends StatelessWidget {
         if (!isClickable) return;
         AppRouter.instance.pushNamed(
           'postDetail',
-          pathParameters: {'alias': item.alias},
+          pathParameters: {'id': item.id.toString()},
         );
       },
       onLongPress: () {

@@ -53,7 +53,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
 
     setState(() => _isSubmitting = true);
 
-    final resp = await client.post('/posts/${widget.item.alias}/react', {
+    final resp = await client.post('/posts/${widget.item.id}/react', {
       'symbol': symbol,
       'attitude': attitude,
     });

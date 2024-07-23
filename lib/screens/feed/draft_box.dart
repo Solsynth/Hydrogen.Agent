@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:solian/models/articles.dart';
-import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/providers/content/feed.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
-import 'package:solian/widgets/articles/article_action.dart';
-import 'package:solian/widgets/articles/article_owned_list.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_owned_list.dart';
 
@@ -23,11 +19,11 @@ class DraftBoxScreen extends StatefulWidget {
 }
 
 class _DraftBoxScreenState extends State<DraftBoxScreen> {
-  final PagingController<int, FeedRecord> _pagingController =
+  final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final FeedProvider provider = Get.find();
+    final PostProvider provider = Get.find();
 
     Response resp;
     try {
@@ -43,7 +39,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
       return;
     }
 
-    final parsed = result.data?.map((e) => FeedRecord.fromJson(e)).toList();
+    final parsed = result.data?.map((e) => Post.fromJson(e)).toList();
     if (parsed != null && parsed.length >= 10) {
       _pagingController.appendPage(parsed, pageKey + parsed.length);
     } else if (parsed != null) {
@@ -79,45 +75,25 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
         ),
         body: RefreshIndicator(
           onRefresh: () => Future.sync(() => _pagingController.refresh()),
-          child: PagedListView<int, FeedRecord>(
+          child: PagedListView<int, Post>(
             pagingController: _pagingController,
             builderDelegate: PagedChildBuilderDelegate(
               itemBuilder: (context, item, index) {
-                switch (item.type) {
-                  case 'post':
-                    final data = Post.fromJson(item.data);
-                    return PostOwnedListEntry(
-                      item: data,
-                      onTap: () async {
-                        showModalBottomSheet(
-                          useRootNavigator: true,
-                          context: context,
-                          builder: (context) => PostAction(
-                            item: data,
-                            noReact: true,
-                          ),
-                        ).then((value) {
-                          if (value != null) _pagingController.refresh();
-                        });
-                      },
-                    ).paddingOnly(left: 12, right: 12, bottom: 4);
-                  case 'article':
-                    final data = Article.fromJson(item.data);
-                    return ArticleOwnedListEntry(
-                      item: data,
-                      onTap: () async {
-                        showModalBottomSheet(
-                          useRootNavigator: true,
-                          context: context,
-                          builder: (context) => ArticleAction(item: data),
-                        ).then((value) {
-                          if (value != null) _pagingController.refresh();
-                        });
-                      },
-                    ).paddingOnly(left: 12, right: 12, bottom: 4);
-                  default:
-                    return const SizedBox();
-                }
+                return PostOwnedListEntry(
+                  item: item,
+                  onTap: () async {
+                    showModalBottomSheet(
+                      useRootNavigator: true,
+                      context: context,
+                      builder: (context) => PostAction(
+                        item: item,
+                        noReact: true,
+                      ),
+                    ).then((value) {
+                      if (value != null) _pagingController.refresh();
+                    });
+                  },
+                ).paddingOnly(left: 12, right: 12, bottom: 4);
               },
             ),
           ),

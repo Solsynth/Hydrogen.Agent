@@ -8,7 +8,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
-import 'package:solian/providers/content/feed.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
@@ -167,7 +167,7 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final FeedProvider provider = Get.find();
+    final PostProvider provider = Get.find();
 
     Response resp;
     try {

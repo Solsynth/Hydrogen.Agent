@@ -7,12 +7,10 @@ class Post {
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
-  String alias;
-  String content;
+  dynamic body;
   List<Tag>? tags;
   List<Category>? categories;
   List<Post>? replies;
-  List<int>? attachments;
   int? replyId;
   int? repostId;
   int? realmId;
@@ -30,12 +28,10 @@ class Post {
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
-    required this.alias,
-    required this.content,
+    required this.body,
     required this.tags,
     required this.categories,
     required this.replies,
-    required this.attachments,
     required this.replyId,
     required this.repostId,
     required this.realmId,
@@ -56,17 +52,13 @@ class Post {
         deletedAt: json['deleted_at'] != null
             ? DateTime.parse(json['deleted_at'])
             : null,
-        alias: json['alias'],
-        content: json['content'],
+        body: json['body'],
         tags: json['tags']?.map((x) => Tag.fromJson(x)).toList().cast<Tag>(),
         categories: json['categories']
             ?.map((x) => Category.fromJson(x))
             .toList()
             .cast<Category>(),
         replies: json['replies'],
-        attachments: json['attachments'] != null
-            ? List<int>.from(json['attachments'])
-            : null,
         replyId: json['reply_id'],
         repostId: json['repost_id'],
         realmId: json['realm_id'],
@@ -90,12 +82,10 @@ class Post {
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
         'deleted_at': deletedAt,
-        'alias': alias,
-        'content': content,
+        'body': body,
         'tags': tags,
         'categories': categories,
         'replies': replies,
-        'attachments': attachments,
         'reply_id': replyId,
         'repost_id': repostId,
         'realm_id': realmId,

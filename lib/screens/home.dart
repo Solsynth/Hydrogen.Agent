@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/feed.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
@@ -21,22 +21,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PagingController<int, FeedRecord> _pagingController =
+  final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final FeedProvider provider = Get.find();
+    final PostProvider provider = Get.find();
 
     Response resp;
     try {
-      resp = await provider.listFeed(pageKey);
+      resp = await provider.listRecommendations(pageKey);
     } catch (e) {
       _pagingController.error = e;
       return;
     }
 
     final PaginationResult result = PaginationResult.fromJson(resp.body);
-    final parsed = result.data?.map((e) => FeedRecord.fromJson(e)).toList();
+    final parsed = result.data?.map((e) => Post.fromJson(e)).toList();
     if (parsed != null && parsed.length >= 10) {
       _pagingController.appendPage(parsed, pageKey + parsed.length);
     } else if (parsed != null) {
@@ -122,20 +122,6 @@ class FeedCreationButton extends StatelessWidget {
                   ),
                   onTap: () {
                     AppRouter.instance.pushNamed('postEditor').then((val) {
-                      if (val != null && onCreated != null) {
-                        onCreated!();
-                      }
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  child: ListTile(
-                    title: Text('articleEditor'.tr),
-                    leading: const Icon(Icons.newspaper),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
-                  onTap: () {
-                    AppRouter.instance.pushNamed('articleEditor').then((val) {
                       if (val != null && onCreated != null) {
                         onCreated!();
                       }

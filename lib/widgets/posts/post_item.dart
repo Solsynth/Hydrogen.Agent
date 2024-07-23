@@ -86,7 +86,7 @@ class _PostItemState extends State<PostItem> {
     }
     if (widget.item.realm != null) {
       labels.add('postInRealm'.trParams({
-        'realm': '#${widget.item.realm!.alias}',
+        'realm': '#${widget.item.realm!.id}',
       }));
     }
 
@@ -141,7 +141,7 @@ class _PostItemState extends State<PostItem> {
           child: PostItem(
             item: widget.item.replyTo!,
             isCompact: true,
-            overrideAttachmentParent: widget.item.alias,
+            overrideAttachmentParent: widget.item.id.toString(),
           ).paddingSymmetric(vertical: 8),
         ),
       ],
@@ -173,7 +173,7 @@ class _PostItemState extends State<PostItem> {
           child: PostItem(
             item: widget.item.repostTo!,
             isCompact: true,
-            overrideAttachmentParent: widget.item.alias,
+            overrideAttachmentParent: widget.item.id.toString(),
           ).paddingSymmetric(vertical: 8),
         ),
       ],
@@ -182,7 +182,7 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-    final hasAttachment = item.attachments?.isNotEmpty ?? false;
+    final hasAttachment = item.body['attachments']?.isNotEmpty ?? false;
 
     if (widget.isCompact) {
       return Column(
@@ -190,7 +190,7 @@ class _PostItemState extends State<PostItem> {
         children: [
           buildHeader().paddingSymmetric(horizontal: 12),
           MarkdownTextContent(
-            content: item.content,
+            content: item.body['content'],
             isSelectable: widget.isContentSelectable,
           ).paddingOnly(
             left: 16,
@@ -199,7 +199,7 @@ class _PostItemState extends State<PostItem> {
             bottom: hasAttachment ? 4 : 0,
           ),
           buildFooter().paddingOnly(left: 16),
-          if (item.attachments?.isNotEmpty ?? false)
+          if (item.body['attachments']?.isNotEmpty ?? false)
             Row(
               children: [
                 Icon(
@@ -209,7 +209,7 @@ class _PostItemState extends State<PostItem> {
                 ).paddingOnly(right: 6),
                 Text(
                   'postAttachmentTip'.trParams(
-                    {'count': item.attachments!.length.toString()},
+                    {'count': item.body['attachments']!.length.toString()},
                   ),
                   style: TextStyle(color: _unFocusColor),
                 )
@@ -245,7 +245,7 @@ class _PostItemState extends State<PostItem> {
                 children: [
                   buildHeader(),
                   MarkdownTextContent(
-                    content: item.content,
+                    content: item.body['content'],
                     isSelectable: widget.isContentSelectable,
                   ).paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
@@ -256,7 +256,7 @@ class _PostItemState extends State<PostItem> {
                         AppRouter.instance.pushNamed(
                           'postDetail',
                           pathParameters: {
-                            'alias': widget.item.replyTo!.alias,
+                            'id': widget.item.replyTo!.id.toString(),
                           },
                         );
                       },
@@ -269,7 +269,7 @@ class _PostItemState extends State<PostItem> {
                         AppRouter.instance.pushNamed(
                           'postDetail',
                           pathParameters: {
-                            'alias': widget.item.repostTo!.alias,
+                            'alias': widget.item.repostTo!.id.toString(),
                           },
                         );
                       },
@@ -292,8 +292,8 @@ class _PostItemState extends State<PostItem> {
             maxWidth: 640,
           ),
           child: AttachmentList(
-            parentId: widget.item.alias,
-            attachmentsId: item.attachments ?? List.empty(),
+            parentId: widget.item.id.toString(),
+            attachmentsId: item.body['attachments'].cast<int>() ?? List.empty(),
             divided: true,
           ),
         ),

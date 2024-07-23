@@ -82,7 +82,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           List.empty(),
       'attachments': _attachments,
       'is_draft': _isDraft,
-      if (widget.edit != null) 'alias': widget.edit!.alias,
       if (widget.reply != null) 'reply_to': widget.reply!.id,
       if (widget.repost != null) 'repost_to': widget.repost!.id,
       if (widget.realm != null) 'realm': widget.realm!.alias,
@@ -90,9 +89,9 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
     Response resp;
     if (widget.edit != null) {
-      resp = await client.put('/posts/${widget.edit!.id}', payload);
+      resp = await client.put('/stories/${widget.edit!.id}', payload);
     } else {
-      resp = await client.post('/posts', payload);
+      resp = await client.post('/stories', payload);
     }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
@@ -105,8 +104,8 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   void syncWidget() {
     if (widget.edit != null) {
-      _contentController.text = widget.edit!.content;
-      _attachments = widget.edit!.attachments ?? List.empty();
+      _contentController.text = widget.edit!.body['content'];
+      _attachments = widget.edit!.body['attachments'] ?? List.empty();
       _isDraft = widget.edit!.isDraft ?? false;
     }
   }

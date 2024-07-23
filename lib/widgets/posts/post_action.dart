@@ -173,8 +173,8 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
     return AlertDialog(
       title: Text('postDeletionConfirm'.tr),
       content: Text('postDeletionConfirmCaption'.trParams({
-        'content': widget.item.content
-            .substring(0, min(widget.item.content.length, 60))
+        'content': widget.item.body['content']
+            .substring(0, min<int>(widget.item.body['content'].length, 60))
             .trim(),
       })),
       actions: <Widget>[

@@ -4,8 +4,6 @@ import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
-import 'package:solian/screens/articles/article_detail.dart';
-import 'package:solian/screens/articles/article_editor.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
@@ -65,22 +63,12 @@ abstract class AppRouter {
         builder: (context, state) => const DraftBoxScreen(),
       ),
       GoRoute(
-        path: '/posts/view/:alias',
+        path: '/posts/view/:id',
         name: 'postDetail',
         builder: (context, state) => TitleShell(
           state: state,
           child: PostDetailScreen(
-            alias: state.pathParameters['alias']!,
-          ),
-        ),
-      ),
-      GoRoute(
-        path: '/articles/view/:alias',
-        name: 'articleDetail',
-        builder: (context, state) => TitleShell(
-          state: state,
-          child: ArticleDetailScreen(
-            alias: state.pathParameters['alias']!,
+            id: state.pathParameters['id']!,
           ),
         ),
       ),
@@ -97,17 +85,6 @@ abstract class AppRouter {
           );
         },
       ),
-      GoRoute(
-        path: '/articles/editor',
-        name: 'articleEditor',
-        builder: (context, state) {
-          final arguments = state.extra as ArticlePublishArguments?;
-          return ArticlePublishScreen(
-            edit: arguments?.edit,
-            realm: arguments?.realm,
-          );
-        },
-      )
     ],
   );
 

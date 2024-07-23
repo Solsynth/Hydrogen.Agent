@@ -2,13 +2,13 @@ import 'package:get/get.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
-class FeedProvider extends GetConnect {
+class PostProvider extends GetConnect {
   @override
   void onInit() {
     httpClient.baseUrl = ServiceFinder.buildUrl('interactive', null);
   }
 
-  Future<Response> listFeed(int page,
+  Future<Response> listRecommendations(int page,
       {int? realm, String? tag, category}) async {
     final queries = [
       'take=${10}',
@@ -17,7 +17,7 @@ class FeedProvider extends GetConnect {
       if (category != null) 'category=$category',
       if (realm != null) 'realmId=$realm',
     ];
-    final resp = await get('/feed?${queries.join('&')}');
+    final resp = await get('/recommendations?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }

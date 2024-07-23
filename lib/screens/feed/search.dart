@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:solian/models/feed.dart';
 import 'package:solian/models/pagination.dart';
-import 'package:solian/providers/content/feed.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
+
+import '../../models/post.dart';
 
 class FeedSearchScreen extends StatefulWidget {
   final String? tag;
@@ -17,15 +18,15 @@ class FeedSearchScreen extends StatefulWidget {
 }
 
 class _FeedSearchScreenState extends State<FeedSearchScreen> {
-  final PagingController<int, FeedRecord> _pagingController =
+  final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 
   getPosts(int pageKey) async {
-    final FeedProvider provider = Get.find();
+    final PostProvider provider = Get.find();
 
     Response resp;
     try {
-      resp = await provider.listFeed(
+      resp = await provider.listRecommendations(
         pageKey,
         tag: widget.tag,
         category: widget.category,
@@ -36,7 +37,7 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
     }
 
     final PaginationResult result = PaginationResult.fromJson(resp.body);
-    final parsed = result.data?.map((e) => FeedRecord.fromJson(e)).toList();
+    final parsed = result.data?.map((e) => Post.fromJson(e)).toList();
     if (parsed != null && parsed.length >= 10) {
       _pagingController.appendPage(parsed, pageKey + parsed.length);
     } else if (parsed != null) {

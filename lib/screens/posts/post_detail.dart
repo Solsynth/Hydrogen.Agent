@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/providers/content/feed.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
 
 class PostDetailScreen extends StatefulWidget {
-  final String alias;
+  final String id;
 
-  const PostDetailScreen({super.key, required this.alias});
+  const PostDetailScreen({super.key, required this.id});
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
@@ -20,10 +20,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Post? item;
 
   Future<Post?> getDetail() async {
-    final FeedProvider provider = Get.find();
+    final PostProvider provider = Get.find();
 
     try {
-      final resp = await provider.getPost(widget.alias);
+      final resp = await provider.getPost(widget.id);
       item = Post.fromJson(resp.body);
     } catch (e) {
       context.showErrorDialog(e).then((_) => Navigator.pop(context));
