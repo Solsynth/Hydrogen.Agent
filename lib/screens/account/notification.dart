@@ -32,7 +32,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     if (markList.isNotEmpty) {
       final client = auth.configureClient('auth');
-      await client.put('/notifications/batch/read', {'messages': markList});
+      await client.put('/notifications/read', {'messages': markList});
     }
 
     provider.notifications.clear();
@@ -55,7 +55,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     final client = auth.configureClient('auth');
 
-    await client.put('/notifications/${element.id}/read', {});
+    await client.put('/notifications/read/${element.id}', {});
 
     provider.notifications.removeAt(index);
 
@@ -98,14 +98,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                   if (provider.notifications.isNotEmpty)
                     SliverToBoxAdapter(
-                      child: ListTile(
-                        tileColor:
-                            Theme.of(context).colorScheme.secondaryContainer,
-                        leading: const Icon(Icons.checklist),
-                        title: Text('notifyAllRead'.tr),
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 28),
-                        onTap: _isBusy ? null : () => markAllRead(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        child: ListTile(
+                          leading: const Icon(Icons.checklist),
+                          title: Text('notifyAllRead'.tr),
+                          onTap: _isBusy ? null : () => markAllRead(),
+                        ),
                       ),
                     ),
                   SliverList.separated(
