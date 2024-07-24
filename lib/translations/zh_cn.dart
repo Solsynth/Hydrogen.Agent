@@ -81,6 +81,8 @@ const simplifiedChineseMessages = {
   'articleEditor': '撰写文章',
   'articleDetail': '文章详情',
   'draftBoxOpen': '打开草稿箱',
+  'postListNews': '新鲜事',
+  'postListShuffle': '打乱看',
   'postNew': '创建新帖子',
   'postNewInRealmHint': '在领域 @realm 里发表新帖子',
   'postAction': '发表',

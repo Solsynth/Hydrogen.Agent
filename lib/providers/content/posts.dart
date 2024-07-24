@@ -9,7 +9,7 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listRecommendations(int page,
-      {int? realm, String? tag, category}) async {
+      {int? realm, String? tag, category, String? channel}) async {
     final queries = [
       'take=${10}',
       'offset=$page',
@@ -17,7 +17,11 @@ class PostProvider extends GetConnect {
       if (category != null) 'category=$category',
       if (realm != null) 'realmId=$realm',
     ];
-    final resp = await get('/recommendations?${queries.join('&')}');
+    final resp = await get(
+      channel == null
+          ? '/recommendations?${queries.join('&')}'
+          : '/recommendations/$channel?${queries.join('&')}',
+    );
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }

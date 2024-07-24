@@ -83,6 +83,8 @@ const messagesEnglish = {
   'notifyAllRead': 'Mark all as read',
   'notifyEmpty': 'All notifications read',
   'notifyEmptyCaption': 'It seems like nothing happened recently',
+  'postListNews': 'News',
+  'postListShuffle': 'Random',
   'postEditor': 'Create new post',
   'articleEditor': 'Create new article',
   'articleDetail': 'Article details',

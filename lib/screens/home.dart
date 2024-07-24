@@ -20,16 +20,24 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
+
+  late final TabController _tabController;
+
+  int mode = 0;
 
   getPosts(int pageKey) async {
     final PostProvider provider = Get.find();
 
     Response resp;
     try {
-      resp = await provider.listRecommendations(pageKey);
+      resp = await provider.listRecommendations(
+        pageKey,
+        channel: mode == 0 ? null : 'shuffle',
+      );
     } catch (e) {
       _pagingController.error = e;
       return;
@@ -48,6 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _pagingController.addPageRequestListener(getPosts);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      switch (_tabController.index) {
+        case 0:
+        case 1:
+          if (mode == _tabController.index) break;
+          mode = _tabController.index;
+          _pagingController.refresh();
+      }
+    });
   }
 
   @override
@@ -68,24 +86,44 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: RefreshIndicator(
           onRefresh: () => Future.sync(() => _pagingController.refresh()),
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                title: AppBarTitle('home'.tr),
-                centerTitle: false,
-                floating: true,
-                toolbarHeight: SolianTheme.toolbarHeight(context),
-                leading: AppBarLeadingButton.adaptive(context),
-                actions: [
-                  const BackgroundStateWidget(),
-                  const NotificationButton(),
-                  SizedBox(
-                    width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return [
+                SliverAppBar(
+                  title: AppBarTitle('home'.tr),
+                  centerTitle: false,
+                  floating: true,
+                  toolbarHeight: SolianTheme.toolbarHeight(context),
+                  leading: AppBarLeadingButton.adaptive(context),
+                  actions: [
+                    const BackgroundStateWidget(),
+                    const NotificationButton(),
+                    SizedBox(
+                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                    ),
+                  ],
+                  bottom: TabBar(
+                    controller: _tabController,
+                    tabs: [
+                      Tab(text: 'postListNews'.tr),
+                      Tab(text: 'postListShuffle'.tr),
+                    ],
                   ),
-                ],
-              ),
-              FeedListWidget(controller: _pagingController),
-            ],
+                )
+              ];
+            },
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                CustomScrollView(slivers: [
+                  FeedListWidget(controller: _pagingController),
+                ]),
+                CustomScrollView(slivers: [
+                  FeedListWidget(controller: _pagingController),
+                ]),
+              ],
+            ),
           ),
         ),
       ),
