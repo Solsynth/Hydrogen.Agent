@@ -55,7 +55,7 @@ class ChatCallProvider extends GetxController {
 
   Future<(String, String)> getRoomToken() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
     final client = auth.configureClient('messaging');
 

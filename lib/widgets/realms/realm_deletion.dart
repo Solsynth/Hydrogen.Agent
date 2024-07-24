@@ -23,7 +23,7 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
 
   Future<void> deleteRealm() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
@@ -41,7 +41,7 @@ class _RealmDeletionDialogState extends State<RealmDeletionDialog> {
 
   Future<void> leaveRealm() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 

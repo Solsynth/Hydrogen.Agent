@@ -27,7 +27,6 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
 
   AccountStatus? _accountStatus;
 
-  late final AuthProvider _auth;
   late final ChannelProvider _channels;
 
   void getStatus() async {
@@ -57,7 +56,6 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
   @override
   void initState() {
     super.initState();
-    _auth = Get.find();
     _channels = Get.find();
     detectSelectedIndex();
     getStatus();
@@ -83,86 +81,83 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
         closeDrawer();
       },
       children: [
-        FutureBuilder(
-          future: auth.getProfileWithCheck(),
-          builder: (context, snapshot) {
-            if (snapshot.data == null) {
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 28),
-                leading: const Icon(Icons.account_circle),
-                title: Text('guest'.tr),
-                subtitle: Text('unsignedIn'.tr),
-                onTap: () {
-                  AppRouter.instance.goNamed('account');
-                  setState(() => _selectedIndex = null);
-                  closeDrawer();
-                },
-              );
-            }
-
+        Obx(() {
+          if (auth.isAuthorized.isFalse) {
             return ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-              title: Text(
-                snapshot.data!.body['nick'],
-                maxLines: 1,
-                overflow: TextOverflow.fade,
-              ),
-              subtitle: Builder(
-                builder: (context) {
-                  if (_accountStatus == null) {
-                    return Text('loading'.tr);
-                  }
-                  final info = StatusProvider.determineStatus(
-                    _accountStatus!,
-                  );
-                  return Text(
-                    info.$3,
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                  );
-                },
-              ),
-              leading: Builder(builder: (context) {
-                final badgeColor = _accountStatus != null
-                    ? StatusProvider.determineStatus(
-                        _accountStatus!,
-                      ).$2
-                    : Colors.grey;
-
-                return badges.Badge(
-                  showBadge: _accountStatus != null,
-                  badgeStyle: badges.BadgeStyle(badgeColor: badgeColor),
-                  position: badges.BadgePosition.bottomEnd(
-                    bottom: 0,
-                    end: -2,
-                  ),
-                  child: AccountAvatar(
-                    content: snapshot.data!.body['avatar'],
-                  ),
-                );
-              }),
-              trailing: IconButton(
-                icon: const Icon(Icons.face_retouching_natural),
-                onPressed: () {
-                  showModalBottomSheet(
-                    useRootNavigator: true,
-                    context: context,
-                    builder: (context) => AccountStatusAction(
-                      currentStatus: _accountStatus!.status,
-                    ),
-                  ).then((val) {
-                    if (val == true) getStatus();
-                  });
-                },
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+              leading: const Icon(Icons.account_circle),
+              title: Text('guest'.tr),
+              subtitle: Text('unsignedIn'.tr),
               onTap: () {
                 AppRouter.instance.goNamed('account');
                 setState(() => _selectedIndex = null);
                 closeDrawer();
               },
             );
-          },
-        ).paddingOnly(top: 8),
+          }
+
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+            title: Text(
+              auth.userProfile.value!['nick'],
+              maxLines: 1,
+              overflow: TextOverflow.fade,
+            ),
+            subtitle: Builder(
+              builder: (context) {
+                if (_accountStatus == null) {
+                  return Text('loading'.tr);
+                }
+                final info = StatusProvider.determineStatus(
+                  _accountStatus!,
+                );
+                return Text(
+                  info.$3,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                );
+              },
+            ),
+            leading: Builder(builder: (context) {
+              final badgeColor = _accountStatus != null
+                  ? StatusProvider.determineStatus(
+                      _accountStatus!,
+                    ).$2
+                  : Colors.grey;
+
+              return badges.Badge(
+                showBadge: _accountStatus != null,
+                badgeStyle: badges.BadgeStyle(badgeColor: badgeColor),
+                position: badges.BadgePosition.bottomEnd(
+                  bottom: 0,
+                  end: -2,
+                ),
+                child: AccountAvatar(
+                  content: auth.userProfile.value!['avatar'],
+                ),
+              );
+            }),
+            trailing: IconButton(
+              icon: const Icon(Icons.face_retouching_natural),
+              onPressed: () {
+                showModalBottomSheet(
+                  useRootNavigator: true,
+                  context: context,
+                  builder: (context) => AccountStatusAction(
+                    currentStatus: _accountStatus!.status,
+                  ),
+                ).then((val) {
+                  if (val == true) getStatus();
+                });
+              },
+            ),
+            onTap: () {
+              AppRouter.instance.goNamed('account');
+              setState(() => _selectedIndex = null);
+              closeDrawer();
+            },
+          );
+        }).paddingOnly(top: 8),
         const Divider(thickness: 0.3, height: 1).paddingOnly(
           bottom: 12,
           top: 8,
@@ -176,49 +171,46 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
         const Divider(thickness: 0.3, height: 1).paddingOnly(
           top: 12,
         ),
-        FutureBuilder(
-          future: _auth.getProfileWithCheck(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData || snapshot.data == null) {
-              return const SizedBox();
-            }
+        Obx(() {
+          if (auth.isAuthorized.isFalse) {
+            return const SizedBox();
+          }
 
-            final selfId = snapshot.data!.body['id'];
+          final selfId = auth.userProfile.value!['id'];
 
-            return Column(
-              children: [
-                Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    title: Text('channels'.tr),
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-                    children: [
-                      Obx(
-                        () => SizedBox(
-                          height: 360,
-                          child: RefreshIndicator(
-                            onRefresh: () =>
-                                _channels.refreshAvailableChannel(),
-                            child: ChannelListWidget(
-                              channels: _channels.groupChannels,
-                              selfId: selfId,
-                              isDense: true,
-                              useReplace: true,
-                              onSelected: (_) {
-                                setState(() => _selectedIndex = null);
-                                closeDrawer();
-                              },
-                            ),
+          return Column(
+            children: [
+              Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  title: Text('channels'.tr),
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+                  children: [
+                    Obx(
+                      () => SizedBox(
+                        height: 360,
+                        child: RefreshIndicator(
+                          onRefresh: () => _channels.refreshAvailableChannel(),
+                          child: ChannelListWidget(
+                            channels: _channels.groupChannels,
+                            selfId: selfId,
+                            isDense: true,
+                            useReplace: true,
+                            onSelected: (_) {
+                              setState(() => _selectedIndex = null);
+                              closeDrawer();
+                            },
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        }),
       ],
     );
   }

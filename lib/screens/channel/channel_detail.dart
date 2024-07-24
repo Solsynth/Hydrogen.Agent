@@ -41,9 +41,9 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 
   void checkOwner() async {
     final AuthProvider auth = Get.find();
-    final prof = await auth.getProfile();
     setState(() {
-      _isOwned = prof.body['id'] == widget.channel.account.externalId;
+      _isOwned =
+          auth.userProfile.value!['id'] == widget.channel.account.externalId;
     });
   }
 
@@ -75,14 +75,14 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 
   void applyProfileChanges() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
     final client = auth.configureClient('messaging');
 
-    final resp = await client.put(
-        '/channels/${widget.realm}/${widget.channel.alias}/members/me', {
+    final resp = await client
+        .put('/channels/${widget.realm}/${widget.channel.alias}/members/me', {
       'nick': null,
       'notify_level': _notifyLevel,
     });

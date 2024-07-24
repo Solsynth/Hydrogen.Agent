@@ -25,7 +25,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
   Future<void> deleteChannel() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
@@ -44,7 +44,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
   Future<void> leaveChannel() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 

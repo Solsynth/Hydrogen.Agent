@@ -69,7 +69,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   void applyPost() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
     if (_contentController.value.text.isEmpty) return;
 
     setState(() => _isBusy = true);

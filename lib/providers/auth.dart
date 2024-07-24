@@ -60,7 +60,10 @@ class AuthProvider extends GetConnect {
   @override
   void onInit() {
     httpClient.baseUrl = ServiceFinder.buildUrl('auth', null);
-    loadCredentials();
+    refreshAuthorizeStatus().then((_) {
+      loadCredentials();
+      refreshUserProfile();
+    });
   }
 
   Future<void> refreshCredentials() async {
@@ -116,7 +119,7 @@ class AuthProvider extends GetConnect {
   }
 
   Future<void> ensureCredentials() async {
-    if (!await isAuthorized) throw Exception('unauthorized');
+    if (isAuthorized.isFalse) throw Exception('unauthorized');
     if (credentials == null) await loadCredentials();
 
     if (credentials!.isExpired) {
@@ -126,7 +129,7 @@ class AuthProvider extends GetConnect {
   }
 
   Future<void> loadCredentials() async {
-    if (await isAuthorized) {
+    if (isAuthorized.isTrue) {
       final content = await storage.read(key: 'auth_credentials');
       credentials = TokenSet.fromJson(jsonDecode(content!));
     }
@@ -137,7 +140,7 @@ class AuthProvider extends GetConnect {
     String username,
     String password,
   ) async {
-    _cachedUserProfileResponse = null;
+    userProfile.value = null;
 
     final client = ServiceFinder.configureClient('auth');
 
@@ -172,6 +175,8 @@ class AuthProvider extends GetConnect {
       value: jsonEncode(credentials!.toJson()),
     );
 
+    await refreshUserProfile();
+
     Get.find<WebSocketProvider>().connect();
     Get.find<WebSocketProvider>().notifyPrefetch();
 
@@ -179,7 +184,8 @@ class AuthProvider extends GetConnect {
   }
 
   void signout() {
-    _cachedUserProfileResponse = null;
+    isAuthorized.value = false;
+    userProfile.value = null;
 
     Get.find<WebSocketProvider>().disconnect();
     Get.find<WebSocketProvider>().notifications.clear();
@@ -195,30 +201,21 @@ class AuthProvider extends GetConnect {
 
   // Data Layer
 
-  Response? _cachedUserProfileResponse;
+  RxBool isAuthorized = false.obs;
+  Rx<Map<String, dynamic>?> userProfile = Rx(null);
 
-  Future<bool> get isAuthorized => storage.containsKey(key: 'auth_credentials');
+  Future<void> refreshAuthorizeStatus() async {
+    isAuthorized.value = await storage.containsKey(key: 'auth_credentials');
+  }
 
-  Future<Response> getProfile({noCache = false}) async {
-    if (!noCache && _cachedUserProfileResponse != null) {
-      return _cachedUserProfileResponse!;
-    }
-
+  Future<void> refreshUserProfile() async {
     final client = configureClient('auth');
 
     final resp = await client.get('/users/me');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
-    } else {
-      _cachedUserProfileResponse = resp;
     }
 
-    return resp;
-  }
-
-  Future<Response?> getProfileWithCheck({noCache = false}) async {
-    if (!await isAuthorized) return null;
-
-    return await getProfile(noCache: noCache);
+    userProfile.value = resp.body;
   }
 }

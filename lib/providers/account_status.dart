@@ -33,7 +33,7 @@ class StatusProvider extends GetConnect {
 
   Future<Response> getCurrentStatus() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
     final client = auth.configureClient('auth');
 
@@ -53,7 +53,7 @@ class StatusProvider extends GetConnect {
     DateTime? clearAt,
   }) async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
     final client = auth.configureClient('auth');
 
@@ -82,7 +82,7 @@ class StatusProvider extends GetConnect {
 
   Future<Response> clearStatus() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
     final client = auth.configureClient('auth');
 

@@ -31,7 +31,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
 
   Future<void> makeCall() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('messaging');
 
@@ -55,7 +55,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
 
   Future<void> endsCall() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('messaging');
 

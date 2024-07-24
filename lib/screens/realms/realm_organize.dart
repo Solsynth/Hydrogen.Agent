@@ -37,7 +37,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
 
   void applyRealm() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     if (_aliasController.value.text.isEmpty) randomizeAlias();
 

@@ -29,93 +29,85 @@ class _AccountScreenState extends State<AccountScreen> {
       (const Icon(Icons.info_outline), 'about'.tr, 'about'),
     ];
 
-    final AuthProvider provider = Get.find();
+    final AuthProvider auth = Get.find();
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: SafeArea(
-        child: FutureBuilder(
-          future: provider.isAuthorized,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasData && snapshot.data == false) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ActionCard(
-                      icon: const Icon(Icons.login, color: Colors.white),
-                      title: 'signin'.tr,
-                      caption: 'signinCaption'.tr,
-                      onTap: () {
-                        showModalBottomSheet(
-                          useRootNavigator: true,
-                          isDismissible: false,
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (context) => const SignInPopup(),
-                        ).then((val) async {
-                          if (val == true) {
-                            await provider.getProfile(noCache: true);
-                            setState(() {});
-                          }
-                        });
-                      },
-                    ),
-                    ActionCard(
-                      icon: const Icon(Icons.add, color: Colors.white),
-                      title: 'signup'.tr,
-                      caption: 'signupCaption'.tr,
-                      onTap: () {
-                        showModalBottomSheet(
-                          useRootNavigator: true,
-                          isDismissible: false,
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (context) => const SignUpPopup(),
-                        ).then((_) {
-                          setState(() {});
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return CenteredContainer(
-              child: ListView(
+        child: Obx(() {
+          if (auth.isAuthorized.isFalse) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AccountHeading().paddingOnly(bottom: 8, top: 8),
-                  ...(actionItems.map(
-                    (x) => ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                      leading: x.$1,
-                      title: Text(x.$2),
-                      onTap: () {
-                        AppRouter.instance
-                            .pushNamed(x.$3)
-                            .then((_) => setState(() {}));
-                      },
-                    ),
-                  )),
-                  ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                    leading: const Icon(Icons.logout),
-                    title: Text('signout'.tr),
+                  ActionCard(
+                    icon: const Icon(Icons.login, color: Colors.white),
+                    title: 'signin'.tr,
+                    caption: 'signinCaption'.tr,
                     onTap: () {
-                      provider.signout();
-                      setState(() {});
+                      showModalBottomSheet(
+                        useRootNavigator: true,
+                        isDismissible: false,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => const SignInPopup(),
+                      ).then((val) async {
+                        if (val == true) {
+                          await auth.refreshUserProfile();
+                        }
+                      });
+                    },
+                  ),
+                  ActionCard(
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    title: 'signup'.tr,
+                    caption: 'signupCaption'.tr,
+                    onTap: () {
+                      showModalBottomSheet(
+                        useRootNavigator: true,
+                        isDismissible: false,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => const SignUpPopup(),
+                      ).then((_) {
+                        setState(() {});
+                      });
                     },
                   ),
                 ],
               ),
             );
-          },
-        ),
+          }
+
+          return CenteredContainer(
+            child: ListView(
+              children: [
+                const AccountHeading().paddingOnly(bottom: 8, top: 8),
+                ...(actionItems.map(
+                  (x) => ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                    leading: x.$1,
+                    title: Text(x.$2),
+                    onTap: () {
+                      AppRouter.instance
+                          .pushNamed(x.$3)
+                          .then((_) => setState(() {}));
+                    },
+                  ),
+                )),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  leading: const Icon(Icons.logout),
+                  title: Text('signout'.tr),
+                  onTap: () {
+                    auth.signout();
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
@@ -139,33 +131,25 @@ class _AccountHeadingState extends State<AccountHeading> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthProvider provider = Get.find();
+    final AuthProvider auth = Get.find();
 
-    return FutureBuilder(
-      future: provider.getProfile(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const LinearProgressIndicator();
-        }
-
-        final prof = snapshot.data!;
-        return AccountHeadingWidget(
-          avatar: prof.body['avatar'],
-          banner: prof.body['banner'],
-          name: prof.body['name'],
-          nick: prof.body['nick'],
-          desc: prof.body['description'],
-          status: _status,
-          badges: prof.body['badges']
-              ?.map((e) => AccountBadge.fromJson(e))
-              .toList()
-              .cast<AccountBadge>(),
-          onEditStatus: () {
-            setState(() {
-              _status = Get.find<StatusProvider>().getCurrentStatus();
-            });
-          },
-        );
+    final prof = auth.userProfile.value!;
+    
+    return AccountHeadingWidget(
+      avatar: prof['avatar'],
+      banner: prof['banner'],
+      name: prof['name'],
+      nick: prof['nick'],
+      desc: prof['description'],
+      status: _status,
+      badges: prof['badges']
+          ?.map((e) => AccountBadge.fromJson(e))
+          .toList()
+          .cast<AccountBadge>(),
+      onEditStatus: () {
+        setState(() {
+          _status = Get.find<StatusProvider>().getCurrentStatus();
+        });
       },
     );
   }

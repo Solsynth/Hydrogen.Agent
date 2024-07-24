@@ -47,7 +47,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
     final AuthProvider auth = Get.find();
 
     if (_isSubmitting) return;
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('interactive');
 

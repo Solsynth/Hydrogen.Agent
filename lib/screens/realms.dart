@@ -28,7 +28,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
 
   getRealms() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
@@ -81,42 +81,33 @@ class _RealmListScreenState extends State<RealmListScreen> {
             ),
           ],
         ),
-        body: FutureBuilder(
-          future: auth.isAuthorized,
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.data == false) {
-              return SigninRequiredOverlay(
-                onSignedIn: () {
-                  getRealms();
-                },
-              );
-            }
+        body: Obx(() {
+          if (auth.isAuthorized.isFalse) {
+            return SigninRequiredOverlay(
+              onSignedIn: () => getRealms(),
+            );
+          }
 
-            return Column(
-              children: [
-                if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-                Expanded(
-                  child: CenteredContainer(
-                    child: RefreshIndicator(
-                      onRefresh: () => getRealms(),
-                      child: ListView.builder(
-                        itemCount: _realms.length,
-                        itemBuilder: (context, index) {
-                          final element = _realms[index];
-                          return buildRealm(element);
-                        },
-                      ),
+          return Column(
+            children: [
+              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+              Expanded(
+                child: CenteredContainer(
+                  child: RefreshIndicator(
+                    onRefresh: () => getRealms(),
+                    child: ListView.builder(
+                      itemCount: _realms.length,
+                      itemBuilder: (context, index) {
+                        final element = _realms[index];
+                        return buildRealm(element);
+                      },
                     ),
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

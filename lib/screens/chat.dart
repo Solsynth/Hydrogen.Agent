@@ -97,49 +97,42 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
-        body: FutureBuilder(
-          future: auth.getProfileWithCheck(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.data == null) {
-              return SigninRequiredOverlay(
-                onSignedIn: () => _channels.refreshAvailableChannel(),
-              );
-            }
+        body: Obx(() {
+          if (auth.isAuthorized.isFalse) {
+            return SigninRequiredOverlay(
+              onSignedIn: () => _channels.refreshAvailableChannel(),
+            );
+          }
 
-            final selfId = snapshot.data!.body['id'];
+          final selfId = auth.userProfile.value!['id'];
 
-            return Column(
-              children: [
-                Obx(() {
-                  if (_channels.isLoading.isFalse) {
-                    return const SizedBox();
-                  } else {
-                    return const LinearProgressIndicator();
-                  }
-                }),
-                const ChatCallCurrentIndicator(),
-                Expanded(
-                  child: CenteredContainer(
-                    child: RefreshIndicator(
-                      onRefresh: _channels.refreshAvailableChannel,
-                      child: Obx(
-                        () => ChannelListWidget(
-                          noCategory: true,
-                          channels: _channels.directChannels,
-                          selfId: selfId,
-                        ),
+          return Column(
+            children: [
+              Obx(() {
+                if (_channels.isLoading.isFalse) {
+                  return const SizedBox();
+                } else {
+                  return const LinearProgressIndicator();
+                }
+              }),
+              const ChatCallCurrentIndicator(),
+              Expanded(
+                child: CenteredContainer(
+                  child: RefreshIndicator(
+                    onRefresh: _channels.refreshAvailableChannel,
+                    child: Obx(
+                      () => ChannelListWidget(
+                        noCategory: true,
+                        channels: _channels.directChannels,
+                        selfId: selfId,
                       ),
                     ),
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

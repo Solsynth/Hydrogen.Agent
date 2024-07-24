@@ -28,7 +28,7 @@ class _ChatEventDeletionDialogState extends State<ChatEventDeletionDialog> {
 
   void performAction() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('messaging');
 

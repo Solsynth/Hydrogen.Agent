@@ -18,7 +18,7 @@ Future<MessageHistoryDb> createHistoryDb() async {
 
 Future<Event?> getRemoteEvent(int id, Channel channel, String scope) async {
   final AuthProvider auth = Get.find();
-  if (!await auth.isAuthorized) return null;
+  if (auth.isAuthorized.isFalse) return null;
 
   final client = auth.configureClient('messaging');
 
@@ -48,7 +48,7 @@ Future<(List<Event>, int)?> getRemoteEvents(
   }
 
   final AuthProvider auth = Get.find();
-  if (!await auth.isAuthorized) return null;
+  if (auth.isAuthorized.isFalse) return null;
 
   final client = auth.configureClient('messaging');
 

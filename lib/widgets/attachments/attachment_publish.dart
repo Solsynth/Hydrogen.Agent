@@ -44,7 +44,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
   Future<void> pickPhotoToUpload() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final medias = await _imagePicker.pickMultiImage();
     if (medias.isEmpty) return;
@@ -73,7 +73,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
   Future<void> pickVideoToUpload() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final media = await _imagePicker.pickVideo(source: ImageSource.gallery);
     if (media == null) return;
@@ -96,7 +96,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
   Future<void> pickFileToUpload() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -121,7 +121,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
   Future<void> takeMediaToUpload(bool isVideo) async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     XFile? media;
     if (isVideo) {

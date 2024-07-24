@@ -26,9 +26,8 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
 
   void checkOwner() async {
     final AuthProvider auth = Get.find();
-    final prof = await auth.getProfile();
     setState(() {
-      _isOwned = prof.body['id'] == widget.realm.accountId;
+      _isOwned = auth.userProfile.value!['id'] == widget.realm.accountId;
     });
   }
 

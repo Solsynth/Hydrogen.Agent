@@ -23,8 +23,7 @@ class _RelativeSelectorState extends State<RelativeSelector> {
 
   getFriends() async {
     final AuthProvider auth = Get.find();
-    final prof = await auth.getProfile();
-    _accountId = prof.body['id'];
+    _accountId = auth.userProfile.value!['id'];
 
     final RelationshipProvider provider = Get.find();
     final resp = await provider.listRelationWithStatus(1);

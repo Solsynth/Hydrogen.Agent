@@ -59,8 +59,8 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     _focusNode.requestFocus();
 
     final AuthProvider auth = Get.find();
-    final prof = await auth.getProfile();
-    if (!await auth.isAuthorized) return;
+    final prof = auth.userProfile.value!;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('messaging');
 
@@ -87,9 +87,9 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       id: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      account: Account.fromJson(prof.body),
+      account: Account.fromJson(prof),
       channelId: widget.channel.id,
-      accountId: prof.body['id'],
+      accountId: prof['id'],
       notify: 0,
     );
     final message = Event(

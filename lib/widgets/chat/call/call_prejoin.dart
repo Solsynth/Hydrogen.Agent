@@ -28,7 +28,7 @@ class _ChatCallPrejoinPopupState extends State<ChatCallPrejoinPopup> {
   void performJoin() async {
     final AuthProvider auth = Get.find();
     final ChatCallProvider provider = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 

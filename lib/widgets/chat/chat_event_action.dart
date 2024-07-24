@@ -35,15 +35,14 @@ class _ChatEventActionState extends State<ChatEventAction> {
   void checkAbleToModifyContent() async {
     if (!['messages.new'].contains(widget.item.type)) return;
 
-    final AuthProvider provider = Get.find();
-    if (!await provider.isAuthorized) return;
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
-    final prof = await provider.getProfile();
     setState(() {
-      _canModifyContent =
-          prof.body?['id'] == widget.item.sender.account.externalId;
+      _canModifyContent = auth.userProfile.value!['id'] ==
+          widget.item.sender.account.externalId;
       _isBusy = false;
     });
   }

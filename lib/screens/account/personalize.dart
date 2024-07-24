@@ -53,17 +53,17 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     setState(() => _isBusy = true);
 
     final AuthProvider auth = Get.find();
-    final prof = await auth.getProfile(noCache: true);
+    final prof = auth.userProfile.value!;
     setState(() {
-      _usernameController.text = prof.body['name'];
-      _nicknameController.text = prof.body['nick'];
-      _descriptionController.text = prof.body['description'];
-      _firstNameController.text = prof.body['profile']['first_name'];
-      _lastNameController.text = prof.body['profile']['last_name'];
-      _avatar = prof.body['avatar'];
-      _banner = prof.body['banner'];
-      if (prof.body['profile']['birthday'] != null) {
-        _birthday = DateTime.parse(prof.body['profile']['birthday']);
+      _usernameController.text = prof['name'];
+      _nicknameController.text = prof['nick'];
+      _descriptionController.text = prof['description'];
+      _firstNameController.text = prof['profile']['first_name'];
+      _lastNameController.text = prof['profile']['last_name'];
+      _avatar = prof['avatar'];
+      _banner = prof['banner'];
+      if (prof['profile']['birthday'] != null) {
+        _birthday = DateTime.parse(prof['profile']['birthday']);
         _birthdayController.text =
             DateFormat('yyyy-MM-dd').format(_birthday!.toLocal());
       }
@@ -74,7 +74,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
   Future<void> updateImage(String position) async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
@@ -120,7 +120,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
   void updatePersonalize() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 

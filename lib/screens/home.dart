@@ -107,42 +107,39 @@ class FeedCreationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
 
-    return FutureBuilder(
-        future: auth.isAuthorized,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data == true) {
-            return PopupMenuButton(
-              icon: const Icon(Icons.edit_square),
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
-                  child: ListTile(
-                    title: Text('postEditor'.tr),
-                    leading: const Icon(Icons.article),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
-                  onTap: () {
-                    AppRouter.instance.pushNamed('postEditor').then((val) {
-                      if (val != null && onCreated != null) {
-                        onCreated!();
-                      }
-                    });
-                  },
-                ),
-                if (!hideDraftBox)
-                  PopupMenuItem(
-                    child: ListTile(
-                      title: Text('draftBoxOpen'.tr),
-                      leading: const Icon(Icons.drafts),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                    onTap: () {
-                      AppRouter.instance.pushNamed('draftBox');
-                    },
-                  ),
-              ],
-            );
-          }
-          return const SizedBox();
-        });
+    if (auth.isAuthorized.isFalse) {
+      return const SizedBox();
+    }
+
+    return PopupMenuButton(
+      icon: const Icon(Icons.edit_square),
+      itemBuilder: (BuildContext context) => [
+        PopupMenuItem(
+          child: ListTile(
+            title: Text('postEditor'.tr),
+            leading: const Icon(Icons.article),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+          onTap: () {
+            AppRouter.instance.pushNamed('postEditor').then((val) {
+              if (val != null && onCreated != null) {
+                onCreated!();
+              }
+            });
+          },
+        ),
+        if (!hideDraftBox)
+          PopupMenuItem(
+            child: ListTile(
+              title: Text('draftBoxOpen'.tr),
+              leading: const Icon(Icons.drafts),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            onTap: () {
+              AppRouter.instance.pushNamed('draftBox');
+            },
+          ),
+      ],
+    );
   }
 }

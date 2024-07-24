@@ -102,7 +102,7 @@ class WebSocketProvider extends GetxController {
 
   Future<void> notifyPrefetch() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('auth');
 
@@ -119,7 +119,7 @@ class WebSocketProvider extends GetxController {
 
   Future<void> registerPushNotifications() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     late final String? token;
     late final String provider;

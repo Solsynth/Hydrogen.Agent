@@ -18,7 +18,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> markAllRead() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
@@ -42,7 +42,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> markOneRead(notify.Notification element, int index) async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final WebSocketProvider provider = Get.find();
 

@@ -25,14 +25,13 @@ class _PostActionState extends State<PostAction> {
   bool _canModifyContent = false;
 
   void checkAbleToModifyContent() async {
-    final AuthProvider provider = Get.find();
-    if (!await provider.isAuthorized) return;
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
-    final prof = await provider.getProfile();
     setState(() {
-      _canModifyContent = prof.body?['id'] == widget.item.author.externalId;
+      _canModifyContent = auth.userProfile.value!['id'] == widget.item.author.externalId;
       _isBusy = false;
     });
   }
@@ -153,7 +152,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
 
   void performAction() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     final client = auth.configureClient('interactive');
 

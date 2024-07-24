@@ -244,44 +244,38 @@ class RealmChannelListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
 
-    return FutureBuilder(
-      future: auth.getProfile(),
-      builder: (context, snapshot) {
-        return RefreshIndicator(
-          onRefresh: onRefresh,
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.add_box),
-                contentPadding: const EdgeInsets.only(left: 32, right: 8),
-                tileColor: Theme.of(context).colorScheme.surfaceContainer,
-                title: Text('channelNew'.tr),
-                subtitle: Text(
-                  'channelNewInRealmHint'
-                      .trParams({'realm': '#${realm.alias}'}),
-                ),
-                onTap: () {
-                  AppRouter.instance
-                      .pushNamed(
-                    'channelOrganizing',
-                    extra: ChannelOrganizeArguments(realm: realm),
-                  )
-                      .then((value) {
-                    if (value != null) onRefresh();
-                  });
-                },
-              ),
-              Expanded(
-                child: ChannelListWidget(
-                  channels: channels,
-                  selfId: snapshot.data?.body['id'] ?? 0,
-                  noCategory: true,
-                ),
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.add_box),
+            contentPadding: const EdgeInsets.only(left: 32, right: 8),
+            tileColor: Theme.of(context).colorScheme.surfaceContainer,
+            title: Text('channelNew'.tr),
+            subtitle: Text(
+              'channelNewInRealmHint'.trParams({'realm': '#${realm.alias}'}),
+            ),
+            onTap: () {
+              AppRouter.instance
+                  .pushNamed(
+                'channelOrganizing',
+                extra: ChannelOrganizeArguments(realm: realm),
               )
-            ],
+                  .then((value) {
+                if (value != null) onRefresh();
+              });
+            },
           ),
-        );
-      },
+          Expanded(
+            child: ChannelListWidget(
+              channels: channels,
+              selfId: auth.userProfile.value!['id'],
+              noCategory: true,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

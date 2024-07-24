@@ -106,9 +106,11 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => ChatCallProvider());
 
     final AuthProvider auth = Get.find();
-    if (await auth.isAuthorized) {
-      Get.find<WebSocketProvider>().connect();
 
+    auth.refreshAuthorizeStatus().then((_) {
+      if (auth.isAuthorized.isFalse) return;
+
+      Get.find<WebSocketProvider>().connect();
       Get.find<ChannelProvider>().refreshAvailableChannel();
 
       try {
@@ -118,6 +120,6 @@ class SolianApp extends StatelessWidget {
           'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),
         );
       }
-    }
+    });
   }
 }

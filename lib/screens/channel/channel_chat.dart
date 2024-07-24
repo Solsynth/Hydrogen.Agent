@@ -44,7 +44,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
   bool _isBusy = false;
   int? _accountId;
 
-  String? _overrideAlias;
+  String? _newAlias;
 
   Channel? _channel;
   Call? _ongoingCall;
@@ -53,26 +53,20 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   late final ChatEventController _chatController;
 
-  getProfile() async {
-    final AuthProvider auth = Get.find();
-    final prof = await auth.getProfile();
-    _accountId = prof.body['id'];
-  }
-
-  getChannel({String? overrideAlias}) async {
+  getChannel({String? alias}) async {
     final ChannelProvider provider = Get.find();
 
     setState(() => _isBusy = true);
 
-    if (overrideAlias != null) _overrideAlias = overrideAlias;
+    if (alias != null) _newAlias = alias;
 
     try {
       final resp = await provider.getChannel(
-        _overrideAlias ?? widget.alias,
+        _newAlias ?? widget.alias,
         realm: widget.realm,
       );
       final respProfile = await provider.getMyChannelProfile(
-        _overrideAlias ?? widget.alias,
+        _newAlias ?? widget.alias,
         realm: widget.realm,
       );
       setState(() {
@@ -93,7 +87,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
     try {
       final resp = await provider.getChannelOngoingCall(
-        _overrideAlias ?? widget.alias,
+        _newAlias ?? widget.alias,
         realm: widget.realm,
       );
       if (resp != null) {
@@ -150,16 +144,16 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   @override
   void initState() {
+    _accountId = Get.find<AuthProvider>().userProfile.value!['id'];
+
     _chatController = ChatEventController();
     _chatController.initialize();
 
     getChannel().then((_) {
       _chatController.getEvents(_channel!, widget.realm);
-
       listenMessages();
     });
 
-    getProfile();
     getOngoingCall();
 
     super.initState();
@@ -225,7 +219,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                 if (value == false) AppRouter.instance.pop();
                 if (value != null) {
                   final resp = Channel.fromJson(value as Map<String, dynamic>);
-                  getChannel(overrideAlias: resp.alias);
+                  getChannel(alias: resp.alias);
                 }
               });
             },

@@ -17,47 +17,30 @@ class BackgroundStateWidget extends StatelessWidget {
       final connecting = ws.isConnecting.isTrue;
 
       return Row(children: [
-        if (disconnected && !connecting)
-          FutureBuilder(
-            future: auth.isAuthorized,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData || snapshot.data == false) {
-                return const SizedBox();
-              }
-              return IconButton(
-                tooltip: [
-                  if (ws.isConnected.isFalse)
-                    'Lost Connection with Solar Network...',
-                ].join('\n'),
-                icon: const Icon(Icons.wifi_off)
-                    .animate(onPlay: (c) => c.repeat())
-                    .fadeIn(duration: 800.ms)
-                    .then()
-                    .fadeOut(duration: 800.ms),
-                onPressed: () {
-                  if (ws.isConnected.isFalse) ws.connect();
-                },
-              );
+        if (auth.isAuthorized.isTrue && disconnected && !connecting)
+          IconButton(
+            tooltip: [
+              if (ws.isConnected.isFalse)
+                'Lost Connection with Solar Network...',
+            ].join('\n'),
+            icon: const Icon(Icons.wifi_off)
+                .animate(onPlay: (c) => c.repeat())
+                .fadeIn(duration: 800.ms)
+                .then()
+                .fadeOut(duration: 800.ms),
+            onPressed: () {
+              if (ws.isConnected.isFalse) ws.connect();
             },
           ),
-        if (connecting)
-          FutureBuilder(
-            future: auth.isAuthorized,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData || snapshot.data == false) {
-                return const SizedBox();
-              }
-              return IconButton(
-                tooltip: [
-                  if (ws.isConnecting.isTrue)
-                    'Waiting Solar Network Connection...',
-                ].join('\n'),
-                icon: const Icon(Icons.sync)
-                    .animate(onPlay: (c) => c.repeat())
-                    .rotate(duration: 1850.ms, begin: 1, end: 0),
-                onPressed: () {},
-              );
-            },
+        if (auth.isAuthorized.isTrue && connecting)
+          IconButton(
+            tooltip: [
+              if (ws.isConnecting.isTrue) 'Waiting Solar Network Connection...',
+            ].join('\n'),
+            icon: const Icon(Icons.sync)
+                .animate(onPlay: (c) => c.repeat())
+                .rotate(duration: 1850.ms, begin: 1, end: 0),
+            onPressed: () {},
           ),
       ]);
     });

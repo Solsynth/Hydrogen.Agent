@@ -31,10 +31,9 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
   void getProfile() async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
-    final prof = await auth.getProfile();
-    setState(() => _accountId = prof.body['id']);
+    setState(() => _accountId = auth.userProfile.value!['id']);
   }
 
   void getMembers() async {
@@ -72,7 +71,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
   void addMember(String username) async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
@@ -93,7 +92,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
 
   void removeMember(ChannelMember item) async {
     final AuthProvider auth = Get.find();
-    if (!await auth.isAuthorized) return;
+    if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
