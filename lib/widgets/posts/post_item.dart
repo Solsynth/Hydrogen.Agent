@@ -293,7 +293,8 @@ class _PostItemState extends State<PostItem> {
           ),
           child: AttachmentList(
             parentId: widget.item.id.toString(),
-            attachmentsId: item.body['attachments'].cast<int>() ?? List.empty(),
+            attachmentsId:
+                item.body['attachments']?.cast<int>() ?? List.empty(),
             divided: true,
           ),
         ),
