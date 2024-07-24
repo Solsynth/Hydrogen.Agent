@@ -34,7 +34,7 @@ class PostProvider extends GetConnect {
       'offset=$page',
     ];
     final client = auth.configureClient('interactive');
-    final resp = await client.get('/drafts?${queries.join('&')}');
+    final resp = await client.get('/posts/drafts?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw Exception(resp.body);
     }

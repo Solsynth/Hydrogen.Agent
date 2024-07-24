@@ -52,10 +52,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Material(
-        color: Theme.of(context).colorScheme.surface,
-        child: RefreshIndicator(
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            showModalBottomSheet(
+              useRootNavigator: true,
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => const PostCreatePopup(),
+            );
+          },
+        ),
+        body: RefreshIndicator(
           onRefresh: () => Future.sync(() => _pagingController.refresh()),
           child: CustomScrollView(
             slivers: [
@@ -68,11 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),
-                  FeedCreationButton(
-                    onCreated: () {
-                      _pagingController.refresh();
-                    },
-                  ),
                   SizedBox(
                     width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                   ),
@@ -93,11 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class FeedCreationButton extends StatelessWidget {
+class PostCreatePopup extends StatelessWidget {
   final bool hideDraftBox;
   final Function? onCreated;
 
-  const FeedCreationButton({
+  const PostCreatePopup({
     super.key,
     this.hideDraftBox = false,
     this.onCreated,
@@ -111,35 +117,62 @@ class FeedCreationButton extends StatelessWidget {
       return const SizedBox();
     }
 
-    return PopupMenuButton(
-      icon: const Icon(Icons.edit_square),
-      itemBuilder: (BuildContext context) => [
-        PopupMenuItem(
-          child: ListTile(
-            title: Text('postEditor'.tr),
-            leading: const Icon(Icons.article),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+    final List<dynamic> actionList = [
+      (
+        icon: const Icon(Icons.edit_square),
+        label: 'postEditor'.tr,
+        onTap: () {
+          Navigator.pop(context);
+          AppRouter.instance.pushNamed('postEditor').then((val) {
+            if (val != null && onCreated != null) onCreated!();
+          });
+        },
+      ),
+      (
+        icon: const Icon(Icons.drafts),
+        label: 'draftBoxOpen'.tr,
+        onTap: () {
+          Navigator.pop(context);
+          AppRouter.instance.pushNamed('draftBox');
+        },
+      ),
+    ];
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.35,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'postNew'.tr,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
+          Expanded(
+            child: GridView.count(
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 3,
+              children: actionList
+                  .map((x) => Card(
+                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        child: InkWell(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
+                          onTap: x.onTap,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              x.icon,
+                              const SizedBox(height: 8),
+                              Text(x.label),
+                            ],
+                          ).paddingAll(18),
+                        ),
+                      ))
+                  .toList(),
+            ).paddingSymmetric(horizontal: 20),
           ),
-          onTap: () {
-            AppRouter.instance.pushNamed('postEditor').then((val) {
-              if (val != null && onCreated != null) {
-                onCreated!();
-              }
-            });
-          },
-        ),
-        if (!hideDraftBox)
-          PopupMenuItem(
-            child: ListTile(
-              title: Text('draftBoxOpen'.tr),
-              leading: const Icon(Icons.drafts),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-            ),
-            onTap: () {
-              AppRouter.instance.pushNamed('draftBox');
-            },
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

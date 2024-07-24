@@ -4,7 +4,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
-import 'package:solian/screens/home.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
@@ -64,10 +63,6 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           actions: [
-            FeedCreationButton(
-              hideDraftBox: true,
-              onCreated: () {},
-            ),
             SizedBox(
               width: SolianTheme.isLargeScreen(context) ? 8 : 16,
             ),
