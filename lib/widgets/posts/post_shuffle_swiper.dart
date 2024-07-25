@@ -40,6 +40,9 @@ class _PostShuffleSwiperState extends State<PostShuffleSwiper> {
           return PostSingleDisplay(
             key: Key('p${element.id}'),
             item: element,
+            onUpdate: () {
+              widget.controller.reloadAllOver();
+            },
           );
         },
         padding: const EdgeInsets.all(24),

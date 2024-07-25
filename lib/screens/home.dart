@@ -44,70 +44,66 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Material(
       color: Theme.of(context).colorScheme.surface,
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add),
-            onPressed: () {
-              showModalBottomSheet(
-                useRootNavigator: true,
-                isScrollControlled: true,
-                context: context,
-                builder: (context) => const PostCreatePopup(),
-              );
-            },
-          ),
-          body: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return [
-                SliverAppBar(
-                  title: AppBarTitle('home'.tr),
-                  centerTitle: false,
-                  floating: true,
-                  toolbarHeight: SolianTheme.toolbarHeight(context),
-                  leading: AppBarLeadingButton.adaptive(context),
-                  actions: [
-                    const BackgroundStateWidget(),
-                    const NotificationButton(),
-                    SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                    ),
-                  ],
-                  bottom: TabBar(
-                    controller: _tabController,
-                    tabs: [
-                      Tab(text: 'postListNews'.tr),
-                      Tab(text: 'postListShuffle'.tr),
-                    ],
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            showModalBottomSheet(
+              useRootNavigator: true,
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => const PostCreatePopup(),
+            );
+          },
+        ),
+        body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                title: AppBarTitle('home'.tr),
+                centerTitle: false,
+                floating: true,
+                toolbarHeight: SolianTheme.toolbarHeight(context),
+                leading: AppBarLeadingButton.adaptive(context),
+                actions: [
+                  const BackgroundStateWidget(),
+                  const NotificationButton(),
+                  SizedBox(
+                    width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                   ),
-                )
-              ];
-            },
-            body: Obx(() {
-              if (_postController.isPreparing.isTrue) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              return TabBarView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _tabController,
-                children: [
-                  RefreshIndicator(
-                    onRefresh: () => _postController.reloadAllOver(),
-                    child: CustomScrollView(slivers: [
-                      FeedListWidget(
-                          controller: _postController.pagingController),
-                    ]),
-                  ),
-                  PostShuffleSwiper(controller: _postController),
                 ],
+                bottom: TabBar(
+                  controller: _tabController,
+                  tabs: [
+                    Tab(text: 'postListNews'.tr),
+                    Tab(text: 'postListShuffle'.tr),
+                  ],
+                ),
+              )
+            ];
+          },
+          body: Obx(() {
+            if (_postController.isPreparing.isTrue) {
+              return const Center(
+                child: CircularProgressIndicator(),
               );
-            }),
-          ),
+            }
+
+            return TabBarView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _tabController,
+              children: [
+                RefreshIndicator(
+                  onRefresh: () => _postController.reloadAllOver(),
+                  child: CustomScrollView(slivers: [
+                    FeedListWidget(
+                        controller: _postController.pagingController),
+                  ]),
+                ),
+                PostShuffleSwiper(controller: _postController),
+              ],
+            );
+          }),
         ),
       ),
     );

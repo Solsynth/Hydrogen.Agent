@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/event.dart';
-import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 
 class ChatEventMessage extends StatelessWidget {
@@ -20,66 +19,52 @@ class ChatEventMessage extends StatelessWidget {
     this.isQuote = false,
   });
 
-  Widget buildAttachment(BuildContext context) {
-    final body = EventMessageBody.fromJson(item.body);
-
-    return Container(
-      key: Key('m${item.uuid}attachments-box'),
-      width: MediaQuery.of(context).size.width,
-      constraints: const BoxConstraints(
-        maxHeight: 720,
-        maxWidth: 640,
-      ),
-      child: AttachmentList(
-        key: Key('m${item.uuid}attachments'),
-        parentId: item.uuid,
-        attachmentsId: body.attachments ?? List.empty(),
-        divided: true,
-        viewport: 1,
-      ),
-    );
-  }
-
-  Widget buildContent() {
+  Widget _buildContent(BuildContext context) {
     final body = EventMessageBody.fromJson(item.body);
     final hasAttachment = body.attachments?.isNotEmpty ?? false;
 
-    return MarkdownTextContent(content: body.text).paddingOnly(
-      left: isQuote ? 0 : 12,
-      right: isQuote ? 0 : 12,
-      top: body.quoteEvent == null ? 2 : 0,
-      bottom: hasAttachment ? 4 : (isHasMerged ? 2 : 0),
-    );
+    if (body.text.isEmpty && hasAttachment) {
+      final unFocusColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+      return Row(
+        children: [
+          Icon(
+            Icons.attachment,
+            size: 18,
+            color: unFocusColor,
+          ).paddingOnly(right: 6),
+          Text(
+            'postAttachmentTip'.trParams(
+              {'count': body.attachments?.length.toString() ?? 0.toString()},
+            ),
+            style: TextStyle(color: unFocusColor),
+          )
+        ],
+      );
+    }
+
+    return MarkdownTextContent(content: body.text);
   }
 
-  Widget buildBody(BuildContext context) {
-    final body = EventMessageBody.fromJson(item.body);
-
+  Widget _buildBody(BuildContext context) {
     if (isContentPreviewing) {
-      return buildContent();
+      return _buildContent(context);
     } else if (isMerged) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          buildContent().paddingOnly(left: 52),
-          if (body.attachments?.isNotEmpty ?? false)
-            buildAttachment(context).paddingOnly(left: 52, bottom: 4),
-        ],
-      );
+      return _buildContent(context).paddingOnly(left: 52);
     } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          buildContent(),
-          if (body.attachments?.isNotEmpty ?? false)
-            buildAttachment(context).paddingOnly(bottom: 4),
-        ],
-      );
+      return _buildContent(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return buildBody(context);
+    final body = EventMessageBody.fromJson(item.body);
+    final hasAttachment = body.attachments?.isNotEmpty ?? false;
+
+    return _buildBody(context).paddingOnly(
+      left: isQuote ? 0 : 12,
+      right: isQuote ? 0 : 12,
+      top: body.quoteEvent == null ? 2 : 0,
+      bottom: hasAttachment ? 4 : (isHasMerged ? 2 : 0),
+    );
   }
 }

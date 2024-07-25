@@ -52,15 +52,21 @@ class _PostItemState extends State<PostItem> {
     super.initState();
   }
 
-  Widget buildDate() {
+  Widget _buildDate() {
     if (widget.isFullDate) {
-      return Text(DateFormat('y/M/d H:m').format(item.createdAt.toLocal()));
+      return Text(DateFormat('y/M/d H:m')
+          .format(item.publishedAt?.toLocal() ?? DateTime.now()));
     } else {
-      return Text(format(item.createdAt.toLocal(), locale: 'en_short'));
+      return Text(
+        format(
+          item.publishedAt?.toLocal() ?? DateTime.now(),
+          locale: 'en_short',
+        ),
+      );
     }
   }
 
-  Widget buildHeader() {
+  Widget _buildHeader() {
     return Row(
       children: [
         if (widget.isCompact)
@@ -72,12 +78,12 @@ class _PostItemState extends State<PostItem> {
           item.author.nick,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ).paddingOnly(left: widget.isCompact ? 6 : 12),
-        buildDate().paddingOnly(left: 4),
+        _buildDate().paddingOnly(left: 4),
       ],
     );
   }
 
-  Widget buildFooter() {
+  Widget _buildFooter() {
     List<String> labels = List.empty(growable: true);
     if (widget.item.createdAt != widget.item.updatedAt) {
       labels.add('postEdited'.trParams({
@@ -116,7 +122,7 @@ class _PostItemState extends State<PostItem> {
     }
   }
 
-  Widget buildReply(BuildContext context) {
+  Widget _buildReply(BuildContext context) {
     return Column(
       children: [
         Row(
@@ -148,7 +154,7 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
-  Widget buildRepost(BuildContext context) {
+  Widget _buildRepost(BuildContext context) {
     return Column(
       children: [
         Row(
@@ -191,7 +197,7 @@ class _PostItemState extends State<PostItem> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildHeader().paddingSymmetric(horizontal: 12),
+          _buildHeader().paddingSymmetric(horizontal: 12),
           MarkdownTextContent(
             content: item.body['content'],
             isSelectable: widget.isContentSelectable,
@@ -201,7 +207,7 @@ class _PostItemState extends State<PostItem> {
             top: 2,
             bottom: hasAttachment ? 4 : 0,
           ),
-          buildFooter().paddingOnly(left: 16),
+          _buildFooter().paddingOnly(left: 16),
           if (attachments.isNotEmpty)
             Row(
               children: [
@@ -246,14 +252,14 @@ class _PostItemState extends State<PostItem> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  buildHeader(),
+                  _buildHeader(),
                   MarkdownTextContent(
                     content: item.body['content'],
                     isSelectable: widget.isContentSelectable,
                   ).paddingOnly(left: 12, right: 8),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
-                      child: buildReply(context).paddingOnly(top: 4),
+                      child: _buildReply(context).paddingOnly(top: 4),
                       onTap: () {
                         if (!widget.isClickable) return;
                         AppRouter.instance.pushNamed(
@@ -266,7 +272,7 @@ class _PostItemState extends State<PostItem> {
                     ),
                   if (widget.item.repostTo != null && widget.isShowEmbed)
                     GestureDetector(
-                      child: buildRepost(context).paddingOnly(top: 4),
+                      child: _buildRepost(context).paddingOnly(top: 4),
                       onTap: () {
                         if (!widget.isClickable) return;
                         AppRouter.instance.pushNamed(
@@ -277,7 +283,7 @@ class _PostItemState extends State<PostItem> {
                         );
                       },
                     ),
-                  buildFooter().paddingOnly(left: 12),
+                  _buildFooter().paddingOnly(left: 12),
                 ],
               ),
             )
@@ -297,7 +303,7 @@ class _PostItemState extends State<PostItem> {
           child: AttachmentList(
             parentId: widget.item.id.toString(),
             attachmentsId: attachments,
-            divided: true,
+            isGrid: attachments.length > 1,
           ),
         ),
         if (widget.isShowReply && widget.isReactable)

@@ -1,3 +1,4 @@
+import 'dart:math' show min;
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -11,7 +12,7 @@ import 'package:solian/widgets/attachments/attachment_list_fullscreen.dart';
 class AttachmentList extends StatefulWidget {
   final String parentId;
   final List<int> attachmentsId;
-  final bool divided;
+  final bool isGrid;
 
   final double? width;
   final double? viewport;
@@ -20,7 +21,7 @@ class AttachmentList extends StatefulWidget {
     super.key,
     required this.parentId,
     required this.attachmentsId,
-    this.divided = false,
+    this.isGrid = false,
     this.width,
     this.viewport,
   });
@@ -101,12 +102,43 @@ class _AttachmentListState extends State<AttachmentList> {
     }
   }
 
-  Widget buildEntry(Attachment element, int idx) {
+  Widget _buildEntry(Attachment? element, int idx) {
+    if (element == null) {
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 280),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.close, size: 32),
+              const SizedBox(height: 8),
+              Text(
+                'attachmentLoadFailed'.tr,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(
+                'attachmentLoadFailedCaption'.tr,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return GestureDetector(
       child: Container(
         width: widget.width ?? MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          border: widget.attachmentsId.length > 1
+              ? Border.symmetric(
+                  vertical: BorderSide(
+                    width: 0.3,
+                    color: Theme.of(context).dividerColor,
+                  ),
+                )
+              : null,
         ),
         child: Stack(
           fit: StackFit.expand,
@@ -115,7 +147,7 @@ class _AttachmentListState extends State<AttachmentList> {
               parentId: widget.parentId,
               key: Key('a${element.uuid}'),
               item: element,
-              badge: _attachmentsMeta.length > 1
+              badge: _attachmentsMeta.length > 1 && !widget.isGrid
                   ? '${idx + 1}/${_attachmentsMeta.length}'
                   : null,
               showHideButton: !element.isMature || _showMature,
@@ -139,15 +171,19 @@ class _AttachmentListState extends State<AttachmentList> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.visibility_off,
-                          color: Colors.white, size: 32),
+                      const Icon(
+                        Icons.visibility_off,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                       const SizedBox(height: 8),
                       Text(
                         'matureContent'.tr,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       Text(
                         'matureContentCaption'.tr,
@@ -193,62 +229,65 @@ class _AttachmentListState extends State<AttachmentList> {
     if (_isLoading) {
       return Container(
         decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHigh),
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        ),
         child: const LinearProgressIndicator(),
       );
     }
 
-    return CarouselSlider.builder(
-      options: CarouselOptions(
-        aspectRatio: _aspectRatio,
-        viewportFraction: widget.viewport ?? (widget.divided ? 0.9 : 1),
-        enableInfiniteScroll: false,
-      ),
-      itemCount: _attachmentsMeta.length,
-      itemBuilder: (context, idx, _) {
-        final element = _attachmentsMeta[idx];
-
-        if (element == null) {
-          return Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 280),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.close, size: 32),
-                  const SizedBox(height: 8),
-                  Text(
-                    'attachmentLoadFailed'.tr,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    'attachmentLoadFailedCaption'.tr,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        if (widget.divided) {
-          const radius = BorderRadius.all(Radius.circular(16));
+    if (widget.isGrid) {
+      const radius = BorderRadius.all(Radius.circular(8));
+      return GridView.builder(
+        padding: EdgeInsets.zero,
+        primary: false,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: min(3, widget.attachmentsId.length),
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+        ),
+        itemCount: widget.attachmentsId.length,
+        itemBuilder: (context, idx) {
+          final element = _attachmentsMeta[idx];
           return Container(
             decoration: BoxDecoration(
               border:
-                  Border.all(color: Theme.of(context).dividerColor, width: 1),
+              Border.all(color: Theme.of(context).dividerColor, width: 1),
               borderRadius: radius,
             ),
             child: ClipRRect(
               borderRadius: radius,
-              child: buildEntry(element, idx),
-            ),
-          ).paddingSymmetric(horizontal: widget.divided ? 4 : 0);
-        } else {
-          return buildEntry(element, idx);
-        }
-      },
+              child: _buildEntry(element, idx),
+            )
+          );
+        },
+      ).paddingSymmetric(horizontal: 24);
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        border: Border.symmetric(
+          horizontal: BorderSide(
+            width: 0.3,
+            color: Theme.of(context).dividerColor,
+          ),
+        ),
+      ),
+      child: CarouselSlider.builder(
+        options: CarouselOptions(
+          aspectRatio: _aspectRatio,
+          viewportFraction:
+              widget.viewport ?? (widget.attachmentsId.length > 1 ? 0.95 : 1),
+          enableInfiniteScroll: false,
+        ),
+        itemCount: _attachmentsMeta.length,
+        itemBuilder: (context, idx, _) {
+          final element = _attachmentsMeta[idx];
+          return _buildEntry(element, idx);
+        },
+      ),
     );
   }
 }

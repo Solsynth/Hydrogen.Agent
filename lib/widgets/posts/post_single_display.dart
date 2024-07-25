@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/widgets/posts/post_item.dart';
+import 'package:solian/widgets/posts/post_list.dart';
 
 class PostSingleDisplay extends StatelessWidget {
   final Post item;
+  final Function onUpdate;
 
-  const PostSingleDisplay({super.key, required this.item});
+  const PostSingleDisplay({
+    super.key,
+    required this.item,
+    required this.onUpdate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +18,13 @@ class PostSingleDisplay extends StatelessWidget {
       alignment: Alignment.center,
       child: Card(
         child: SingleChildScrollView(
-          child: PostItem(
+          child: PostListEntryWidget(
             item: item,
-          ).paddingSymmetric(horizontal: 10, vertical: 16),
+            isClickable: true,
+            isShowEmbed: true,
+            isNestedClickable: true,
+            onUpdate: onUpdate,
+          ),
         ),
       ),
     );

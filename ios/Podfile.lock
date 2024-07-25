@@ -107,7 +107,7 @@ PODS:
     - GoogleUtilities/Privacy
   - image_picker_ios (0.0.1):
     - Flutter
-  - livekit_client (2.2.1):
+  - livekit_client (2.2.2):
     - Flutter
     - WebRTC-SDK (= 125.6422.04)
   - media_kit_libs_ios_video (1.0.4):
@@ -138,11 +138,11 @@ PODS:
   - SDWebImage (5.19.4):
     - SDWebImage/Core (= 5.19.4)
   - SDWebImage/Core (5.19.4)
-  - Sentry/HybridSDK (8.30.1)
-  - sentry_flutter (8.4.0):
+  - Sentry/HybridSDK (8.32.0)
+  - sentry_flutter (8.5.0):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.30.1)
+    - Sentry/HybridSDK (= 8.32.0)
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
@@ -268,7 +268,7 @@ SPEC CHECKSUMS:
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
-  livekit_client: 411d387fd6f993851081069afbe7f04a8e974f1b
+  livekit_client: c767049a635d5b6d43de3273dca3c439b8a6e970
   media_kit_libs_ios_video: a5fe24bc7875ccd6378a0978c13185e1344651c1
   media_kit_native_event_loop: e6b2ab20cf0746eb1c33be961fcf79667304fa2a
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
@@ -281,8 +281,8 @@ SPEC CHECKSUMS:
   protocol_handler_ios: a5db8abc38526ee326988b808be621e5fd568990
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
   SDWebImage: 066c47b573f408f18caa467d71deace7c0f8280d
-  Sentry: 514a3ea653886e9a48c6287d8b7bf05ec24bf3be
-  sentry_flutter: edc037f7af0dc1512d6c33a5c2c7c838bd0d6806
+  Sentry: 96ae1dcdf01a644bc3a3b1dc279cecaf48a833fb
+  sentry_flutter: f1d86adcb93a959bc47a40d8d55059bdf7569bc5
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe

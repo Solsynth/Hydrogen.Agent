@@ -5,6 +5,7 @@ import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
+import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/chat/chat_event_action_log.dart';
 import 'package:solian/widgets/chat/chat_event_message.dart';
 import 'package:timeago/timeago.dart' show format;
@@ -36,7 +37,30 @@ class ChatEvent extends StatelessWidget {
     return '$negativeSign${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
   }
 
-  Widget buildQuote() {
+  Widget _buildAttachment(BuildContext context) {
+    final attachments = item.body['attachments'] != null
+        ? List<int>.from(item.body['attachments'].map((x) => x))
+        : List<int>.empty();
+
+    if (attachments.isEmpty) return const SizedBox();
+
+    return Container(
+      key: Key('m${item.uuid}attachments-box'),
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.only(top: isMerged ? 0 : 4),
+      constraints: const BoxConstraints(
+        maxHeight: 720,
+      ),
+      child: AttachmentList(
+        key: Key('m${item.uuid}attachments'),
+        parentId: item.uuid,
+        attachmentsId: attachments,
+        viewport: 1,
+      ),
+    );
+  }
+
+  Widget _buildQuote() {
     return FutureBuilder(
       future: chatController!.getEvent(
         item.body['quote_event'],
@@ -55,7 +79,7 @@ class ChatEvent extends StatelessWidget {
     );
   }
 
-  Widget buildContent() {
+  Widget _buildContent() {
     switch (item.type) {
       case 'messages.new':
         return ChatEventMessage(
@@ -121,17 +145,17 @@ class ChatEvent extends StatelessWidget {
     }
   }
 
-  Widget buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context) {
     if (isContentPreviewing || (isMerged && !isQuote)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (item.body['quote_event'] != null && chatController != null)
-            buildQuote(),
+            _buildQuote(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(child: buildContent()),
+              Expanded(child: _buildContent()),
               if (item.isPending)
                 const SizedBox(
                   width: 12,
@@ -139,9 +163,10 @@ class ChatEvent extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
             ],
-          ),
+          ).paddingOnly(right: 12),
+          _buildAttachment(context),
         ],
-      ).paddingOnly(right: 12);
+      );
     } else if (isQuote) {
       return Card(
         child: Row(
@@ -170,7 +195,7 @@ class ChatEvent extends StatelessWidget {
                       Text(format(item.createdAt, locale: 'en_short')),
                     ],
                   ),
-                  buildContent().paddingOnly(left: 0.5),
+                  _buildContent().paddingOnly(left: 0.5),
                 ],
               ),
             ),
@@ -214,11 +239,11 @@ class ChatEvent extends StatelessWidget {
                     ).paddingSymmetric(horizontal: 12),
                     if (item.body['quote_event'] != null &&
                         chatController != null)
-                      buildQuote(),
+                      _buildQuote(),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(child: buildContent()),
+                        Expanded(child: _buildContent()),
                         if (item.isPending)
                           const SizedBox(
                             width: 12,
@@ -232,6 +257,7 @@ class ChatEvent extends StatelessWidget {
               ),
             ],
           ).paddingSymmetric(horizontal: 12),
+          _buildAttachment(context),
         ],
       );
     }
@@ -239,6 +265,6 @@ class ChatEvent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return buildBody(context);
+    return _buildBody(context);
   }
 }
