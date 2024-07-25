@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:solian/models/pagination.dart';
-import 'package:solian/models/post.dart';
+import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/posts.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
@@ -22,48 +19,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  final PagingController<int, Post> _pagingController =
-      PagingController(firstPageKey: 0);
+  final PostListController _postController = PostListController();
 
   late final TabController _tabController;
-
-  int mode = 0;
-
-  getPosts(int pageKey) async {
-    final PostProvider provider = Get.find();
-
-    Response resp;
-    try {
-      resp = await provider.listRecommendations(
-        pageKey,
-        channel: mode == 0 ? null : 'shuffle',
-      );
-    } catch (e) {
-      _pagingController.error = e;
-      return;
-    }
-
-    final PaginationResult result = PaginationResult.fromJson(resp.body);
-    final parsed = result.data?.map((e) => Post.fromJson(e)).toList();
-    if (parsed != null && parsed.length >= 10) {
-      _pagingController.appendPage(parsed, pageKey + parsed.length);
-    } else if (parsed != null) {
-      _pagingController.appendLastPage(parsed);
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _pagingController.addPageRequestListener(getPosts);
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       switch (_tabController.index) {
         case 0:
         case 1:
-          if (mode == _tabController.index) break;
-          mode = _tabController.index;
-          _pagingController.refresh();
+          if (_postController.mode.value == _tabController.index) break;
+          _postController.mode.value = _tabController.index;
+          _postController.reloadAllOver();
       }
     });
   }
@@ -84,46 +54,45 @@ class _HomeScreenState extends State<HomeScreen>
             );
           },
         ),
-        body: RefreshIndicator(
-          onRefresh: () => Future.sync(() => _pagingController.refresh()),
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return [
-                SliverAppBar(
-                  title: AppBarTitle('home'.tr),
-                  centerTitle: false,
-                  floating: true,
-                  toolbarHeight: SolianTheme.toolbarHeight(context),
-                  leading: AppBarLeadingButton.adaptive(context),
-                  actions: [
-                    const BackgroundStateWidget(),
-                    const NotificationButton(),
-                    SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
-                    ),
-                  ],
-                  bottom: TabBar(
-                    controller: _tabController,
-                    tabs: [
-                      Tab(text: 'postListNews'.tr),
-                      Tab(text: 'postListShuffle'.tr),
-                    ],
+        body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return [
+              SliverAppBar(
+                title: AppBarTitle('home'.tr),
+                centerTitle: false,
+                floating: true,
+                toolbarHeight: SolianTheme.toolbarHeight(context),
+                leading: AppBarLeadingButton.adaptive(context),
+                actions: [
+                  const BackgroundStateWidget(),
+                  const NotificationButton(),
+                  SizedBox(
+                    width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                   ),
-                )
-              ];
-            },
-            body: TabBarView(
-              controller: _tabController,
-              children: [
-                CustomScrollView(slivers: [
-                  FeedListWidget(controller: _pagingController),
+                ],
+                bottom: TabBar(
+                  controller: _tabController,
+                  tabs: [
+                    Tab(text: 'postListNews'.tr),
+                    Tab(text: 'postListShuffle'.tr),
+                  ],
+                ),
+              )
+            ];
+          },
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              RefreshIndicator(
+                onRefresh: () => _postController.reloadAllOver(),
+                child: CustomScrollView(slivers: [
+                  FeedListWidget(controller: _postController.pagingController),
                 ]),
-                CustomScrollView(slivers: [
-                  FeedListWidget(controller: _pagingController),
-                ]),
-              ],
-            ),
+              ),
+              CustomScrollView(slivers: [
+                FeedListWidget(controller: _postController.pagingController),
+              ]),
+            ],
           ),
         ),
       ),
@@ -132,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
-    _pagingController.dispose();
+    _postController.dispose();
     super.dispose();
   }
 }

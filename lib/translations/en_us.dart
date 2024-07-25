@@ -95,7 +95,7 @@ const messagesEnglish = {
   'postEdited': 'Edited at @date',
   'postNewCreated': 'Created at @date',
   'postAttachmentTip': '@count attachment(s)',
-  'postInRealm': 'In realm @realm',
+  'postInRealm': 'In @realm',
   'postDetail': 'Post',
   'postReplies': 'Replies',
   'postPublish': 'Post a post',

@@ -86,7 +86,7 @@ class _PostItemState extends State<PostItem> {
     }
     if (widget.item.realm != null) {
       labels.add('postInRealm'.trParams({
-        'realm': '#${widget.item.realm!.id}',
+        'realm': widget.item.realm!.alias,
       }));
     }
 

@@ -105,7 +105,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   void syncWidget() {
     if (widget.edit != null) {
       _contentController.text = widget.edit!.body['content'];
-      _attachments = widget.edit!.body['attachments'] ?? List.empty();
+      _attachments = widget.edit!.body['attachments']?.cast<int>() ?? List.empty();
       _isDraft = widget.edit!.isDraft ?? false;
     }
   }
