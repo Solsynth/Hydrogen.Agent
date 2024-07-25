@@ -2,10 +2,9 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/providers/content/posts.dart';
 
-import '../providers/content/posts.dart';
-
-class PostListController {
+class PostListController extends GetxController {
   /// The polling source modifier.
   /// - `0`: default recommendations
   /// - `1`: shuffle mode
@@ -46,14 +45,25 @@ class PostListController {
   }
 
   RxBool isBusy = false.obs;
+  RxBool isPreparing = false.obs;
 
+  RxInt focusCursor = 0.obs;
+  Post get focusPost => postList[focusCursor.value];
+
+  RxInt postTotal = 0.obs;
   RxList<Post> postList = RxList.empty(growable: true);
+
   RxInt nextPageKey = 0.obs;
   RxBool hasMore = true.obs;
 
   Future<void> reloadAllOver() async {
+    isPreparing.value = true;
+
+    focusCursor.value = 0;
     nextPageKey.value = 0;
+    postList.clear();
     hasMore.value = true;
+
     _resetPagingController();
     final result = await loadMore();
     if (result != null && hasMore.value) {
@@ -62,18 +72,25 @@ class PostListController {
       pagingController.appendLastPage(result);
     }
     _initPagingController();
+
+    isPreparing.value = false;
   }
 
   Future<List<Post>?> loadMore() async {
     final result = await _loadPosts(nextPageKey.value);
 
     if (result != null && result.length >= 10) {
-      nextPageKey.value = nextPageKey.value + result.length;
+      postList.addAll(result);
+      nextPageKey.value += result.length;
       hasMore.value = true;
     } else if (result != null) {
-      nextPageKey.value = nextPageKey.value + result.length;
+      postList.addAll(result);
+      nextPageKey.value += result.length;
       hasMore.value = false;
     }
+
+    final idx = <dynamic>{};
+    postList.retainWhere((x) => idx.add(x.id));
 
     return result;
   }
@@ -98,12 +115,14 @@ class PostListController {
     final PaginationResult result = PaginationResult.fromJson(resp.body);
     final out = result.data?.map((e) => Post.fromJson(e)).toList();
 
-    if (out != null) postList.addAll(out.cast<Post>());
+    postTotal.value = result.count;
 
     return out;
   }
 
+  @override
   void dispose() {
     pagingController.dispose();
+    super.dispose();
   }
 }

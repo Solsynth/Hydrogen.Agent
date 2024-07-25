@@ -182,7 +182,10 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-    final hasAttachment = item.body['attachments']?.isNotEmpty ?? false;
+    final List<int> attachments = item.body['attachments'] is List
+        ? item.body['attachments']?.cast<int>()
+        : List.empty();
+    final hasAttachment = attachments.isNotEmpty;
 
     if (widget.isCompact) {
       return Column(
@@ -199,7 +202,7 @@ class _PostItemState extends State<PostItem> {
             bottom: hasAttachment ? 4 : 0,
           ),
           buildFooter().paddingOnly(left: 16),
-          if (item.body['attachments']?.isNotEmpty ?? false)
+          if (attachments.isNotEmpty)
             Row(
               children: [
                 Icon(
@@ -209,7 +212,7 @@ class _PostItemState extends State<PostItem> {
                 ).paddingOnly(right: 6),
                 Text(
                   'postAttachmentTip'.trParams(
-                    {'count': item.body['attachments']!.length.toString()},
+                    {'count': attachments.length.toString()},
                   ),
                   style: TextStyle(color: _unFocusColor),
                 )
@@ -293,8 +296,7 @@ class _PostItemState extends State<PostItem> {
           ),
           child: AttachmentList(
             parentId: widget.item.id.toString(),
-            attachmentsId:
-                item.body['attachments']?.cast<int>() ?? List.empty(),
+            attachmentsId: attachments,
             divided: true,
           ),
         ),
