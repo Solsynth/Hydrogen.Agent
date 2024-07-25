@@ -26,7 +26,7 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
 
     Response resp;
     try {
-      resp = await provider.listRecommendations(
+      resp = await provider.listPost(
         pageKey,
         tag: widget.tag,
         category: widget.category,
