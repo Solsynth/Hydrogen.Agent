@@ -7,6 +7,7 @@ class FeedListWidget extends StatelessWidget {
   final bool isShowEmbed;
   final bool isClickable;
   final bool isNestedClickable;
+  final bool isPinned;
   final PagingController<int, Post> controller;
 
   const FeedListWidget({
@@ -15,6 +16,7 @@ class FeedListWidget extends StatelessWidget {
     this.isShowEmbed = true,
     this.isClickable = true,
     this.isNestedClickable = true,
+    this.isPinned = true,
   });
 
   @override
@@ -24,6 +26,9 @@ class FeedListWidget extends StatelessWidget {
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
+          if (item.pinnedAt != null && !isPinned) {
+            return const SizedBox();
+          }
           return PostListEntryWidget(
             isShowEmbed: isShowEmbed,
             isNestedClickable: isNestedClickable,

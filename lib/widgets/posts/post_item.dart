@@ -112,6 +112,12 @@ class _PostItemState extends State<PostItem> {
         ),
       ));
     }
+    if (widget.item.pinnedAt != null) {
+      widgets.add(Text(
+        'postPinned'.tr,
+        style: TextStyle(fontSize: 12, color: _unFocusColor),
+      ));
+    }
 
     if (widgets.isEmpty) {
       return const SizedBox();

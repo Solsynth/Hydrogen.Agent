@@ -6,16 +6,17 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
+import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
+import 'package:solian/widgets/posts/post_list.dart';
 import 'package:solian/widgets/sized_container.dart';
-
-import '../../widgets/attachments/attachment_list.dart';
 
 class AccountProfilePage extends StatefulWidget {
   final String name;
@@ -35,20 +36,44 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   bool _showMature = false;
 
   Account? _userinfo;
+  List<Post> _pinnedPosts = List.empty();
+  int _totalUpvote = 0, _totalDownvote = 0;
 
   Future<void> getUserinfo() async {
     setState(() => _isBusy = true);
 
-    final client = ServiceFinder.configureClient('auth');
-    final resp = await client.get('/users/${widget.name}');
-    if (resp.statusCode == 200) {
-      _userinfo = Account.fromJson(resp.body);
-      setState(() => _isBusy = false);
-    } else {
+    var client = ServiceFinder.configureClient('auth');
+    var resp = await client.get('/users/${widget.name}');
+    if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
         Navigator.pop(context);
       });
+    } else {
+      _userinfo = Account.fromJson(resp.body);
     }
+
+    client = ServiceFinder.configureClient('interactive');
+    resp = await client.get('/users/${widget.name}');
+    if (resp.statusCode != 200) {
+      context.showErrorDialog(resp.bodyString).then((_) {
+        Navigator.pop(context);
+      });
+    } else {
+      _totalUpvote = resp.body['total_upvote'];
+      _totalDownvote = resp.body['total_downvote'];
+    }
+
+    resp = await client.get('/users/${widget.name}/pin');
+    if (resp.statusCode != 200) {
+      context.showErrorDialog(resp.bodyString).then((_) {
+        Navigator.pop(context);
+      });
+    } else {
+      _pinnedPosts =
+          resp.body.map((x) => Post.fromJson(x)).toList().cast<Post>();
+    }
+
+    setState(() => _isBusy = false);
   }
 
   @override
@@ -144,12 +169,68 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
               RefreshIndicator(
                 onRefresh: () => _postController.reloadAllOver(),
                 child: CustomScrollView(slivers: [
+                  SliverToBoxAdapter(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              'totalUpvote'.tr,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Text(
+                              _totalUpvote.toString(),
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              'totalDownvote'.tr,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Text(
+                              _totalDownvote.toString(),
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ).paddingOnly(top: 16, bottom: 12),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: Divider(thickness: 0.3, height: 0.3),
+                  ),
+                  SliverList.separated(
+                    itemCount: _pinnedPosts.length,
+                    itemBuilder: (context, idx) {
+                      final element = _pinnedPosts[idx];
+                      return Material(
+                        color:
+                            Theme.of(context).colorScheme.surfaceContainerLow,
+                        child: PostListEntryWidget(
+                          item: element,
+                          isClickable: true,
+                          isNestedClickable: true,
+                          isShowEmbed: true,
+                          onUpdate: () {
+                            _postController.reloadAllOver();
+                          },
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, idx) =>
+                        const Divider(thickness: 0.3, height: 0.3),
+                  ),
                   if (_userinfo == null)
                     const SliverFillRemaining(
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   if (_userinfo != null)
                     FeedListWidget(
+                      isPinned: false,
                       controller: _postController.pagingController,
                     ),
                 ]),

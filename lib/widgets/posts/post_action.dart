@@ -31,7 +31,8 @@ class _PostActionState extends State<PostAction> {
     setState(() => _isBusy = true);
 
     setState(() {
-      _canModifyContent = auth.userProfile.value!['id'] == widget.item.author.externalId;
+      _canModifyContent =
+          auth.userProfile.value!['id'] == widget.item.author.externalId;
       _isBusy = false;
     });
   }
@@ -98,6 +99,21 @@ class _PostActionState extends State<PostAction> {
                 if (_canModifyContent && !widget.noReact)
                   const Divider(thickness: 0.3, height: 0.3)
                       .paddingSymmetric(vertical: 16),
+                if (_canModifyContent)
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                    leading: const Icon(Icons.push_pin),
+                    title: Text(
+                      widget.item.pinnedAt == null
+                          ? 'pinPost'.tr
+                          : 'unpinPost'.tr,
+                    ),
+                    onTap: () async {
+                      final client = Get.find<AuthProvider>().configureClient('interactive');
+                      await client.post('/posts/${widget.item.id}/pin', {});
+                      Navigator.pop(context, true);
+                    },
+                  ),
                 if (_canModifyContent)
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 24),
