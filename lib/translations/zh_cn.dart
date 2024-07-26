@@ -255,4 +255,10 @@ const simplifiedChineseMessages = {
   'accountStatusNegative': '负面',
   'accountStatusNeutral': '中性',
   'accountStatusPositive': '积极',
+  'bsCheckingServer': '检查服务器状态中',
+  'bsCheckingServerFail': '无法连接至服务器，请检查你的网络状态或我们服务维护状态',
+  'bsAuthorizing': '正在授权中',
+  'bsEstablishingConn': '部署连接中',
+  'bsPreparingData': '正在准备用户资料',
+  'bsRegisteringPushNotify': '正在启用推送通知',
 };

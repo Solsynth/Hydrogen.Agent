@@ -276,4 +276,10 @@ const messagesEnglish = {
   'accountStatusNegative': 'Negative',
   'accountStatusNeutral': 'Neutral',
   'accountStatusPositive': 'Positive',
+  'bsCheckingServer': 'Checking Server Status',
+  'bsCheckingServerFail': 'Unable connect to server, check your network connection or follow our service maintenance status',
+  'bsAuthorizing': 'Authorizing',
+  'bsEstablishingConn': 'Establishing Connection',
+  'bsPreparingData': 'Preparing User Data',
+  'bsRegisteringPushNotify': 'Enabling Push Notifications',
 };

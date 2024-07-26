@@ -15,7 +15,7 @@ abstract class ServiceFinder {
     } else if (serviceName == 'passport') {
       return '$passportUrl$append';
     }
-    return '$dealerUrl/srv/$serviceName$append';
+    return '$dealerUrl/cgi/$serviceName$append';
   }
 
   static GetConnect configureClient(String serviceName,

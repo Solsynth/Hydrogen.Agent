@@ -42,7 +42,7 @@ class WebSocketProvider extends GetxController {
     super.onInit();
   }
 
-  void connect({noRetry = false}) async {
+  Future<void> connect({noRetry = false}) async {
     if (isConnected.value) {
       return;
     } else {

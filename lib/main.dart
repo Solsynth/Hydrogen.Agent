@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:solian/exts.dart';
+import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/websocket.dart';
@@ -87,7 +87,9 @@ class SolianApp extends StatelessWidget {
       builder: (context, child) {
         return SystemShell(
           child: ScaffoldMessenger(
-            child: child ?? const SizedBox(),
+            child: BootstrapperShell(
+              child: child ?? const SizedBox(),
+            ),
           ),
         );
       },
@@ -104,23 +106,5 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => ChannelProvider());
     Get.lazyPut(() => RealmProvider());
     Get.lazyPut(() => ChatCallProvider());
-
-    final AuthProvider auth = Get.find();
-
-    auth.refreshAuthorizeStatus().then((_) {
-      if (auth.isAuthorized.isFalse) return;
-
-      Get.find<WebSocketProvider>().connect();
-      Get.find<ChannelProvider>().refreshAvailableChannel();
-      Get.find<RelationshipProvider>().refreshFriendList();
-
-      try {
-        Get.find<WebSocketProvider>().registerPushNotifications();
-      } catch (err) {
-        context.showSnackbar(
-          'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),
-        );
-      }
-    });
   }
 }
