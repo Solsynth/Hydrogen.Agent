@@ -1,5 +1,11 @@
+import 'dart:math' as math;
+
+import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
 
 class AttachmentListFullScreen extends StatefulWidget {
@@ -15,6 +21,30 @@ class AttachmentListFullScreen extends StatefulWidget {
 }
 
 class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
+  bool _showDetails = true;
+
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
+  String _formatBytes(int bytes, {int decimals = 2}) {
+    if (bytes == 0) return '0 Bytes';
+    const k = 1024;
+    final dm = decimals < 0 ? 0 : decimals;
+    final sizes = [
+      'Bytes',
+      'KiB',
+      'MiB',
+      'GiB',
+      'TiB',
+      'PiB',
+      'EiB',
+      'ZiB',
+      'YiB'
+    ];
+    final i = (math.log(bytes) / math.log(k)).floor().toInt();
+    return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -22,28 +52,131 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return DismissiblePage(
+      key: Key('attachment-dismissible${widget.attachment.id}'),
+      direction: DismissiblePageDismissDirection.multi,
+      onDismissed: () => Navigator.pop(context),
+      dismissThresholds: const {
+        DismissiblePageDismissDirection.multi: 0.05,
+      },
       child: GestureDetector(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: InteractiveViewer(
-            boundaryMargin: const EdgeInsets.all(128),
-            minScale: 0.1,
-            maxScale: 16,
-            panEnabled: true,
-            scaleEnabled: true,
-            child: AttachmentItem(
-              parentId: widget.parentId,
-              showHideButton: false,
-              item: widget.attachment,
-              fit: BoxFit.contain,
+        child: Stack(
+          fit: StackFit.loose,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: InteractiveViewer(
+                boundaryMargin: EdgeInsets.zero,
+                minScale: 1,
+                maxScale: 16,
+                panEnabled: false,
+                scaleEnabled: true,
+                child: AttachmentItem(
+                  parentId: widget.parentId,
+                  showHideButton: false,
+                  item: widget.attachment,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
-          ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 300,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+                  ),
+                ),
+              ),
+            )
+                .animate(target: _showDetails ? 1 : 0)
+                .fadeIn(curve: Curves.fastEaseInToSlowEaseOut),
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom,
+              left: 16,
+              right: 16,
+              child: Material(
+                color: Colors.transparent,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.attachment.account != null)
+                      Row(
+                        children: [
+                          AccountAvatar(
+                            content: widget.attachment.account!.avatar,
+                            radius: 19,
+                          ),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'attachmentUploadBy'.tr,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              Text(
+                                widget.attachment.account!.nick,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.attachment.alt,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Wrap(
+                      spacing: 6,
+                      children: [
+                        if (widget.attachment.metadata?['width'] != null &&
+                            widget.attachment.metadata?['height'] != null)
+                          Text(
+                            '${widget.attachment.metadata?['width']}x${widget.attachment.metadata?['height']}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _unFocusColor,
+                            ),
+                          ),
+                        if (widget.attachment.metadata?['ratio'] != null)
+                          Text(
+                            '${(widget.attachment.metadata?['ratio'] as double).toPrecision(2)}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _unFocusColor,
+                            ),
+                          ),
+                        Text(
+                          _formatBytes(widget.attachment.size),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _unFocusColor,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )
+                .animate(target: _showDetails ? 1 : 0)
+                .fadeIn(curve: Curves.fastEaseInToSlowEaseOut),
+          ],
         ),
         onTap: () {
-          Navigator.pop(context);
+          setState(() => _showDetails = !_showDetails);
         },
       ),
     );

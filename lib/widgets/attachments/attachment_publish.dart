@@ -191,7 +191,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     }
   }
 
-  String formatBytes(int bytes, {int decimals = 2}) {
+  String _formatBytes(int bytes, {int decimals = 2}) {
     if (bytes == 0) return '0 Bytes';
     const k = 1024;
     final dm = decimals < 0 ? 0 : decimals;
@@ -353,7 +353,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
                                                 fontFamily: 'monospace'),
                                           ),
                                           Text(
-                                            '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${formatBytes(element.size)}',
+                                            '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${_formatBytes(element.size)}',
                                             style:
                                                 const TextStyle(fontSize: 12),
                                           ),

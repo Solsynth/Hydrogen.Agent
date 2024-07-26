@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
-import 'package:mutex/mutex.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
@@ -55,7 +54,6 @@ class AuthProvider extends GetConnect {
   static const storage = FlutterSecureStorage();
 
   TokenSet? credentials;
-  Mutex credentialsRefreshMutex = Mutex();
 
   @override
   void onInit() {
@@ -66,9 +64,17 @@ class AuthProvider extends GetConnect {
     });
   }
 
+  Completer<void>? _refreshCompleter;
+
   Future<void> refreshCredentials() async {
+    if (_refreshCompleter != null) {
+      await _refreshCompleter!.future;
+      return;
+    } else {
+      _refreshCompleter = Completer<void>();
+    }
+
     try {
-      credentialsRefreshMutex.acquire();
       if (!credentials!.isExpired) return;
       final resp = await post('/auth/token', {
         'refresh_token': credentials!.refreshToken,
@@ -86,10 +92,13 @@ class AuthProvider extends GetConnect {
         key: 'auth_credentials',
         value: jsonEncode(credentials!.toJson()),
       );
-    } catch (_) {
+      _refreshCompleter!.complete();
+      log('Refreshed credentials at ${DateTime.now()}');
+    } catch (e) {
+      _refreshCompleter!.completeError(e);
       rethrow;
     } finally {
-      credentialsRefreshMutex.release();
+      _refreshCompleter = null;
     }
   }
 
@@ -124,7 +133,6 @@ class AuthProvider extends GetConnect {
 
     if (credentials!.isExpired) {
       await refreshCredentials();
-      log('Refreshed credentials at ${DateTime.now()}');
     }
   }
 

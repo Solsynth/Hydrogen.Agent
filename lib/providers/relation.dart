@@ -18,7 +18,7 @@ class RelationshipProvider extends GetxController {
   bool hasFriend(Account account) {
     final auth = Get.find<AuthProvider>();
     if (auth.userProfile.value!['id'] == account.id) return true;
-    return _friends.any((x) => x.id == account.id);
+    return _friends.any((x) => x.relatedId == account.id);
   }
 
   Future<Response> listRelation() {

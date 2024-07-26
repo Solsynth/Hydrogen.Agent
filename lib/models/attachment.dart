@@ -1,3 +1,5 @@
+import 'package:solian/models/account.dart';
+
 class Attachment {
   int id;
   DateTime createdAt;
@@ -13,7 +15,8 @@ class Attachment {
   String destination;
   Map<String, dynamic>? metadata;
   bool isMature;
-  int accountId;
+  Account? account;
+  int? accountId;
 
   Attachment({
     required this.id,
@@ -30,6 +33,7 @@ class Attachment {
     required this.destination,
     required this.metadata,
     required this.isMature,
+    required this.account,
     required this.accountId,
   });
 
@@ -48,6 +52,7 @@ class Attachment {
     destination: json['destination'],
     metadata: json['metadata'],
     isMature: json['is_mature'],
+    account: json['account'] != null ? Account.fromJson(json['account']) : null,
     accountId: json['account_id'],
   );
 
@@ -66,6 +71,7 @@ class Attachment {
     'destination': destination,
     'metadata': metadata,
     'is_mature': isMature,
+    'account': account?.toJson(),
     'account_id': accountId,
   };
 }

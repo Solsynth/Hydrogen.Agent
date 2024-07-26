@@ -2,6 +2,7 @@ import 'dart:math' show min;
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
@@ -236,16 +237,10 @@ class AttachmentListEntry extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.close, size: 32),
-              const SizedBox(height: 8),
-              Text(
-                'attachmentLoadFailed'.tr,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              Text(
-                'attachmentLoadFailedCaption'.tr,
-                textAlign: TextAlign.center,
+              Icon(
+                Icons.close,
+                size: 32,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ],
           ),
@@ -325,13 +320,12 @@ class AttachmentListEntry extends StatelessWidget {
         if (!showMature && item!.isMature) {
           onReveal(true);
         } else if (['image'].contains(item!.mimetype.split('/').first)) {
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => AttachmentListFullScreen(
-                parentId: parentId,
-                attachment: item!,
-              ),
+          context.pushTransparentRoute(
+            AttachmentListFullScreen(
+              parentId: parentId,
+              attachment: item!,
             ),
+            rootNavigator: true,
           );
         }
       },

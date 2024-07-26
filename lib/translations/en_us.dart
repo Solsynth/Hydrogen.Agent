@@ -132,6 +132,7 @@ const messagesEnglish = {
   'reactAdd': 'React',
   'reactCompleted': 'Your reaction has been added',
   'reactUncompleted': 'Your reaction has been removed',
+  'attachmentUploadBy': 'Upload by',
   'attachmentAdd': 'Attach attachments',
   'attachmentAddGalleryPhoto': 'Gallery photo',
   'attachmentAddGalleryVideo': 'Gallery video',
