@@ -25,9 +25,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
-    Get.lazyPut(() => PostListController());
     super.initState();
-    _postController = Get.find();
+    _postController = PostListController();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       switch (_tabController.index) {
@@ -97,7 +96,8 @@ class _HomeScreenState extends State<HomeScreen>
                   onRefresh: () => _postController.reloadAllOver(),
                   child: CustomScrollView(slivers: [
                     FeedListWidget(
-                        controller: _postController.pagingController),
+                      controller: _postController.pagingController,
+                    ),
                   ]),
                 ),
                 PostShuffleSwiper(controller: _postController),

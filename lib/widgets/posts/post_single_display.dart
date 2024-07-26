@@ -14,10 +14,10 @@ class PostSingleDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      child: Card(
-        child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Container(
+        alignment: Alignment.center,
+        child: Card(
           child: PostListEntryWidget(
             item: item,
             isClickable: true,

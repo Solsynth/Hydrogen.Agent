@@ -10,6 +10,7 @@ import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/feed/feed_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:timeago/timeago.dart' show format;
 
 class PostItem extends StatefulWidget {
@@ -253,10 +254,13 @@ class _PostItemState extends State<PostItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(),
-                  MarkdownTextContent(
-                    content: item.body['content'],
-                    isSelectable: widget.isContentSelectable,
-                  ).paddingOnly(left: 12, right: 8),
+                  SizedContainer(
+                    maxWidth: 640,
+                    child: MarkdownTextContent(
+                      content: item.body['content'],
+                      isSelectable: widget.isContentSelectable,
+                    ).paddingOnly(left: 12, right: 8),
+                  ),
                   if (widget.item.replyTo != null && widget.isShowEmbed)
                     GestureDetector(
                       child: _buildReply(context).paddingOnly(top: 4),
@@ -298,7 +302,6 @@ class _PostItemState extends State<PostItem> {
           width: MediaQuery.of(context).size.width,
           constraints: const BoxConstraints(
             maxHeight: 720,
-            maxWidth: 640,
           ),
           child: AttachmentList(
             parentId: widget.item.id.toString(),

@@ -82,7 +82,8 @@ class _AccountScreenState extends State<AccountScreen> {
           return CenteredContainer(
             child: ListView(
               children: [
-                const AccountHeading().paddingOnly(bottom: 8, top: 8),
+                if (auth.userProfile.value != null)
+                  const AccountHeading().paddingOnly(bottom: 8, top: 8),
                 ...(actionItems.map(
                   (x) => ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 34),
@@ -134,7 +135,7 @@ class _AccountHeadingState extends State<AccountHeading> {
     final AuthProvider auth = Get.find();
 
     final prof = auth.userProfile.value!;
-    
+
     return AccountHeadingWidget(
       avatar: prof['avatar'],
       banner: prof['banner'],

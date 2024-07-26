@@ -82,7 +82,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
       },
       children: [
         Obx(() {
-          if (auth.isAuthorized.isFalse) {
+          if (auth.isAuthorized.isFalse || auth.userProfile.value == null) {
             return ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 28),
               leading: const Icon(Icons.account_circle),
@@ -172,7 +172,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
           top: 12,
         ),
         Obx(() {
-          if (auth.isAuthorized.isFalse) {
+          if (auth.isAuthorized.isFalse || auth.userProfile.value == null) {
             return const SizedBox();
           }
 

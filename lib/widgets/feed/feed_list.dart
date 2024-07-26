@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/widgets/sized_container.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class FeedListWidget extends StatelessWidget {
@@ -25,20 +24,14 @@ class FeedListWidget extends StatelessWidget {
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
-          return SizedContainer(
-            child: Builder(
-              builder: (context) {
-                return PostListEntryWidget(
-                  isShowEmbed: isShowEmbed,
-                  isNestedClickable: isNestedClickable,
-                  isClickable: isClickable,
-                  item: item,
-                  onUpdate: () {
-                    controller.refresh();
-                  },
-                );
-              },
-            ),
+          return PostListEntryWidget(
+            isShowEmbed: isShowEmbed,
+            isNestedClickable: isNestedClickable,
+            isClickable: isClickable,
+            item: item,
+            onUpdate: () {
+              controller.refresh();
+            },
           );
         },
       ),

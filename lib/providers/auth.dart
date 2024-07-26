@@ -175,10 +175,10 @@ class AuthProvider extends GetConnect {
       value: jsonEncode(credentials!.toJson()),
     );
 
-    await refreshUserProfile();
-
     Get.find<WebSocketProvider>().connect();
     Get.find<WebSocketProvider>().notifyPrefetch();
+    await refreshAuthorizeStatus();
+    await refreshUserProfile();
 
     return credentials!;
   }

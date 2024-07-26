@@ -13,6 +13,7 @@ class AttachmentList extends StatefulWidget {
   final String parentId;
   final List<int> attachmentsId;
   final bool isGrid;
+  final bool isForceGrid;
 
   final double? width;
   final double? viewport;
@@ -22,6 +23,7 @@ class AttachmentList extends StatefulWidget {
     required this.parentId,
     required this.attachmentsId,
     this.isGrid = false,
+    this.isForceGrid = false,
     this.width,
     this.viewport,
   });
@@ -235,7 +237,9 @@ class _AttachmentListState extends State<AttachmentList> {
       );
     }
 
-    if (widget.isGrid) {
+    final isNotPureImage = _attachmentsMeta
+        .any((x) => x?.mimetype.split('/').firstOrNull != 'image');
+    if (widget.isGrid && (widget.isForceGrid || !isNotPureImage)) {
       const radius = BorderRadius.all(Radius.circular(8));
       return GridView.builder(
         padding: EdgeInsets.zero,
@@ -251,16 +255,15 @@ class _AttachmentListState extends State<AttachmentList> {
         itemBuilder: (context, idx) {
           final element = _attachmentsMeta[idx];
           return Container(
-            decoration: BoxDecoration(
-              border:
-              Border.all(color: Theme.of(context).dividerColor, width: 1),
-              borderRadius: radius,
-            ),
-            child: ClipRRect(
-              borderRadius: radius,
-              child: _buildEntry(element, idx),
-            )
-          );
+              decoration: BoxDecoration(
+                border:
+                    Border.all(color: Theme.of(context).dividerColor, width: 1),
+                borderRadius: radius,
+              ),
+              child: ClipRRect(
+                borderRadius: radius,
+                child: _buildEntry(element, idx),
+              ));
         },
       ).paddingSymmetric(horizontal: 24);
     }

@@ -3,6 +3,7 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/widgets/posts/post_single_display.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class PostShuffleSwiper extends StatefulWidget {
   final PostListController controller;
@@ -37,12 +38,14 @@ class _PostShuffleSwiperState extends State<PostShuffleSwiper> {
             );
           }
           final element = widget.controller.postList[index];
-          return PostSingleDisplay(
-            key: Key('p${element.id}'),
-            item: element,
-            onUpdate: () {
-              widget.controller.reloadAllOver();
-            },
+          return CenteredContainer(
+            child: PostSingleDisplay(
+              key: Key('p${element.id}'),
+              item: element,
+              onUpdate: () {
+                widget.controller.reloadAllOver();
+              },
+            ),
           );
         },
         padding: const EdgeInsets.all(24),
