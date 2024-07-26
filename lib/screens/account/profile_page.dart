@@ -7,13 +7,12 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/screens/account/notification.dart';
+import 'package:solian/providers/relation.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
-import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 import 'package:solian/widgets/sized_container.dart';
@@ -28,11 +27,13 @@ class AccountProfilePage extends StatefulWidget {
 }
 
 class _AccountProfilePageState extends State<AccountProfilePage> {
+  late final RelationshipProvider _relationshipProvider;
   late final PostListController _postController;
   final PagingController<int, Attachment> _albumPagingController =
       PagingController(firstPageKey: 0);
 
   bool _isBusy = true;
+  bool _isMakingFriend = false;
   bool _showMature = false;
 
   Account? _userinfo;
@@ -63,22 +64,35 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       _totalDownvote = resp.body['total_downvote'];
     }
 
-    resp = await client.get('/users/${widget.name}/pin');
+    setState(() => _isBusy = false);
+  }
+
+  Future<void> getPinnedPosts() async {
+    final client = ServiceFinder.configureClient('interactive');
+    final resp = await client.get('/users/${widget.name}/pin');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
         Navigator.pop(context);
       });
     } else {
-      _pinnedPosts =
-          resp.body.map((x) => Post.fromJson(x)).toList().cast<Post>();
+      setState(() {
+        _pinnedPosts =
+            resp.body.map((x) => Post.fromJson(x)).toList().cast<Post>();
+      });
     }
+  }
 
-    setState(() => _isBusy = false);
+  int get _userSocialCreditPoints {
+    int birthPart =
+        DateTime.now().difference(_userinfo!.createdAt.toLocal()).inSeconds;
+    birthPart = birthPart >> 16;
+    return _totalUpvote * 2 - _totalDownvote + birthPart;
   }
 
   @override
   void initState() {
     super.initState();
+    _relationshipProvider = Get.find();
     _postController = PostListController(author: widget.name);
     _albumPagingController.addPageRequestListener((pageKey) async {
       final client = ServiceFinder.configureClient('files');
@@ -99,7 +113,26 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
         _albumPagingController.error = resp.bodyString;
       }
     });
+
     getUserinfo();
+    getPinnedPosts();
+  }
+
+  Widget _buildStatisticsEntry(String label, String content) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          Text(
+            content,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -147,8 +180,29 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         ],
                       ),
                     ),
-                    const BackgroundStateWidget(),
-                    const NotificationButton(),
+                    if (_userinfo != null &&
+                        !_relationshipProvider.hasFriend(_userinfo!))
+                      IconButton(
+                        icon: const Icon(Icons.person_add),
+                        onPressed: _isMakingFriend
+                            ? null
+                            : () async {
+                                setState(() => _isMakingFriend = true);
+                                try {
+                                  await _relationshipProvider.makeFriend(widget.name);
+                                  context.showSnackbar('accountFriendRequestSent'.tr);
+                                } catch (e) {
+                                  context.showErrorDialog(e);
+                                } finally {
+                                  setState(() => _isMakingFriend = false);
+                                }
+                              },
+                      )
+                    else
+                      const IconButton(
+                        icon: Icon(Icons.handshake),
+                        onPressed: null,
+                      ),
                     SizedBox(
                       width: SolianTheme.isLargeScreen(context) ? 8 : 16,
                     ),
@@ -167,33 +221,42 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               RefreshIndicator(
-                onRefresh: () => _postController.reloadAllOver(),
+                onRefresh: () => Future.wait([
+                  _postController.reloadAllOver(),
+                  getPinnedPosts(),
+                ]),
                 child: CustomScrollView(slivers: [
                   SliverToBoxAdapter(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    child: Column(
                       children: [
-                        Column(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Text(
-                              'totalUpvote'.tr,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            Text(
-                              _totalUpvote.toString(),
-                              style: Theme.of(context).textTheme.bodyLarge,
+                            _buildStatisticsEntry(
+                              'totalSocialCreditPoints'.tr,
+                              _userinfo != null
+                                  ? _userSocialCreditPoints.toString()
+                                  : 0.toString(),
                             ),
                           ],
                         ),
-                        Column(
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Text(
-                              'totalDownvote'.tr,
-                              style: Theme.of(context).textTheme.bodySmall,
+                            Obx(
+                              () => _buildStatisticsEntry(
+                                'totalPostCount'.tr,
+                                _postController.postTotal.value.toString(),
+                              ),
                             ),
-                            Text(
+                            _buildStatisticsEntry(
+                              'totalUpvote'.tr,
+                              _totalUpvote.toString(),
+                            ),
+                            _buildStatisticsEntry(
+                              'totalDownvote'.tr,
                               _totalDownvote.toString(),
-                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ],
                         ),

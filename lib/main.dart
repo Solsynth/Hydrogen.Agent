@@ -112,6 +112,7 @@ class SolianApp extends StatelessWidget {
 
       Get.find<WebSocketProvider>().connect();
       Get.find<ChannelProvider>().refreshAvailableChannel();
+      Get.find<RelationshipProvider>().refreshFriendList();
 
       try {
         Get.find<WebSocketProvider>().registerPushNotifications();

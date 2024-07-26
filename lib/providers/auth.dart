@@ -208,7 +208,6 @@ class AuthProvider extends GetConnect {
 
   Future<void> refreshUserProfile() async {
     final client = configureClient('auth');
-
     final resp = await client.get('/users/me');
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);

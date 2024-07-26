@@ -1,24 +1,42 @@
 import 'package:get/get.dart';
+import 'package:solian/models/account.dart';
 import 'package:solian/models/relations.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 
-class RelationshipProvider extends GetConnect {
-  @override
-  void onInit() {
-    final AuthProvider auth = Get.find();
+class RelationshipProvider extends GetxController {
+  final RxList<Relationship> _friends = RxList.empty(growable: true);
 
-    httpClient.baseUrl = ServiceFinder.buildUrl('auth', null);
-    httpClient.addAuthenticator(auth.requestAuthenticator);
+  Future<void> refreshFriendList() async {
+    final resp = await listRelationWithStatus(1);
+    _friends.value = resp.body
+        .map((e) => Relationship.fromJson(e))
+        .toList()
+        .cast<Relationship>();
+    _friends.refresh();
   }
 
-  Future<Response> listRelation() => get('/users/me/relations');
+  bool hasFriend(Account account) {
+    final auth = Get.find<AuthProvider>();
+    if (auth.userProfile.value!['id'] == account.id) return true;
+    return _friends.any((x) => x.id == account.id);
+  }
 
-  Future<Response> listRelationWithStatus(int status) =>
-      get('/users/me/relations?status=$status');
+  Future<Response> listRelation() {
+    final AuthProvider auth = Get.find();
+    final client = auth.configureClient('auth');
+    return client.get('/users/me/relations');
+  }
+
+  Future<Response> listRelationWithStatus(int status) {
+    final AuthProvider auth = Get.find();
+    final client = auth.configureClient('auth');
+    return client.get('/users/me/relations?status=$status');
+  }
 
   Future<Response> makeFriend(String username) async {
-    final resp = await post('/users/me/relations?related=$username', {});
+    final AuthProvider auth = Get.find();
+    final client = auth.configureClient('auth');
+    final resp = await client.post('/users/me/relations?related=$username', {});
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }
@@ -44,10 +62,10 @@ class RelationshipProvider extends GetConnect {
   Future<Response> editRelation(Relationship relationship, int status) async {
     final AuthProvider auth = Get.find();
     final client = auth.configureClient('auth');
-    final resp =
-        await client.patch('/users/me/relations/${relationship.relatedId}', {
-      'status': status,
-    });
+    final resp = await client.patch(
+      '/users/me/relations/${relationship.relatedId}',
+      {'status': status},
+    );
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }

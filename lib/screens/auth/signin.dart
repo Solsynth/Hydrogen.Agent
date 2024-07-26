@@ -62,8 +62,10 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
 
     try {
       await auth.signin(context, username, password);
-      await auth.refreshAuthorizeStatus();
-      await auth.refreshUserProfile();
+      await Future.delayed(const Duration(milliseconds: 250), () async {
+        await auth.refreshAuthorizeStatus();
+        await auth.refreshUserProfile();
+      });
     } on RiskyAuthenticateException catch (e) {
       showDialog(
         context: context,
@@ -77,7 +79,8 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
                 onPressed: () {
                   const redirect = 'solink://auth?status=done';
                   launchUrlString(
-                    ServiceFinder.buildUrl('passport', '/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}'),
+                    ServiceFinder.buildUrl('passport',
+                        '/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}'),
                     mode: LaunchMode.inAppWebView,
                   );
                   Navigator.pop(context);
