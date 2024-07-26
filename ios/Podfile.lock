@@ -143,6 +143,8 @@ PODS:
     - Flutter
     - FlutterMacOS
     - Sentry/HybridSDK (= 8.32.0)
+  - share_plus (0.0.1):
+    - Flutter
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
@@ -176,6 +178,7 @@ DEPENDENCIES:
   - protocol_handler_ios (from `.symlinks/plugins/protocol_handler_ios/ios`)
   - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
   - sentry_flutter (from `.symlinks/plugins/sentry_flutter/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
   - volume_controller (from `.symlinks/plugins/volume_controller/ios`)
@@ -240,6 +243,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/screen_brightness_ios/ios"
   sentry_flutter:
     :path: ".symlinks/plugins/sentry_flutter/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/darwin"
   url_launcher_ios:
@@ -283,6 +288,7 @@ SPEC CHECKSUMS:
   SDWebImage: 066c47b573f408f18caa467d71deace7c0f8280d
   Sentry: 96ae1dcdf01a644bc3a3b1dc279cecaf48a833fb
   sentry_flutter: f1d86adcb93a959bc47a40d8d55059bdf7569bc5
+  share_plus: 8875f4f2500512ea181eef553c3e27dba5135aad
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe

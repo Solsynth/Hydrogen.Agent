@@ -10,6 +10,7 @@ const messagesEnglish = {
   'draft': 'Draft',
   'draftSave': 'Save',
   'draftBox': 'Draft Box',
+  'share': 'Share',
   'feed': 'Feed',
   'feedSearch': 'Search Feed',
   'feedSearchWithTag': 'Searching with tag #@key',
@@ -282,4 +283,6 @@ const messagesEnglish = {
   'bsEstablishingConn': 'Establishing Connection',
   'bsPreparingData': 'Preparing User Data',
   'bsRegisteringPushNotify': 'Enabling Push Notifications',
+  'postShareContent': '@content\n\n@username on the Solar Network\nCheck it out: @link',
+  'postShareSubject': '@username posted a post on the Solar Network',
 };

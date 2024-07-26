@@ -6,6 +6,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class BootstrapperShell extends StatefulWidget {
   final Widget child;
@@ -129,12 +130,16 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                     child: CircularProgressIndicator(strokeWidth: 3),
                   ),
                 const SizedBox(height: 12),
-                Text(
-                  _subtitle ??
-                      '${_periods[_periodCursor].label.tr} (${_periodCursor + 1}/${_periods.length})',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: _unFocusColor,
+                CenteredContainer(
+                  maxWidth: 280,
+                  child: Text(
+                    _subtitle ??
+                        '${_periods[_periodCursor].label.tr} (${_periodCursor + 1}/${_periods.length})',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: _unFocusColor,
+                    ),
                   ),
                 ),
               ],

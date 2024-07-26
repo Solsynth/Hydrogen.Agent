@@ -17,6 +17,7 @@ const simplifiedChineseMessages = {
   'draft': '草稿',
   'draftSave': '存为草稿',
   'draftBox': '草稿箱',
+  'share': '分享',
   'feed': '资讯',
   'feedSearch': '搜索资讯',
   'feedSearchWithTag': '检索带有 #@key 标签的资讯',
@@ -261,4 +262,6 @@ const simplifiedChineseMessages = {
   'bsEstablishingConn': '部署连接中',
   'bsPreparingData': '正在准备用户资料',
   'bsRegisteringPushNotify': '正在启用推送通知',
+  'postShareContent': '@content\n\n@username 在 Solar Network\n原帖地址：@link',
+  'postShareSubject': '@username 在 Solar Network 上发布了一篇帖子',
 };

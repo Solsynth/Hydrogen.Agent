@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
@@ -66,6 +67,25 @@ class _PostActionState extends State<PostAction> {
           Expanded(
             child: ListView(
               children: [
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  leading: const Icon(Icons.share),
+                  title: Text('share'.tr),
+                  onTap: () async {
+                    await Share.share(
+                      'postShareContent'.trParams({
+                        'username': widget.item.author.nick,
+                        'content': widget.item.body['text'],
+                        'link':
+                            'https://sn.solsynth.dev/posts/${widget.item.id}',
+                      }),
+                      subject: 'postShareSubject'.trParams({
+                        'username': widget.item.author.nick,
+                      }),
+                    );
+                    Navigator.pop(context);
+                  },
+                ),
                 if (!widget.noReact)
                   ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -109,7 +129,8 @@ class _PostActionState extends State<PostAction> {
                           : 'unpinPost'.tr,
                     ),
                     onTap: () async {
-                      final client = Get.find<AuthProvider>().configureClient('interactive');
+                      final client = Get.find<AuthProvider>()
+                          .configureClient('interactive');
                       await client.post('/posts/${widget.item.id}/pin', {});
                       Navigator.pop(context, true);
                     },

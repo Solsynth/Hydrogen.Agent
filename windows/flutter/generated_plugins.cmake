@@ -18,6 +18,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   protocol_handler_windows
   screen_brightness_windows
   sentry_flutter
+  share_plus
   url_launcher_windows
 )
 
