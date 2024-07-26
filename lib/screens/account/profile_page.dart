@@ -11,10 +11,11 @@ import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
-import 'package:solian/widgets/attachments/attachment_item.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/feed/feed_list.dart';
 import 'package:solian/widgets/sized_container.dart';
+
+import '../../widgets/attachments/attachment_list.dart';
 
 class AccountProfilePage extends StatefulWidget {
   final String name;
@@ -31,6 +32,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       PagingController(firstPageKey: 0);
 
   bool _isBusy = true;
+  bool _showMature = false;
 
   Account? _userinfo;
 
@@ -59,8 +61,11 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
           .get('/attachments?take=10&offset=$pageKey&author=${widget.name}');
       if (resp.statusCode == 200) {
         final result = PaginationResult.fromJson(resp.body);
-        final out = result.data?.map((e) => Attachment.fromJson(e)).toList();
-        if (out != null && out.length >= 10) {
+        final out = result.data
+            ?.map((e) => Attachment.fromJson(e))
+            .where((x) => x.mimetype.split('/').firstOrNull == 'image')
+            .toList();
+        if (out != null && result.data!.length >= 10) {
           _albumPagingController.appendPage(out, pageKey + out.length);
         } else if (out != null) {
           _albumPagingController.appendLastPage(out);
@@ -90,10 +95,12 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                 floating: true,
                 toolbarHeight: SolianTheme.toolbarHeight(context),
                 leadingWidth: 24,
-                leading: AppBarLeadingButton.adaptive(context),
+                automaticallyImplyLeading: false,
                 flexibleSpace: Row(
                   children: [
-                    const SizedBox(width: 16),
+                    AppBarLeadingButton.adaptive(context) ??
+                        const SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     if (_userinfo != null)
                       AccountAvatar(content: _userinfo!.avatar, radius: 16),
                     const SizedBox(width: 12),
@@ -152,6 +159,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                   onRefresh: () =>
                       Future.sync(() => _albumPagingController.refresh()),
                   child: PagedGridView<int, Attachment>(
+                    padding: EdgeInsets.zero,
                     pagingController: _albumPagingController,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -172,15 +180,19 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                           ),
                           child: ClipRRect(
                             borderRadius: radius,
-                            child: AttachmentItem(
+                            child: AttachmentListEntry(
                               item: item,
                               parentId: 'album',
+                              showMature: _showMature,
+                              onReveal: (value) {
+                                setState(() => _showMature = value);
+                              },
                             ),
                           ),
                         );
                       },
                     ),
-                  ),
+                  ).paddingAll(16),
                 ),
               ),
             ],

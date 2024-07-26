@@ -52,7 +52,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
   }
 
   void performAction() async {
-    final AuthProvider provider = Get.find();
+    final AuthProvider auth = Get.find();
 
     final username = _usernameController.value.text;
     final password = _passwordController.value.text;
@@ -61,7 +61,9 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
     setState(() => _isBusy = true);
 
     try {
-      await provider.signin(context, username, password);
+      await auth.signin(context, username, password);
+      await auth.refreshAuthorizeStatus();
+      await auth.refreshUserProfile();
     } on RiskyAuthenticateException catch (e) {
       showDialog(
         context: context,

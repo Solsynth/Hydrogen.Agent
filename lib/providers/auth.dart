@@ -177,8 +177,6 @@ class AuthProvider extends GetConnect {
 
     Get.find<WebSocketProvider>().connect();
     Get.find<WebSocketProvider>().notifyPrefetch();
-    await refreshAuthorizeStatus();
-    await refreshUserProfile();
 
     return credentials!;
   }

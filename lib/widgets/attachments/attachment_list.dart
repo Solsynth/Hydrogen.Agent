@@ -107,113 +107,16 @@ class _AttachmentListState extends State<AttachmentList> {
   }
 
   Widget _buildEntry(Attachment? element, int idx) {
-    if (element == null) {
-      return Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 280),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.close, size: 32),
-              const SizedBox(height: 8),
-              Text(
-                'attachmentLoadFailed'.tr,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              Text(
-                'attachmentLoadFailedCaption'.tr,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return GestureDetector(
-      child: Container(
-        width: widget.width ?? MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          border: widget.attachmentsId.length > 1
-              ? Border.symmetric(
-                  vertical: BorderSide(
-                    width: 0.3,
-                    color: Theme.of(context).dividerColor,
-                  ),
-                )
-              : null,
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            AttachmentItem(
-              parentId: widget.parentId,
-              key: Key('a${element.uuid}'),
-              item: element,
-              badge: _attachmentsMeta.length > 1 && !widget.isGrid
-                  ? '${idx + 1}/${_attachmentsMeta.length}'
-                  : null,
-              showHideButton: !element.isMature || _showMature,
-              onHide: () {
-                setState(() => _showMature = false);
-              },
-            ),
-            if (element.isMature && !_showMature)
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                  ),
-                ),
-              ),
-            if (element.isMature && !_showMature)
-              Center(
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 280),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.visibility_off,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'matureContent'.tr,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        'matureContentCaption'.tr,
-                        style: const TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-      onTap: () {
-        if (!_showMature && _attachmentsMeta.any((e) => e!.isMature)) {
-          setState(() => _showMature = true);
-        } else if (['image'].contains(element.mimetype.split('/').first)) {
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => AttachmentListFullScreen(
-                parentId: widget.parentId,
-                attachment: element,
-              ),
-            ),
-          );
-        }
+    return AttachmentListEntry(
+      item: element,
+      parentId: widget.parentId,
+      width: widget.width,
+      badgeContent: '${idx + 1}/${_attachmentsMeta.length}',
+      showBadge: _attachmentsMeta.length > 1 && !widget.isGrid,
+      showBorder: widget.attachmentsId.length > 1,
+      showMature: _showMature,
+      onReveal: (value) {
+        setState(() => _showMature = value);
       },
     );
   }
@@ -298,6 +201,140 @@ class _AttachmentListState extends State<AttachmentList> {
           return _buildEntry(element, idx);
         },
       ),
+    );
+  }
+}
+
+class AttachmentListEntry extends StatelessWidget {
+  final String parentId;
+  final Attachment? item;
+  final String? badgeContent;
+  final double? width;
+  final bool showBorder;
+  final bool showBadge;
+  final bool showMature;
+  final Function(bool) onReveal;
+
+  const AttachmentListEntry({
+    super.key,
+    required this.parentId,
+    required this.onReveal,
+    this.item,
+    this.badgeContent,
+    this.width,
+    this.showBorder = false,
+    this.showBadge = false,
+    this.showMature = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (item == null) {
+      return Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 280),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.close, size: 32),
+              const SizedBox(height: 8),
+              Text(
+                'attachmentLoadFailed'.tr,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text(
+                'attachmentLoadFailedCaption'.tr,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return GestureDetector(
+      child: Container(
+        width: width ?? MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          border: showBorder
+              ? Border.symmetric(
+                  vertical: BorderSide(
+                    width: 0.3,
+                    color: Theme.of(context).dividerColor,
+                  ),
+                )
+              : null,
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AttachmentItem(
+              parentId: parentId,
+              key: Key('a${item!.uuid}'),
+              item: item!,
+              badge: showBadge ? badgeContent : null,
+              showHideButton: !item!.isMature || showMature,
+              onHide: () {
+                onReveal(false);
+              },
+            ),
+            if (item!.isMature && !showMature)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
+              ),
+            if (item!.isMature && !showMature)
+              Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 280),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.visibility_off,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'matureContent'.tr,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        'matureContentCaption'.tr,
+                        style: const TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+      onTap: () {
+        if (!showMature && item!.isMature) {
+          onReveal(true);
+        } else if (['image'].contains(item!.mimetype.split('/').first)) {
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => AttachmentListFullScreen(
+                parentId: parentId,
+                attachment: item!,
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }
