@@ -18,6 +18,7 @@ class AccountHeadingWidget extends StatelessWidget {
   final String? desc;
   final Account? detail;
   final List<AccountBadge>? badges;
+  final List<Widget>? extraWidgets;
 
   final Future<Response>? status;
   final Function? onEditStatus;
@@ -32,6 +33,7 @@ class AccountHeadingWidget extends StatelessWidget {
     required this.badges,
     this.detail,
     this.status,
+    this.extraWidgets,
     this.onEditStatus,
   });
 
@@ -149,19 +151,6 @@ class AccountHeadingWidget extends StatelessWidget {
             ],
           ).paddingOnly(left: 116, top: 6),
           const SizedBox(height: 4),
-          if (detail?.suspendedAt != null)
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                child: ListTile(
-                  title: Text('accountSuspended'.tr),
-                  subtitle: Text('accountSuspendedAt'.trParams({
-                    'date': DateFormat('y/M/d').format(detail!.suspendedAt!),
-                  })),
-                  trailing: const Icon(Icons.block),
-                ),
-              ),
-            ).paddingOnly(left: 16, right: 16),
           if (badges?.isNotEmpty ?? false)
             SizedBox(
               width: double.infinity,
@@ -177,7 +166,21 @@ class AccountHeadingWidget extends StatelessWidget {
                   vertical: PlatformInfo.isMobile ? 0 : 6,
                 ),
               ),
-            ).paddingOnly(left: 16, right: 16),
+            ).paddingSymmetric(horizontal: 16),
+          ...?extraWidgets?.map((x) => x.paddingSymmetric(horizontal: 16)),
+          if (detail?.suspendedAt != null)
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                child: ListTile(
+                  title: Text('accountSuspended'.tr),
+                  subtitle: Text('accountSuspendedAt'.trParams({
+                    'date': DateFormat('y/M/d').format(detail!.suspendedAt!),
+                  })),
+                  trailing: const Icon(Icons.block),
+                ),
+              ),
+            ).paddingSymmetric(horizontal: 16),
           SizedBox(
             width: double.infinity,
             child: Card(
@@ -188,7 +191,7 @@ class AccountHeadingWidget extends StatelessWidget {
                 ),
               ),
             ),
-          ).paddingOnly(left: 16, right: 16),
+          ).paddingSymmetric(horizontal: 16),
         ],
       ),
     );

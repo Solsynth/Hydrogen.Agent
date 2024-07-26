@@ -5,6 +5,8 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
 
 class PostListController extends GetxController {
+  String? author;
+
   /// The polling source modifier.
   /// - `0`: default recommendations
   /// - `1`: shuffle mode
@@ -13,9 +15,9 @@ class PostListController extends GetxController {
   /// The paging controller for infinite loading.
   /// Only available when mode is `0`.
   PagingController<int, Post> pagingController =
-  PagingController(firstPageKey: 0);
+      PagingController(firstPageKey: 0);
 
-  PostListController() {
+  PostListController({this.author}) {
     _initPagingController();
   }
 
@@ -48,6 +50,7 @@ class PostListController extends GetxController {
   RxBool isPreparing = false.obs;
 
   RxInt focusCursor = 0.obs;
+
   Post get focusPost => postList[focusCursor.value];
 
   RxInt postTotal = 0.obs;
@@ -102,17 +105,24 @@ class PostListController extends GetxController {
 
     Response resp;
     try {
-      resp = await provider.listRecommendations(
-        pageKey,
-        channel: mode.value == 0 ? null : 'shuffle',
-      );
+      if (author != null) {
+        resp = await provider.listPost(
+          pageKey,
+          author: author,
+        );
+      } else {
+        resp = await provider.listRecommendations(
+          pageKey,
+          channel: mode.value == 0 ? null : 'shuffle',
+        );
+      }
     } catch (e) {
       rethrow;
     } finally {
       isBusy.value = false;
     }
 
-    final PaginationResult result = PaginationResult.fromJson(resp.body);
+    final result = PaginationResult.fromJson(resp.body);
     final out = result.data?.map((e) => Post.fromJson(e)).toList();
 
     postTotal.value = result.count;

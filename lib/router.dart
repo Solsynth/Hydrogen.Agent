@@ -4,6 +4,7 @@ import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
+import 'package:solian/screens/account/profile_page.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
@@ -199,6 +200,13 @@ abstract class AppRouter {
         builder: (context, state) => TitleShell(
           state: state,
           child: const PersonalizeScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/account/view/:name',
+        name: 'accountProfilePage',
+        builder: (context, state) => AccountProfilePage(
+          name: state.pathParameters['name']!,
         ),
       ),
       GoRoute(

@@ -298,16 +298,10 @@ class _PostItemState extends State<PostItem> {
           right: 16,
           left: 16,
         ),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          constraints: const BoxConstraints(
-            maxHeight: 720,
-          ),
-          child: AttachmentList(
-            parentId: widget.item.id.toString(),
-            attachmentsId: attachments,
-            isGrid: attachments.length > 1,
-          ),
+        AttachmentList(
+          parentId: widget.item.id.toString(),
+          attachmentsId: attachments,
+          isGrid: attachments.length > 1,
         ),
         if (widget.isShowReply && widget.isReactable)
           PostQuickAction(

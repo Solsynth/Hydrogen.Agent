@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/account_status.dart';
+import 'package:solian/router.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_heading.dart';
 
@@ -23,9 +24,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
   void getUserinfo() async {
     setState(() => _isBusy = true);
 
-    final client = GetConnect();
-    client.httpClient.baseUrl = ServiceFinder.buildUrl('auth', null);
-
+    final client = ServiceFinder.configureClient('auth');
     final resp = await client.get('/users/${widget.account.name}');
     if (resp.statusCode == 200) {
       _userinfo = Account.fromJson(resp.body);
@@ -39,14 +38,16 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
   @override
   void initState() {
     super.initState();
-
     getUserinfo();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isBusy || _userinfo == null) {
-      return const Center(child: CircularProgressIndicator());
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: const Center(child: CircularProgressIndicator()),
+      );
     }
 
     return SizedBox(
@@ -62,7 +63,28 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
             desc: _userinfo!.description,
             detail: _userinfo!,
             badges: _userinfo!.badges,
-            status: Get.find<StatusProvider>().getSomeoneStatus(_userinfo!.name),
+            status:
+                Get.find<StatusProvider>().getSomeoneStatus(_userinfo!.name),
+            extraWidgets: [
+              Card(
+                child: ListTile(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  title: Text('visitProfilePage'.tr),
+                  visualDensity:
+                      const VisualDensity(horizontal: -4, vertical: -2),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    AppRouter.instance.goNamed(
+                      'accountProfilePage',
+                      pathParameters: {'name': _userinfo!.name},
+                    );
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ],
           ).paddingOnly(top: 16),
         ],
       ),

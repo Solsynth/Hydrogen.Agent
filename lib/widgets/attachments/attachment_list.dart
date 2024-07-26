@@ -14,6 +14,7 @@ class AttachmentList extends StatefulWidget {
   final List<int> attachmentsId;
   final bool isGrid;
   final bool isForceGrid;
+  final double flatMaxHeight;
 
   final double? width;
   final double? viewport;
@@ -24,6 +25,7 @@ class AttachmentList extends StatefulWidget {
     required this.attachmentsId,
     this.isGrid = false,
     this.isForceGrid = false,
+    this.flatMaxHeight = 720,
     this.width,
     this.viewport,
   });
@@ -255,20 +257,25 @@ class _AttachmentListState extends State<AttachmentList> {
         itemBuilder: (context, idx) {
           final element = _attachmentsMeta[idx];
           return Container(
-              decoration: BoxDecoration(
-                border:
-                    Border.all(color: Theme.of(context).dividerColor, width: 1),
-                borderRadius: radius,
-              ),
-              child: ClipRRect(
-                borderRadius: radius,
-                child: _buildEntry(element, idx),
-              ));
+            decoration: BoxDecoration(
+              border:
+                  Border.all(color: Theme.of(context).dividerColor, width: 1),
+              borderRadius: radius,
+            ),
+            child: ClipRRect(
+              borderRadius: radius,
+              child: _buildEntry(element, idx),
+            ),
+          );
         },
       ).paddingSymmetric(horizontal: 24);
     }
 
     return Container(
+      width: MediaQuery.of(context).size.width,
+      constraints: BoxConstraints(
+        maxHeight: widget.flatMaxHeight,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHigh,
         border: Border.symmetric(

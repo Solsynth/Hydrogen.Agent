@@ -45,12 +45,13 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listPost(int page,
-      {int? realm, String? tag, category}) async {
+      {int? realm, String? author, tag, category}) async {
     final queries = [
       'take=${10}',
       'offset=$page',
       if (tag != null) 'tag=$tag',
       if (category != null) 'category=$category',
+      if (author != null) 'author=$author',
       if (realm != null) 'realmId=$realm',
     ];
     final resp = await get('/posts?${queries.join('&')}');
