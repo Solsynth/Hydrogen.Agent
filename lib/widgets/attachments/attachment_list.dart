@@ -214,6 +214,7 @@ class AttachmentListEntry extends StatelessWidget {
   final bool showBorder;
   final bool showBadge;
   final bool showMature;
+  final bool isDense;
   final Function(bool) onReveal;
 
   const AttachmentListEntry({
@@ -226,6 +227,7 @@ class AttachmentListEntry extends StatelessWidget {
     this.showBorder = false,
     this.showBadge = false,
     this.showMature = false,
+    this.isDense = false,
   });
 
   @override
@@ -295,20 +297,22 @@ class AttachmentListEntry extends StatelessWidget {
                         color: Colors.white,
                         size: 32,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'matureContent'.tr,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      if (!isDense) const SizedBox(height: 8),
+                      if (!isDense)
+                        Text(
+                          'matureContent'.tr,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'matureContentCaption'.tr,
-                        style: const TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
+                      if (!isDense)
+                        Text(
+                          'matureContentCaption'.tr,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
                     ],
                   ),
                 ),

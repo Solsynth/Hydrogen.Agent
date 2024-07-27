@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -21,6 +22,7 @@ import 'package:solian/router.dart';
 import 'package:solian/shells/system_shell.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/translations.dart';
+import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 void main() async {
   await SentryFlutter.init(
@@ -39,6 +41,9 @@ void main() async {
         _initializePlatformComponents(),
       ]);
 
+      GoRouter.optionURLReflectsImperativeAPIs = true;
+
+      usePathUrlStrategy();
       runApp(const SolianApp());
     },
   );

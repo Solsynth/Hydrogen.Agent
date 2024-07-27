@@ -326,6 +326,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                             borderRadius: radius,
                             child: AttachmentListEntry(
                               item: item,
+                              isDense: true,
                               parentId: 'album',
                               showMature: _showMature,
                               onReveal: (value) {
