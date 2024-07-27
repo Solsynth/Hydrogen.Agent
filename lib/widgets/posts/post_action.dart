@@ -44,7 +44,7 @@ class _PostActionState extends State<PostAction> {
       'postShareContent'.trParams({
         'username': widget.item.author.nick,
         'content': widget.item.body['content'] ?? 'no content',
-        'link': 'https://sn.solsynth.dev/posts/${widget.item.id}',
+        'link': 'https://sn.solsynth.dev/posts/view/${widget.item.id}',
       }),
       subject: 'postShareSubject'.trParams({
         'username': widget.item.author.nick,
