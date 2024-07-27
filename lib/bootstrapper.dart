@@ -33,11 +33,18 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       action: () async {
         final client = ServiceFinder.configureClient('dealer');
         final resp = await client.get('/.well-known');
-        if (resp.statusCode != 200) {
+        if (resp.statusCode != null && resp.statusCode != 200) {
+          setState(() {
+            _isErrored = true;
+            _subtitle = 'bsCheckingServerDown'.tr;
+          });
+          throw Exception('unable connect to server');
+        } else if (resp.statusCode == null) {
           setState(() {
             _isErrored = true;
             _subtitle = 'bsCheckingServerFail'.tr;
           });
+          throw Exception('unable connect to server');
         }
       },
     ),
@@ -90,11 +97,15 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
   ];
 
   Future<void> _runPeriods() async {
-    for (var idx = 0; idx < _periods.length; idx++) {
-      await _periods[idx].action();
-      setState(() => _periodCursor++);
+    try {
+      for (var idx = 0; idx < _periods.length; idx++) {
+        await _periods[idx].action();
+        if (_isErrored) break;
+        setState(() => _periodCursor++);
+      }
+    } finally {
+      setState(() => _isBusy = false);
     }
-    setState(() => _isBusy = false);
   }
 
   @override
@@ -119,30 +130,53 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                 child: Image.asset('assets/logo.png', width: 80, height: 80),
               ),
             ),
-            Column(
-              children: [
-                if (_isErrored)
-                  const Icon(Icons.cancel, size: 24)
-                else
-                  const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 3),
-                  ),
-                const SizedBox(height: 12),
-                CenteredContainer(
-                  maxWidth: 280,
-                  child: Text(
-                    _subtitle ??
-                        '${_periods[_periodCursor].label.tr} (${_periodCursor + 1}/${_periods.length})',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: _unFocusColor,
+            GestureDetector(
+              child: Column(
+                children: [
+                  if (_isErrored)
+                    const Icon(Icons.cancel, size: 24)
+                  else
+                    const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 3),
+                    ),
+                  const SizedBox(height: 12),
+                  CenteredContainer(
+                    maxWidth: 280,
+                    child: Column(
+                      children: [
+                        Text(
+                          _subtitle ??
+                              '${_periods[_periodCursor].label.tr} (${_periodCursor + 1}/${_periods.length})',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: _unFocusColor,
+                          ),
+                        ),
+                        Text(
+                          '2024 © Solsynth LLC',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: _unFocusColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              onTap: () {
+                if (_isBusy) return;
+                setState(() {
+                  _isBusy = true;
+                  _isErrored = false;
+                  _periodCursor = 0;
+                });
+                _runPeriods();
+              },
             )
           ],
         ),
