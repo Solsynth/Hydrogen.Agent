@@ -93,11 +93,14 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
               child: IgnorePointer(
                 child: Container(
                   height: 300,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
-                      colors: [Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+                      colors: [
+                        Theme.of(context).colorScheme.surface,
+                        Theme.of(context).colorScheme.surface.withOpacity(0),
+                      ],
                     ),
                   ),
                 ),
