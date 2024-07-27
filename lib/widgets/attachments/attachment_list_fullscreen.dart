@@ -59,6 +59,14 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
       dismissThresholds: const {
         DismissiblePageDismissDirection.multi: 0.05,
       },
+      onDragStart: () {
+        print('start dragging');
+        setState(() => _showDetails = false);
+      },
+      onDragEnd: () {
+        print('stop dragging');
+        setState(() => _showDetails = true);
+      },
       child: GestureDetector(
         child: Stack(
           fit: StackFit.loose,
@@ -70,7 +78,7 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
                 boundaryMargin: EdgeInsets.zero,
                 minScale: 1,
                 maxScale: 16,
-                panEnabled: false,
+                panEnabled: true,
                 scaleEnabled: true,
                 child: AttachmentItem(
                   parentId: widget.parentId,
@@ -98,7 +106,7 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
                 .animate(target: _showDetails ? 1 : 0)
                 .fadeIn(curve: Curves.fastEaseInToSlowEaseOut),
             Positioned(
-              bottom: MediaQuery.of(context).padding.bottom,
+              bottom: math.max(MediaQuery.of(context).padding.bottom, 16),
               left: 16,
               right: 16,
               child: IgnorePointer(

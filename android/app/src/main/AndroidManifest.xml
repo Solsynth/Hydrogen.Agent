@@ -54,7 +54,9 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="solsynth.dev" />
+                <data android:host="solsynth.dev" />
+                <data android:host="sn.solsynth.dev" />
+                <data android:scheme="https" />
                 <data android:scheme="https" />
                 <data android:scheme="solink" />
             </intent-filter>

@@ -156,7 +156,7 @@ class PostCreatePopup extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.35,
+      height: MediaQuery.of(context).size.height * 0.38,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
