@@ -25,7 +25,7 @@ class _PostActionState extends State<PostAction> {
   bool _isBusy = true;
   bool _canModifyContent = false;
 
-  void checkAbleToModifyContent() async {
+  void _checkAbleToModifyContent() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -38,10 +38,25 @@ class _PostActionState extends State<PostAction> {
     });
   }
 
+  Future<void> _doShare() async {
+    final box = context.findRenderObject() as RenderBox?;
+    await Share.share(
+      'postShareContent'.trParams({
+        'username': widget.item.author.nick,
+        'content': widget.item.body['content'] ?? 'no content',
+        'link': 'https://sn.solsynth.dev/posts/${widget.item.id}',
+      }),
+      subject: 'postShareSubject'.trParams({
+        'username': widget.item.author.nick,
+      }),
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    checkAbleToModifyContent();
+    _checkAbleToModifyContent();
   }
 
   @override
@@ -72,17 +87,7 @@ class _PostActionState extends State<PostAction> {
                   leading: const Icon(Icons.share),
                   title: Text('share'.tr),
                   onTap: () async {
-                    await Share.share(
-                      'postShareContent'.trParams({
-                        'username': widget.item.author.nick,
-                        'content': widget.item.body['text'],
-                        'link':
-                            'https://sn.solsynth.dev/posts/${widget.item.id}',
-                      }),
-                      subject: 'postShareSubject'.trParams({
-                        'username': widget.item.author.nick,
-                      }),
-                    );
+                    await _doShare();
                     Navigator.pop(context);
                   },
                 ),
@@ -187,7 +192,7 @@ class PostDeletionDialog extends StatefulWidget {
 class _PostDeletionDialogState extends State<PostDeletionDialog> {
   bool _isBusy = false;
 
-  void performAction() async {
+  void _performAction() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -219,7 +224,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
           child: Text('cancel'.tr),
         ),
         TextButton(
-          onPressed: _isBusy ? null : () => performAction(),
+          onPressed: _isBusy ? null : () => _performAction(),
           child: Text('confirm'.tr),
         ),
       ],
