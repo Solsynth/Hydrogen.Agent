@@ -53,15 +53,11 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
     for (final media in medias) {
       final file = File(media.path);
-      final hash = await calculateFileSha256(file);
-      final meta = await calculateImageMetaFromFile(file);
-
       try {
         await uploadAttachment(
           await file.readAsBytes(),
           file.path,
-          hash,
-          {...meta},
+          null,
         );
       } catch (err) {
         context.showErrorDialog(err);
@@ -81,12 +77,9 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     setState(() => _isBusy = true);
 
     final file = File(media.path);
-    final hash = await calculateFileSha256(file);
 
     try {
-      await uploadAttachment(await file.readAsBytes(), file.path, hash, {
-        'ratio': 16 / 9,
-      });
+      await uploadAttachment(await file.readAsBytes(), file.path, null);
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -108,9 +101,8 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
     for (final file in files) {
-      final hash = await calculateFileSha256(file);
       try {
-        await uploadAttachment(await file.readAsBytes(), file.path, hash, null);
+        await uploadAttachment(await file.readAsBytes(), file.path, null);
       } catch (err) {
         context.showErrorDialog(err);
       }
@@ -133,20 +125,9 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
     setState(() => _isBusy = true);
 
-    Map<String, dynamic> metadata;
     final file = File(media.path);
-    final hash = await calculateFileSha256(file);
-
-    if (isVideo) {
-      metadata = {'ratio': 16 / 9};
-    } else {
-      metadata = await calculateImageMetaFromFile(file);
-    }
-
     try {
-      await uploadAttachment(await file.readAsBytes(), file.path, hash, {
-        ...metadata,
-      });
+      await uploadAttachment(await file.readAsBytes(), file.path, null);
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -160,15 +141,13 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
 
     setState(() => _isBusy = true);
 
-    final hash = await calculateBytesSha256(data);
-    final meta = await calculateImageData(data);
-    uploadAttachment(data, 'Pasted Image', hash, {...meta});
+    uploadAttachment(data, 'Pasted Image', null);
 
     setState(() => _isBusy = false);
   }
 
-  Future<void> uploadAttachment(Uint8List data, String path, String hash,
-      Map<String, dynamic>? metadata) async {
+  Future<void> uploadAttachment(
+      Uint8List data, String path, Map<String, dynamic>? metadata) async {
     final AttachmentProvider provider = Get.find();
     try {
       context.showSnackbar((PlatformInfo.isWeb
@@ -178,7 +157,6 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
       final resp = await provider.createAttachment(
         data,
         path,
-        hash,
         widget.usage,
         metadata,
       );
@@ -279,15 +257,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
             setState(() => _isBusy = true);
             for (final file in detail.files) {
               final data = await file.readAsBytes();
-              final hash = await calculateBytesSha256(data);
-
-              Map<String, dynamic> meta = {};
-
-              if (file.mimeType?.split('/').firstOrNull == 'image') {
-                meta = await calculateImageData(data);
-              }
-
-              uploadAttachment(data, file.path, hash, {...meta});
+              uploadAttachment(data, file.path, null);
             }
             setState(() => _isBusy = false);
           },
@@ -507,7 +477,8 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
     _isMature = widget.item.isMature;
     _altController.text = widget.item.alt;
 
-    if (['image', 'video'].contains(widget.item.mimetype.split('/').firstOrNull)) {
+    if (['image', 'video']
+        .contains(widget.item.mimetype.split('/').firstOrNull)) {
       _ratioController.text =
           widget.item.metadata?['ratio']?.toString() ?? 1.toString();
       _hasAspectRatio = true;

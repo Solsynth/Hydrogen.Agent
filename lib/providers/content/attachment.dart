@@ -1,59 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:isolate';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:solian/models/attachment.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
-import 'package:image/image.dart' as img;
-
-Future<String> calculateBytesSha256(Uint8List data) async {
-  Digest digest;
-  if (PlatformInfo.isWeb) {
-    digest = sha256.convert(data);
-  } else {
-    digest = await Isolate.run(() => sha256.convert(data));
-  }
-  return digest.toString();
-}
-
-Future<String> calculateFileSha256(File file) async {
-  Uint8List bytes;
-  if (PlatformInfo.isWeb) {
-    bytes = await file.readAsBytes();
-  } else {
-    bytes = await Isolate.run(() => file.readAsBytesSync());
-  }
-  return await calculateBytesSha256(bytes);
-}
-
-Future<Map<String, dynamic>> calculateImageData(Uint8List data) async {
-  if (PlatformInfo.isWeb) {
-    return {};
-  }
-  final decoder = await Isolate.run(() => img.findDecoderForData(data));
-  if (decoder == null) return {};
-  final image = await Isolate.run(() => decoder.decode(data));
-  if (image == null) return {};
-  return {
-    'width': image.width,
-    'height': image.height,
-    'ratio': image.width / image.height
-  };
-}
-
-Future<Map<String, dynamic>> calculateImageMetaFromFile(File file) async {
-  if (PlatformInfo.isWeb) {
-    return {};
-  }
-  final bytes = await Isolate.run(() => file.readAsBytesSync());
-  return await calculateImageData(bytes);
-}
 
 class AttachmentProvider extends GetConnect {
   static Map<String, String> mimetypeOverrides = {
@@ -79,7 +31,6 @@ class AttachmentProvider extends GetConnect {
       if (result.destination != 0 && result.isAnalyzed) {
         _cachedResponses[id] = result;
       }
-      print(result);
       return result;
     }
 
@@ -89,7 +40,6 @@ class AttachmentProvider extends GetConnect {
   Future<Response> createAttachment(
     Uint8List data,
     String path,
-    String hash,
     String usage,
     Map<String, dynamic>? metadata,
   ) async {
@@ -117,7 +67,6 @@ class AttachmentProvider extends GetConnect {
     final payload = FormData({
       'alt': fileAlt,
       'file': filePayload,
-      'hash': hash,
       'usage': usage,
       if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
       'metadata': jsonEncode(metadata),

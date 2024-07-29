@@ -86,15 +86,11 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     Response? attachResp;
     try {
       final file = File(image.path);
-      final hash = await calculateFileSha256(file);
-      final meta =  await calculateImageMetaFromFile(file);
-
       attachResp = await provider.createAttachment(
         await file.readAsBytes(),
         file.path,
-        hash,
         'p.$position',
-        {...meta},
+        null
       );
     } catch (e) {
       setState(() => _isBusy = false);

@@ -60,11 +60,9 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
         DismissiblePageDismissDirection.multi: 0.05,
       },
       onDragStart: () {
-        print('start dragging');
         setState(() => _showDetails = false);
       },
       onDragEnd: () {
-        print('stop dragging');
         setState(() => _showDetails = true);
       },
       child: GestureDetector(
