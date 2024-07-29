@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
+import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
@@ -65,17 +66,24 @@ class AttachmentProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.buildUrl('files', null);
   }
 
-  final Map<int, Response> _cachedResponses = {};
+  final Map<int, Attachment> _cachedResponses = {};
 
-  Future<Response> getMetadata(int id, {noCache = false}) async {
+  Future<Attachment?> getMetadata(int id, {noCache = false}) async {
     if (!noCache && _cachedResponses.containsKey(id)) {
       return _cachedResponses[id]!;
     }
 
     final resp = await get('/attachments/$id/meta');
-    _cachedResponses[id] = resp;
+    if (resp.statusCode == 200) {
+      final result = Attachment.fromJson(resp.body);
+      if (result.destination != 0 && result.isAnalyzed) {
+        _cachedResponses[id] = result;
+      }
+      print(result);
+      return result;
+    }
 
-    return resp;
+    return null;
   }
 
   Future<Response> createAttachment(

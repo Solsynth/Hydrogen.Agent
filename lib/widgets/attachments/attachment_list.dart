@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
@@ -43,7 +44,7 @@ class _AttachmentListState extends State<AttachmentList> {
 
   List<Attachment?> _attachmentsMeta = List.empty();
 
-  void getMetadataList() {
+  void _getMetadataList() {
     final AttachmentProvider provider = Get.find();
 
     if (widget.attachmentsId.isEmpty) {
@@ -56,8 +57,8 @@ class _AttachmentListState extends State<AttachmentList> {
     for (var idx = 0; idx < widget.attachmentsId.length; idx++) {
       provider.getMetadata(widget.attachmentsId[idx]).then((resp) {
         progress++;
-        if (resp.body != null) {
-          _attachmentsMeta[idx] = Attachment.fromJson(resp.body);
+        if (resp != null) {
+          _attachmentsMeta[idx] = resp;
         }
         if (progress == widget.attachmentsId.length) {
           calculateAspectRatio();
@@ -125,7 +126,7 @@ class _AttachmentListState extends State<AttachmentList> {
   @override
   void initState() {
     super.initState();
-    getMetadataList();
+    _getMetadataList();
   }
 
   @override
@@ -234,19 +235,13 @@ class AttachmentListEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     if (item == null) {
       return Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 280),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.close,
-                size: 32,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ],
-          ),
-        ),
+        child: Icon(
+          Icons.close,
+          size: 32,
+          color: Theme.of(context).colorScheme.onSurface,
+        )
+            .animate(onPlay: (e) => e.repeat(reverse: true))
+            .fade(duration: 500.ms),
       );
     }
 

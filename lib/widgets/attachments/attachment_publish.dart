@@ -226,7 +226,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
     for (var idx = 0; idx < widget.current.length; idx++) {
       provider.getMetadata(widget.current[idx]).then((resp) {
         progress++;
-        _attachments[idx] = Attachment.fromJson(resp.body);
+        _attachments[idx] = resp;
         if (progress == widget.current.length) {
           setState(() {
             _isBusy = false;

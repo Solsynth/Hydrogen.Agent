@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -83,7 +84,9 @@ class _AttachmentItemState extends State<AttachmentItem> {
                   onPressed: () {
                     launchUrlString(
                       ServiceFinder.buildUrl(
-                          'files', '/attachments/${widget.item.id}'),
+                        'files',
+                        '/attachments/${widget.item.id}',
+                      ),
                     );
                   },
                 ),
@@ -125,14 +128,27 @@ class _AttachmentItemImage extends StatelessWidget {
           if (PlatformInfo.canCacheImage)
             CachedNetworkImage(
               fit: fit,
-              imageUrl:
-                  ServiceFinder.buildUrl('files', '/attachments/${item.id}'),
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Center(
-                child: CircularProgressIndicator(
-                  value: downloadProgress.progress,
-                ),
+              imageUrl: ServiceFinder.buildUrl(
+                'files',
+                '/attachments/${item.id}',
               ),
+              progressIndicatorBuilder: (context, url, downloadProgress) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: downloadProgress.progress,
+                  ),
+                );
+              },
+              errorWidget: (context, url, error) {
+                return Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Center(
+                    child: const Icon(Icons.close, size: 32)
+                        .animate(onPlay: (e) => e.repeat(reverse: true))
+                        .fade(duration: 500.ms),
+                  ),
+                );
+              },
             )
           else
             Image.network(
@@ -147,6 +163,16 @@ class _AttachmentItemImage extends StatelessWidget {
                         ? loadingProgress.cumulativeBytesLoaded /
                             loadingProgress.expectedTotalBytes!
                         : null,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Center(
+                    child: const Icon(Icons.close, size: 32)
+                        .animate(onPlay: (e) => e.repeat(reverse: true))
+                        .fade(duration: 500.ms),
                   ),
                 );
               },

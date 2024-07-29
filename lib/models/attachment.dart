@@ -12,7 +12,8 @@ class Attachment {
   String usage;
   String mimetype;
   String hash;
-  String destination;
+  int destination;
+  bool isAnalyzed;
   Map<String, dynamic>? metadata;
   bool isMature;
   Account? account;
@@ -31,6 +32,7 @@ class Attachment {
     required this.mimetype,
     required this.hash,
     required this.destination,
+    required this.isAnalyzed,
     required this.metadata,
     required this.isMature,
     required this.account,
@@ -50,6 +52,7 @@ class Attachment {
     mimetype: json['mimetype'],
     hash: json['hash'],
     destination: json['destination'],
+    isAnalyzed: json['is_analyzed'],
     metadata: json['metadata'],
     isMature: json['is_mature'],
     account: json['account'] != null ? Account.fromJson(json['account']) : null,
@@ -69,6 +72,7 @@ class Attachment {
     'mimetype': mimetype,
     'hash': hash,
     'destination': destination,
+    'is_analyzed': isAnalyzed,
     'metadata': metadata,
     'is_mature': isMature,
     'account': account?.toJson(),
