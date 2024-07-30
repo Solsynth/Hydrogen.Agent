@@ -29,6 +29,7 @@ class PostPublishScreen extends StatefulWidget {
   final Post? reply;
   final Post? repost;
   final Realm? realm;
+  final int mode;
 
   const PostPublishScreen({
     super.key,
@@ -36,6 +37,7 @@ class PostPublishScreen extends StatefulWidget {
     this.reply,
     this.repost,
     this.realm,
+    required this.mode,
   });
 
   @override
@@ -79,6 +81,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   }
 
   void syncWidget() {
+    _editorController.mode.value = widget.mode;
     if (widget.edit != null) {
       _editorController.editTarget = widget.edit;
     }
@@ -108,7 +111,13 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       child: Scaffold(
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),
-          title: AppBarTitle('postEditorModeStory'.tr),
+          title: Obx(
+            () => AppBarTitle(
+              _editorController.mode.value == 0
+                  ? 'postEditorModeStory'.tr
+                  : 'postEditorModeArticle'.tr,
+            ),
+          ),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           actions: [

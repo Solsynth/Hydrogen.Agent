@@ -136,11 +136,25 @@ class PostCreatePopup extends StatelessWidget {
 
     final List<dynamic> actionList = [
       (
-        icon: const Icon(Icons.edit_square),
+        icon: const Icon(Icons.post_add),
         label: 'postEditorModeStory'.tr,
         onTap: () {
           Navigator.pop(context);
-          AppRouter.instance.pushNamed('postEditor').then((val) {
+          AppRouter.instance.pushNamed('postEditor', queryParameters: {
+            'mode': 0.toString(),
+          }).then((val) {
+            if (val != null && onCreated != null) onCreated!();
+          });
+        },
+      ),
+      (
+        icon: const Icon(Icons.description),
+        label: 'postEditorModeArticle'.tr,
+        onTap: () {
+          Navigator.pop(context);
+          AppRouter.instance.pushNamed('postEditor', queryParameters: {
+            'mode': 1.toString(),
+          }).then((val) {
             if (val != null && onCreated != null) onCreated!();
           });
         },

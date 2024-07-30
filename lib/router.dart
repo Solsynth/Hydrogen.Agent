@@ -83,6 +83,7 @@ abstract class AppRouter {
             reply: arguments?.reply,
             repost: arguments?.repost,
             realm: arguments?.realm,
+            mode: int.tryParse(state.uri.queryParameters['mode'] ?? '0') ?? 0,
           );
         },
       ),
