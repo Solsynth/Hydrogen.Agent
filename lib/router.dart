@@ -18,6 +18,7 @@ import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
 import 'package:solian/screens/home.dart';
 import 'package:solian/screens/posts/post_editor.dart';
+import 'package:solian/screens/settings.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/shells/title_shell.dart';
 
@@ -34,6 +35,22 @@ abstract class AppRouter {
           _chatRoute,
           _realmRoute,
           _accountRoute,
+          GoRoute(
+            path: '/about',
+            name: 'about',
+            builder: (context, state) => TitleShell(
+              state: state,
+              child: const AboutScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/settings',
+            name: 'settings',
+            builder: (context, state) => TitleShell(
+              state: state,
+              child: const SettingScreen(),
+            ),
+          ),
         ],
       ),
     ],
@@ -208,14 +225,6 @@ abstract class AppRouter {
         name: 'accountProfilePage',
         builder: (context, state) => AccountProfilePage(
           name: state.pathParameters['name']!,
-        ),
-      ),
-      GoRoute(
-        path: '/about',
-        name: 'about',
-        builder: (context, state) => TitleShell(
-          state: state,
-          child: const AboutScreen(),
         ),
       ),
     ],

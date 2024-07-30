@@ -78,8 +78,8 @@ class SolianApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp.router(
       title: 'Solian',
-      theme: SolianTheme.build(Brightness.light),
-      darkTheme: SolianTheme.build(Brightness.dark),
+      theme: currentLightTheme,
+      darkTheme: currentDarkTheme,
       themeMode: ThemeMode.system,
       routerDelegate: AppRouter.instance.routerDelegate,
       routeInformationParser: AppRouter.instance.routeInformationParser,

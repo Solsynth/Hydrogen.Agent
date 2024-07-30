@@ -27,6 +27,7 @@ const i18nEnglish = {
   'about': 'About',
   'edit': 'Edit',
   'delete': 'Delete',
+  'settings': 'Settings',
   'search': 'Search',
   'post': 'Post',
   'article': 'Article',
@@ -293,6 +294,7 @@ const i18nEnglish = {
   'accountStatusNegative': 'Negative',
   'accountStatusNeutral': 'Neutral',
   'accountStatusPositive': 'Positive',
+  'bsLoadingTheme': 'Loading Theme',
   'bsCheckingServer': 'Checking Server Status',
   'bsCheckingServerFail':
       'Unable connect to server, check your network connection',
@@ -304,4 +306,9 @@ const i18nEnglish = {
   'postShareContent':
       '@content\n\n@username on the Solar Network\nCheck it out: @link',
   'postShareSubject': '@username posted a post on the Solar Network',
+  'themeColor': 'Global Theme Color',
+  'themeColorRed': 'Modern Red',
+  'themeColorBlue': 'Classic Blue',
+  'themeColorMiku': 'Miku Blue',
+  'themeColorApplied': 'Global theme color has been saved, restart to get applied.',
 };

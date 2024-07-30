@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/sized_container.dart';
 
 class BootstrapperShell extends StatefulWidget {
@@ -29,6 +31,18 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
   int _periodCursor = 0;
 
   late final List<({String label, Future<void> Function() action})> _periods = [
+    (
+      label: 'bsLoadingTheme',
+      action: () async {
+        final prefs = await SharedPreferences.getInstance();
+        if (prefs.containsKey('global_theme_color')) {
+          final value = prefs.getInt('global_theme_color')!;
+          final color = Color(value);
+          currentLightTheme = SolianTheme.build(Brightness.light, seedColor: color);
+          currentDarkTheme = SolianTheme.build(Brightness.dark, seedColor: color);
+        }
+      }
+    ),
     (
       label: 'bsCheckingServer',
       action: () async {

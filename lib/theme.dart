@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:solian/platform.dart';
 
+ThemeData? currentLightTheme = SolianTheme.build(Brightness.light);
+ThemeData? currentDarkTheme = SolianTheme.build(Brightness.dark);
+
 abstract class SolianTheme {
   static bool isLargeScreen(BuildContext context) =>
       MediaQuery.of(context).size.width > 640;
@@ -27,13 +30,13 @@ abstract class SolianTheme {
     }
   }
 
-  static ThemeData build(Brightness brightness) {
+  static ThemeData build(Brightness brightness, {Color? seedColor}) {
     return ThemeData(
       brightness: brightness,
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         brightness: brightness,
-        seedColor: const Color.fromRGBO(154, 98, 91, 1),
+        seedColor: seedColor ?? const Color.fromRGBO(154, 98, 91, 1),
       ),
     );
   }

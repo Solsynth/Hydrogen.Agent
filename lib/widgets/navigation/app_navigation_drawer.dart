@@ -138,23 +138,28 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               );
             }),
             trailing: IconButton(
-              icon: const Icon(Icons.face_retouching_natural),
+              icon: const Icon(Icons.settings),
               onPressed: () {
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  context: context,
-                  builder: (context) => AccountStatusAction(
-                    currentStatus: _accountStatus!.status,
-                  ),
-                ).then((val) {
-                  if (val == true) getStatus();
-                });
+                AppRouter.instance.pushNamed('settings');
+                setState(() => _selectedIndex = null);
+                closeDrawer();
               },
             ),
             onTap: () {
               AppRouter.instance.goNamed('account');
               setState(() => _selectedIndex = null);
               closeDrawer();
+            },
+            onLongPress: () {
+              showModalBottomSheet(
+                useRootNavigator: true,
+                context: context,
+                builder: (context) => AccountStatusAction(
+                  currentStatus: _accountStatus!.status,
+                ),
+              ).then((val) {
+                if (val == true) getStatus();
+              });
             },
           );
         }).paddingOnly(top: 8),
