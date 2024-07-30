@@ -1,4 +1,4 @@
-const messagesEnglish = {
+const i18nEnglish = {
   'done': 'Done',
   'hide': 'Hide',
   'okay': 'Okay',
@@ -97,7 +97,9 @@ const messagesEnglish = {
   'postPinned': 'Pinned',
   'postListNews': 'News',
   'postListShuffle': 'Random',
-  'postEditor': 'Create new post',
+  'postEditorModeStory': 'Post a post',
+  'postEditorModeArticle': 'Post an article',
+  'postEditor': 'Post editor',
   'articleEditor': 'Create new article',
   'articleDetail': 'Article details',
   'draftBoxOpen': 'Open draft box',

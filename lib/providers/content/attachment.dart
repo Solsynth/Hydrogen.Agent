@@ -83,7 +83,6 @@ class AttachmentProvider extends GetConnect {
     int id,
     String alt,
     String usage, {
-    double? ratio,
     bool isMature = false,
   }) async {
     final AuthProvider auth = Get.find();
@@ -92,9 +91,6 @@ class AttachmentProvider extends GetConnect {
     final client = auth.configureClient('files');
 
     var resp = await client.put('/attachments/$id', {
-      'metadata': {
-        if (ratio != null) 'ratio': ratio,
-      },
       'alt': alt,
       'usage': usage,
       'is_mature': isMature,

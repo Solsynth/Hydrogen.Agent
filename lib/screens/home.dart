@@ -137,7 +137,7 @@ class PostCreatePopup extends StatelessWidget {
     final List<dynamic> actionList = [
       (
         icon: const Icon(Icons.edit_square),
-        label: 'postEditor'.tr,
+        label: 'postEditorModeStory'.tr,
         onTap: () {
           Navigator.pop(context);
           AppRouter.instance.pushNamed('postEditor').then((val) {

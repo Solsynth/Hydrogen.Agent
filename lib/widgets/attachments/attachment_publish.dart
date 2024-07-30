@@ -361,7 +361,7 @@ class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
                     alignment: WrapAlignment.center,
                     runAlignment: WrapAlignment.center,
                     children: [
-                      if (PlatformInfo.isDesktop)
+                      if (PlatformInfo.isDesktop || PlatformInfo.isIOS || PlatformInfo.isWeb)
                         ElevatedButton.icon(
                           icon: const Icon(Icons.paste),
                           label: Text('attachmentAddClipboard'.tr),
@@ -426,12 +426,10 @@ class AttachmentEditorDialog extends StatefulWidget {
 }
 
 class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
-  final _ratioController = TextEditingController();
   final _altController = TextEditingController();
 
   bool _isBusy = false;
   bool _isMature = false;
-  bool _hasAspectRatio = false;
 
   Future<Attachment?> updateAttachment() async {
     final AttachmentProvider provider = Get.find();
@@ -442,9 +440,6 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
         widget.item.id,
         _altController.value.text,
         widget.item.usage,
-        ratio: _hasAspectRatio
-            ? (double.tryParse(_ratioController.value.text) ?? 1)
-            : null,
         isMature: _isMature,
       );
 
@@ -476,13 +471,6 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
   void syncWidget() {
     _isMature = widget.item.isMature;
     _altController.text = widget.item.alt;
-
-    if (['image', 'video']
-        .contains(widget.item.mimetype.split('/').firstOrNull)) {
-      _ratioController.text =
-          widget.item.metadata?['ratio']?.toString() ?? 1.toString();
-      _hasAspectRatio = true;
-    }
   }
 
   @override
@@ -516,61 +504,6 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
               ),
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              readOnly: !_hasAspectRatio,
-              controller: _ratioController,
-              decoration: InputDecoration(
-                isDense: true,
-                prefixIcon: const Icon(Icons.aspect_ratio),
-                border: const OutlineInputBorder(),
-                labelText: 'aspectRatio'.tr,
-              ),
-              onTapOutside: (_) =>
-                  FocusManager.instance.primaryFocus?.unfocus(),
-            ),
-            const SizedBox(height: 5),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Wrap(
-                spacing: 6,
-                runSpacing: 0,
-                children: [
-                  ActionChip(
-                    avatar: Icon(Icons.square_rounded,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    label: Text('aspectRatioSquare'.tr),
-                    onPressed: () {
-                      if (_hasAspectRatio) {
-                        setState(() => _ratioController.text = '1');
-                      }
-                    },
-                  ),
-                  ActionChip(
-                    avatar: Icon(Icons.portrait,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    label: Text('aspectRatioPortrait'.tr),
-                    onPressed: () {
-                      if (_hasAspectRatio) {
-                        setState(
-                            () => _ratioController.text = (9 / 16).toString());
-                      }
-                    },
-                  ),
-                  ActionChip(
-                    avatar: Icon(Icons.landscape,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
-                    label: Text('aspectRatioLandscape'.tr),
-                    onPressed: () {
-                      if (_hasAspectRatio) {
-                        setState(
-                            () => _ratioController.text = (16 / 9).toString());
-                      }
-                    },
-                  ),
-                ],
-              ),
             ),
             Card(
               child: CheckboxListTile(

@@ -108,7 +108,6 @@ class _AttachmentItemImage extends StatelessWidget {
   final Function? onHide;
 
   const _AttachmentItemImage({
-    super.key,
     required this.parentId,
     required this.item,
     required this.showBadge,
@@ -215,7 +214,7 @@ class _AttachmentItemImage extends StatelessWidget {
 class _AttachmentItemVideo extends StatefulWidget {
   final Attachment item;
 
-  const _AttachmentItemVideo({super.key, required this.item});
+  const _AttachmentItemVideo({required this.item});
 
   @override
   State<_AttachmentItemVideo> createState() => _AttachmentItemVideoState();

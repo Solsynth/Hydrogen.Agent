@@ -1,4 +1,4 @@
-const simplifiedChineseMessages = {
+const i18nSimplifiedChinese = {
   'done': '完成',
   'hide': '隐藏',
   'okay': '确认',
@@ -89,7 +89,9 @@ const simplifiedChineseMessages = {
   'pinPost': '置顶本帖',
   'unpinPost': '取消置顶本帖',
   'postPinned': '已置顶',
-  'postEditor': '发个帖子',
+  'postEditorModeStory': '发个帖子',
+  'postEditorModeArticle': '撰写文章',
+  'postEditor': '帖子编辑器',
   'articleEditor': '撰写文章',
   'articleDetail': '文章详情',
   'draftBoxOpen': '打开草稿箱',

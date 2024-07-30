@@ -134,7 +134,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       child: Scaffold(
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),
-          title: AppBarTitle('postPublish'.tr),
+          title: AppBarTitle('postEditorModeStory'.tr),
           centerTitle: false,
           toolbarHeight: SolianTheme.toolbarHeight(context),
           actions: [
