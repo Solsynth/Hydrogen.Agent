@@ -98,6 +98,7 @@ const i18nEnglish = {
   'unpinPost': 'Unpin this post',
   'postRestoreFromLocal': 'Restore from local',
   'postAutoSaveAt': 'Auto saved at @date',
+  'postCategoriesAndTags': 'Categories n\' Tags',
   'postVisibility': 'Visibility',
   'postVisibilityAll': 'Everyone',
   'postVisibilityFriends': 'Friends',
@@ -293,12 +294,14 @@ const i18nEnglish = {
   'accountStatusNeutral': 'Neutral',
   'accountStatusPositive': 'Positive',
   'bsCheckingServer': 'Checking Server Status',
-  'bsCheckingServerFail': 'Unable connect to server, check your network connection',
+  'bsCheckingServerFail':
+      'Unable connect to server, check your network connection',
   'bsCheckingServerDown': 'Server currently unavailable, please retry later',
   'bsAuthorizing': 'Authorizing',
   'bsEstablishingConn': 'Establishing Connection',
   'bsPreparingData': 'Preparing User Data',
   'bsRegisteringPushNotify': 'Enabling Push Notifications',
-  'postShareContent': '@content\n\n@username on the Solar Network\nCheck it out: @link',
+  'postShareContent':
+      '@content\n\n@username on the Solar Network\nCheck it out: @link',
   'postShareSubject': '@username posted a post on the Solar Network',
 };

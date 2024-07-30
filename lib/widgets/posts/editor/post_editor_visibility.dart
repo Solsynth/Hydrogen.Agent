@@ -54,8 +54,8 @@ class PostEditorVisibilityDialog extends StatelessWidget {
             );
           }),
           Obx(() {
-            if (controller.visibility.value != 2 &&
-                controller.visibility.value != 3) {
+            if (controller.visibility.value == 2 ||
+                controller.visibility.value == 3) {
               return const SizedBox(height: 8);
             }
             return const SizedBox();

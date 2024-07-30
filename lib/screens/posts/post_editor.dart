@@ -382,6 +382,13 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                             _editorController.editAttachment(context);
                           },
                         ),
+                        IconButton(
+                          icon: const Icon(Icons.tag),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            _editorController.editCategoriesAndTags(context);
+                          },
+                        ),
                       ],
                     ).paddingSymmetric(horizontal: 6, vertical: 8),
                   ),

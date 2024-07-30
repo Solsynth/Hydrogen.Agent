@@ -33,7 +33,7 @@ abstract class SolianTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         brightness: brightness,
-        seedColor: const Color.fromRGBO(103, 96, 193, 1),
+        seedColor: const Color.fromRGBO(154, 98, 91, 1),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
@@ -101,7 +102,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       for (var idx = 0; idx < _periods.length; idx++) {
         await _periods[idx].action();
         if (_isErrored) break;
-        setState(() => _periodCursor++);
+        if (_periodCursor < _periods.length - 1) {
+          setState(() => _periodCursor++);
+        }
       }
     } finally {
       setState(() => _isBusy = false);
@@ -127,7 +130,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
               height: 280,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Image.asset('assets/logo.png', width: 80, height: 80),
+                child: Image.asset('assets/logo.png', width: 80, height: 80)
+                    .animate(onPlay: (c) => c.repeat())
+                    .rotate(duration: 850.ms, curve: Curves.easeInOut),
               ),
             ),
             GestureDetector(

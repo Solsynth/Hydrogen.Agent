@@ -6,9 +6,9 @@ import 'package:get/get.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
+import 'package:solian/widgets/posts/editor/post_editor_categories_tags.dart';
 import 'package:solian/widgets/posts/editor/post_editor_overview.dart';
 import 'package:solian/widgets/posts/editor/post_editor_visibility.dart';
-import 'package:textfield_tags/textfield_tags.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PostEditorController extends GetxController {
@@ -17,7 +17,6 @@ class PostEditorController extends GetxController {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final contentController = TextEditingController();
-  final tagController = StringTagController();
 
   RxInt mode = 0.obs;
   RxInt contentLength = 0.obs;
@@ -27,6 +26,7 @@ class PostEditorController extends GetxController {
   Rx<Post?> repostTo = Rx(null);
   Rx<Realm?> realmZone = Rx(null);
   RxList<int> attachments = RxList<int>.empty(growable: true);
+  RxList<String> tags = RxList<String>.empty(growable: true);
 
   RxList<int> visibleUsers = RxList.empty(growable: true);
   RxList<int> invisibleUsers = RxList.empty(growable: true);
@@ -74,6 +74,15 @@ class PostEditorController extends GetxController {
     return showDialog(
       context: context,
       builder: (context) => PostEditorVisibilityDialog(
+        controller: this,
+      ),
+    );
+  }
+
+  Future<void> editCategoriesAndTags(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => PostEditorCategoriesDialog(
         controller: this,
       ),
     );
@@ -127,8 +136,8 @@ class PostEditorController extends GetxController {
     titleController.clear();
     descriptionController.clear();
     contentController.clear();
-    tagController.clearTags();
     attachments.clear();
+    tags.clear();
     visibleUsers.clear();
     invisibleUsers.clear();
     visibility.value = 0;
@@ -206,8 +215,7 @@ class PostEditorController extends GetxController {
       'title': title,
       'description': description,
       'content': contentController.text,
-      'tags': tagController.getTags?.map((x) => {'alias': x}).toList() ??
-          List.empty(),
+      'tags': tags,
       'attachments': attachments,
       'visible_users': visibleUsers,
       'invisible_users': invisibleUsers,
@@ -259,7 +267,7 @@ class PostEditorController extends GetxController {
       descriptionController.text.isNotEmpty,
       contentController.text.isNotEmpty,
       attachments.isNotEmpty,
-      tagController.getTags?.isNotEmpty ?? false,
+      tags.isNotEmpty
     ].any((x) => x);
   }
 
@@ -267,8 +275,9 @@ class PostEditorController extends GetxController {
   void dispose() {
     _saveTimer?.cancel();
 
+    titleController.dispose();
+    descriptionController.dispose();
     contentController.dispose();
-    tagController.dispose();
     super.dispose();
   }
 }

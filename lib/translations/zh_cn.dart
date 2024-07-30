@@ -92,6 +92,7 @@ const i18nSimplifiedChinese = {
   'unpinPost': '取消置顶本帖',
   'postRestoreFromLocal': '内容从本地暂存回复',
   'postAutoSaveAt': '已自动保存于 @date',
+  'postCategoriesAndTags': '分类与标签',
   'postVisibility': '帖子可见性',
   'postVisibilityAll': '所有人可见',
   'postVisibilityFriends': '仅好友可见',
