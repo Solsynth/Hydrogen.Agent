@@ -54,10 +54,10 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
   Widget build(BuildContext context) {
     return DismissiblePage(
       key: Key('attachment-dismissible${widget.attachment.id}'),
-      direction: DismissiblePageDismissDirection.multi,
+      direction: DismissiblePageDismissDirection.vertical,
       onDismissed: () => Navigator.pop(context),
       dismissThresholds: const {
-        DismissiblePageDismissDirection.multi: 0.05,
+        DismissiblePageDismissDirection.vertical: 0.0,
       },
       onDragStart: () {
         setState(() => _showDetails = false);
