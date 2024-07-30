@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
@@ -70,6 +71,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else {
+      _editorController.localClear();
       AppRouter.instance.pop(resp.body);
     }
 
@@ -234,11 +236,63 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
               ),
             ),
             Material(
-              elevation: 8,
               color: Theme.of(context).colorScheme.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Obx(() {
+                    final textStyle = TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.75),
+                    );
+                    final showFactors = [
+                      _editorController.isRestoreFromLocal.value,
+                      _editorController.lastSaveTime.value != null,
+                    ];
+                    final doShow = showFactors.any((x) => x);
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 16,
+                      ),
+                      child: Row(
+                        children: [
+                          if (showFactors[0])
+                            Text('postRestoreFromLocal'.tr, style: textStyle)
+                                .paddingOnly(right: 4),
+                          if (showFactors[0])
+                            InkWell(
+                              child: Text('clear'.tr, style: textStyle),
+                              onTap: () {
+                                _editorController.localClear();
+                                _editorController.currentClear();
+                                setState(() {});
+                              },
+                            ),
+                          if (showFactors.where((x) => x).length > 1)
+                            Text(
+                              '·',
+                              style: textStyle,
+                            ).paddingSymmetric(horizontal: 8),
+                          if (showFactors[1])
+                            Text(
+                              'postAutoSaveAt'.trParams({
+                                'date': DateFormat('HH:mm:ss').format(
+                                  _editorController.lastSaveTime.value ??
+                                      DateTime.now(),
+                                )
+                              }),
+                              style: textStyle,
+                            ),
+                        ],
+                      ),
+                    )
+                        .animate(target: doShow ? 1 : 0)
+                        .fade(curve: Curves.easeInOut, duration: 300.ms);
+                  }),
                   if (_editorController.mode.value == 0)
                     Obx(
                       () => TweenAnimationBuilder<double>(
