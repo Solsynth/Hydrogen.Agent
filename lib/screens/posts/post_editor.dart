@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
@@ -10,10 +11,7 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
-import 'package:solian/widgets/attachments/attachment_publish.dart';
 import 'package:solian/widgets/posts/post_item.dart';
-import 'package:solian/widgets/feed/feed_tags_field.dart';
-import 'package:textfield_tags/textfield_tags.dart';
 import 'package:badges/badges.dart' as badges;
 
 class PostPublishArguments {
@@ -44,54 +42,30 @@ class PostPublishScreen extends StatefulWidget {
 }
 
 class _PostPublishScreenState extends State<PostPublishScreen> {
-  final _contentController = TextEditingController();
-  final _tagsController = StringTagController();
+  final _editorController = PostEditorController();
 
   bool _isBusy = false;
 
-  List<int> _attachments = List.empty();
-
-  bool _isDraft = false;
-
-  void showAttachments() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => AttachmentPublishPopup(
-        usage: 'i.attachment',
-        current: _attachments,
-        onUpdate: (value) {
-          setState(() => _attachments = value);
-        },
-      ),
-    );
-  }
-
-  void applyPost() async {
+  void _applyPost() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
-    if (_contentController.value.text.isEmpty) return;
+    if (_editorController.isEmpty) return;
 
     setState(() => _isBusy = true);
 
     final client = auth.configureClient('interactive');
 
-    final payload = {
-      'content': _contentController.value.text,
-      'tags': _tagsController.getTags?.map((x) => {'alias': x}).toList() ??
-          List.empty(),
-      'attachments': _attachments,
-      'is_draft': _isDraft,
-      if (widget.reply != null) 'reply_to': widget.reply!.id,
-      if (widget.repost != null) 'repost_to': widget.repost!.id,
-      if (widget.realm != null) 'realm': widget.realm!.alias,
-    };
-
     Response resp;
     if (widget.edit != null) {
-      resp = await client.put('/stories/${widget.edit!.id}', payload);
+      resp = await client.put(
+        '/stories/${widget.edit!.id}',
+        _editorController.payload,
+      );
     } else {
-      resp = await client.post('/stories', payload);
+      resp = await client.post(
+        '/stories',
+        _editorController.payload,
+      );
     }
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
@@ -104,9 +78,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   void syncWidget() {
     if (widget.edit != null) {
-      _contentController.text = widget.edit!.body['content'];
-      _attachments = widget.edit!.body['attachments']?.cast<int>() ?? List.empty();
-      _isDraft = widget.edit!.isDraft ?? false;
+      _editorController.editTarget = widget.edit;
     }
   }
 
@@ -116,8 +88,8 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   @override
   void initState() {
-    syncWidget();
     super.initState();
+    syncWidget();
   }
 
   @override
@@ -139,151 +111,195 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           toolbarHeight: SolianTheme.toolbarHeight(context),
           actions: [
             TextButton(
-              onPressed: _isBusy ? null : () => applyPost(),
-              child: Text(
-                _isDraft
-                    ? 'draftSave'.tr.toUpperCase()
-                    : 'postAction'.tr.toUpperCase(),
+              onPressed: _isBusy ? null : () => _applyPost(),
+              child: Obx(
+                () => Text(
+                  _editorController.isDraft.isTrue
+                      ? 'draftSave'.tr.toUpperCase()
+                      : 'postAction'.tr.toUpperCase(),
+                ),
               ),
             )
           ],
         ),
-        body: Stack(
+        body: Column(
           children: [
-            ListView(
-              children: [
-                if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-                if (widget.edit != null && widget.edit!.isDraft != true)
-                  MaterialBanner(
-                    leading: const Icon(Icons.edit),
-                    leadingPadding: const EdgeInsets.only(left: 10, right: 20),
-                    dividerColor: Colors.transparent,
-                    content: Text('postEditingNotify'.tr),
-                    actions: notifyBannerActions,
-                  ),
-                if (widget.reply != null)
-                  ExpansionTile(
-                    leading: const FaIcon(
-                      FontAwesomeIcons.reply,
-                      size: 18,
-                    ).paddingOnly(left: 2),
-                    title: Text('postReplyingNotify'.trParams(
-                      {'username': '@${widget.reply!.author.name}'},
-                    )),
-                    collapsedBackgroundColor:
-                        Theme.of(context).colorScheme.surfaceContainer,
-                    children: [
-                      PostItem(
-                        item: widget.reply!,
-                        isReactable: false,
-                      ).paddingOnly(bottom: 8),
-                    ],
-                  ),
-                if (widget.repost != null)
-                  ExpansionTile(
-                    leading: const FaIcon(
-                      FontAwesomeIcons.retweet,
-                      size: 18,
-                    ).paddingOnly(left: 2),
-                    title: Text('postRepostingNotify'.trParams(
-                      {'username': '@${widget.repost!.author.name}'},
-                    )),
-                    collapsedBackgroundColor:
-                        Theme.of(context).colorScheme.surfaceContainer,
-                    children: [
-                      PostItem(
-                        item: widget.repost!,
-                        isReactable: false,
-                      ).paddingOnly(bottom: 8),
-                    ],
-                  ),
-                if (widget.realm != null)
-                  MaterialBanner(
-                    leading: const Icon(Icons.group),
-                    leadingPadding: const EdgeInsets.only(left: 10, right: 20),
-                    dividerColor: Colors.transparent,
-                    content: Text(
-                      'postInRealmNotify'
-                          .trParams({'realm': '#${widget.realm!.alias}'}),
-                    ),
-                    actions: notifyBannerActions,
-                  ),
-                const Divider(thickness: 0.3, height: 0.3)
-                    .paddingOnly(bottom: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TextField(
-                    maxLines: null,
-                    autofocus: true,
-                    autocorrect: true,
-                    keyboardType: TextInputType.multiline,
-                    controller: _contentController,
-                    decoration: InputDecoration.collapsed(
-                      hintText: 'postContentPlaceholder'.tr,
-                    ),
-                    onTapOutside: (_) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
-                  ),
-                ),
-                const SizedBox(height: 120)
-              ],
+            ListTile(
+              tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              title: Text(
+                _editorController.title ?? 'title'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                _editorController.description ?? 'description'.tr,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              contentPadding: const EdgeInsets.only(
+                left: 16,
+                right: 8,
+                top: 0,
+                bottom: 0,
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  _editorController.editOverview(context).then((_) {
+                    setState(() {});
+                  });
+                },
+              ),
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Material(
-                elevation: 8,
-                color: Theme.of(context).colorScheme.surface,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TagsField(
-                      initialTags:
-                          widget.edit?.tags?.map((x) => x.alias).toList(),
-                      tagsController: _tagsController,
-                      hintText: 'postTagsPlaceholder'.tr,
+            Expanded(
+              child: ListView(
+                children: [
+                  if (_isBusy)
+                    const LinearProgressIndicator().animate().scaleX(),
+                  if (widget.edit != null && widget.edit!.isDraft != true)
+                    MaterialBanner(
+                      leading: const Icon(Icons.edit),
+                      leadingPadding:
+                          const EdgeInsets.only(left: 10, right: 20),
+                      dividerColor: Colors.transparent,
+                      content: Text('postEditingNotify'.tr),
+                      actions: notifyBannerActions,
                     ),
-                    const Divider(thickness: 0.3, height: 0.3),
-                    SizedBox(
-                      height: 56,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          IconButton(
-                            icon: _isDraft
+                  if (widget.reply != null)
+                    ExpansionTile(
+                      leading: const FaIcon(
+                        FontAwesomeIcons.reply,
+                        size: 18,
+                      ).paddingOnly(left: 2),
+                      title: Text('postReplyingNotify'.trParams(
+                        {'username': '@${widget.reply!.author.name}'},
+                      )),
+                      collapsedBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainer,
+                      children: [
+                        PostItem(
+                          item: widget.reply!,
+                          isReactable: false,
+                        ).paddingOnly(bottom: 8),
+                      ],
+                    ),
+                  if (widget.repost != null)
+                    ExpansionTile(
+                      leading: const FaIcon(
+                        FontAwesomeIcons.retweet,
+                        size: 18,
+                      ).paddingOnly(left: 2),
+                      title: Text('postRepostingNotify'.trParams(
+                        {'username': '@${widget.repost!.author.name}'},
+                      )),
+                      collapsedBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainer,
+                      children: [
+                        PostItem(
+                          item: widget.repost!,
+                          isReactable: false,
+                        ).paddingOnly(bottom: 8),
+                      ],
+                    ),
+                  if (widget.realm != null)
+                    MaterialBanner(
+                      leading: const Icon(Icons.group),
+                      leadingPadding:
+                          const EdgeInsets.only(left: 10, right: 20),
+                      dividerColor: Colors.transparent,
+                      content: Text(
+                        'postInRealmNotify'
+                            .trParams({'realm': '#${widget.realm!.alias}'}),
+                      ),
+                      actions: notifyBannerActions,
+                    ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TextField(
+                      maxLines: null,
+                      autofocus: true,
+                      autocorrect: true,
+                      keyboardType: TextInputType.multiline,
+                      controller: _editorController.contentController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'postContentPlaceholder'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    ),
+                  ),
+                  const SizedBox(height: 120)
+                ],
+              ),
+            ),
+            Material(
+              elevation: 8,
+              color: Theme.of(context).colorScheme.surface,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_editorController.mode.value == 0)
+                    Obx(
+                      () => TweenAnimationBuilder<double>(
+                        tween: Tween(
+                          begin: 0,
+                          end: _editorController.contentLength.value / 4096,
+                        ),
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        builder: (context, value, _) => LinearProgressIndicator(
+                          minHeight: 2,
+                          color: _editorController.contentLength.value > 4096
+                              ? Colors.red[900]
+                              : Theme.of(context).colorScheme.primary,
+                          value: value,
+                        ),
+                      ),
+                    ),
+                  SizedBox(
+                    height: 56,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Obx(
+                          () => IconButton(
+                            icon: _editorController.isDraft.value
                                 ? const Icon(Icons.drive_file_rename_outline)
                                 : const Icon(Icons.public),
-                            color: _isDraft
+                            color: _editorController.isDraft.value
                                 ? Colors.grey.shade600
                                 : Colors.green.shade700,
                             onPressed: () {
-                              setState(() => _isDraft = !_isDraft);
+                              _editorController.toggleDraftMode();
                             },
                           ),
-                          IconButton(
-                            icon: badges.Badge(
+                        ),
+                        IconButton(
+                          icon: Obx(
+                            () => badges.Badge(
                               badgeContent: Text(
-                                _attachments.length.toString(),
+                                _editorController.attachments.length.toString(),
                                 style: const TextStyle(color: Colors.white),
                               ),
-                              showBadge: _attachments.isNotEmpty,
+                              showBadge:
+                                  _editorController.attachments.isNotEmpty,
                               position: badges.BadgePosition.topEnd(
                                 top: -12,
                                 end: -8,
                               ),
                               child: const Icon(Icons.camera_alt),
                             ),
-                            color: Theme.of(context).colorScheme.primary,
-                            onPressed: () => showAttachments(),
                           ),
-                        ],
-                      ).paddingSymmetric(horizontal: 6, vertical: 8),
-                    ),
-                  ],
-                ).paddingOnly(bottom: MediaQuery.of(context).padding.bottom),
-              ),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () =>
+                              _editorController.editAttachment(context),
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 6, vertical: 8),
+                  ),
+                ],
+              ).paddingOnly(bottom: MediaQuery.of(context).padding.bottom),
             ),
           ],
         ),
@@ -293,8 +309,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   @override
   void dispose() {
-    _contentController.dispose();
-    _tagsController.dispose();
+    _editorController.dispose();
     super.dispose();
   }
 }

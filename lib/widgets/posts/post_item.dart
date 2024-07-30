@@ -55,7 +55,7 @@ class _PostItemState extends State<PostItem> {
 
   Widget _buildDate() {
     if (widget.isFullDate) {
-      return Text(DateFormat('y/M/d H:m')
+      return Text(DateFormat('y/M/d HH:mm')
           .format(item.publishedAt?.toLocal() ?? DateTime.now()));
     } else {
       return Text(
@@ -75,20 +75,49 @@ class _PostItemState extends State<PostItem> {
             content: item.author.avatar.toString(),
             radius: 10,
           ).paddingOnly(left: 2),
-        Text(
-          item.author.nick,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ).paddingOnly(left: widget.isCompact ? 6 : 12),
-        _buildDate().paddingOnly(left: 4),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    item.author.nick,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  _buildDate().paddingOnly(left: 4),
+                ],
+              ),
+              if (item.body['title'] != null)
+                Text(
+                  item.body['title'],
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(fontSize: 15),
+                ),
+              if (item.body['description'] != null)
+                Text(
+                  item.body['description'],
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              if (item.body['description'] != null ||
+                  item.body['title'] != null)
+                const Divider(thickness: 0.3, height: 1).paddingSymmetric(
+                  vertical: 8,
+                ),
+            ],
+          ).paddingOnly(left: widget.isCompact ? 6 : 12),
+        ),
       ],
     );
   }
 
   Widget _buildFooter() {
     List<String> labels = List.empty(growable: true);
-    if (widget.item.createdAt != widget.item.updatedAt) {
+    if (widget.item.editedAt != null) {
       labels.add('postEdited'.trParams({
-        'date': DateFormat('yy/M/d H:m').format(item.updatedAt.toLocal()),
+        'date': DateFormat('yy/M/d HH:mm').format(item.editedAt!.toLocal()),
       }));
     }
     if (widget.item.realm != null) {

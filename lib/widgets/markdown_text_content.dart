@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_selectionarea/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -13,8 +13,7 @@ class MarkdownTextContent extends StatelessWidget {
     this.isSelectable = false,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildContent(BuildContext context) {
     return Markdown(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -47,5 +46,13 @@ class MarkdownTextContent extends StatelessWidget {
         );
       },
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isSelectable) {
+      return SelectionArea(child: _buildContent(context));
+    }
+    return _buildContent(context);
   }
 }

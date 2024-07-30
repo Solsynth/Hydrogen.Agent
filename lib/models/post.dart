@@ -6,6 +6,7 @@ class Post {
   int id;
   DateTime createdAt;
   DateTime updatedAt;
+  DateTime? editedAt;
   DateTime? deletedAt;
   dynamic body;
   List<Tag>? tags;
@@ -28,6 +29,7 @@ class Post {
     required this.id,
     required this.createdAt,
     required this.updatedAt,
+    required this.editedAt,
     required this.deletedAt,
     required this.body,
     required this.tags,
@@ -69,6 +71,9 @@ class Post {
         repostTo:
             json['repost_to'] != null ? Post.fromJson(json['repost_to']) : null,
         realm: json['realm'] != null ? Realm.fromJson(json['realm']) : null,
+        editedAt: json['edited_at'] != null
+            ? DateTime.parse(json['edited_at'])
+            : null,
         publishedAt: json['published_at'] != null
             ? DateTime.parse(json['published_at'])
             : null,
@@ -86,7 +91,8 @@ class Post {
         'id': id,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
+        'edited_at': editedAt?.toIso8601String(),
+        'deleted_at': deletedAt?.toIso8601String(),
         'body': body,
         'tags': tags,
         'categories': categories,
