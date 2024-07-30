@@ -18,12 +18,12 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
 
-class AttachmentPublishPopup extends StatefulWidget {
+class AttachmentEditorPopup extends StatefulWidget {
   final String usage;
   final List<int> current;
   final void Function(List<int> data) onUpdate;
 
-  const AttachmentPublishPopup({
+  const AttachmentEditorPopup({
     super.key,
     required this.usage,
     required this.current,
@@ -31,10 +31,10 @@ class AttachmentPublishPopup extends StatefulWidget {
   });
 
   @override
-  State<AttachmentPublishPopup> createState() => _AttachmentPublishPopupState();
+  State<AttachmentEditorPopup> createState() => _AttachmentEditorPopupState();
 }
 
-class _AttachmentPublishPopupState extends State<AttachmentPublishPopup> {
+class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
   final _imagePicker = ImagePicker();
 
   bool _isBusy = false;

@@ -148,7 +148,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               contentPadding: const EdgeInsets.only(
-                left: 16,
+                left: 17,
                 right: 8,
                 top: 0,
                 bottom: 0,
@@ -225,15 +225,18 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       actions: notifyBannerActions,
                     ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: TextField(
                       maxLines: null,
                       autofocus: true,
                       autocorrect: true,
                       keyboardType: TextInputType.multiline,
                       controller: _editorController.contentController,
-                      decoration: InputDecoration.collapsed(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
                         hintText: 'postContentPlaceholder'.tr,
                       ),
                       onTapOutside: (_) =>
@@ -299,7 +302,10 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                         ],
                       ),
                     )
-                        .animate(target: doShow ? 1 : 0)
+                        .animate(
+                          key: const Key('post-editor-hint-animation'),
+                          target: doShow ? 1 : 0,
+                        )
                         .fade(curve: Curves.easeInOut, duration: 300.ms);
                   }),
                   if (_editorController.mode.value == 0)
@@ -325,22 +331,39 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        Obx(
-                          () => IconButton(
-                            icon: _editorController.isDraft.value
-                                ? const Icon(Icons.drive_file_rename_outline)
-                                : const Icon(Icons.public),
-                            color: _editorController.isDraft.value
-                                ? Colors.grey.shade600
-                                : Colors.green.shade700,
+                        Obx(() {
+                          final isDraft = _editorController.isDraft.value;
+                          return IconButton(
+                            icon: const Icon(
+                              Icons.drive_file_rename_outline,
+                              color: Colors.grey,
+                            )
+                                .animate(
+                                  target: isDraft ? 0 : 1,
+                                )
+                                .fadeOut(duration: 150.ms)
+                                .swap(
+                                  duration: 150.ms,
+                                  builder: (_, __) => const Icon(
+                                    Icons.public,
+                                    color: Colors.green,
+                                  ).animate().fadeIn(duration: 150.ms),
+                                ),
                             onPressed: () {
                               _editorController.toggleDraftMode();
                             },
-                          ),
+                          );
+                        }),
+                        IconButton(
+                          icon: const Icon(Icons.disabled_visible),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            _editorController.editVisibility(context);
+                          },
                         ),
                         IconButton(
-                          icon: Obx(
-                            () => badges.Badge(
+                          icon: Obx(() {
+                            return badges.Badge(
                               badgeContent: Text(
                                 _editorController.attachments.length.toString(),
                                 style: const TextStyle(color: Colors.white),
@@ -351,12 +374,13 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                                 top: -12,
                                 end: -8,
                               ),
-                              child: const Icon(Icons.camera_alt),
-                            ),
-                          ),
+                              child: const Icon(Icons.file_present_rounded),
+                            );
+                          }),
                           color: Theme.of(context).colorScheme.primary,
-                          onPressed: () =>
-                              _editorController.editAttachment(context),
+                          onPressed: () {
+                            _editorController.editAttachment(context);
+                          },
                         ),
                       ],
                     ).paddingSymmetric(horizontal: 6, vertical: 8),

@@ -6,7 +6,7 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/widgets/attachments/attachment_publish.dart';
+import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:uuid/uuid.dart';
 
@@ -47,7 +47,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => AttachmentPublishPopup(
+      builder: (context) => AttachmentEditorPopup(
         usage: 'm.attachment',
         current: _attachments,
         onUpdate: (value) => _attachments = value,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/relations.dart';
-import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
@@ -10,21 +9,17 @@ class RelativeSelector extends StatefulWidget {
   final String title;
   final Widget? Function(Account item)? trailingBuilder;
 
-  const RelativeSelector({super.key, required this.title, this.trailingBuilder});
+  const RelativeSelector(
+      {super.key, required this.title, this.trailingBuilder});
 
   @override
   State<RelativeSelector> createState() => _RelativeSelectorState();
 }
 
 class _RelativeSelectorState extends State<RelativeSelector> {
-  int _accountId = 0;
-
   final List<Relationship> _friends = List.empty(growable: true);
 
-  getFriends() async {
-    final AuthProvider auth = Get.find();
-    _accountId = auth.userProfile.value!['id'];
-
+  _getFriends() async {
     final RelationshipProvider provider = Get.find();
     final resp = await provider.listRelationWithStatus(1);
 
@@ -39,8 +34,7 @@ class _RelativeSelectorState extends State<RelativeSelector> {
   @override
   void initState() {
     super.initState();
-
-    getFriends();
+    _getFriends();
   }
 
   @override
@@ -58,7 +52,7 @@ class _RelativeSelectorState extends State<RelativeSelector> {
             child: ListView.builder(
               itemCount: _friends.length,
               itemBuilder: (context, index) {
-                var element = _friends[index].getOtherside(_accountId);
+                var element = _friends[index].related;
                 return ListTile(
                   title: Text(element.nick),
                   subtitle: Text(element.name),

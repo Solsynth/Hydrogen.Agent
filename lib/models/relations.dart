@@ -46,12 +46,4 @@ class Relationship {
         'related': related.toJson(),
         'status': status,
       };
-
-  Account getOtherside(int selfId) {
-    if (accountId != selfId) {
-      return account;
-    } else {
-      return related;
-    }
-  }
 }

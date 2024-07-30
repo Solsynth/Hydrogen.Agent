@@ -3,11 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
-import 'package:solian/widgets/attachments/attachment_publish.dart';
+import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/posts/editor/post_editor_overview.dart';
+import 'package:solian/widgets/posts/editor/post_editor_visibility.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +28,10 @@ class PostEditorController extends GetxController {
   Rx<Realm?> realmZone = Rx(null);
   RxList<int> attachments = RxList<int>.empty(growable: true);
 
+  RxList<int> visibleUsers = RxList.empty(growable: true);
+  RxList<int> invisibleUsers = RxList.empty(growable: true);
+
+  RxInt visibility = 0.obs;
   RxBool isDraft = false.obs;
 
   RxBool isRestoreFromLocal = false.obs;
@@ -66,11 +70,20 @@ class PostEditorController extends GetxController {
     );
   }
 
+  Future<void> editVisibility(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => PostEditorVisibilityDialog(
+        controller: this,
+      ),
+    );
+  }
+
   Future<void> editAttachment(BuildContext context) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => AttachmentPublishPopup(
+      builder: (context) => AttachmentEditorPopup(
         usage: 'i.attachment',
         current: attachments,
         onUpdate: (value) {
@@ -116,6 +129,9 @@ class PostEditorController extends GetxController {
     contentController.clear();
     tagController.clearTags();
     attachments.clear();
+    visibleUsers.clear();
+    invisibleUsers.clear();
+    visibility.value = 0;
     isDraft.value = false;
     isRestoreFromLocal.value = false;
     lastSaveTime.value = null;
@@ -145,7 +161,7 @@ class PostEditorController extends GetxController {
   }
 
   String get typeEndpoint {
-    switch(mode.value) {
+    switch (mode.value) {
       case 0:
         return 'stories';
       case 1:
@@ -156,7 +172,7 @@ class PostEditorController extends GetxController {
   }
 
   String get type {
-    switch(mode.value) {
+    switch (mode.value) {
       case 0:
         return 'story';
       case 1:
@@ -193,6 +209,9 @@ class PostEditorController extends GetxController {
       'tags': tagController.getTags?.map((x) => {'alias': x}).toList() ??
           List.empty(),
       'attachments': attachments,
+      'visible_users': visibleUsers,
+      'invisible_users': invisibleUsers,
+      'visibility': visibility.value,
       'is_draft': isDraft.value,
       if (replyTo.value != null) 'reply_to': replyTo.value!.id,
       if (repostTo.value != null) 'repost_to': repostTo.value!.id,
@@ -207,7 +226,14 @@ class PostEditorController extends GetxController {
     contentController.text = value['content'] ?? '';
     attachments.value = value['attachments'].cast<int>() ?? List.empty();
     attachments.refresh();
+    visibility.value = value['visibility'];
     isDraft.value = value['is_draft'];
+    if (value['visible_users'] != null) {
+      visibleUsers.value = value['visible_users'].cast<int>();
+    }
+    if (value['invisible_users'] != null) {
+      invisibleUsers.value = value['invisible_users'].cast<int>();
+    }
     if (value['reply_to'] != null) {
       replyTo.value = Post.fromJson(value['reply_to']);
     }
