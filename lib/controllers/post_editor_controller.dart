@@ -94,6 +94,7 @@ class PostEditorController extends GetxController {
         'repost_to': repostTo.value?.toJson(),
         'edit_to': editTo.value?.toJson(),
         'realm': realmZone.value?.toJson(),
+        'type': type,
       }),
     );
   }
@@ -131,6 +132,7 @@ class PostEditorController extends GetxController {
       return;
     }
 
+    type = value.type;
     editTo.value = value;
     isDraft.value = value.isDraft ?? false;
     titleController.text = value.body['title'] ?? '';
@@ -140,6 +142,37 @@ class PostEditorController extends GetxController {
     attachments.refresh();
 
     contentLength.value = contentController.text.length;
+  }
+
+  String get typeEndpoint {
+    switch(mode.value) {
+      case 0:
+        return 'stories';
+      case 1:
+        return 'articles';
+      default:
+        return 'stories';
+    }
+  }
+
+  String get type {
+    switch(mode.value) {
+      case 0:
+        return 'story';
+      case 1:
+        return 'article';
+      default:
+        return 'story';
+    }
+  }
+
+  set type(String value) {
+    switch (value) {
+      case 'story':
+        mode.value = 0;
+      case 'article':
+        mode.value = 1;
+    }
   }
 
   String? get title {
@@ -168,6 +201,7 @@ class PostEditorController extends GetxController {
   }
 
   set payload(Map<String, dynamic> value) {
+    type = value['type'];
     titleController.text = value['title'] ?? '';
     descriptionController.text = value['description'] ?? '';
     contentController.text = value['content'] ?? '';

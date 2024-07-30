@@ -12,6 +12,7 @@ class Post {
   List<Tag>? tags;
   List<Category>? categories;
   List<Post>? replies;
+  String type;
   int? replyId;
   int? repostId;
   int? realmId;
@@ -31,6 +32,7 @@ class Post {
     required this.updatedAt,
     required this.editedAt,
     required this.deletedAt,
+    required this.type,
     required this.body,
     required this.tags,
     required this.categories,
@@ -56,6 +58,7 @@ class Post {
         deletedAt: json['deleted_at'] != null
             ? DateTime.parse(json['deleted_at'])
             : null,
+        type: json['type'],
         body: json['body'],
         tags: json['tags']?.map((x) => Tag.fromJson(x)).toList().cast<Tag>(),
         categories: json['categories']
@@ -93,6 +96,7 @@ class Post {
         'updated_at': updatedAt.toIso8601String(),
         'edited_at': editedAt?.toIso8601String(),
         'deleted_at': deletedAt?.toIso8601String(),
+        'type': type,
         'body': body,
         'tags': tags,
         'categories': categories,

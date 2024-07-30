@@ -59,12 +59,12 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     Response resp;
     if (widget.edit != null) {
       resp = await client.put(
-        '/stories/${widget.edit!.id}',
+        '/${_editorController.typeEndpoint}/${widget.edit!.id}',
         _editorController.payload,
       );
     } else {
       resp = await client.post(
-        '/stories',
+        '/${_editorController.typeEndpoint}',
         _editorController.payload,
       );
     }
