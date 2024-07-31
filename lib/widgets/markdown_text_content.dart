@@ -19,7 +19,9 @@ class MarkdownTextContent extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       data: content,
       padding: EdgeInsets.zero,
-      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+      styleSheet: MarkdownStyleSheet.fromTheme(
+        Theme.of(context),
+      ).copyWith(
         horizontalRuleDecoration: BoxDecoration(
           border: Border(
             top: BorderSide(

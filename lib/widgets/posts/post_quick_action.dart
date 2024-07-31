@@ -85,65 +85,65 @@ class _PostQuickActionState extends State<PostQuickAction> {
   Widget build(BuildContext context) {
     const density = VisualDensity(horizontal: -4, vertical: -3);
 
+    final reactionEntries = widget.item.metric!.reactionList.entries.toList();
+
     return SizedBox(
       height: 32,
       width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
+      child: CustomScrollView(
+        scrollDirection: Axis.horizontal,
+        slivers: [
           if (widget.isReactable && widget.isShowReply)
-            ActionChip(
-              avatar: const Icon(Icons.comment),
-              label: Text(widget.item.metric!.replyCount.toString()),
-              visualDensity: density,
-              onPressed: () {
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  context: context,
-                  builder: (context) {
-                    return PostReplyListPopup(item: widget.item);
-                  },
-                );
-              },
-            ),
-          if (widget.isReactable && widget.isShowReply)
-            const VerticalDivider(
-              thickness: 0.3,
-              width: 0.3,
-              indent: 8,
-              endIndent: 8,
-            ).paddingSymmetric(horizontal: 8),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              children: [
-                ...widget.item.metric!.reactionList.entries.map((x) {
-                  final info = reactions[x.key];
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ActionChip(
-                      avatar: Text(info!.icon),
-                      label: Text(x.value.toString()),
-                      tooltip: ':${x.key}:',
-                      visualDensity: density,
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => doWidgetReact(x.key, info.attitude),
-                    ),
+            SliverToBoxAdapter(
+              child: ActionChip(
+                avatar: const Icon(Icons.comment),
+                label: Text(widget.item.metric!.replyCount.toString()),
+                visualDensity: density,
+                onPressed: () {
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    context: context,
+                    builder: (context) {
+                      return PostReplyListPopup(item: widget.item);
+                    },
                   );
-                }),
-                if (widget.isReactable)
-                  ActionChip(
-                    avatar: const Icon(Icons.add_reaction, color: Colors.teal),
-                    label: Text('reactAdd'.tr),
-                    visualDensity: density,
-                    onPressed: () => showReactMenu(),
-                  ),
-              ],
+                },
+              ),
             ),
-          )
+          if (widget.isReactable && widget.isShowReply)
+            SliverToBoxAdapter(
+              child: const VerticalDivider(
+                thickness: 0.3,
+                width: 0.3,
+                indent: 8,
+                endIndent: 8,
+              ).paddingSymmetric(horizontal: 8),
+            ),
+          SliverList.builder(
+            itemCount: reactionEntries.length,
+            itemBuilder: (context, index) {
+              final x = reactionEntries[index];
+              final info = reactions[x.key];
+              return ActionChip(
+                avatar: Text(info!.icon),
+                label: Text(x.value.toString()),
+                tooltip: ':${x.key}:',
+                visualDensity: density,
+                onPressed: _isSubmitting
+                    ? null
+                    : () => doWidgetReact(x.key, info.attitude),
+              ).paddingOnly(right: 8);
+            },
+          ),
+          if (widget.isReactable)
+            SliverToBoxAdapter(
+              child: ActionChip(
+                avatar: const Icon(Icons.add_reaction, color: Colors.teal),
+                label: Text('reactAdd'.tr),
+                visualDensity: density,
+                onPressed: () => showReactMenu(),
+              ),
+            ),
         ],
       ),
     );

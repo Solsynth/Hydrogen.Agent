@@ -48,6 +48,7 @@ class PostListWidget extends StatelessWidget {
 }
 
 class PostListEntryWidget extends StatelessWidget {
+  final int renderOrder;
   final bool isShowEmbed;
   final bool isNestedClickable;
   final bool isClickable;
@@ -56,6 +57,7 @@ class PostListEntryWidget extends StatelessWidget {
 
   const PostListEntryWidget({
     super.key,
+    this.renderOrder = 0,
     required this.isShowEmbed,
     required this.isNestedClickable,
     required this.isClickable,

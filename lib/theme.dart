@@ -36,11 +36,11 @@ abstract class SolianTheme {
         seedColor: seedColor ?? const Color.fromRGBO(154, 98, 91, 1),
       ),
       fontFamily: 'Comfortaa',
-      fontFamilyFallback: const [
+      fontFamilyFallback: [
         'NotoSansSC',
         'NotoSansHK',
         'NotoSansJP',
-        'NotoSansEmoji'
+        if (PlatformInfo.isWeb) 'NotoSansEmoji',
       ],
       typography: Typography.material2021(
         colorScheme: brightness == Brightness.light

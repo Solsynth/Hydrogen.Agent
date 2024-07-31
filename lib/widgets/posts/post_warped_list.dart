@@ -3,14 +3,14 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
-class FeedListWidget extends StatelessWidget {
+class PostWarpedListWidget extends StatelessWidget {
   final bool isShowEmbed;
   final bool isClickable;
   final bool isNestedClickable;
   final bool isPinned;
   final PagingController<int, Post> controller;
 
-  const FeedListWidget({
+  const PostWarpedListWidget({
     super.key,
     required this.controller,
     this.isShowEmbed = true,
@@ -30,6 +30,7 @@ class FeedListWidget extends StatelessWidget {
             return const SizedBox();
           }
           return PostListEntryWidget(
+            renderOrder: index,
             isShowEmbed: isShowEmbed,
             isNestedClickable: isNestedClickable,
             isClickable: isClickable,

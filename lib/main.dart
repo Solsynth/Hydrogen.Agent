@@ -76,7 +76,7 @@ Future<void> _initializePlatformComponents() async {
 final themeSwitcher = ThemeSwitcher(
   lightThemeData: SolianTheme.build(Brightness.light),
   darkThemeData: SolianTheme.build(Brightness.dark),
-)..restoreTheme();
+);
 
 class SolianApp extends StatelessWidget {
   const SolianApp({super.key});

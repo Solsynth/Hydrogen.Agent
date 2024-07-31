@@ -325,7 +325,7 @@ class _PostItemState extends State<PostItem> {
                   _buildFooter().paddingOnly(left: 12),
                 ],
               ),
-            )
+            ),
           ],
         ).paddingOnly(
           top: 10,

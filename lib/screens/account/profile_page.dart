@@ -13,8 +13,8 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
-import 'package:solian/widgets/feed/feed_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
+import 'package:solian/widgets/posts/post_warped_list.dart';
 import 'package:solian/widgets/sized_container.dart';
 
 class AccountProfilePage extends StatefulWidget {
@@ -292,7 +292,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   if (_userinfo != null)
-                    FeedListWidget(
+                    PostWarpedListWidget(
                       isPinned: false,
                       controller: _postController.pagingController,
                     ),

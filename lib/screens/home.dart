@@ -8,8 +8,8 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
-import 'package:solian/widgets/feed/feed_list.dart';
 import 'package:solian/widgets/posts/post_shuffle_swiper.dart';
+import 'package:solian/widgets/posts/post_warped_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen>
                 RefreshIndicator(
                   onRefresh: () => _postController.reloadAllOver(),
                   child: CustomScrollView(slivers: [
-                    FeedListWidget(
+                    PostWarpedListWidget(
                       controller: _postController.pagingController,
                     ),
                   ]),
