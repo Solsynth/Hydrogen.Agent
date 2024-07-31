@@ -81,15 +81,29 @@ flutter:
     - assets/logo.png
 
   fonts:
+    - family: NotoSansEmoji
+      fonts:
+        - asset: assets/fonts/NotoColorEmoji-Regular.ttf
     - family: NotoSansSC
       fonts:
-        - asset: assets/fonts/NotoSansSC-VariableFont_wght.ttf
+        - asset: assets/fonts/NotoSansSC-Regular.ttf
+        - asset: assets/fonts/NotoSansSC-Bold.ttf
+          weight: 700
     - family: NotoSansHK
       fonts:
-        - asset: assets/fonts/NotoSansHK-VariableFont_wght.ttf
-    - family: Quicksand
+        - asset: assets/fonts/NotoSansHK-Regular.ttf
+        - asset: assets/fonts/NotoSansHK-Bold.ttf
+          weight: 700
+    - family: NotoSansJP
       fonts:
-        - asset: assets/fonts/Quicksand-VariableFont_wght.ttf
+        - asset: assets/fonts/NotoSansJP-Regular.ttf
+        - asset: assets/fonts/NotoSansJP-Bold.ttf
+          weight: 700
+    - family: Comfortaa
+      fonts:
+        - asset: assets/fonts/Comfortaa-Regular.ttf
+        - asset: assets/fonts/Comfortaa-Bold.ttf
+          weight: 700
 
 flutter_launcher_icons:
   android:
