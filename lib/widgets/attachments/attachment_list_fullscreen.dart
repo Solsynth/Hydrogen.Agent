@@ -45,6 +45,14 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
     return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
   }
 
+  double _getRatio() {
+    final value = widget.attachment.metadata?['ratio'];
+    if (value == null) return 1;
+    if (value is int) return value.toDouble();
+    if (value is double) return value;
+    return 1;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -164,7 +172,7 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
                             ),
                           if (widget.attachment.metadata?['ratio'] != null)
                             Text(
-                              '${(widget.attachment.metadata?['ratio'] as double).toPrecision(2)}',
+                              '${_getRatio().toPrecision(2)}',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: _unFocusColor,
