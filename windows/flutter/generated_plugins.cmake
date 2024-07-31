@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
   flutter_secure_storage_windows
   flutter_webrtc
+  gal
   livekit_client
   media_kit_libs_windows_video
   media_kit_video

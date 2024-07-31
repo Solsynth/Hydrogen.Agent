@@ -33,6 +33,7 @@ const i18nSimplifiedChinese = {
   'article': '文章',
   'reply': '回复',
   'repost': '转帖',
+  'openInAlbum': '在相簿中打开',
   'openInBrowser': '在浏览器中打开',
   'notification': '通知',
   'errorHappened': '发生错误了',
@@ -290,4 +291,5 @@ const i18nSimplifiedChinese = {
   'themeColorKagamine': '镜音黄',
   'themeColorLuka': '流音粉',
   'themeColorApplied': '全局主题颜色已应用',
+  'attachmentSaved': '附件已保存到系统相册',
 };

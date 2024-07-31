@@ -8,7 +8,7 @@ import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
-import 'package:solian/widgets/feed/feed_tags.dart';
+import 'package:solian/widgets/posts/post_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:timeago/timeago.dart' show format;
@@ -129,7 +129,7 @@ class _PostItemState extends State<PostItem> {
     List<Widget> widgets = List.empty(growable: true);
 
     if (widget.item.tags?.isNotEmpty ?? false) {
-      widgets.add(FeedTagsList(tags: widget.item.tags!));
+      widgets.add(PostTagsList(tags: widget.item.tags!));
     }
     if (labels.isNotEmpty) {
       widgets.add(Text(

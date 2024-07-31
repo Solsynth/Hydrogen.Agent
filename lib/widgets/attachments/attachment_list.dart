@@ -322,7 +322,7 @@ class AttachmentListEntry extends StatelessWidget {
           context.pushTransparentRoute(
             AttachmentListFullScreen(
               parentId: parentId,
-              attachment: item!,
+              item: item!,
             ),
             rootNavigator: true,
           );

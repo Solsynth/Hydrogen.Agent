@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:solian/models/feed.dart';
 import 'package:solian/router.dart';
 
-class FeedTagsList extends StatelessWidget {
+class PostTagsList extends StatelessWidget {
   final List<Tag> tags;
 
-  const FeedTagsList({
+  const PostTagsList({
     super.key,
     required this.tags,
   });

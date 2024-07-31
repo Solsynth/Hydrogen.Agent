@@ -33,6 +33,7 @@ const i18nEnglish = {
   'article': 'Article',
   'reply': 'Reply',
   'repost': 'Repost',
+  'openInAlbum': 'Open in album',
   'openInBrowser': 'Open in browser',
   'notification': 'Notification',
   'errorHappened': 'An error occurred',
@@ -313,4 +314,5 @@ const i18nEnglish = {
   'themeColorKagamine': 'Kagamine Yellow',
   'themeColorLuka': 'Luka Pink',
   'themeColorApplied': 'Global theme color has been applied.',
+  'attachmentSaved': 'Attachment saved to your system album.',
 };

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 extension SolianExtenions on BuildContext {
-  void showSnackbar(String content) {
+  void showSnackbar(String content, {SnackBarAction? action}) {
     ScaffoldMessenger.of(this).showSnackBar(SnackBar(
       content: Text(content),
+      action: action,
     ));
   }
 
