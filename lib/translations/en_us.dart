@@ -312,6 +312,5 @@ const i18nEnglish = {
   'themeColorMiku': 'Miku Blue',
   'themeColorKagamine': 'Kagamine Yellow',
   'themeColorLuka': 'Luka Pink',
-  'themeColorApplied':
-      'Global theme color has been applied, dark mode theme need restart to get applied.',
+  'themeColorApplied': 'Global theme color has been applied.',
 };

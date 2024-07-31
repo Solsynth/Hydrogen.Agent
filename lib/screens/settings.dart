@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/theme.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -30,22 +32,16 @@ class _SettingScreenState extends State<SettingScreen> {
       icon: Icon(Icons.circle, color: color),
       tooltip: label,
       onPressed: () {
-        currentLightTheme = SolianTheme.build(
-          Brightness.light,
-          seedColor: color,
-        );
-        currentDarkTheme = SolianTheme.build(
-          Brightness.dark,
-          seedColor: color,
-        );
-        if (!Get.isDarkMode) {
-          Get.changeTheme(
-            SolianTheme.build(Brightness.light, seedColor: color),
-          );
-        } else {
-          // Dark mode cannot be hot reload
-          // https://github.com/jonataslaw/getx/issues/1411
-        }
+        context.read<ThemeSwitcher>().setTheme(
+              SolianTheme.build(
+                Brightness.light,
+                seedColor: color,
+              ),
+              SolianTheme.build(
+                Brightness.dark,
+                seedColor: color,
+              ),
+            );
         _prefs.setInt('global_theme_color', color.value);
         context.clearSnackbar();
         context.showSnackbar('themeColorApplied'.tr);

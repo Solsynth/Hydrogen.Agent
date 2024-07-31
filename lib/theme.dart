@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solian/platform.dart';
 
-ThemeData? currentLightTheme = SolianTheme.build(Brightness.light);
-ThemeData? currentDarkTheme = SolianTheme.build(Brightness.dark);
-
 abstract class SolianTheme {
   static bool isLargeScreen(BuildContext context) =>
       MediaQuery.of(context).size.width > 640;

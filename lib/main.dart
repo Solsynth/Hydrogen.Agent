@@ -5,11 +5,12 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
@@ -38,7 +39,6 @@ void main() async {
       MediaKit.ensureInitialized();
 
       await Future.wait([
-        _initializeTheme(),
         _initializeFirebase(),
         _initializePlatformComponents(),
       ]);
@@ -49,16 +49,6 @@ void main() async {
       runApp(const SolianApp());
     },
   );
-}
-
-Future<void> _initializeTheme() async {
-  final prefs = await SharedPreferences.getInstance();
-  if (prefs.containsKey('global_theme_color')) {
-    final value = prefs.getInt('global_theme_color')!;
-    final color = Color(value);
-    currentLightTheme = SolianTheme.build(Brightness.light, seedColor: color);
-    currentDarkTheme = SolianTheme.build(Brightness.dark, seedColor: color);
-  }
 }
 
 Future<void> _initializeFirebase() async {
@@ -83,33 +73,45 @@ Future<void> _initializePlatformComponents() async {
   }
 }
 
+final themeSwitcher = ThemeSwitcher(
+  lightThemeData: SolianTheme.build(Brightness.light),
+  darkThemeData: SolianTheme.build(Brightness.dark),
+)..restoreTheme();
+
 class SolianApp extends StatelessWidget {
   const SolianApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp.router(
-      title: 'Solian',
-      theme: currentLightTheme,
-      darkTheme: currentDarkTheme,
-      themeMode: ThemeMode.system,
-      routerDelegate: AppRouter.instance.routerDelegate,
-      routeInformationParser: AppRouter.instance.routeInformationParser,
-      routeInformationProvider: AppRouter.instance.routeInformationProvider,
-      backButtonDispatcher: AppRouter.instance.backButtonDispatcher,
-      translations: SolianMessages(),
-      locale: Get.deviceLocale,
-      fallbackLocale: const Locale('en', 'US'),
-      onInit: () => _initializeProviders(context),
-      builder: (context, child) {
-        return SystemShell(
-          child: ScaffoldMessenger(
-            child: BootstrapperShell(
-              child: child ?? const SizedBox(),
-            ),
-          ),
+    return ChangeNotifierProvider.value(
+      value: themeSwitcher,
+      child: Builder(builder: (context) {
+        final theme = Provider.of<ThemeSwitcher>(context);
+
+        return GetMaterialApp.router(
+          title: 'Solian',
+          theme: theme.lightThemeData,
+          darkTheme: theme.darkThemeData,
+          themeMode: ThemeMode.system,
+          routerDelegate: AppRouter.instance.routerDelegate,
+          routeInformationParser: AppRouter.instance.routeInformationParser,
+          routeInformationProvider: AppRouter.instance.routeInformationProvider,
+          backButtonDispatcher: AppRouter.instance.backButtonDispatcher,
+          translations: SolianMessages(),
+          locale: Get.deviceLocale,
+          fallbackLocale: const Locale('en', 'US'),
+          onInit: () => _initializeProviders(context),
+          builder: (context, child) {
+            return SystemShell(
+              child: ScaffoldMessenger(
+                child: BootstrapperShell(
+                  child: child ?? const SizedBox(),
+                ),
+              ),
+            );
+          },
         );
-      },
+      }),
     );
   }
 
