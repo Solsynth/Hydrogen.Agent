@@ -2,7 +2,7 @@ name: solian
 description: "The Solar Network App"
 publish_to: "none"
 
-version: 1.2.0+1
+version: 1.2.0+3
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -79,6 +79,17 @@ flutter:
 
   assets:
     - assets/logo.png
+
+  fonts:
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansSC-VariableFont_wght.ttf
+    - family: NotoSansHK
+      fonts:
+        - asset: assets/fonts/NotoSansHK-VariableFont_wght.ttf
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand-VariableFont_wght.ttf
 
 flutter_launcher_icons:
   android:

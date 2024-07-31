@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
@@ -37,6 +38,7 @@ void main() async {
       MediaKit.ensureInitialized();
 
       await Future.wait([
+        _initializeTheme(),
         _initializeFirebase(),
         _initializePlatformComponents(),
       ]);
@@ -47,6 +49,16 @@ void main() async {
       runApp(const SolianApp());
     },
   );
+}
+
+Future<void> _initializeTheme() async {
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.containsKey('global_theme_color')) {
+    final value = prefs.getInt('global_theme_color')!;
+    final color = Color(value);
+    currentLightTheme = SolianTheme.build(Brightness.light, seedColor: color);
+    currentDarkTheme = SolianTheme.build(Brightness.dark, seedColor: color);
+  }
 }
 
 Future<void> _initializeFirebase() async {

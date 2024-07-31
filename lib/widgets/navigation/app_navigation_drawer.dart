@@ -29,7 +29,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
 
   late final ChannelProvider _channels;
 
-  void getStatus() async {
+  Future<void> _getStatus() async {
     final StatusProvider provider = Get.find();
 
     final resp = await provider.getCurrentStatus();
@@ -40,7 +40,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     });
   }
 
-  void detectSelectedIndex() {
+  void _detectSelectedIndex() {
     if (widget.routeName == null) return;
 
     final nameList = AppNavigation.destinations.map((x) => x.page).toList();
@@ -49,22 +49,33 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     _selectedIndex = idx != -1 ? idx : null;
   }
 
-  void closeDrawer() {
+  void _closeDrawer() {
     rootScaffoldKey.currentState!.closeDrawer();
+  }
+
+  Widget _buildSettingButton() {
+    return IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: () {
+          AppRouter.instance.pushNamed('settings');
+          setState(() => _selectedIndex = null);
+          _closeDrawer();
+        }
+    );
   }
 
   @override
   void initState() {
     super.initState();
     _channels = Get.find();
-    detectSelectedIndex();
-    getStatus();
+    _detectSelectedIndex();
+    _getStatus();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    detectSelectedIndex();
+    _detectSelectedIndex();
   }
 
   @override
@@ -78,7 +89,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
       onDestinationSelected: (idx) {
         setState(() => _selectedIndex = idx);
         AppRouter.instance.goNamed(AppNavigation.destinations[idx].page);
-        closeDrawer();
+        _closeDrawer();
       },
       children: [
         Obx(() {
@@ -88,10 +99,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               leading: const Icon(Icons.account_circle),
               title: Text('guest'.tr),
               subtitle: Text('unsignedIn'.tr),
+              trailing: _buildSettingButton(),
               onTap: () {
                 AppRouter.instance.goNamed('account');
                 setState(() => _selectedIndex = null);
-                closeDrawer();
+                _closeDrawer();
               },
             );
           }
@@ -137,18 +149,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                 ),
               );
             }),
-            trailing: IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () {
-                AppRouter.instance.pushNamed('settings');
-                setState(() => _selectedIndex = null);
-                closeDrawer();
-              },
-            ),
+            trailing: _buildSettingButton(),
             onTap: () {
               AppRouter.instance.goNamed('account');
               setState(() => _selectedIndex = null);
-              closeDrawer();
+              _closeDrawer();
             },
             onLongPress: () {
               showModalBottomSheet(
@@ -158,7 +163,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                   currentStatus: _accountStatus!.status,
                 ),
               ).then((val) {
-                if (val == true) getStatus();
+                if (val == true) _getStatus();
               });
             },
           );
@@ -204,7 +209,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                             useReplace: true,
                             onSelected: (_) {
                               setState(() => _selectedIndex = null);
-                              closeDrawer();
+                              _closeDrawer();
                             },
                           ),
                         ),

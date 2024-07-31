@@ -30,14 +30,36 @@ class _SettingScreenState extends State<SettingScreen> {
       icon: Icon(Icons.circle, color: color),
       tooltip: label,
       onPressed: () {
-        currentLightTheme =
-            SolianTheme.build(Brightness.light, seedColor: color);
-        currentDarkTheme = SolianTheme.build(Brightness.dark, seedColor: color);
+        currentLightTheme = SolianTheme.build(
+          Brightness.light,
+          seedColor: color,
+        );
+        currentDarkTheme = SolianTheme.build(
+          Brightness.dark,
+          seedColor: color,
+        );
+        if (!Get.isDarkMode) {
+          Get.changeTheme(
+            SolianTheme.build(Brightness.light, seedColor: color),
+          );
+        } else {
+          // Dark mode cannot be hot reload
+          // https://github.com/jonataslaw/getx/issues/1411
+        }
         _prefs.setInt('global_theme_color', color.value);
+        context.clearSnackbar();
         context.showSnackbar('themeColorApplied'.tr);
       },
     );
   }
+
+  static final List<(String, Color)> _presentTheme = [
+    ('themeColorRed', const Color.fromRGBO(154, 98, 91, 1)),
+    ('themeColorBlue', const Color.fromRGBO(103, 96, 193, 1)),
+    ('themeColorMiku', const Color.fromRGBO(56, 120, 126, 1)),
+    ('themeColorKagamine', const Color.fromRGBO(244, 183, 63, 1)),
+    ('themeColorLuka', const Color.fromRGBO(243, 174, 218, 1)),
+  ];
 
   @override
   void initState() {
@@ -58,20 +80,9 @@ class _SettingScreenState extends State<SettingScreen> {
             height: 56,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children: [
-                _buildThemeColorButton(
-                  'themeColorRed'.tr,
-                  const Color.fromRGBO(154, 98, 91, 1),
-                ),
-                _buildThemeColorButton(
-                  'themeColorBlue'.tr,
-                  const Color.fromRGBO(103, 96, 193, 1),
-                ),
-                _buildThemeColorButton(
-                  'themeColorMiku'.tr,
-                  const Color.fromRGBO(56, 120, 126, 1),
-                ),
-              ],
+              children: _presentTheme
+                  .map((x) => _buildThemeColorButton(x.$1, x.$2))
+                  .toList(),
             ).paddingSymmetric(horizontal: 12, vertical: 8),
           ),
         ],

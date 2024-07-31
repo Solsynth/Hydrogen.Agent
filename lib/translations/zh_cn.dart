@@ -287,5 +287,7 @@ const i18nSimplifiedChinese = {
   'themeColorRed': '现代红',
   'themeColorBlue': '经典蓝',
   'themeColorMiku': '未来色',
-  'themeColorApplied': '全局主题颜色已保存，重启后生效。',
+  'themeColorKagamine': '镜音黄',
+  'themeColorLuka': '流音粉',
+  'themeColorApplied': '全局主题颜色已应用，深色模式中主题需要重启生效',
 };

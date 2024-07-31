@@ -38,6 +38,9 @@ abstract class SolianTheme {
         brightness: brightness,
         seedColor: seedColor ?? const Color.fromRGBO(154, 98, 91, 1),
       ),
+      fontFamily: 'Quicksand',
+      fontFamilyFallback: const ['NotoSansSC', 'NotoSansHK'],
+      typography: Typography.material2021(),
     );
   }
 }
