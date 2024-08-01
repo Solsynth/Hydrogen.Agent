@@ -160,6 +160,7 @@ const i18nEnglish = {
   'attachmentAutoUpload': 'Auto Upload',
   'attachmentUploadQueue': 'Upload Queue',
   'attachmentUploadQueueStart': 'Start All',
+  'attachmentUploadInProgress': 'There are attachments being uploaded. Please wait until all attachments have been uploaded before proceeding...',
   'attachmentAttached': 'Exists Files',
   'attachmentUploadBlocked': 'Upload blocked, there is currently a task in progress...',
   'attachmentAdd': 'Attach attachments',

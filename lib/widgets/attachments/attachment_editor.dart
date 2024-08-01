@@ -455,11 +455,12 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                       const SizedBox(width: 10),
                       Obx(() {
                         if (_uploadController.isUploading.value) {
-                          return const SizedBox(
+                          return SizedBox(
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
+                              value: _uploadController.progressOfUpload.value,
                             ),
                           );
                         }

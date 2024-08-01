@@ -5,9 +5,11 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
+import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:uuid/uuid.dart';
 
 class ChatMessageInput extends StatefulWidget {
@@ -79,6 +81,14 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     final AuthProvider auth = Get.find();
     final prof = auth.userProfile.value!;
     if (auth.isAuthorized.isFalse) return;
+
+    final AttachmentUploaderController uploader = Get.find();
+    if (uploader.queueOfUpload.any(
+      ((x) => x.usage == 'm.attachment' && x.isUploading),
+    )) {
+      context.showErrorDialog('attachmentUploadInProgress'.tr);
+      return;
+    }
 
     Response resp;
 
@@ -259,7 +269,18 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.attach_file),
+                icon: badges.Badge(
+                  badgeContent: Text(
+                    _attachments.length.toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  showBadge: _attachments.isNotEmpty,
+                  position: badges.BadgePosition.topEnd(
+                    top: -12,
+                    end: -8,
+                  ),
+                  child: const Icon(Icons.file_present_rounded),
+                ),
                 color: Colors.teal,
                 onPressed: () => _editAttachments(),
               ),

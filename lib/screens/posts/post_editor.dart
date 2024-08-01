@@ -8,6 +8,7 @@ import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
+import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
@@ -56,6 +57,14 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     if (auth.isAuthorized.isFalse) return;
     if (_editorController.isEmpty) return;
 
+    final AttachmentUploaderController uploader = Get.find();
+    if (uploader.queueOfUpload.any(
+      ((x) => x.usage == 'i.attachment' && x.isUploading),
+    )) {
+      context.showErrorDialog('attachmentUploadInProgress'.tr);
+      return;
+    }
+
     setState(() => _isBusy = true);
 
     final client = auth.configureClient('interactive');
@@ -92,15 +101,16 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     }
   }
 
-  void cancelAction() {
+  void _cancelAction() {
     _editorController.localClear();
     AppRouter.instance.pop();
   }
 
   Post? get _editTo => _editorController.editTo.value;
+
   Post? get _replyTo => _editorController.replyTo.value;
+
   Post? get _repostTo => _editorController.repostTo.value;
-  Realm? get _realm => _editorController.realmZone.value;
 
   @override
   void initState() {
@@ -114,7 +124,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   Widget build(BuildContext context) {
     final notifyBannerActions = [
       TextButton(
-        onPressed: cancelAction,
+        onPressed: _cancelAction,
         child: Text('cancel'.tr),
       )
     ];

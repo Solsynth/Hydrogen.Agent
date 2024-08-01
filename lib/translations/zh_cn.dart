@@ -149,6 +149,7 @@ const i18nSimplifiedChinese = {
   'attachmentAutoUpload': '自动上传',
   'attachmentUploadQueue': '上传队列',
   'attachmentUploadQueueStart': '整队上传',
+  'attachmentUploadInProgress': '有附件正在上传，请等待所有附件上传完毕后再进行操作……',
   'attachmentAttached': '已附附件',
   'attachmentUploadBlocked': '上传受阻，当前已有任务进行中……',
   'attachmentAdd': '附加附件',
