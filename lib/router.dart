@@ -1,3 +1,5 @@
+import 'package:animations/animations.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/screens/about.dart';
@@ -93,15 +95,26 @@ abstract class AppRouter {
       GoRoute(
         path: '/posts/editor',
         name: 'postEditor',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final arguments = state.extra as PostPublishArguments?;
-          return PostPublishScreen(
-            edit: arguments?.edit,
-            reply: arguments?.reply,
-            repost: arguments?.repost,
-            realm: arguments?.realm,
-            postListController: arguments?.postListController,
-            mode: int.tryParse(state.uri.queryParameters['mode'] ?? '0') ?? 0,
+          return CustomTransitionPage(
+            child: PostPublishScreen(
+              edit: arguments?.edit,
+              reply: arguments?.reply,
+              repost: arguments?.repost,
+              realm: arguments?.realm,
+              postListController: arguments?.postListController,
+              mode: int.tryParse(state.uri.queryParameters['mode'] ?? '0') ?? 0,
+            ),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeThroughTransition(
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                child: child,
+              );
+            },
           );
         },
       ),

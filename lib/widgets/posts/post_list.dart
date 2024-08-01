@@ -4,7 +4,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
-import 'package:solian/widgets/sized_container.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
@@ -29,16 +28,14 @@ class PostListWidget extends StatelessWidget {
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
-          return CenteredContainer(
-            child: PostListEntryWidget(
-              isShowEmbed: isShowEmbed,
-              isNestedClickable: isNestedClickable,
-              isClickable: isClickable,
-              item: item,
-              onUpdate: () {
-                controller.refresh();
-              },
-            ),
+          return PostListEntryWidget(
+            isShowEmbed: isShowEmbed,
+            isNestedClickable: isNestedClickable,
+            isClickable: isClickable,
+            item: item,
+            onUpdate: () {
+              controller.refresh();
+            },
           );
         },
       ),
