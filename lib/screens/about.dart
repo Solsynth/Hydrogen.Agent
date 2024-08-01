@@ -47,17 +47,29 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 16),
             TextButton(
               style: denseButtonStyle,
-              child: const Text('More Information'),
-              onPressed: () {
-                launchUrlString('https://solsynth.dev/products/solar-network');
+              child: const Text('App Details'),
+              onPressed: () async {
+                final info = await PackageInfo.fromPlatform();
+
+                showAboutDialog(
+                  context: context,
+                  applicationVersion: '${info.version} (${info.buildNumber})',
+                  applicationLegalese:
+                      'The Solar Network App is an intuitive and self-hostable social network and computing platform. Experience the freedom of a user-friendly design that empowers you to create and connect with communities on your own terms. Embrace the future of social networking with a platform that prioritizes your independence and privacy.',
+                  applicationIcon: Image.asset(
+                    'assets/logo.png',
+                    width: 56,
+                    height: 56,
+                  ),
+                );
               },
             ),
             TextButton(
               style: denseButtonStyle,
+              child: const Text('Project Website'),
               onPressed: () {
-                launchUrlString('https://solsynth.dev');
+                launchUrlString('https://solsynth.dev/products/solar-network');
               },
-              child: const Text('Official Website'),
             ),
             const SizedBox(height: 16),
             const Text(
