@@ -8,13 +8,15 @@ import 'package:solian/widgets/app_bar_leading.dart';
 class TitleShell extends StatelessWidget {
   final bool showAppBar;
   final bool isCenteredTitle;
-  final GoRouterState state;
+  final String? title;
+  final GoRouterState? state;
   final Widget child;
 
   const TitleShell({
     super.key,
     required this.child,
-    required this.state,
+    this.title,
+    this.state,
     this.showAppBar = true,
     this.isCenteredTitle = false,
   });
@@ -25,7 +27,9 @@ class TitleShell extends StatelessWidget {
       appBar: showAppBar
           ? AppBar(
               leading: AppBarLeadingButton.adaptive(context),
-              title: AppBarTitle(state.topRoute?.name?.tr ?? 'page'.tr),
+              title: AppBarTitle(
+                title ?? (state!.topRoute?.name?.tr ?? 'page'.tr),
+              ),
               centerTitle: isCenteredTitle,
               toolbarHeight: SolianTheme.toolbarHeight(context),
             )

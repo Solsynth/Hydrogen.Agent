@@ -9,8 +9,13 @@ import 'package:solian/widgets/posts/post_replies.dart';
 
 class PostDetailScreen extends StatefulWidget {
   final String id;
+  final Post? post;
 
-  const PostDetailScreen({super.key, required this.id});
+  const PostDetailScreen({
+    super.key,
+    required this.id,
+    this.post,
+  });
 
   @override
   State<PostDetailScreen> createState() => _PostDetailScreenState();
@@ -20,6 +25,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Post? item;
 
   Future<Post?> getDetail() async {
+    if (widget.post != null) {
+      item = widget.post;
+      return widget.post;
+    }
+
     final PostProvider provider = Get.find();
 
     try {

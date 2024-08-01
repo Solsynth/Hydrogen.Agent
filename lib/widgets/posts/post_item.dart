@@ -1,9 +1,11 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/models/post.dart';
-import 'package:solian/router.dart';
+import 'package:solian/screens/posts/post_detail.dart';
+import 'package:solian/shells/title_shell.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
@@ -159,66 +161,88 @@ class _PostItemState extends State<PostItem> {
   }
 
   Widget _buildReply(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            FaIcon(
-              FontAwesomeIcons.reply,
-              size: 16,
-              color: _unFocusColor,
-            ),
-            Expanded(
-              child: Text(
-                'postRepliedNotify'.trParams(
-                  {'username': '@${widget.item.replyTo!.author.name}'},
-                ),
-                style: TextStyle(color: _unFocusColor),
-              ).paddingOnly(left: 6),
-            ),
-          ],
-        ).paddingOnly(left: 12),
-        Card(
-          elevation: 1,
-          child: PostItem(
-            item: widget.item.replyTo!,
-            isCompact: true,
-            overrideAttachmentParent: widget.item.id.toString(),
-          ).paddingSymmetric(vertical: 8),
+    return OpenContainer(
+      closedBuilder: (_, openContainer) => Column(
+        children: [
+          Row(
+            children: [
+              FaIcon(
+                FontAwesomeIcons.reply,
+                size: 16,
+                color: _unFocusColor,
+              ),
+              Expanded(
+                child: Text(
+                  'postRepliedNotify'.trParams(
+                    {'username': '@${widget.item.replyTo!.author.name}'},
+                  ),
+                  style: TextStyle(color: _unFocusColor),
+                ).paddingOnly(left: 6),
+              ),
+            ],
+          ).paddingOnly(left: 12),
+          Card(
+            elevation: 1,
+            child: PostItem(
+              item: widget.item.replyTo!,
+              isCompact: true,
+              overrideAttachmentParent: widget.item.id.toString(),
+            ).paddingSymmetric(vertical: 8),
+          ),
+        ],
+      ),
+      openBuilder: (_, __) => TitleShell(
+        title: 'postDetail'.tr,
+        child: PostDetailScreen(
+          id: widget.item.replyTo!.id.toString(),
+          post: widget.item.replyTo!,
         ),
-      ],
+      ),
+      closedColor: Theme.of(context).colorScheme.surface,
+      openColor: Theme.of(context).colorScheme.surface,
     );
   }
 
   Widget _buildRepost(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            FaIcon(
-              FontAwesomeIcons.retweet,
-              size: 16,
-              color: _unFocusColor,
-            ),
-            Expanded(
-              child: Text(
-                'postRepostedNotify'.trParams(
-                  {'username': '@${widget.item.repostTo!.author.name}'},
-                ),
-                style: TextStyle(color: _unFocusColor),
-              ).paddingOnly(left: 6),
-            ),
-          ],
-        ).paddingOnly(left: 12),
-        Card(
-          elevation: 1,
-          child: PostItem(
-            item: widget.item.repostTo!,
-            isCompact: true,
-            overrideAttachmentParent: widget.item.id.toString(),
-          ).paddingSymmetric(vertical: 8),
+    return OpenContainer(
+      closedBuilder: (_, openContainer) => Column(
+        children: [
+          Row(
+            children: [
+              FaIcon(
+                FontAwesomeIcons.retweet,
+                size: 16,
+                color: _unFocusColor,
+              ),
+              Expanded(
+                child: Text(
+                  'postRepostedNotify'.trParams(
+                    {'username': '@${widget.item.repostTo!.author.name}'},
+                  ),
+                  style: TextStyle(color: _unFocusColor),
+                ).paddingOnly(left: 6),
+              ),
+            ],
+          ).paddingOnly(left: 12),
+          Card(
+            elevation: 1,
+            child: PostItem(
+              item: widget.item.repostTo!,
+              isCompact: true,
+              overrideAttachmentParent: widget.item.id.toString(),
+            ).paddingSymmetric(vertical: 8),
+          ),
+        ],
+      ),
+      openBuilder: (_, __) => TitleShell(
+        title: 'postDetail'.tr,
+        child: PostDetailScreen(
+          id: widget.item.repostTo!.id.toString(),
+          post: widget.item.repostTo!,
         ),
-      ],
+      ),
+      closedColor: Theme.of(context).colorScheme.surface,
+      openColor: Theme.of(context).colorScheme.surface,
     );
   }
 
@@ -264,100 +288,89 @@ class _PostItemState extends State<PostItem> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              child: AccountAvatar(content: item.author.avatar.toString()),
-              onTap: () {
-                showModalBottomSheet(
-                  useRootNavigator: true,
-                  isScrollControlled: true,
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  context: context,
-                  builder: (context) => AccountProfilePopup(
-                    account: item.author,
-                  ),
-                );
-              },
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  SizedContainer(
-                    maxWidth: 640,
-                    child: MarkdownTextContent(
-                      content: item.body['content'],
-                      isSelectable: widget.isContentSelectable,
-                    ).paddingOnly(left: 12, right: 8),
-                  ),
-                  if (widget.item.replyTo != null && widget.isShowEmbed)
-                    GestureDetector(
-                      child: _buildReply(context).paddingOnly(top: 4),
-                      onTap: () {
-                        if (!widget.isClickable) return;
-                        AppRouter.instance.pushNamed(
-                          'postDetail',
-                          pathParameters: {
-                            'id': widget.item.replyTo!.id.toString(),
-                          },
-                        );
-                      },
+    return OpenContainer(
+      closedBuilder: (_, openContainer) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                child: AccountAvatar(content: item.author.avatar.toString()),
+                onTap: () {
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    context: context,
+                    builder: (context) => AccountProfilePopup(
+                      account: item.author,
                     ),
-                  if (widget.item.repostTo != null && widget.isShowEmbed)
-                    GestureDetector(
-                      child: _buildRepost(context).paddingOnly(top: 4),
-                      onTap: () {
-                        if (!widget.isClickable) return;
-                        AppRouter.instance.pushNamed(
-                          'postDetail',
-                          pathParameters: {
-                            'alias': widget.item.repostTo!.id.toString(),
-                          },
-                        );
-                      },
-                    ),
-                  _buildFooter().paddingOnly(left: 12),
-                ],
+                  );
+                },
               ),
-            ),
-          ],
-        ).paddingOnly(
-          top: 10,
-          bottom: hasAttachment ? 10 : 0,
-          right: 16,
-          left: 16,
-        ),
-        AttachmentList(
-          parentId: widget.item.id.toString(),
-          attachmentsId: attachments,
-          isGrid: attachments.length > 1,
-        ),
-        if (widget.isShowReply && widget.isReactable)
-          PostQuickAction(
-            isShowReply: widget.isShowReply,
-            isReactable: widget.isReactable,
-            item: widget.item,
-            onReact: (symbol, changes) {
-              setState(() {
-                item.metric!.reactionList[symbol] =
-                    (item.metric!.reactionList[symbol] ?? 0) + changes;
-              });
-            },
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    SizedContainer(
+                      maxWidth: 640,
+                      child: MarkdownTextContent(
+                        content: item.body['content'],
+                        isSelectable: widget.isContentSelectable,
+                      ).paddingOnly(left: 12, right: 8),
+                    ),
+                    if (widget.item.replyTo != null && widget.isShowEmbed)
+                      _buildReply(context).paddingOnly(top: 4),
+                    if (widget.item.repostTo != null && widget.isShowEmbed)
+                      _buildRepost(context).paddingOnly(top: 4),
+                    _buildFooter().paddingOnly(left: 12),
+                  ],
+                ),
+              ),
+            ],
           ).paddingOnly(
-            top: hasAttachment ? 10 : 6,
-            left: hasAttachment ? 24 : 60,
+            top: 10,
+            bottom: hasAttachment ? 10 : 0,
             right: 16,
-            bottom: 10,
-          )
-        else
-          const SizedBox(height: 10),
-      ],
+            left: 16,
+          ),
+          AttachmentList(
+            parentId: widget.item.id.toString(),
+            attachmentsId: attachments,
+            isGrid: attachments.length > 1,
+          ),
+          if (widget.isShowReply && widget.isReactable)
+            PostQuickAction(
+              isShowReply: widget.isShowReply,
+              isReactable: widget.isReactable,
+              item: widget.item,
+              onReact: (symbol, changes) {
+                setState(() {
+                  item.metric!.reactionList[symbol] =
+                      (item.metric!.reactionList[symbol] ?? 0) + changes;
+                });
+              },
+            ).paddingOnly(
+              top: hasAttachment ? 10 : 6,
+              left: hasAttachment ? 24 : 60,
+              right: 16,
+              bottom: 10,
+            )
+          else
+            const SizedBox(height: 10),
+        ],
+      ),
+      openBuilder: (_, __) => TitleShell(
+        title: 'postDetail'.tr,
+        child: PostDetailScreen(
+          id: item.id.toString(),
+          post: item,
+        ),
+      ),
+      closedColor: Theme.of(context).colorScheme.surface,
+      openColor: Theme.of(context).colorScheme.surface,
     );
   }
 }
