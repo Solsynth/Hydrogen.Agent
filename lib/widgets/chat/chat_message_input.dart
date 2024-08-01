@@ -46,7 +46,6 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   void _editAttachments() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       builder: (context) => AttachmentEditorPopup(
         usage: 'm.attachment',
         current: _attachments,

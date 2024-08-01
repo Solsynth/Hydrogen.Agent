@@ -112,7 +112,6 @@ class PostEditorController extends GetxController {
   Future<void> editAttachment(BuildContext context) {
     return showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       builder: (context) => AttachmentEditorPopup(
         usage: 'i.attachment',
         current: attachments,

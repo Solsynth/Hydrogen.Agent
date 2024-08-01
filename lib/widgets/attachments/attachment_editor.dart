@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:dismissible_page/dismissible_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -16,6 +17,7 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
+import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
 
 class AttachmentEditorPopup extends StatefulWidget {
@@ -42,7 +44,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
   List<Attachment?> _attachments = List.empty(growable: true);
 
-  Future<void> pickPhotoToUpload() async {
+  Future<void> _pickPhotoToUpload() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -54,7 +56,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     for (final media in medias) {
       final file = File(media.path);
       try {
-        await uploadAttachment(
+        await _uploadAttachment(
           await file.readAsBytes(),
           file.path,
           null,
@@ -67,7 +69,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> pickVideoToUpload() async {
+  Future<void> _pickVideoToUpload() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -79,7 +81,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     final file = File(media.path);
 
     try {
-      await uploadAttachment(await file.readAsBytes(), file.path, null);
+      await _uploadAttachment(await file.readAsBytes(), file.path, null);
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -87,7 +89,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> pickFileToUpload() async {
+  Future<void> _pickFileToUpload() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -102,7 +104,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     for (final file in files) {
       try {
-        await uploadAttachment(await file.readAsBytes(), file.path, null);
+        await _uploadAttachment(await file.readAsBytes(), file.path, null);
       } catch (err) {
         context.showErrorDialog(err);
       }
@@ -111,7 +113,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> takeMediaToUpload(bool isVideo) async {
+  Future<void> _takeMediaToUpload(bool isVideo) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -127,7 +129,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     final file = File(media.path);
     try {
-      await uploadAttachment(await file.readAsBytes(), file.path, null);
+      await _uploadAttachment(await file.readAsBytes(), file.path, null);
     } catch (err) {
       context.showErrorDialog(err);
     }
@@ -135,18 +137,18 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     setState(() => _isBusy = false);
   }
 
-  void pasteFileToUpload() async {
+  void _pasteFileToUpload() async {
     final data = await Pasteboard.image;
     if (data == null) return;
 
     setState(() => _isBusy = true);
 
-    uploadAttachment(data, 'Pasted Image', null);
+    _uploadAttachment(data, 'Pasted Image', null);
 
     setState(() => _isBusy = false);
   }
 
-  Future<void> uploadAttachment(
+  Future<void> _uploadAttachment(
       Uint8List data, String path, Map<String, dynamic>? metadata) async {
     final AttachmentProvider provider = Get.find();
     try {
@@ -188,7 +190,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
   }
 
-  void revertMetadataList() {
+  void _revertMetadataList() {
     final AttachmentProvider provider = Get.find();
 
     if (widget.current.isEmpty) {
@@ -215,7 +217,17 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     }
   }
 
-  void showEdit(Attachment element, int index) {
+  void _showAttachmentPreview(Attachment element) {
+    context.pushTransparentRoute(
+      AttachmentFullScreen(
+        parentId: 'attachment-editor-preview',
+        item: element,
+      ),
+      rootNavigator: true,
+    );
+  }
+
+  void _showEdit(Attachment element, int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -234,15 +246,68 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    revertMetadataList();
+  Widget _buildListEntry(Attachment element, int index) {
+    var fileType = element.mimetype.split('/').firstOrNull;
+    fileType ??= 'unknown';
+
+    final canBePreview = fileType.toLowerCase() == 'image';
+
+    return Container(
+      padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
+      child: Card(
+        color: Theme.of(context).colorScheme.surface,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 54,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          element.alt,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace'),
+                        ),
+                        Text(
+                          '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${_formatBytes(element.size)}',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    color: Colors.teal,
+                    icon: const Icon(Icons.preview),
+                    visualDensity: const VisualDensity(horizontal: -4),
+                    onPressed: canBePreview
+                        ? () => _showAttachmentPreview(element)
+                        : null,
+                  ),
+                  IconButton(
+                    color: Theme.of(context).colorScheme.primary,
+                    visualDensity: const VisualDensity(horizontal: -4),
+                    icon: const Icon(Icons.more_horiz),
+                    onPressed: () => _showEdit(element, index),
+                  ),
+                ],
+              ).paddingSymmetric(vertical: 8, horizontal: 16),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
-  void dispose() {
-    super.dispose();
+  void initState() {
+    super.initState();
+    _revertMetadataList();
   }
 
   @override
@@ -250,160 +315,95 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     const density = VisualDensity(horizontal: 0, vertical: 0);
 
     return SafeArea(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: DropTarget(
-          onDragDone: (detail) async {
-            setState(() => _isBusy = true);
-            for (final file in detail.files) {
-              final data = await file.readAsBytes();
-              uploadAttachment(data, file.path, null);
-            }
-            setState(() => _isBusy = false);
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'attachmentAdd'.tr,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-              Expanded(
-                child: Builder(builder: (context) {
-                  if (_isFirstTimeBusy && _isBusy) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  return ListView.builder(
-                    itemCount: _attachments.length,
-                    itemBuilder: (context, index) {
-                      final element = _attachments[index];
-                      var fileType = element!.mimetype.split('/').firstOrNull;
-                      fileType ??= 'unknown';
-                      return Container(
-                        padding: const EdgeInsets.only(
-                            left: 16, right: 8, bottom: 16),
-                        child: Card(
-                          color: Theme.of(context).colorScheme.surface,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 280,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(8),
-                                    topRight: Radius.circular(8),
-                                  ),
-                                  child: AttachmentItem(
-                                    parentId: 'attachment-editor',
-                                    item: element,
-                                    showBadge: false,
-                                    showHideButton: false,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 54,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            element.alt,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'monospace'),
-                                          ),
-                                          Text(
-                                            '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${_formatBytes(element.size)}',
-                                            style:
-                                                const TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    IconButton(
-                                      style: TextButton.styleFrom(
-                                        shape: const CircleBorder(),
-                                        foregroundColor:
-                                            Theme.of(context).primaryColor,
-                                      ),
-                                      icon: const Icon(Icons.more_horiz),
-                                      onPressed: () => showEdit(element, index),
-                                    ),
-                                  ],
-                                ).paddingSymmetric(vertical: 8, horizontal: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+      child: DropTarget(
+        onDragDone: (detail) async {
+          setState(() => _isBusy = true);
+          for (final file in detail.files) {
+            final data = await file.readAsBytes();
+            _uploadAttachment(data, file.path, null);
+          }
+          setState(() => _isBusy = false);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'attachmentAdd'.tr,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
+            if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+            Expanded(
+              child: Builder(builder: (context) {
+                if (_isFirstTimeBusy && _isBusy) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                }),
+                }
+
+                return ListView.builder(
+                  itemCount: _attachments.length,
+                  itemBuilder: (context, index) {
+                    final element = _attachments[index];
+                    return _buildListEntry(element!, index);
+                  },
+                );
+              }),
+            ),
+            const Divider(thickness: 0.3, height: 0.3),
+            SizedBox(
+              height: 64,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 0,
+                  alignment: WrapAlignment.center,
+                  runAlignment: WrapAlignment.center,
+                  children: [
+                    if (PlatformInfo.isDesktop ||
+                        PlatformInfo.isIOS ||
+                        PlatformInfo.isWeb)
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.paste),
+                        label: Text('attachmentAddClipboard'.tr),
+                        style: const ButtonStyle(visualDensity: density),
+                        onPressed: () => _pasteFileToUpload(),
+                      ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.add_photo_alternate),
+                      label: Text('attachmentAddGalleryPhoto'.tr),
+                      style: const ButtonStyle(visualDensity: density),
+                      onPressed: () => _pickPhotoToUpload(),
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.add_road),
+                      label: Text('attachmentAddGalleryVideo'.tr),
+                      style: const ButtonStyle(visualDensity: density),
+                      onPressed: () => _pickVideoToUpload(),
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.photo_camera_back),
+                      label: Text('attachmentAddCameraPhoto'.tr),
+                      style: const ButtonStyle(visualDensity: density),
+                      onPressed: () => _takeMediaToUpload(false),
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.video_camera_back_outlined),
+                      label: Text('attachmentAddCameraVideo'.tr),
+                      style: const ButtonStyle(visualDensity: density),
+                      onPressed: () => _takeMediaToUpload(true),
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.file_present_rounded),
+                      label: Text('attachmentAddFile'.tr),
+                      style: const ButtonStyle(visualDensity: density),
+                      onPressed: () => _pickFileToUpload(),
+                    ),
+                  ],
+                ).paddingSymmetric(horizontal: 12),
               ),
-              const Divider(thickness: 0.3, height: 0.3),
-              SizedBox(
-                height: 64,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 0,
-                    alignment: WrapAlignment.center,
-                    runAlignment: WrapAlignment.center,
-                    children: [
-                      if (PlatformInfo.isDesktop || PlatformInfo.isIOS || PlatformInfo.isWeb)
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.paste),
-                          label: Text('attachmentAddClipboard'.tr),
-                          style: const ButtonStyle(visualDensity: density),
-                          onPressed: () => pasteFileToUpload(),
-                        ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.add_photo_alternate),
-                        label: Text('attachmentAddGalleryPhoto'.tr),
-                        style: const ButtonStyle(visualDensity: density),
-                        onPressed: () => pickPhotoToUpload(),
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.add_road),
-                        label: Text('attachmentAddGalleryVideo'.tr),
-                        style: const ButtonStyle(visualDensity: density),
-                        onPressed: () => pickVideoToUpload(),
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.photo_camera_back),
-                        label: Text('attachmentAddCameraPhoto'.tr),
-                        style: const ButtonStyle(visualDensity: density),
-                        onPressed: () => takeMediaToUpload(false),
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.video_camera_back_outlined),
-                        label: Text('attachmentAddCameraVideo'.tr),
-                        style: const ButtonStyle(visualDensity: density),
-                        onPressed: () => takeMediaToUpload(true),
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.file_present_rounded),
-                        label: Text('attachmentAddFile'.tr),
-                        style: const ButtonStyle(visualDensity: density),
-                        onPressed: () => pickFileToUpload(),
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 12),
-                ),
-              )
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

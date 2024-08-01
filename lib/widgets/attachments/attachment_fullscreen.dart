@@ -16,19 +16,18 @@ import 'package:solian/widgets/attachments/attachment_item.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:path/path.dart' show extension;
 
-class AttachmentListFullScreen extends StatefulWidget {
+class AttachmentFullScreen extends StatefulWidget {
   final String parentId;
   final Attachment item;
 
-  const AttachmentListFullScreen(
+  const AttachmentFullScreen(
       {super.key, required this.parentId, required this.item});
 
   @override
-  State<AttachmentListFullScreen> createState() =>
-      _AttachmentListFullScreenState();
+  State<AttachmentFullScreen> createState() => _AttachmentFullScreenState();
 }
 
-class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
+class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
   bool _showDetails = true;
 
   bool _isDownloading = false;
@@ -83,7 +82,7 @@ class _AttachmentListFullScreenState extends State<AttachmentListFullScreen> {
     setState(() => _isDownloading = true);
 
     var extName = extension(widget.item.name);
-    if(extName.isEmpty) extName = '.png';
+    if (extName.isEmpty) extName = '.png';
     final imagePath =
         '${Directory.systemTemp.path}/${widget.item.uuid}$extName';
     await Dio().download(

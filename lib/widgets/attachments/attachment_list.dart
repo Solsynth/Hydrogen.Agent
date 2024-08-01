@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
 import 'package:solian/providers/content/attachment.dart';
-import 'package:solian/widgets/attachments/attachment_list_fullscreen.dart';
+import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
 
 class AttachmentList extends StatefulWidget {
   final String parentId;
@@ -320,7 +320,7 @@ class AttachmentListEntry extends StatelessWidget {
           onReveal(true);
         } else if (['image'].contains(item!.mimetype.split('/').first)) {
           context.pushTransparentRoute(
-            AttachmentListFullScreen(
+            AttachmentFullScreen(
               parentId: parentId,
               item: item!,
             ),
