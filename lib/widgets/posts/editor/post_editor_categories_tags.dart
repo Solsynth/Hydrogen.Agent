@@ -16,8 +16,7 @@ class PostEditorCategoriesDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           TagsField(
-            initialTags:
-                controller.editTo.value?.tags?.map((x) => x.alias).toList(),
+            initialTags: controller.tags,
             hintText: 'postTagsPlaceholder'.tr,
             onUpdate: (value) {
               controller.tags.value = value;

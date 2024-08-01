@@ -163,6 +163,9 @@ class PostEditorController extends GetxController {
     titleController.text = value.body['title'] ?? '';
     descriptionController.text = value.body['description'] ?? '';
     contentController.text = value.body['content'] ?? '';
+    tags.value =
+        value.body['tags']?.map((x) => x['alias']).toList() ?? List.empty();
+    tags.refresh();
     attachments.value = value.body['attachments']?.cast<int>() ?? List.empty();
     attachments.refresh();
 
@@ -215,7 +218,7 @@ class PostEditorController extends GetxController {
       'title': title,
       'description': description,
       'content': contentController.text,
-      'tags': tags,
+      'tags': tags.map((x) => {'alias': x}).toList(),
       'attachments': attachments,
       'visible_users': visibleUsers,
       'invisible_users': invisibleUsers,
@@ -229,6 +232,7 @@ class PostEditorController extends GetxController {
 
   set payload(Map<String, dynamic> value) {
     type = value['type'];
+    tags.value = value['tags'].map((x) => x['alias']).toList();
     titleController.text = value['title'] ?? '';
     descriptionController.text = value['description'] ?? '';
     contentController.text = value['content'] ?? '';

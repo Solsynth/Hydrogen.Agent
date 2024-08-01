@@ -91,6 +91,11 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     AppRouter.instance.pop();
   }
 
+  Post? get _editTo => _editorController.editTo.value;
+  Post? get _replyTo => _editorController.replyTo.value;
+  Post? get _repostTo => _editorController.repostTo.value;
+  Realm? get _realm => _editorController.realmZone.value;
+
   @override
   void initState() {
     super.initState();
@@ -167,7 +172,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 children: [
                   if (_isBusy)
                     const LinearProgressIndicator().animate().scaleX(),
-                  if (widget.edit != null && widget.edit!.isDraft != true)
+                  if (_editTo != null && _editTo!.isDraft != true)
                     MaterialBanner(
                       leading: const Icon(Icons.edit),
                       leadingPadding:
@@ -176,7 +181,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       content: Text('postEditingNotify'.tr),
                       actions: notifyBannerActions,
                     ),
-                  if (widget.reply != null)
+                  if (_replyTo != null)
                     ExpansionTile(
                       leading: const FaIcon(
                         FontAwesomeIcons.reply,
@@ -189,12 +194,12 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                           Theme.of(context).colorScheme.surfaceContainer,
                       children: [
                         PostItem(
-                          item: widget.reply!,
+                          item: _replyTo!,
                           isReactable: false,
                         ).paddingOnly(bottom: 8),
                       ],
                     ),
-                  if (widget.repost != null)
+                  if (_repostTo != null)
                     ExpansionTile(
                       leading: const FaIcon(
                         FontAwesomeIcons.retweet,
@@ -207,12 +212,12 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                           Theme.of(context).colorScheme.surfaceContainer,
                       children: [
                         PostItem(
-                          item: widget.repost!,
+                          item: _repostTo!,
                           isReactable: false,
                         ).paddingOnly(bottom: 8),
                       ],
                     ),
-                  if (widget.realm != null)
+                  if (_realm != null)
                     MaterialBanner(
                       leading: const Icon(Icons.group),
                       leadingPadding:
@@ -220,7 +225,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       dividerColor: Colors.transparent,
                       content: Text(
                         'postInRealmNotify'
-                            .trParams({'realm': '#${widget.realm!.alias}'}),
+                            .trParams({'realm': '#${_realm!.alias}'}),
                       ),
                       actions: notifyBannerActions,
                     ),
@@ -383,7 +388,20 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.tag),
+                          icon: Obx(() {
+                            return badges.Badge(
+                              badgeContent: Text(
+                                _editorController.tags.length.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              showBadge: _editorController.tags.isNotEmpty,
+                              position: badges.BadgePosition.topEnd(
+                                top: -12,
+                                end: -8,
+                              ),
+                              child: const Icon(Icons.label),
+                            );
+                          }),
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
                             _editorController.editCategoriesAndTags(context);
