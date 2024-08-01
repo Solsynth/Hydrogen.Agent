@@ -8,9 +8,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pasteboard/pasteboard.dart';
-import 'package:path/path.dart' show basename;
+import 'package:path/path.dart' show basename, extension;
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
@@ -203,6 +204,31 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     );
   }
 
+  Future<void> _cropAttachment(int queueIndex) async {
+    final task = _uploadController.queueOfUpload[queueIndex];
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: task.file.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'cropImage'.tr,
+          toolbarColor: Colors.deepOrange,
+          toolbarWidgetColor: Colors.white,
+          aspectRatioPresets: CropAspectRatioPreset.values,
+        ),
+        IOSUiSettings(
+          title: 'cropImage'.tr,
+          aspectRatioPresets: CropAspectRatioPreset.values,
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+    if (croppedFile == null) return;
+    _uploadController.queueOfUpload[queueIndex].file = File(croppedFile.path);
+    _uploadController.queueOfUpload.refresh();
+  }
+
   Future<void> _deleteAttachment(Attachment element) async {
     setState(() => _isBusy = true);
     try {
@@ -216,6 +242,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
   }
 
   Widget _buildQueueEntry(AttachmentUploadTask element, int index) {
+    final extName = extension(element.file.path).substring(1);
+    final canBeCrop = ['png', 'jpg', 'jpeg', 'gif'].contains(extName);
+
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
       child: Card(
@@ -269,23 +298,38 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         child: Icon(Icons.check),
                       ),
                     ),
+                  if (!element.isCompleted && canBeCrop)
+                    Obx(
+                      () => IconButton(
+                        color: Colors.teal,
+                        icon: const Icon(Icons.crop),
+                        visualDensity: const VisualDensity(horizontal: -4),
+                        onPressed: _uploadController.isUploading.value
+                            ? null
+                            : () {
+                                _cropAttachment(index);
+                              },
+                      ),
+                    ),
                   if (!element.isCompleted && !element.isUploading)
-                    IconButton(
-                      color: Colors.green,
-                      icon: const Icon(Icons.play_arrow),
-                      visualDensity: const VisualDensity(horizontal: -4),
-                      onPressed: _uploadController.isUploading.value
-                          ? null
-                          : () {
-                              _uploadController
-                                  .performSingleTask(index)
-                                  .then((r) {
-                                widget.onAdd(r.id);
-                                if (mounted) {
-                                  setState(() => _attachments.add(r));
-                                }
-                              });
-                            },
+                    Obx(
+                      () => IconButton(
+                        color: Colors.green,
+                        icon: const Icon(Icons.play_arrow),
+                        visualDensity: const VisualDensity(horizontal: -4),
+                        onPressed: _uploadController.isUploading.value
+                            ? null
+                            : () {
+                                _uploadController
+                                    .performSingleTask(index)
+                                    .then((r) {
+                                  widget.onAdd(r.id);
+                                  if (mounted) {
+                                    setState(() => _attachments.add(r));
+                                  }
+                                });
+                              },
+                      ),
                     ),
                   if (!element.isCompleted && !element.isUploading)
                     IconButton(

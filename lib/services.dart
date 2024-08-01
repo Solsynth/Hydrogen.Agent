@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 abstract class ServiceFinder {
-  static const bool devFlag = true;
+  static const bool devFlag = false;
 
   static const String dealerUrl =
       devFlag ? 'http://localhost:8442' : 'https://api.sn.solsynth.dev';

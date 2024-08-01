@@ -303,4 +303,5 @@ const i18nSimplifiedChinese = {
   'themeColorLuka': '流音粉',
   'themeColorApplied': '全局主题颜色已应用',
   'attachmentSaved': '附件已保存到系统相册',
+  'cropImage': '裁剪图片',
 };

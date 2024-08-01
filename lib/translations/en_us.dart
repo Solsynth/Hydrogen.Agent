@@ -326,4 +326,5 @@ const i18nEnglish = {
   'themeColorLuka': 'Luka Pink',
   'themeColorApplied': 'Global theme color has been applied.',
   'attachmentSaved': 'Attachment saved to your system album.',
+  'cropImage': 'Crop Image',
 };
