@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/exts.dart';
@@ -50,26 +51,24 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   }
 
   void _syncWidget() async {
-    setState(() => _isBusy = true);
+    _isBusy = true;
 
     final AuthProvider auth = Get.find();
     final prof = auth.userProfile.value!;
-    setState(() {
-      _usernameController.text = prof['name'];
-      _nicknameController.text = prof['nick'];
-      _descriptionController.text = prof['description'];
-      _firstNameController.text = prof['profile']['first_name'];
-      _lastNameController.text = prof['profile']['last_name'];
-      _avatar = prof['avatar'];
-      _banner = prof['banner'];
-      if (prof['profile']['birthday'] != null) {
-        _birthday = DateTime.parse(prof['profile']['birthday']);
-        _birthdayController.text =
-            DateFormat('yyyy-MM-dd').format(_birthday!.toLocal());
-      }
+    _usernameController.text = prof['name'];
+    _nicknameController.text = prof['nick'];
+    _descriptionController.text = prof['description'];
+    _firstNameController.text = prof['profile']['first_name'];
+    _lastNameController.text = prof['profile']['last_name'];
+    _avatar = prof['avatar'];
+    _banner = prof['banner'];
+    if (prof['profile']['birthday'] != null) {
+      _birthday = DateTime.parse(prof['profile']['birthday']);
+      _birthdayController.text =
+          DateFormat('yyyy-MM-dd').format(_birthday!.toLocal());
+    }
 
-      _isBusy = false;
-    });
+    _isBusy = false;
   }
 
   Future<void> _editImage(String position) async {
@@ -79,15 +78,40 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'cropImage'.tr,
+          toolbarColor: Theme.of(context).colorScheme.primary,
+          toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+        IOSUiSettings(
+          title: 'cropImage'.tr,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedFile == null) return;
+    final file = File(croppedFile.path);
+
     setState(() => _isBusy = true);
 
     final AttachmentProvider provider = Get.find();
 
     Response? attachResp;
     try {
-      final file = File(image.path);
       attachResp = await provider.createAttachment(
-          await file.readAsBytes(), file.path, 'p.$position', null);
+        await file.readAsBytes(),
+        file.path,
+        'p.$position',
+        null,
+      );
     } catch (e) {
       setState(() => _isBusy = false);
       context.showErrorDialog(e);
@@ -142,8 +166,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(Duration.zero, () => _syncWidget());
+    _syncWidget();
   }
 
   @override

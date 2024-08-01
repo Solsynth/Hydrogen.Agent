@@ -211,8 +211,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'cropImage'.tr,
-          toolbarColor: Colors.deepOrange,
-          toolbarWidgetColor: Colors.white,
+          toolbarColor: Theme.of(context).colorScheme.primary,
+          toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
           aspectRatioPresets: CropAspectRatioPreset.values,
         ),
         IOSUiSettings(
