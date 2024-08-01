@@ -24,7 +24,8 @@ class PostItem extends StatefulWidget {
   final bool isShowEmbed;
   final bool isFullDate;
   final bool isContentSelectable;
-  final String? overrideAttachmentParent;
+  final String? attachmentParent;
+  final Color? backgroundColor;
 
   const PostItem({
     super.key,
@@ -36,7 +37,8 @@ class PostItem extends StatefulWidget {
     this.isShowEmbed = true,
     this.isFullDate = false,
     this.isContentSelectable = false,
-    this.overrideAttachmentParent,
+    this.attachmentParent,
+    this.backgroundColor,
   });
 
   @override
@@ -186,7 +188,7 @@ class _PostItemState extends State<PostItem> {
             child: PostItem(
               item: widget.item.replyTo!,
               isCompact: true,
-              overrideAttachmentParent: widget.item.id.toString(),
+              attachmentParent: widget.item.id.toString(),
             ).paddingSymmetric(vertical: 8),
           ),
         ],
@@ -198,7 +200,9 @@ class _PostItemState extends State<PostItem> {
           post: widget.item.replyTo!,
         ),
       ),
-      closedColor: Theme.of(context).colorScheme.surface,
+      closedElevation: 0,
+      openElevation: 0,
+      closedColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }
@@ -229,7 +233,7 @@ class _PostItemState extends State<PostItem> {
             child: PostItem(
               item: widget.item.repostTo!,
               isCompact: true,
-              overrideAttachmentParent: widget.item.id.toString(),
+              attachmentParent: widget.item.id.toString(),
             ).paddingSymmetric(vertical: 8),
           ),
         ],
@@ -241,7 +245,9 @@ class _PostItemState extends State<PostItem> {
           post: widget.item.repostTo!,
         ),
       ),
-      closedColor: Theme.of(context).colorScheme.surface,
+      closedElevation: 0,
+      openElevation: 0,
+      closedColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }
@@ -369,7 +375,9 @@ class _PostItemState extends State<PostItem> {
           post: item,
         ),
       ),
-      closedColor: Theme.of(context).colorScheme.surface,
+      closedElevation: 0,
+      openElevation: 0,
+      closedColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }

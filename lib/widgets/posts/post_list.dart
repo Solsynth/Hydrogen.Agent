@@ -11,6 +11,7 @@ class PostListWidget extends StatelessWidget {
   final bool isClickable;
   final bool isNestedClickable;
   final PagingController<int, Post> controller;
+  final Color? backgroundColor;
 
   const PostListWidget({
     super.key,
@@ -18,6 +19,7 @@ class PostListWidget extends StatelessWidget {
     this.isShowEmbed = true,
     this.isClickable = true,
     this.isNestedClickable = true,
+    this.backgroundColor,
   });
 
   @override
@@ -32,6 +34,7 @@ class PostListWidget extends StatelessWidget {
             isNestedClickable: isNestedClickable,
             isClickable: isClickable,
             item: item,
+            backgroundColor: backgroundColor,
             onUpdate: () {
               controller.refresh();
             },
@@ -50,6 +53,7 @@ class PostListEntryWidget extends StatelessWidget {
   final bool isClickable;
   final Post item;
   final Function onUpdate;
+  final Color? backgroundColor;
 
   const PostListEntryWidget({
     super.key,
@@ -59,6 +63,7 @@ class PostListEntryWidget extends StatelessWidget {
     required this.isClickable,
     required this.item,
     required this.onUpdate,
+    this.backgroundColor,
   });
 
   @override
@@ -69,6 +74,7 @@ class PostListEntryWidget extends StatelessWidget {
         item: item,
         isShowEmbed: isShowEmbed,
         isClickable: isNestedClickable,
+        backgroundColor: backgroundColor,
       ).paddingSymmetric(vertical: 8),
       onLongPress: () {
         final AuthProvider auth = Get.find();
