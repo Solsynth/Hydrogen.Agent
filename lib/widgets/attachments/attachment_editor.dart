@@ -56,12 +56,10 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     final medias = await _imagePicker.pickMultiImage();
     if (medias.isEmpty) return;
 
-    for (final media in medias) {
-      final file = File(media.path);
-      _enqueueTask(
-        AttachmentUploadTask(file: file, usage: widget.usage),
-      );
-    }
+    _enqueueTaskBatch(medias.map((x) {
+      final file = File(x.path);
+      return AttachmentUploadTask(file: file, usage: widget.usage);
+    }));
   }
 
   Future<void> _pickVideoToUpload() async {
@@ -88,11 +86,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
-    for (final file in files) {
-      _enqueueTask(
-        AttachmentUploadTask(file: file, usage: widget.usage),
-      );
-    }
+    _enqueueTaskBatch(files.map((x) {
+      return AttachmentUploadTask(file: x, usage: widget.usage);
+    }));
   }
 
   Future<void> _takeMediaToUpload(bool isVideo) async {
@@ -159,7 +155,11 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       _isFirstTimeBusy = false;
       return;
     } else {
-      _attachments = List.filled(widget.initialAttachments.length, null);
+      _attachments = List.filled(
+        widget.initialAttachments.length,
+        null,
+        growable: true,
+      );
     }
 
     setState(() => _isBusy = true);
@@ -239,20 +239,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                             fontFamily: 'monospace',
                           ),
                         ),
-                        FutureBuilder(
-                          future: element.file.length(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Text(
-                                '- Bytes',
-                                style: TextStyle(fontSize: 12),
-                              );
-                            }
-                            return Text(
-                              _formatBytes(snapshot.data!),
-                              style: const TextStyle(fontSize: 12),
-                            );
-                          },
+                        Text(
+                          'In queue #${index + 1}',
+                          style: const TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
@@ -410,6 +399,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     }
   }
 
+  void _enqueueTaskBatch(Iterable<AttachmentUploadTask> tasks) {
+    _uploadController.enqueueTaskBatch(tasks);
+    if (_isAutoUpload) {
+      _startUploading();
+    }
+  }
+
   void _startUploading() {
     _uploadController.performUploadQueue(onData: (r) {
       widget.onAdd(r.id);
@@ -433,11 +429,10 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       child: DropTarget(
         onDragDone: (detail) async {
           if (_uploadController.isUploading.value) return;
-          for (final file in detail.files) {
-            _enqueueTask(
-              AttachmentUploadTask(file: File(file.path), usage: widget.usage),
-            );
-          }
+          _enqueueTaskBatch(detail.files.map((x) {
+            final file = File(x.path);
+            return AttachmentUploadTask(file: file, usage: widget.usage);
+          }));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

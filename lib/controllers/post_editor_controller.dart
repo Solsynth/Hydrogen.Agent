@@ -115,10 +115,10 @@ class PostEditorController extends GetxController {
       builder: (context) => AttachmentEditorPopup(
         usage: 'i.attachment',
         initialAttachments: attachments,
-        onAdd: (value) {
+        onAdd: (int value) {
           attachments.add(value);
         },
-        onRemove: (value) {
+        onRemove: (int value) {
           attachments.remove(value);
         },
       ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -26,9 +27,38 @@ class AttachmentUploaderController extends GetxController {
   RxDouble progressOfUpload = 0.0.obs;
   RxList<AttachmentUploadTask> queueOfUpload = RxList.empty(growable: true);
 
+  Timer? _progressSyncTimer;
+  double _progressOfUpload = 0.0;
+
+  void _syncProgress() {
+    progressOfUpload.value = _progressOfUpload;
+    queueOfUpload.refresh();
+  }
+
+  void _startProgressSyncTimer() {
+    if (_progressSyncTimer != null) {
+      _progressSyncTimer!.cancel();
+    }
+    _progressSyncTimer = Timer.periodic(
+      const Duration(milliseconds: 500),
+      (_) => _syncProgress(),
+    );
+  }
+
+  void _stopProgressSyncTimer() {
+    if (_progressSyncTimer == null) return;
+    _progressSyncTimer!.cancel();
+    _progressSyncTimer = null;
+  }
+
   void enqueueTask(AttachmentUploadTask task) {
     if (isUploading.value) throw Exception('uploading blocked');
     queueOfUpload.add(task);
+  }
+
+  void enqueueTaskBatch(Iterable<AttachmentUploadTask> tasks) {
+    if (isUploading.value) throw Exception('uploading blocked');
+    queueOfUpload.addAll(tasks);
   }
 
   void dequeueTask(AttachmentUploadTask task) {
@@ -40,8 +70,8 @@ class AttachmentUploaderController extends GetxController {
     isUploading.value = true;
     progressOfUpload.value = 0;
 
+    _startProgressSyncTimer();
     queueOfUpload[queueIndex].isUploading = true;
-    queueOfUpload.refresh();
 
     final task = queueOfUpload[queueIndex];
     final result = await _rawUploadAttachment(
@@ -51,13 +81,13 @@ class AttachmentUploaderController extends GetxController {
       null,
       onProgress: (value) {
         queueOfUpload[queueIndex].progress = value;
-        queueOfUpload.refresh();
-        progressOfUpload.value = value;
+        _progressOfUpload = value;
       },
     );
 
     queueOfUpload.removeAt(queueIndex);
-    queueOfUpload.refresh();
+    _stopProgressSyncTimer();
+    _syncProgress();
 
     isUploading.value = false;
 
@@ -70,9 +100,10 @@ class AttachmentUploaderController extends GetxController {
     isUploading.value = true;
     progressOfUpload.value = 0;
 
+    _startProgressSyncTimer();
+
     for (var idx = 0; idx < queueOfUpload.length; idx++) {
       queueOfUpload[idx].isUploading = true;
-      queueOfUpload.refresh();
 
       final task = queueOfUpload[idx];
       final result = await _rawUploadAttachment(
@@ -82,20 +113,20 @@ class AttachmentUploaderController extends GetxController {
         null,
         onProgress: (value) {
           queueOfUpload[idx].progress = value;
-          queueOfUpload.refresh();
-          progressOfUpload.value = (idx + value) / queueOfUpload.length;
+          _progressOfUpload = (idx + value) / queueOfUpload.length;
         },
       );
-      progressOfUpload.value = (idx + 1) / queueOfUpload.length;
+      _progressOfUpload = (idx + 1) / queueOfUpload.length;
       onData(result);
 
       queueOfUpload[idx].isUploading = false;
       queueOfUpload[idx].isCompleted = false;
-      queueOfUpload.refresh();
     }
 
     queueOfUpload.clear();
-    queueOfUpload.refresh();
+    _stopProgressSyncTimer();
+    _syncProgress();
+
     isUploading.value = false;
   }
 
