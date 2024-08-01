@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:markdown_toolbar/markdown_toolbar.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
@@ -46,6 +47,7 @@ class PostPublishScreen extends StatefulWidget {
 
 class _PostPublishScreenState extends State<PostPublishScreen> {
   final _editorController = PostEditorController();
+  final _contentFocusNode = FocusNode();
 
   bool _isBusy = false;
 
@@ -99,6 +101,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   @override
   void initState() {
     super.initState();
+    _editorController.contentController.addListener(() => setState(() {}));
     syncWidget();
   }
 
@@ -139,6 +142,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           ],
         ),
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
               tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -167,56 +171,55 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 },
               ),
             ),
+            if (_editTo != null && _editTo!.isDraft != true)
+              MaterialBanner(
+                leading: const Icon(Icons.edit),
+                leadingPadding: const EdgeInsets.only(left: 10, right: 20),
+                dividerColor: Colors.transparent,
+                content: Text('postEditingNotify'.tr),
+                actions: notifyBannerActions,
+              ),
+            if (_replyTo != null)
+              ExpansionTile(
+                leading: const FaIcon(
+                  FontAwesomeIcons.reply,
+                  size: 18,
+                ).paddingOnly(left: 2),
+                title: Text('postReplyingNotify'.trParams(
+                  {'username': '@${widget.reply!.author.name}'},
+                )),
+                collapsedBackgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainer,
+                children: [
+                  PostItem(
+                    item: _replyTo!,
+                    isReactable: false,
+                  ).paddingOnly(bottom: 8),
+                ],
+              ),
+            if (_repostTo != null)
+              ExpansionTile(
+                leading: const FaIcon(
+                  FontAwesomeIcons.retweet,
+                  size: 18,
+                ).paddingOnly(left: 2),
+                title: Text('postRepostingNotify'.trParams(
+                  {'username': '@${widget.repost!.author.name}'},
+                )),
+                collapsedBackgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainer,
+                children: [
+                  PostItem(
+                    item: _repostTo!,
+                    isReactable: false,
+                  ).paddingOnly(bottom: 8),
+                ],
+              ),
             Expanded(
               child: ListView(
                 children: [
                   if (_isBusy)
                     const LinearProgressIndicator().animate().scaleX(),
-                  if (_editTo != null && _editTo!.isDraft != true)
-                    MaterialBanner(
-                      leading: const Icon(Icons.edit),
-                      leadingPadding:
-                          const EdgeInsets.only(left: 10, right: 20),
-                      dividerColor: Colors.transparent,
-                      content: Text('postEditingNotify'.tr),
-                      actions: notifyBannerActions,
-                    ),
-                  if (_replyTo != null)
-                    ExpansionTile(
-                      leading: const FaIcon(
-                        FontAwesomeIcons.reply,
-                        size: 18,
-                      ).paddingOnly(left: 2),
-                      title: Text('postReplyingNotify'.trParams(
-                        {'username': '@${widget.reply!.author.name}'},
-                      )),
-                      collapsedBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainer,
-                      children: [
-                        PostItem(
-                          item: _replyTo!,
-                          isReactable: false,
-                        ).paddingOnly(bottom: 8),
-                      ],
-                    ),
-                  if (_repostTo != null)
-                    ExpansionTile(
-                      leading: const FaIcon(
-                        FontAwesomeIcons.retweet,
-                        size: 18,
-                      ).paddingOnly(left: 2),
-                      title: Text('postRepostingNotify'.trParams(
-                        {'username': '@${widget.repost!.author.name}'},
-                      )),
-                      collapsedBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainer,
-                      children: [
-                        PostItem(
-                          item: _repostTo!,
-                          isReactable: false,
-                        ).paddingOnly(bottom: 8),
-                      ],
-                    ),
                   if (_realm != null)
                     MaterialBanner(
                       leading: const Icon(Icons.group),
@@ -240,8 +243,8 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       autocorrect: true,
                       keyboardType: TextInputType.multiline,
                       controller: _editorController.contentController,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
+                      focusNode: _contentFocusNode,
+                      decoration: InputDecoration.collapsed(
                         hintText: 'postContentPlaceholder'.tr,
                       ),
                       onTapOutside: (_) =>
@@ -407,6 +410,17 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                             _editorController.editCategoriesAndTags(context);
                           },
                         ),
+                        MarkdownToolbar(
+                          hideImage: true,
+                          useIncludedTextField: false,
+                          backgroundColor: Colors.transparent,
+                          iconColor: Theme.of(context).colorScheme.onSurface,
+                          controller: _editorController.contentController,
+                          focusNode: _contentFocusNode,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20)),
+                          width: 40,
+                        ).paddingSymmetric(horizontal: 4),
                       ],
                     ).paddingSymmetric(horizontal: 6, vertical: 8),
                   ),
@@ -421,6 +435,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
   @override
   void dispose() {
+    _contentFocusNode.dispose();
     _editorController.dispose();
     super.dispose();
   }

@@ -65,6 +65,7 @@ dependencies:
   gal: ^2.3.0
   dio: ^5.5.0+1
   image_cropper: ^8.0.1
+  markdown_toolbar: ^0.5.0
 
 dev_dependencies:
   flutter_test:
