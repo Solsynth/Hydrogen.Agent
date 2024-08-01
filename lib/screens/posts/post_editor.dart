@@ -82,7 +82,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     setState(() => _isBusy = false);
   }
 
-  void syncWidget() {
+  void _syncWidget() {
     _editorController.mode.value = widget.mode;
     if (widget.edit != null) {
       _editorController.editTarget = widget.edit;
@@ -105,7 +105,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   void initState() {
     super.initState();
     _editorController.contentController.addListener(() => setState(() {}));
-    syncWidget();
+    _syncWidget();
   }
 
   @override
@@ -416,6 +416,25 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
                             _editorController.editPublishZone(context);
+                          },
+                        ),
+                        IconButton(
+                          icon: Obx(() {
+                            return badges.Badge(
+                              showBadge:
+                                  _editorController.publishedAt.value != null ||
+                                      _editorController.publishedUntil.value !=
+                                          null,
+                              position: badges.BadgePosition.topEnd(
+                                top: -4,
+                                end: -6,
+                              ),
+                              child: const Icon(Icons.schedule),
+                            );
+                          }),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            _editorController.editPublishDate(context);
                           },
                         ),
                         MarkdownToolbar(

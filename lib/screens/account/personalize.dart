@@ -34,7 +34,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
   bool _isBusy = false;
 
-  void selectBirthday() async {
+  void _selectBirthday() async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _birthday?.toLocal(),
@@ -49,7 +49,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     }
   }
 
-  void syncWidget() async {
+  void _syncWidget() async {
     setState(() => _isBusy = true);
 
     final AuthProvider auth = Get.find();
@@ -72,7 +72,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     });
   }
 
-  Future<void> updateImage(String position) async {
+  Future<void> _editImage(String position) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -87,11 +87,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     try {
       final file = File(image.path);
       attachResp = await provider.createAttachment(
-        await file.readAsBytes(),
-        file.path,
-        'p.$position',
-        null
-      );
+          await file.readAsBytes(), file.path, 'p.$position', null);
     } catch (e) {
       setState(() => _isBusy = false);
       context.showErrorDialog(e);
@@ -105,7 +101,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       {'attachment': attachResp.body['id']},
     );
     if (resp.statusCode == 200) {
-      syncWidget();
+      _syncWidget();
       context.showSnackbar('accountPersonalizeApplied'.tr);
     } else {
       context.showErrorDialog(resp.bodyString);
@@ -114,7 +110,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     setState(() => _isBusy = false);
   }
 
-  void updatePersonalize() async {
+  void _editUserInfo() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -134,7 +130,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       },
     );
     if (resp.statusCode == 200) {
-      syncWidget();
+      _syncWidget();
       context.showSnackbar('accountPersonalizeApplied'.tr);
     } else {
       context.showErrorDialog(resp.bodyString);
@@ -147,7 +143,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration.zero, () => syncWidget());
+    Future.delayed(Duration.zero, () => _syncWidget());
   }
 
   @override
@@ -168,7 +164,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                 left: 40,
                 child: FloatingActionButton.small(
                   heroTag: const Key('avatar-editor'),
-                  onPressed: () => updateImage('avatar'),
+                  onPressed: () => _editImage('avatar'),
                   child: const Icon(
                     Icons.camera,
                   ),
@@ -187,7 +183,8 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                     color: Theme.of(context).colorScheme.surfaceContainerHigh,
                     child: _banner != null
                         ? Image.network(
-                            ServiceFinder.buildUrl('files', '/attachments/$_banner'),
+                            ServiceFinder.buildUrl(
+                                'files', '/attachments/$_banner'),
                             fit: BoxFit.cover,
                             loadingBuilder: (BuildContext context, Widget child,
                                 ImageChunkEvent? loadingProgress) {
@@ -212,7 +209,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                 right: 16,
                 child: FloatingActionButton(
                   heroTag: const Key('banner-editor'),
-                  onPressed: () => updateImage('banner'),
+                  onPressed: () => _editImage('banner'),
                   child: const Icon(
                     Icons.camera_alt,
                   ),
@@ -293,18 +290,18 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               border: const OutlineInputBorder(),
               labelText: 'birthday'.tr,
             ),
-            onTap: () => selectBirthday(),
+            onTap: () => _selectBirthday(),
           ).paddingSymmetric(horizontal: padding),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _isBusy ? null : () => syncWidget(),
+                onPressed: _isBusy ? null : () => _syncWidget(),
                 child: Text('reset'.tr),
               ),
               ElevatedButton(
-                onPressed: _isBusy ? null : () => updatePersonalize(),
+                onPressed: _isBusy ? null : () => _editUserInfo(),
                 child: Text('apply'.tr),
               ),
             ],

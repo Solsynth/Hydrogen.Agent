@@ -7,6 +7,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/posts/editor/post_editor_categories_tags.dart';
+import 'package:solian/widgets/posts/editor/post_editor_date.dart';
 import 'package:solian/widgets/posts/editor/post_editor_overview.dart';
 import 'package:solian/widgets/posts/editor/post_editor_publish_zone.dart';
 import 'package:solian/widgets/posts/editor/post_editor_visibility.dart';
@@ -26,6 +27,8 @@ class PostEditorController extends GetxController {
   Rx<Post?> replyTo = Rx(null);
   Rx<Post?> repostTo = Rx(null);
   Rx<Realm?> realmZone = Rx(null);
+  Rx<DateTime?> publishedAt = Rx(null);
+  Rx<DateTime?> publishedUntil = Rx(null);
   RxList<int> attachments = RxList<int>.empty(growable: true);
   RxList<String> tags = RxList<String>.empty(growable: true);
 
@@ -93,6 +96,15 @@ class PostEditorController extends GetxController {
     return showDialog(
       context: context,
       builder: (context) => PostEditorPublishZoneDialog(
+        controller: this,
+      ),
+    );
+  }
+
+  Future<void> editPublishDate(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => PostEditorDateDialog(
         controller: this,
       ),
     );
@@ -173,6 +185,8 @@ class PostEditorController extends GetxController {
     titleController.text = value.body['title'] ?? '';
     descriptionController.text = value.body['description'] ?? '';
     contentController.text = value.body['content'] ?? '';
+    publishedAt.value = value.publishedAt;
+    publishedUntil.value = value.publishedUntil;
     tags.value =
         value.body['tags']?.map((x) => x['alias']).toList() ?? List.empty();
     tags.refresh();
@@ -233,6 +247,9 @@ class PostEditorController extends GetxController {
       'visible_users': visibleUsers,
       'invisible_users': invisibleUsers,
       'visibility': visibility.value,
+      'published_at': publishedAt.value?.toUtc().toIso8601String() ??
+          DateTime.now().toUtc().toIso8601String(),
+      'published_until': publishedUntil.value?.toUtc().toIso8601String(),
       'is_draft': isDraft.value,
       if (replyTo.value != null) 'reply_to': replyTo.value!.id,
       if (repostTo.value != null) 'repost_to': repostTo.value!.id,
@@ -255,6 +272,12 @@ class PostEditorController extends GetxController {
     }
     if (value['invisible_users'] != null) {
       invisibleUsers.value = value['invisible_users'].cast<int>();
+    }
+    if (value['published_at'] != null) {
+      publishedAt.value = DateTime.parse(value['published_at']).toLocal();
+    }
+    if (value['published_until'] != null) {
+      publishedAt.value = DateTime.parse(value['published_until']).toLocal();
     }
     if (value['reply_to'] != null) {
       replyTo.value = Post.fromJson(value['reply_to']);

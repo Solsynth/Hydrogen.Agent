@@ -20,6 +20,7 @@ class Post {
   Post? repostTo;
   Realm? realm;
   DateTime? publishedAt;
+  DateTime? publishedUntil;
   DateTime? pinnedAt;
   bool? isDraft;
   int authorId;
@@ -44,6 +45,7 @@ class Post {
     required this.repostTo,
     required this.realm,
     required this.publishedAt,
+    required this.publishedUntil,
     required this.pinnedAt,
     required this.isDraft,
     required this.authorId,
@@ -80,6 +82,9 @@ class Post {
         publishedAt: json['published_at'] != null
             ? DateTime.parse(json['published_at'])
             : null,
+        publishedUntil: json['published_until'] != null
+            ? DateTime.parse(json['published_until'])
+            : null,
         pinnedAt: json['pinned_at'] != null
             ? DateTime.parse(json['pinned_at'])
             : null,
@@ -108,6 +113,7 @@ class Post {
         'repost_to': repostTo?.toJson(),
         'realm': realm?.toJson(),
         'published_at': publishedAt?.toIso8601String(),
+        'published_until': publishedUntil?.toIso8601String(),
         'pinned_at': pinnedAt?.toIso8601String(),
         'is_draft': isDraft,
         'author_id': authorId,
