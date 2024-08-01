@@ -93,6 +93,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   }
 
   void cancelAction() {
+    _editorController.localClear();
     AppRouter.instance.pop();
   }
 
@@ -104,6 +105,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.edit == null) _editorController.localRead();
     _editorController.contentController.addListener(() => setState(() {}));
     _syncWidget();
   }

@@ -45,7 +45,6 @@ class PostEditorController extends GetxController {
   PostEditorController() {
     SharedPreferences.getInstance().then((inst) {
       _prefs = inst;
-      localRead();
       _saveTimer = Timer.periodic(
         const Duration(seconds: 3),
         (Timer t) {
@@ -144,10 +143,12 @@ class PostEditorController extends GetxController {
   }
 
   void localRead() {
-    if (_prefs.containsKey('post_editor_local_save')) {
-      isRestoreFromLocal.value = true;
-      payload = jsonDecode(_prefs.getString('post_editor_local_save')!);
-    }
+    SharedPreferences.getInstance().then((inst) {
+      if (inst.containsKey('post_editor_local_save')) {
+        isRestoreFromLocal.value = true;
+        payload = jsonDecode(inst.getString('post_editor_local_save')!);
+      }
+    });
   }
 
   void localClear() {
@@ -259,7 +260,7 @@ class PostEditorController extends GetxController {
 
   set payload(Map<String, dynamic> value) {
     type = value['type'];
-    tags.value = value['tags'].map((x) => x['alias']).toList();
+    tags.value = value['tags'].map((x) => x['alias']).toList().cast<String>();
     titleController.text = value['title'] ?? '';
     descriptionController.text = value['description'] ?? '';
     contentController.text = value['content'] ?? '';
