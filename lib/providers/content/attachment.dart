@@ -38,11 +38,8 @@ class AttachmentProvider extends GetConnect {
   }
 
   Future<Response> createAttachment(
-    Uint8List data,
-    String path,
-    String usage,
-    Map<String, dynamic>? metadata,
-  ) async {
+      Uint8List data, String path, String usage, Map<String, dynamic>? metadata,
+      {Function(double)? onProgress}) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
@@ -71,7 +68,13 @@ class AttachmentProvider extends GetConnect {
       if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
       'metadata': jsonEncode(metadata),
     });
-    final resp = await client.post('/attachments', payload);
+    final resp = await client.post(
+      '/attachments',
+      payload,
+      uploadProgress: (progress) {
+        if (onProgress != null) onProgress(progress);
+      },
+    );
     if (resp.statusCode != 200) {
       throw Exception(resp.bodyString);
     }

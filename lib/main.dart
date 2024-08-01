@@ -10,6 +10,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
@@ -125,5 +126,6 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => ChannelProvider());
     Get.lazyPut(() => RealmProvider());
     Get.lazyPut(() => ChatCallProvider());
+    Get.lazyPut(() => AttachmentUploaderController());
   }
 }

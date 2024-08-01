@@ -38,7 +38,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  List<int> _attachments = List.empty(growable: true);
+  final List<int> _attachments = List.empty(growable: true);
 
   Event? _editTo;
   Event? _replyTo;
@@ -48,8 +48,17 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       context: context,
       builder: (context) => AttachmentEditorPopup(
         usage: 'm.attachment',
-        current: _attachments,
-        onUpdate: (value) => _attachments = value,
+        initialAttachments: _attachments,
+        onAdd: (value) {
+          setState(() {
+            _attachments.add(value);
+          });
+        },
+        onRemove: (value) {
+          setState(() {
+            _attachments.remove(value);
+          });
+        },
       ),
     );
   }

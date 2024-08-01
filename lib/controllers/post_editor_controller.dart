@@ -114,10 +114,12 @@ class PostEditorController extends GetxController {
       context: context,
       builder: (context) => AttachmentEditorPopup(
         usage: 'i.attachment',
-        current: attachments,
-        onUpdate: (value) {
-          attachments.value = value;
-          attachments.refresh();
+        initialAttachments: attachments,
+        onAdd: (value) {
+          attachments.add(value);
+        },
+        onRemove: (value) {
+          attachments.remove(value);
         },
       ),
     );
@@ -163,6 +165,8 @@ class PostEditorController extends GetxController {
     visibleUsers.clear();
     invisibleUsers.clear();
     visibility.value = 0;
+    publishedAt.value = null;
+    publishedUntil.value = null;
     isDraft.value = false;
     isRestoreFromLocal.value = false;
     lastSaveTime.value = null;

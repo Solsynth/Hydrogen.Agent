@@ -112,7 +112,9 @@ class ChatEvent extends StatelessWidget {
       case 'messages.edit':
         return ChatEventMessageActionLog(
           icon: const Icon(Icons.edit_note, size: 16),
-          text: 'messageEditDesc'.trParams({'id': '#${item.id}'}),
+          text: 'messageEditDesc'.trParams({
+            'id': '#${item.body['related_event']}',
+          }),
           isMerged: isMerged,
           isHasMerged: isHasMerged,
           isQuote: isQuote,
@@ -120,7 +122,9 @@ class ChatEvent extends StatelessWidget {
       case 'messages.delete':
         return ChatEventMessageActionLog(
           icon: const Icon(Icons.cancel_schedule_send, size: 16),
-          text: 'messageDeleteDesc'.trParams({'id': '#${item.id}'}),
+          text: 'messageDeleteDesc'.trParams({
+            'id': '#${item.body['related_event']}',
+          }),
           isMerged: isMerged,
           isHasMerged: isHasMerged,
           isQuote: isQuote,
