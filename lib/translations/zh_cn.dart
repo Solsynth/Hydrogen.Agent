@@ -18,6 +18,7 @@ const i18nSimplifiedChinese = {
   'draft': '草稿',
   'draftSave': '存为草稿',
   'draftBox': '草稿箱',
+  'more': '更多',
   'share': '分享',
   'feed': '资讯',
   'feedSearch': '搜索资讯',

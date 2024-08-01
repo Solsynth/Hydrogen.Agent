@@ -10,6 +10,7 @@ const i18nEnglish = {
   'draft': 'Draft',
   'draftSave': 'Save',
   'draftBox': 'Draft Box',
+  'more': 'More',
   'share': 'Share',
   'feed': 'Feed',
   'feedSearch': 'Search Feed',

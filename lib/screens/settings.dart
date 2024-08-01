@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/theme_switcher.dart';
+import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -79,6 +80,21 @@ class _SettingScreenState extends State<SettingScreen> {
                   .toList(),
             ).paddingSymmetric(horizontal: 12, vertical: 8),
           ),
+          _buildCaptionHeader('more'.tr),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextButton(
+                style: const ButtonStyle(
+                  visualDensity: VisualDensity(horizontal: -4, vertical: -4),
+                ),
+                child: Text('about'.tr),
+                onPressed: () {
+                  AppRouter.instance.pushNamed('about');
+                },
+              ),
+            ],
+          ).paddingSymmetric(horizontal: 12, vertical: 8),
         ],
       ),
     );

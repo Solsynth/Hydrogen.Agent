@@ -26,7 +26,6 @@ class _AccountScreenState extends State<AccountScreen> {
         'accountPersonalize'
       ),
       (const Icon(Icons.diversity_1), 'accountFriend'.tr, 'accountFriend'),
-      (const Icon(Icons.info_outline), 'about'.tr, 'about'),
     ];
 
     final AuthProvider auth = Get.find();
@@ -41,7 +40,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ActionCard(
-                    icon: const Icon(Icons.login, color: Colors.white),
+                    icon: Icon(
+                      Icons.login,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                     title: 'signin'.tr,
                     caption: 'signinCaption'.tr,
                     onTap: () {
@@ -59,7 +61,10 @@ class _AccountScreenState extends State<AccountScreen> {
                     },
                   ),
                   ActionCard(
-                    icon: const Icon(Icons.add, color: Colors.white),
+                    icon: Icon(
+                      Icons.add,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                     title: 'signup'.tr,
                     caption: 'signupCaption'.tr,
                     onTap: () {
@@ -184,7 +189,7 @@ class ActionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundColor: Colors.indigo,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 child: icon,
               ).paddingOnly(bottom: 12),
               Text(
