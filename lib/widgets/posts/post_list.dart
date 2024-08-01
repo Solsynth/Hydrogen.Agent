@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/router.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
@@ -71,13 +70,6 @@ class PostListEntryWidget extends StatelessWidget {
         isShowEmbed: isShowEmbed,
         isClickable: isNestedClickable,
       ).paddingSymmetric(vertical: 8),
-      onTap: () {
-        if (!isClickable) return;
-        AppRouter.instance.pushNamed(
-          'postDetail',
-          pathParameters: {'id': item.id.toString()},
-        );
-      },
       onLongPress: () {
         final AuthProvider auth = Get.find();
         if (auth.isAuthorized.isFalse) return;

@@ -102,6 +102,7 @@ class _PostQuickActionState extends State<PostQuickAction> {
                 onPressed: () {
                   showModalBottomSheet(
                     useRootNavigator: true,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     context: context,
                     builder: (context) {
                       return PostReplyListPopup(item: widget.item);
