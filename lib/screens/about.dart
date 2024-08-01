@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -17,7 +18,9 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/logo.png', width: 64, height: 64),
+            Image.asset('assets/logo.png', width: 64, height: 64)
+                .animate(onPlay: (c) => c.repeat())
+                .rotate(duration: 1000.ms),
             Text(
               'Solian',
               style: Theme.of(context).textTheme.headlineMedium,
