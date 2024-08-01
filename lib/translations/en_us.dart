@@ -101,6 +101,8 @@ const i18nEnglish = {
   'postRestoreFromLocal': 'Restore from local',
   'postAutoSaveAt': 'Auto saved at @date',
   'postCategoriesAndTags': 'Categories n\' Tags',
+  'postPublishZone': 'Publish Zone',
+  'postPublishZoneNone': 'None',
   'postVisibility': 'Visibility',
   'postVisibilityAll': 'Everyone',
   'postVisibilityFriends': 'Friends',

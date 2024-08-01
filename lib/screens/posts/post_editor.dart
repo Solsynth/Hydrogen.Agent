@@ -87,6 +87,9 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     if (widget.edit != null) {
       _editorController.editTarget = widget.edit;
     }
+    if (widget.realm != null) {
+      _editorController.realmZone.value = widget.realm;
+    }
   }
 
   void cancelAction() {
@@ -220,18 +223,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 children: [
                   if (_isBusy)
                     const LinearProgressIndicator().animate().scaleX(),
-                  if (_realm != null)
-                    MaterialBanner(
-                      leading: const Icon(Icons.group),
-                      leadingPadding:
-                          const EdgeInsets.only(left: 10, right: 20),
-                      dividerColor: Colors.transparent,
-                      content: Text(
-                        'postInRealmNotify'
-                            .trParams({'realm': '#${_realm!.alias}'}),
-                      ),
-                      actions: notifyBannerActions,
-                    ),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -408,6 +399,23 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
                             _editorController.editCategoriesAndTags(context);
+                          },
+                        ),
+                        IconButton(
+                          icon: Obx(() {
+                            return badges.Badge(
+                              showBadge:
+                                  _editorController.realmZone.value != null,
+                              position: badges.BadgePosition.topEnd(
+                                top: -4,
+                                end: -6,
+                              ),
+                              child: const Icon(Icons.workspaces),
+                            );
+                          }),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            _editorController.editPublishZone(context);
                           },
                         ),
                         MarkdownToolbar(

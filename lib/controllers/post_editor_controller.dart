@@ -8,6 +8,7 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/posts/editor/post_editor_categories_tags.dart';
 import 'package:solian/widgets/posts/editor/post_editor_overview.dart';
+import 'package:solian/widgets/posts/editor/post_editor_publish_zone.dart';
 import 'package:solian/widgets/posts/editor/post_editor_visibility.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,6 +84,15 @@ class PostEditorController extends GetxController {
     return showDialog(
       context: context,
       builder: (context) => PostEditorCategoriesDialog(
+        controller: this,
+      ),
+    );
+  }
+
+  Future<void> editPublishZone(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => PostEditorPublishZoneDialog(
         controller: this,
       ),
     );
