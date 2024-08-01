@@ -4,6 +4,7 @@ import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
+import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
@@ -51,7 +52,9 @@ class _HomeScreenState extends State<HomeScreen>
               useRootNavigator: true,
               isScrollControlled: true,
               context: context,
-              builder: (context) => const PostCreatePopup(),
+              builder: (context) => PostCreatePopup(
+                controller: _postController,
+              ),
             );
           },
         ),
@@ -118,12 +121,12 @@ class _HomeScreenState extends State<HomeScreen>
 
 class PostCreatePopup extends StatelessWidget {
   final bool hideDraftBox;
-  final Function? onCreated;
+  final PostListController controller;
 
   const PostCreatePopup({
     super.key,
     this.hideDraftBox = false,
-    this.onCreated,
+    required this.controller,
   });
 
   @override
@@ -140,11 +143,13 @@ class PostCreatePopup extends StatelessWidget {
         label: 'postEditorModeStory'.tr,
         onTap: () {
           Navigator.pop(context);
-          AppRouter.instance.pushNamed('postEditor', queryParameters: {
-            'mode': 0.toString(),
-          }).then((val) {
-            if (val != null && onCreated != null) onCreated!();
-          });
+          AppRouter.instance.pushNamed(
+            'postEditor',
+            extra: PostPublishArguments(postListController: controller),
+            queryParameters: {
+              'mode': 0.toString(),
+            },
+          );
         },
       ),
       (
@@ -152,11 +157,13 @@ class PostCreatePopup extends StatelessWidget {
         label: 'postEditorModeArticle'.tr,
         onTap: () {
           Navigator.pop(context);
-          AppRouter.instance.pushNamed('postEditor', queryParameters: {
-            'mode': 1.toString(),
-          }).then((val) {
-            if (val != null && onCreated != null) onCreated!();
-          });
+          AppRouter.instance.pushNamed(
+            'postEditor',
+            extra: PostPublishArguments(postListController: controller),
+            queryParameters: {
+              'mode': 1.toString(),
+            },
+          );
         },
       ),
       (

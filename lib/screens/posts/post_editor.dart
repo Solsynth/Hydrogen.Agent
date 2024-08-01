@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
+import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
@@ -22,8 +23,15 @@ class PostPublishArguments {
   final Post? reply;
   final Post? repost;
   final Realm? realm;
+  final PostListController? postListController;
 
-  PostPublishArguments({this.edit, this.reply, this.repost, this.realm});
+  PostPublishArguments({
+    this.edit,
+    this.reply,
+    this.repost,
+    this.realm,
+    this.postListController,
+  });
 }
 
 class PostPublishScreen extends StatefulWidget {
@@ -31,6 +39,7 @@ class PostPublishScreen extends StatefulWidget {
   final Post? reply;
   final Post? repost;
   final Realm? realm;
+  final PostListController? postListController;
   final int mode;
 
   const PostPublishScreen({
@@ -39,6 +48,7 @@ class PostPublishScreen extends StatefulWidget {
     this.reply,
     this.repost,
     this.realm,
+    this.postListController,
     required this.mode,
   });
 
@@ -85,6 +95,9 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       context.showErrorDialog(resp.bodyString);
     } else {
       _editorController.localClear();
+      if (widget.postListController != null) {
+        widget.postListController!.reloadAllOver();
+      }
       AppRouter.instance.pop(resp.body);
     }
 

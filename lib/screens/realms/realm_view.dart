@@ -12,7 +12,6 @@ import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
-import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
@@ -136,6 +135,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
               }
 
               return TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   RealmPostListWidget(realm: _realm!),
                   RealmChannelListWidget(
@@ -189,7 +189,6 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
   @override
   void initState() {
     super.initState();
-
     _pagingController.addPageRequestListener(getPosts);
   }
 
@@ -199,28 +198,6 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
       onRefresh: () => Future.sync(() => _pagingController.refresh()),
       child: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
-            child: ListTile(
-              leading: const Icon(Icons.post_add),
-              contentPadding: const EdgeInsets.only(left: 24, right: 8),
-              tileColor: Theme.of(context).colorScheme.surfaceContainer,
-              title: Text('postNew'.tr),
-              subtitle: Text(
-                'postNewInRealmHint'
-                    .trParams({'realm': '#${widget.realm.alias}'}),
-              ),
-              onTap: () {
-                AppRouter.instance
-                    .pushNamed(
-                  'postEditor',
-                  extra: PostPublishArguments(realm: widget.realm),
-                )
-                    .then((value) {
-                  if (value != null) _pagingController.refresh();
-                });
-              },
-            ),
-          ),
           PostListWidget(controller: _pagingController),
         ],
       ),

@@ -26,7 +26,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
 
   final List<Realm> _realms = List.empty(growable: true);
 
-  getRealms() async {
+  _getRealms() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -48,7 +48,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
   @override
   void initState() {
     super.initState();
-    getRealms();
+    _getRealms();
   }
 
   @override
@@ -71,7 +71,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
               onPressed: () {
                 AppRouter.instance.pushNamed('realmOrganizing').then(
                   (value) {
-                    if (value != null) getRealms();
+                    if (value != null) _getRealms();
                   },
                 );
               },
@@ -84,7 +84,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
         body: Obx(() {
           if (auth.isAuthorized.isFalse) {
             return SigninRequiredOverlay(
-              onSignedIn: () => getRealms(),
+              onSignedIn: () => _getRealms(),
             );
           }
 
@@ -94,12 +94,12 @@ class _RealmListScreenState extends State<RealmListScreen> {
               Expanded(
                 child: CenteredContainer(
                   child: RefreshIndicator(
-                    onRefresh: () => getRealms(),
+                    onRefresh: () => _getRealms(),
                     child: ListView.builder(
                       itemCount: _realms.length,
                       itemBuilder: (context, index) {
                         final element = _realms[index];
-                        return buildRealm(element);
+                        return _buildEntry(element);
                       },
                     ),
                   ),
@@ -112,7 +112,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
     );
   }
 
-  Widget buildRealm(Realm element) {
+  Widget _buildEntry(Realm element) {
     return Card(
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(8)),
