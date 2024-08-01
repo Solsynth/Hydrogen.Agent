@@ -18,7 +18,6 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
-import 'package:solian/widgets/attachments/attachment_item.dart';
 
 class AttachmentEditorPopup extends StatefulWidget {
   final String usage;
@@ -233,10 +232,6 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       builder: (context) {
         return AttachmentEditorDialog(
           item: element,
-          onDelete: () {
-            setState(() => _attachments.removeAt(index));
-            widget.onUpdate(_attachments.map((e) => e!.id).toList());
-          },
           onUpdate: (item) {
             setState(() => _attachments[index] = item);
             widget.onUpdate(_attachments.map((e) => e!.id).toList());
@@ -244,6 +239,18 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
         );
       },
     );
+  }
+
+  Future<void> _deleteAttachment(Attachment element) async {
+    setState(() => _isBusy = true);
+    try {
+      final AttachmentProvider provider = Get.find();
+      await provider.deleteAttachment(element.id);
+    } catch (e) {
+      context.showErrorDialog(e);
+    } finally {
+      setState(() => _isBusy = false);
+    }
   }
 
   Widget _buildListEntry(Attachment element, int index) {
@@ -289,11 +296,40 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         ? () => _showAttachmentPreview(element)
                         : null,
                   ),
-                  IconButton(
-                    color: Theme.of(context).colorScheme.primary,
-                    visualDensity: const VisualDensity(horizontal: -4),
+                  PopupMenuButton(
                     icon: const Icon(Icons.more_horiz),
-                    onPressed: () => _showEdit(element, index),
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    style: const ButtonStyle(
+                      visualDensity: VisualDensity(horizontal: -4),
+                    ),
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem(
+                        child: ListTile(
+                          title: Text('edit'.tr),
+                          leading: const Icon(Icons.edit),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                        ),
+                        onTap: () => _showEdit(element, index),
+                      ),
+                      PopupMenuItem(
+                          child: ListTile(
+                            title: Text('delete'.tr),
+                            leading: const Icon(Icons.delete),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                            ),
+                          ),
+                          onTap: () {
+                            _deleteAttachment(element).then((_) {
+                              setState(() => _attachments.removeAt(index));
+                              widget.onUpdate(
+                                _attachments.map((e) => e!.id).toList(),
+                              );
+                            });
+                          }),
+                    ],
                   ),
                 ],
               ).paddingSymmetric(vertical: 8, horizontal: 16),
@@ -412,14 +448,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
 class AttachmentEditorDialog extends StatefulWidget {
   final Attachment item;
-  final Function onDelete;
   final Function(Attachment item) onUpdate;
 
-  const AttachmentEditorDialog(
-      {super.key,
-      required this.item,
-      required this.onDelete,
-      required this.onUpdate});
+  const AttachmentEditorDialog({
+    super.key,
+    required this.item,
+    required this.onUpdate,
+  });
 
   @override
   State<AttachmentEditorDialog> createState() => _AttachmentEditorDialogState();
@@ -431,7 +466,7 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
   bool _isBusy = false;
   bool _isMature = false;
 
-  Future<Attachment?> updateAttachment() async {
+  Future<Attachment?> _updateAttachment() async {
     final AttachmentProvider provider = Get.find();
 
     setState(() => _isBusy = true);
@@ -452,19 +487,6 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
 
       setState(() => _isBusy = false);
       return null;
-    }
-  }
-
-  Future<void> deleteAttachment() async {
-    setState(() => _isBusy = true);
-    try {
-      final AttachmentProvider provider = Get.find();
-      await provider.deleteAttachment(widget.item.id);
-      widget.onDelete();
-    } catch (e) {
-      context.showErrorDialog(e);
-    } finally {
-      setState(() => _isBusy = false);
     }
   }
 
@@ -505,34 +527,24 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
             ),
-            Card(
-              child: CheckboxListTile(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                title: Text('matureContent'.tr),
-                secondary: const Icon(Icons.visibility_off),
-                value: _isMature,
-                onChanged: (newValue) {
-                  setState(() => _isMature = newValue ?? false);
-                },
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
+            const SizedBox(height: 8),
+            CheckboxListTile(
+              contentPadding: const EdgeInsets.only(left: 4, right: 18),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              title: Text('matureContent'.tr),
+              secondary: const Icon(Icons.visibility_off),
+              value: _isMature,
+              onChanged: (newValue) {
+                setState(() => _isMature = newValue ?? false);
+              },
+              controlAffinity: ListTileControlAffinity.leading,
             ),
           ],
         ),
       ),
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: <Widget>[
-        TextButton(
-          style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error),
-          onPressed: () {
-            deleteAttachment().then((_) {
-              Navigator.pop(context);
-            });
-          },
-          child: Text('delete'.tr),
-        ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -546,7 +558,7 @@ class _AttachmentEditorDialogState extends State<AttachmentEditorDialog> {
             TextButton(
               child: Text('apply'.tr),
               onPressed: () {
-                updateAttachment().then((value) {
+                _updateAttachment().then((value) {
                   if (value != null) {
                     widget.onUpdate(value);
                     Navigator.pop(context);
