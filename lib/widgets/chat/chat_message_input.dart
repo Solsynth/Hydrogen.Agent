@@ -43,7 +43,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   Event? _editTo;
   Event? _replyTo;
 
-  void showAttachments() {
+  void _editAttachments() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -55,30 +55,59 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     );
   }
 
-  Future<void> sendMessage() async {
+  List<String> _findMentionedUsers(String text) {
+    RegExp regExp = RegExp(r'@[a-zA-Z0-9_]+');
+    Iterable<RegExpMatch> matches = regExp.allMatches(text);
+
+    List<String> mentionedUsers =
+        matches.map((match) => match.group(0)!.substring(1)).toList();
+
+    return mentionedUsers;
+  }
+
+  Future<void> _sendMessage() async {
     _focusNode.requestFocus();
 
     final AuthProvider auth = Get.find();
     final prof = auth.userProfile.value!;
     if (auth.isAuthorized.isFalse) return;
 
-    final client = auth.configureClient('messaging');
+    Response resp;
 
-    // TODO Deal with the @ ping (query uid with username), and then add into related_user and replace the @ with internal link in body
+    final mentionedUserNames = _findMentionedUsers(_textController.text);
+    final mentionedUserIds = List<int>.empty(growable: true);
+
+    var client = auth.configureClient('auth');
+    if (mentionedUserNames.isNotEmpty) {
+      resp = await client.get('/users?name=${mentionedUserNames.join(',')}');
+      if (resp.statusCode != 200) {
+        context.showErrorDialog(resp.bodyString);
+        return;
+      } else {
+        mentionedUserIds.addAll(
+          resp.body.map((x) => Account.fromJson(x).id).toList().cast<int>(),
+        );
+      }
+    }
+
+    client = auth.configureClient('messaging');
 
     const uuid = Uuid();
     final payload = {
       'uuid': uuid.v4(),
       'type': _editTo == null ? 'messages.new' : 'messages.edit',
       'body': {
-        'text': _textController.value.text,
+        'text': _textController.text,
         'algorithm': 'plain',
         'attachments': List.from(_attachments),
         'related_users': [
           if (_replyTo != null) _replyTo!.sender.accountId,
+          ...mentionedUserIds,
         ],
         if (_replyTo != null) 'quote_event': _replyTo!.id,
         if (_editTo != null) 'related_event': _editTo!.id,
+        if (_editTo != null && _editTo!.body['quote_event'] != null)
+          'quote_event': _editTo!.body['quote_event'],
       }
     };
 
@@ -111,7 +140,6 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
     resetInput();
 
-    Response resp;
     if (_editTo != null) {
       resp = await client.put(
         '/channels/${widget.realm}/${widget.channel.alias}/messages/${_editTo!.id}',
@@ -217,7 +245,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                           {'channel': '#${widget.channel.alias}'},
                         ),
                   ),
-                  onSubmitted: (_) => sendMessage(),
+                  onSubmitted: (_) => _sendMessage(),
                   onTapOutside: (_) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                 ),
@@ -225,12 +253,12 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
               IconButton(
                 icon: const Icon(Icons.attach_file),
                 color: Colors.teal,
-                onPressed: () => showAttachments(),
+                onPressed: () => _editAttachments(),
               ),
               IconButton(
                 icon: const Icon(Icons.send),
                 color: Theme.of(context).colorScheme.primary,
-                onPressed: () => sendMessage(),
+                onPressed: () => _sendMessage(),
               )
             ],
           ).paddingOnly(left: 20, right: 16),
