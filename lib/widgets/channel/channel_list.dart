@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
@@ -31,7 +33,9 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   final List<Channel> _globalChannels = List.empty(growable: true);
   final Map<String, List<Channel>> _inRealms = {};
 
-  void mapChannels() {
+  final ChatEventController _eventController = ChatEventController();
+
+  void _mapChannels() {
     _inRealms.clear();
     _globalChannels.clear();
 
@@ -55,16 +59,17 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   @override
   void didUpdateWidget(covariant ChannelListWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    setState(() => mapChannels());
+    setState(() => _mapChannels());
   }
 
   @override
   void initState() {
     super.initState();
-    mapChannels();
+    _mapChannels();
+    _eventController.initialize();
   }
 
-  void gotoChannel(Channel item) {
+  void _gotoChannel(Channel item) {
     if (widget.useReplace) {
       AppRouter.instance.pushReplacementNamed(
         'channelChat',
@@ -88,7 +93,35 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     }
   }
 
-  Widget buildItem(Channel item) {
+  Widget _buildDirectMessageDescription(Channel item, ChannelMember otherside) {
+    if (PlatformInfo.isWeb) {
+      return Text('channelDirectDescription'.trParams(
+        {'username': '@${otherside.account.name}'},
+      ));
+    }
+
+    return FutureBuilder(
+      future: Future.delayed(
+        const Duration(milliseconds: 500),
+        () => _eventController.database.localEvents.findLastByChannel(item.id),
+      ),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData && snapshot.data == null) {
+          return Text('channelDirectDescription'.trParams(
+            {'username': '@${otherside.account.name}'},
+          ));
+        }
+
+        return Text(
+          '${snapshot.data!.data.sender.account.nick}: ${snapshot.data!.data.body['text'] ?? 'Unsupported message to preview'}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        );
+      },
+    );
+  }
+
+  Widget _buildEntry(Channel item) {
     final padding = widget.isDense
         ? const EdgeInsets.symmetric(horizontal: 20)
         : const EdgeInsets.symmetric(horizontal: 16);
@@ -102,37 +135,36 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         leading: AccountAvatar(
           content: otherside.account.avatar,
           radius: widget.isDense ? 12 : 20,
-          bgColor: Colors.indigo,
-          feColor: Colors.white,
+          bgColor: Theme.of(context).colorScheme.primary,
+          feColor: Theme.of(context).colorScheme.onPrimary,
         ),
         contentPadding: padding,
         title: Text(otherside.account.nick),
         subtitle: !widget.isDense
-            ? Text(
-                'channelDirectDescription'.trParams(
-                  {'username': '@${otherside.account.name}'},
-                ),
-              )
+            ? _buildDirectMessageDescription(item, otherside)
             : null,
-        onTap: () => gotoChannel(item),
+        onTap: () => _gotoChannel(item),
       );
     } else {
       return ListTile(
         minTileHeight: widget.isDense ? 48 : null,
         leading: CircleAvatar(
-          backgroundColor:
-              item.realmId == null ? Colors.indigo : Colors.transparent,
+          backgroundColor: item.realmId == null
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
           radius: widget.isDense ? 12 : 20,
           child: FaIcon(
             FontAwesomeIcons.hashtag,
-            color: item.realmId == null ? Colors.white : Colors.indigo,
+            color: item.realmId == null
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.primary,
             size: widget.isDense ? 12 : 16,
           ),
         ),
         contentPadding: padding,
         title: Text(item.name),
         subtitle: !widget.isDense ? Text(item.description) : null,
-        onTap: () => gotoChannel(item),
+        onTap: () => _gotoChannel(item),
       );
     }
   }
@@ -146,7 +178,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
             itemCount: _globalChannels.length,
             itemBuilder: (context, index) {
               final element = _globalChannels[index];
-              return buildItem(element);
+              return _buildEntry(element);
             },
           ),
         ],
@@ -159,13 +191,13 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
           itemCount: _globalChannels.length,
           itemBuilder: (context, index) {
             final element = _globalChannels[index];
-            return buildItem(element);
+            return _buildEntry(element);
           },
         ),
         SliverList.list(
           children: _inRealms.entries.map((element) {
             return ExpansionTile(
-              tilePadding: const EdgeInsets.symmetric(horizontal: 20),
+              tilePadding: const EdgeInsets.only(left: 20, right: 24),
               minTileHeight: 48,
               title: Text(element.value.first.realm!.name),
               leading: CircleAvatar(
@@ -177,7 +209,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
                   size: widget.isDense ? 12 : 16,
                 ),
               ),
-              children: element.value.map((x) => buildItem(x)).toList(),
+              children: element.value.map((x) => _buildEntry(x)).toList(),
             );
           }).toList(),
         ),

@@ -16,7 +16,7 @@ class ChatEventController {
   Channel? channel;
   String? scope;
 
-  initialize() async {
+  Future<void> initialize() async {
     if (!PlatformInfo.isWeb) {
       database = await createHistoryDb();
     }
