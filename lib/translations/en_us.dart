@@ -129,7 +129,7 @@ const i18nEnglish = {
   'postAction': 'Post',
   'postEdited': 'Edited at @date',
   'postNewCreated': 'Created at @date',
-  'postAttachmentTip': '@count attachment(s)',
+  'attachmentHint': '@count attachment(s)',
   'postInRealm': 'In @realm',
   'postDetail': 'Post',
   'postReplies': 'Replies',

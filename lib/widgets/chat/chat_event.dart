@@ -37,12 +37,32 @@ class ChatEvent extends StatelessWidget {
     return '$negativeSign${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
   }
 
-  Widget _buildAttachment(BuildContext context) {
+  Widget _buildAttachment(BuildContext context, {bool isMinimal = false}) {
     final attachments = item.body['attachments'] != null
         ? List<int>.from(item.body['attachments'].map((x) => x))
         : List<int>.empty();
 
     if (attachments.isEmpty) return const SizedBox();
+
+    if (isMinimal) {
+      final unFocusColor =
+          Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+      return Row(
+        children: [
+          Icon(
+            Icons.attachment,
+            size: 18,
+            color: unFocusColor,
+          ).paddingOnly(right: 6),
+          Text(
+            'attachmentHint'.trParams(
+              {'count': attachments.length.toString()},
+            ),
+            style: TextStyle(color: unFocusColor),
+          )
+        ],
+      );
+    }
 
     return Container(
       key: Key('m${item.uuid}attachments-box'),
@@ -164,7 +184,8 @@ class ChatEvent extends StatelessWidget {
                 ),
             ],
           ).paddingOnly(right: 12),
-          _buildAttachment(context),
+          _buildAttachment(context, isMinimal: isContentPreviewing)
+              .paddingOnly(left: isContentPreviewing ? 12 : 0),
         ],
       );
     } else if (isQuote) {

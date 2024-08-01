@@ -24,7 +24,8 @@ class ChatEventMessage extends StatelessWidget {
     final hasAttachment = body.attachments?.isNotEmpty ?? false;
 
     if (body.text.isEmpty && hasAttachment) {
-      final unFocusColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+      final unFocusColor =
+          Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
       return Row(
         children: [
           Icon(
@@ -33,7 +34,7 @@ class ChatEventMessage extends StatelessWidget {
             color: unFocusColor,
           ).paddingOnly(right: 6),
           Text(
-            'postAttachmentTip'.trParams(
+            'attachmentHint'.trParams(
               {'count': body.attachments?.length.toString() ?? 0.toString()},
             ),
             style: TextStyle(color: unFocusColor),
@@ -46,9 +47,7 @@ class ChatEventMessage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context) {
-    if (isContentPreviewing) {
-      return _buildContent(context);
-    } else if (isMerged) {
+    if (isMerged) {
       return _buildContent(context).paddingOnly(left: 52);
     } else {
       return _buildContent(context);
@@ -64,7 +63,7 @@ class ChatEventMessage extends StatelessWidget {
       left: isQuote ? 0 : 12,
       right: isQuote ? 0 : 12,
       top: body.quoteEvent == null ? 2 : 0,
-      bottom: hasAttachment ? 4 : (isHasMerged ? 2 : 0),
+      bottom: hasAttachment && !isContentPreviewing ? 4 : (isHasMerged ? 2 : 0),
     );
   }
 }

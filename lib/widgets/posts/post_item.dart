@@ -253,7 +253,7 @@ class _PostItemState extends State<PostItem> {
                   color: _unFocusColor,
                 ).paddingOnly(right: 6),
                 Text(
-                  'postAttachmentTip'.trParams(
+                  'attachmentHint'.trParams(
                     {'count': attachments.length.toString()},
                   ),
                   style: TextStyle(color: _unFocusColor),

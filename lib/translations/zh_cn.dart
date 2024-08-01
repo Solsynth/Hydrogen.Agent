@@ -124,7 +124,7 @@ const i18nSimplifiedChinese = {
   'postEdited': '编辑于 @date',
   'postNewCreated': '创建于 @date',
   'postInRealm': '发表于 @realm',
-  'postAttachmentTip': '@count 个附件',
+  'attachmentHint': '@count 个附件',
   'postDetail': '帖子详情',
   'postReplies': '帖子回复',
   'postPublish': '编辑帖子',
