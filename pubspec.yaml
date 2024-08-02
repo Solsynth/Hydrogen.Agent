@@ -27,7 +27,6 @@ dependencies:
   crypto: ^3.0.3
   path: ^1.9.0
   intl: ^0.19.0
-  image: ^4.1.7
   font_awesome_flutter: ^10.7.0
   web_socket_channel: ^3.0.0
   permission_handler: ^11.3.1
@@ -50,7 +49,6 @@ dependencies:
   media_kit: ^1.1.10+1
   media_kit_video: ^1.2.4
   media_kit_libs_video: ^1.0.4
-  textfield_tags: ^3.0.1
   pasteboard: ^0.2.0
   desktop_drop: ^0.4.4
   badges: ^3.1.2
@@ -60,7 +58,6 @@ dependencies:
   flutter_cache_manager: ^3.3.3
   flutter_markdown_selectionarea: ^0.6.17+1
   shared_preferences: ^2.2.3
-  easy_debounce: ^2.0.3
   provider: ^6.1.2
   gal: ^2.3.0
   dio: ^5.5.0+1
