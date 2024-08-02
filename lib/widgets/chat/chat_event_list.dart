@@ -84,8 +84,8 @@ class ChatEventList extends StatelessWidget {
                   );
                 },
               ).animate(key: Key('m-animation${item.uuid}')).slideY(
-                    duration: 500.ms,
-                    curve: Curves.easeInOut,
+                    duration: 250.ms,
+                    curve: Curves.fastEaseInToSlowEaseOut,
                     end: 0,
                     begin: 0.5,
                   );
