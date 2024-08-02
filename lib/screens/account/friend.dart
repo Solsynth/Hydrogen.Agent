@@ -38,6 +38,9 @@ class _FriendScreenState extends State<FriendScreen>
           .cast<Relationship>();
       _isBusy = false;
     });
+
+    relations.friendRequestCount.value =
+        _relations.where((x) => x.status == 0).length;
   }
 
   void promptAddFriend() async {

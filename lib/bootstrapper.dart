@@ -85,7 +85,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
           await Future.wait([
             Get.find<RealmProvider>().refreshAvailableRealms(),
             Get.find<ChannelProvider>().refreshAvailableChannel(),
-            Get.find<RelationshipProvider>().refreshFriendList(),
+            Get.find<RelationshipProvider>().refreshRelativeList(),
           ]);
         }
       },

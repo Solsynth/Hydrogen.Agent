@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/account_status.dart';
+import 'package:solian/providers/relation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/auth/signin.dart';
 import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/widgets/account/account_heading.dart';
 import 'package:solian/widgets/sized_container.dart';
+import 'package:badges/badges.dart' as badges;
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -23,9 +25,27 @@ class _AccountScreenState extends State<AccountScreen> {
       (
         const Icon(Icons.color_lens),
         'accountPersonalize'.tr,
-        'accountPersonalize'
+        'accountPersonalize',
       ),
-      (const Icon(Icons.diversity_1), 'accountFriend'.tr, 'accountFriend'),
+      (
+        Obx(() {
+          final RelationshipProvider relations = Get.find();
+          return badges.Badge(
+            badgeContent: Text(
+              relations.friendRequestCount.value.toString(),
+              style: const TextStyle(color: Colors.white),
+            ),
+            showBadge: relations.friendRequestCount.value > 0,
+            position: badges.BadgePosition.topEnd(
+              top: -12,
+              end: -8,
+            ),
+            child: const Icon(Icons.diversity_1),
+          );
+        }),
+        'accountFriend'.tr,
+        'accountFriend',
+      ),
     ];
 
     final AuthProvider auth = Get.find();

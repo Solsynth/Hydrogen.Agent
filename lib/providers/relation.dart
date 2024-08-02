@@ -4,15 +4,19 @@ import 'package:solian/models/relations.dart';
 import 'package:solian/providers/auth.dart';
 
 class RelationshipProvider extends GetxController {
+  final RxInt friendRequestCount = 0.obs;
+
   final RxList<Relationship> _friends = RxList.empty(growable: true);
 
-  Future<void> refreshFriendList() async {
-    final resp = await listRelationWithStatus(1);
-    _friends.value = resp.body
+  Future<void> refreshRelativeList() async {
+    final resp = await listRelation();
+    final List<Relationship> result = resp.body
         .map((e) => Relationship.fromJson(e))
         .toList()
         .cast<Relationship>();
+    _friends.value = result.where((x) => x.status == 1).toList();
     _friends.refresh();
+    friendRequestCount.value = result.where((x) => x.status == 0).length;
   }
 
   bool hasFriend(Account account) {

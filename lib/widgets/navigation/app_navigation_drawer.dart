@@ -4,6 +4,7 @@ import 'package:solian/models/account_status.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
+import 'package:solian/providers/relation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/theme.dart';
@@ -60,8 +61,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
           AppRouter.instance.pushNamed('settings');
           setState(() => _selectedIndex = null);
           _closeDrawer();
-        }
-    );
+        });
   }
 
   @override
@@ -130,22 +130,36 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                 );
               },
             ),
-            leading: Builder(builder: (context) {
-              final badgeColor = _accountStatus != null
+            leading: Obx(() {
+              final statusBadgeColor = _accountStatus != null
                   ? StatusProvider.determineStatus(
                       _accountStatus!,
                     ).$2
                   : Colors.grey;
 
+              final RelationshipProvider relations = Get.find();
+              final accountNotifications = relations.friendRequestCount.value;
+
               return badges.Badge(
-                showBadge: _accountStatus != null,
-                badgeStyle: badges.BadgeStyle(badgeColor: badgeColor),
-                position: badges.BadgePosition.bottomEnd(
-                  bottom: 0,
-                  end: -2,
+                badgeContent: Text(
+                  accountNotifications.toString(),
+                  style: const TextStyle(color: Colors.white),
                 ),
-                child: AccountAvatar(
-                  content: auth.userProfile.value!['avatar'],
+                showBadge: accountNotifications > 0,
+                position: badges.BadgePosition.topEnd(
+                  top: -10,
+                  end: -6,
+                ),
+                child: badges.Badge(
+                  showBadge: _accountStatus != null,
+                  badgeStyle: badges.BadgeStyle(badgeColor: statusBadgeColor),
+                  position: badges.BadgePosition.bottomEnd(
+                    bottom: 0,
+                    end: -2,
+                  ),
+                  child: AccountAvatar(
+                    content: auth.userProfile.value!['avatar'],
+                  ),
                 ),
               );
             }),
