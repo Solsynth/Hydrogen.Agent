@@ -30,6 +30,23 @@ extension SolianExtenions on BuildContext {
     );
   }
 
+  Future<void> showInfoDialog(String title, body) {
+    return showDialog<void>(
+      useRootNavigator: true,
+      context: this,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('okay'.tr),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> showErrorDialog(dynamic exception) {
     var stack = StackTrace.current;
     var stackTrace = '$stack';

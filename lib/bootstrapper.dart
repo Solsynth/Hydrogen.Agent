@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
@@ -24,6 +26,7 @@ class BootstrapperShell extends StatefulWidget {
 class _BootstrapperShellState extends State<BootstrapperShell> {
   bool _isBusy = true;
   bool _isErrored = false;
+  bool _isDismissable = true;
   String? _subtitle;
 
   Color get _unFocusColor =>
@@ -39,6 +42,32 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       },
     ),
     (
+      label: 'bsCheckForUpdate',
+      action: () async {
+        if (PlatformInfo.isWeb) return;
+        try {
+          final info = await PackageInfo.fromPlatform();
+          final localVersionString = '${info.version}+${info.buildNumber}';
+          final resp = await GetConnect().get(
+            'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?limit=1',
+          );
+          if (resp.body[0]['name'] != localVersionString) {
+            setState(() {
+              _isErrored = true;
+              _subtitle = PlatformInfo.isIOS || PlatformInfo.isMacOS
+                  ? 'bsCheckForUpdateDescApple'.tr
+                  : 'bsCheckForUpdateDescCommon'.tr;
+            });
+          }
+        } catch (e) {
+          setState(() {
+            _isErrored = true;
+            _subtitle = 'bsCheckForUpdateFailed'.tr;
+          });
+        }
+      },
+    ),
+    (
       label: 'bsCheckingServer',
       action: () async {
         final client = ServiceFinder.configureClient('dealer');
@@ -47,12 +76,14 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
           setState(() {
             _isErrored = true;
             _subtitle = 'bsCheckingServerDown'.tr;
+            _isDismissable = false;
           });
           throw Exception('unable connect to server');
         } else if (resp.statusCode == null) {
           setState(() {
             _isErrored = true;
             _subtitle = 'bsCheckingServerFail'.tr;
+            _isDismissable = false;
           });
           throw Exception('unable connect to server');
         }
@@ -148,9 +179,11 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
             GestureDetector(
               child: Column(
                 children: [
-                  if (_isErrored)
-                    const Icon(Icons.cancel, size: 24)
-                  else
+                  if (_isErrored && !_isDismissable)
+                    const Icon(Icons.cancel, size: 24),
+                  if (_isErrored && _isDismissable)
+                    const Icon(Icons.warning, size: 24),
+                  if (!_isErrored && _isBusy)
                     const SizedBox(
                       width: 24,
                       height: 24,
@@ -161,15 +194,24 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                     maxWidth: 280,
                     child: Column(
                       children: [
-                        Text(
-                          _subtitle ??
-                              '${_periods[_periodCursor].label.tr} (${_periodCursor + 1}/${_periods.length})',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: _unFocusColor,
+                        if (_subtitle == null)
+                          Text(
+                            '${_periods[_periodCursor].label.tr} (${_periodCursor + 1}/${_periods.length})',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: _unFocusColor,
+                            ),
                           ),
-                        ),
+                        if (_subtitle != null)
+                          Text(
+                            _subtitle!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: _unFocusColor,
+                            ),
+                          ).paddingOnly(bottom: 4),
                         Text(
                           '2024 © Solsynth LLC',
                           textAlign: TextAlign.center,
@@ -185,12 +227,19 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
               ),
               onTap: () {
                 if (_isBusy) return;
-                setState(() {
-                  _isBusy = true;
-                  _isErrored = false;
-                  _periodCursor = 0;
-                });
-                _runPeriods();
+                if (_isDismissable) {
+                  setState(() {
+                    _isBusy = false;
+                    _isErrored = false;
+                  });
+                } else {
+                  setState(() {
+                    _isBusy = true;
+                    _isErrored = false;
+                    _periodCursor = 0;
+                  });
+                  _runPeriods();
+                }
               },
             )
           ],

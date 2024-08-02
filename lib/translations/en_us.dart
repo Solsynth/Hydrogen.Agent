@@ -314,6 +314,11 @@ const i18nEnglish = {
   'accountStatusNeutral': 'Neutral',
   'accountStatusPositive': 'Positive',
   'bsLoadingTheme': 'Loading Theme',
+  'bsCheckForUpdate': 'Checking For Updates',
+  'bsCheckForUpdateFailed': 'Unable to Check Updates',
+  'bsCheckForUpdateNew': 'Found New Version',
+  'bsCheckForUpdateDescApple': 'Please head to TestFlight and update your app to latest version to prevent error happens and get latest functions.',
+  'bsCheckForUpdateDescCommon': 'Please head to our website download and install latest version of application to prevent error happens and get latest functions.',
   'bsCheckingServer': 'Checking Server Status',
   'bsCheckingServerFail':
       'Unable connect to server, check your network connection',
