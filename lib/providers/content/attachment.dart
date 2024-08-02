@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:solian/models/attachment.dart';
+import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:dio/dio.dart' as dio;
@@ -20,6 +21,48 @@ class AttachmentProvider extends GetConnect {
   }
 
   final Map<int, Attachment> _cachedResponses = {};
+
+  Future<List<Attachment?>> listMetadata(
+    List<int> id, {
+    noCache = false,
+  }) async {
+    List<Attachment?> result = List.filled(id.length, null);
+    List<int> pendingQuery = List.empty(growable: true);
+    if (!noCache) {
+      for (var idx = 0; idx < id.length; idx++) {
+        if (_cachedResponses.containsKey(id[idx])) {
+          result[idx] = _cachedResponses[id[idx]];
+        } else {
+          pendingQuery.add(id[idx]);
+        }
+      }
+    }
+
+    final resp = await get(
+      '/attachments?take=${pendingQuery.length}&id=${pendingQuery.join(',')}',
+    );
+    if (resp.statusCode != 200) return result;
+
+    final rawOut = PaginationResult.fromJson(resp.body);
+    if (rawOut.data == null) return result;
+
+    final List<Attachment> out =
+        rawOut.data!.map((x) => Attachment.fromJson(x)).toList();
+    for (final item in out) {
+      if (item.destination != 0 && item.isAnalyzed) {
+        _cachedResponses[item.id] = item;
+      }
+    }
+    for (var i = 0; i < out.length; i++) {
+      for (var j = 0; j < id.length; j++) {
+        if (out[i].id == id[j]) {
+          result[j] = out[i];
+        }
+      }
+    }
+
+    return result;
+  }
 
   Future<Attachment?> getMetadata(int id, {noCache = false}) async {
     if (!noCache && _cachedResponses.containsKey(id)) {

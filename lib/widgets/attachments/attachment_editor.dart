@@ -222,19 +222,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     setState(() => _isBusy = true);
 
-    int progress = 0;
-    for (var idx = 0; idx < widget.initialAttachments.length; idx++) {
-      attach.getMetadata(widget.initialAttachments[idx]).then((resp) {
-        progress++;
-        _attachments[idx] = resp;
-        if (progress == widget.initialAttachments.length) {
-          setState(() {
-            _isBusy = false;
-            _isFirstTimeBusy = false;
-          });
-        }
+    attach.listMetadata(widget.initialAttachments).then((result) {
+      setState(() {
+        _attachments = result;
+        _isBusy = false;
+        _isFirstTimeBusy = false;
       });
-    }
+    });
   }
 
   void _showAttachmentPreview(Attachment element) {

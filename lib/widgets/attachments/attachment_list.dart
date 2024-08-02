@@ -45,7 +45,7 @@ class _AttachmentListState extends State<AttachmentList> {
   List<Attachment?> _attachmentsMeta = List.empty();
 
   void _getMetadataList() {
-    final AttachmentProvider provider = Get.find();
+    final AttachmentProvider attach = Get.find();
 
     if (widget.attachmentsId.isEmpty) {
       return;
@@ -53,25 +53,15 @@ class _AttachmentListState extends State<AttachmentList> {
       _attachmentsMeta = List.filled(widget.attachmentsId.length, null);
     }
 
-    int progress = 0;
-    for (var idx = 0; idx < widget.attachmentsId.length; idx++) {
-      provider.getMetadata(widget.attachmentsId[idx]).then((resp) {
-        progress++;
-        if (resp != null) {
-          _attachmentsMeta[idx] = resp;
-        }
-        if (progress == widget.attachmentsId.length) {
-          calculateAspectRatio();
-
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
-        }
+    attach.listMetadata(widget.attachmentsId).then((result) {
+      setState(() {
+        _attachmentsMeta = result;
+        _isLoading = false;
       });
-    }
+    });
   }
 
-  void calculateAspectRatio() {
+  void _calculateAspectRatio() {
     bool isConsistent = true;
     double? consistentValue;
     int portrait = 0, square = 0, landscape = 0;
