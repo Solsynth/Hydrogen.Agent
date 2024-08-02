@@ -24,7 +24,7 @@ class ChatEventList extends StatelessWidget {
     required this.onReply,
   });
 
-  bool checkMessageMergeable(Event? a, Event? b) {
+  bool _checkMessageMergeable(Event? a, Event? b) {
     if (a == null || b == null) return false;
     if (a.sender.account.id != b.sender.account.id) return false;
     return a.createdAt.difference(b.createdAt).inMinutes <= 3;
@@ -42,13 +42,13 @@ class ChatEventList extends StatelessWidget {
             itemBuilder: (context, index) {
               bool isMerged = false, hasMerged = false;
               if (index > 0) {
-                hasMerged = checkMessageMergeable(
+                hasMerged = _checkMessageMergeable(
                   chatController.currentEvents[index - 1].data,
                   chatController.currentEvents[index].data,
                 );
               }
               if (index + 1 < chatController.currentEvents.length) {
-                isMerged = checkMessageMergeable(
+                isMerged = _checkMessageMergeable(
                   chatController.currentEvents[index].data,
                   chatController.currentEvents[index + 1].data,
                 );

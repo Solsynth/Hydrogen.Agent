@@ -110,6 +110,63 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     );
   }
 
+  Future<void> _linkAttachments() async {
+    final controller = TextEditingController();
+    final input = await showDialog<String?>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('attachmentAddLink'.tr),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('attachmentAddLinkHint'.tr, textAlign: TextAlign.left),
+              const SizedBox(height: 18),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'attachmentAddLinkInput'.tr,
+                ),
+                onTapOutside: (_) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: Text('cancel'.tr),
+            ),
+            TextButton(
+              child: Text('next'.tr),
+              onPressed: () {
+                Navigator.pop(context, controller.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+
+    if (input == null || input.isEmpty) return;
+    final value = int.tryParse(input);
+    if (value == null) return;
+
+    final AttachmentProvider attach = Get.find();
+    final result = await attach.getMetadata(value);
+    if (result != null) {
+      widget.onAdd(result.id);
+      setState(() => _attachments.add(result));
+    }
+  }
+
   void _pasteFileToUpload() async {
     final data = await Pasteboard.image;
     if (data == null) return;
@@ -150,7 +207,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
   }
 
   void _revertMetadataList() {
-    final AttachmentProvider provider = Get.find();
+    final AttachmentProvider attach = Get.find();
 
     if (widget.initialAttachments.isEmpty) {
       _isFirstTimeBusy = false;
@@ -167,7 +224,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     int progress = 0;
     for (var idx = 0; idx < widget.initialAttachments.length; idx++) {
-      provider.getMetadata(widget.initialAttachments[idx]).then((resp) {
+      attach.getMetadata(widget.initialAttachments[idx]).then((resp) {
         progress++;
         _attachments[idx] = resp;
         if (progress == widget.initialAttachments.length) {
@@ -425,6 +482,19 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           });
                         },
                       ),
+                      PopupMenuItem(
+                        child: ListTile(
+                          title: Text('unlink'.tr),
+                          leading: const Icon(Icons.link_off),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                        ),
+                        onTap: () {
+                          widget.onRemove(element.id);
+                          setState(() => _attachments.removeAt(index));
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -660,6 +730,12 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           label: Text('attachmentAddFile'.tr),
                           style: const ButtonStyle(visualDensity: density),
                           onPressed: () => _pickFileToUpload(),
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.link),
+                          label: Text('attachmentAddFile'.tr),
+                          style: const ButtonStyle(visualDensity: density),
+                          onPressed: () => _linkAttachments(),
                         ),
                       ],
                     ).paddingSymmetric(horizontal: 12),

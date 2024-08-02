@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
+import 'package:dio/dio.dart' as dio;
 
 class AttachmentProvider extends GetConnect {
   static Map<String, String> mimetypeOverrides = {
@@ -37,18 +38,14 @@ class AttachmentProvider extends GetConnect {
     return null;
   }
 
-  Future<Response> createAttachment(
+  Future<Attachment> createAttachment(
       Uint8List data, String path, String usage, Map<String, dynamic>? metadata,
       {Function(double)? onProgress}) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
-    final client = auth.configureClient(
-      'files',
-      timeout: const Duration(minutes: 3),
-    );
-
-    final filePayload = MultipartFile(data, filename: basename(path));
+    final filePayload =
+        dio.MultipartFile.fromBytes(data, filename: basename(path));
     final fileAlt = basename(path).contains('.')
         ? basename(path).substring(0, basename(path).lastIndexOf('.'))
         : basename(path);
@@ -61,25 +58,31 @@ class AttachmentProvider extends GetConnect {
     if (mimetypeOverrides.keys.contains(fileExt)) {
       mimetypeOverride = mimetypeOverrides[fileExt];
     }
-    final payload = FormData({
+    final payload = dio.FormData.fromMap({
       'alt': fileAlt,
       'file': filePayload,
       'usage': usage,
       if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
       'metadata': jsonEncode(metadata),
     });
-    final resp = await client.post(
+    final resp = await dio.Dio(
+      dio.BaseOptions(
+        baseUrl: ServiceFinder.buildUrl('files', null),
+        headers: {'Authorization': 'Bearer ${auth.credentials!.accessToken}'},
+      ),
+    ).post(
       '/attachments',
-      payload,
-      uploadProgress: (progress) {
-        if (onProgress != null) onProgress(progress);
+      data: payload,
+      onSendProgress: (count, total) {
+        if (onProgress != null) onProgress(count / total);
       },
     );
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      print(resp.data);
+      throw Exception(resp.data);
     }
 
-    return resp;
+    return Attachment.fromJson(resp.data);
   }
 
   Future<Response> updateAttachment(

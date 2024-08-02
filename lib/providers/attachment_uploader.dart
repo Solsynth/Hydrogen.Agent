@@ -180,14 +180,13 @@ class AttachmentUploaderController extends GetxController {
       {Function(double)? onProgress}) async {
     final AttachmentProvider provider = Get.find();
     try {
-      final resp = await provider.createAttachment(
+      final result = await provider.createAttachment(
         data,
         path,
         usage,
         metadata,
         onProgress: onProgress,
       );
-      var result = Attachment.fromJson(resp.body);
       return result;
     } catch (err) {
       rethrow;

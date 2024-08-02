@@ -7,6 +7,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/services.dart';
@@ -104,9 +105,9 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     final AttachmentProvider provider = Get.find();
 
-    Response? attachResp;
+    Attachment? attachResult;
     try {
-      attachResp = await provider.createAttachment(
+      attachResult = await provider.createAttachment(
         await file.readAsBytes(),
         file.path,
         'p.$position',
@@ -122,7 +123,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     final resp = await client.put(
       '/users/me/$position',
-      {'attachment': attachResp.body['id']},
+      {'attachment': attachResult.id},
     );
     if (resp.statusCode == 200) {
       _syncWidget();
