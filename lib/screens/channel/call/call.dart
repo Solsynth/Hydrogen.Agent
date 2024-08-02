@@ -21,6 +21,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   Timer? _timer;
   String _currentDuration = '00:00:00';
 
+  int _layoutMode = 0;
+
   bool _showControls = true;
   CancelableOperation? _hideControlsOperation;
 
@@ -54,6 +56,14 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     });
   }
 
+  void _switchLayout() {
+    if (_layoutMode < 1) {
+      setState(() => _layoutMode++);
+    } else {
+      setState(() => _layoutMode = 0);
+    }
+  }
+
   void _toggleControls() {
     if (_showControls) {
       setState(() => _showControls = false);
@@ -72,6 +82,107 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         if (!mounted) return;
         if (_showControls) _toggleControls();
       }),
+    );
+  }
+
+  Widget _buildListLayout() {
+    final ChatCallProvider call = Get.find();
+    return Stack(
+      children: [
+        Container(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          child: call.focusTrack.value != null
+              ? InteractiveParticipantWidget(
+                  isFixed: false,
+                  participant: call.focusTrack.value!,
+                  onTap: () {},
+                )
+              : const SizedBox(),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          child: SizedBox(
+            height: 128,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: math.max(0, call.participantTracks.length),
+              itemBuilder: (BuildContext context, int index) {
+                final track = call.participantTracks[index];
+                if (track.participant.sid ==
+                    call.focusTrack.value?.participant.sid) {
+                  return Container();
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8, left: 8),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child: InteractiveParticipantWidget(
+                      isFixed: true,
+                      width: 120,
+                      height: 120,
+                      color: Theme.of(context).cardColor,
+                      participant: track,
+                      onTap: () {
+                        if (track.participant.sid !=
+                            call.focusTrack.value?.participant.sid) {
+                          call.changeFocusTrack(track);
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGridLayout() {
+    final ChatCallProvider call = Get.find();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double screenWidth = constraints.maxWidth;
+        double screenHeight = constraints.maxHeight;
+
+        int columns = (math.sqrt(call.participantTracks.length)).ceil();
+        int rows = (call.participantTracks.length / columns).ceil();
+
+        double tileWidth = screenWidth / columns;
+        double tileHeight = screenHeight / rows;
+
+        return GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            childAspectRatio: tileWidth / tileHeight,
+          ),
+          itemCount: math.max(0, call.participantTracks.length),
+          itemBuilder: (BuildContext context, int index) {
+            final track = call.participantTracks[index];
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: InteractiveParticipantWidget(
+                  isFixed: true,
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  participant: track,
+                  onTap: () {
+                    if (track.participant.sid !=
+                        call.focusTrack.value?.participant.sid) {
+                      call.changeFocusTrack(track);
+                    }
+                  },
+                ),
+              ),
+            );
+          },
+        );
+      }
     );
   }
 
@@ -124,78 +235,53 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             child: Obx(
-              () => Stack(
+              () => Column(
                 children: [
-                  Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
-                          child: provider.focusTrack.value != null
-                              ? InteractiveParticipantWidget(
-                                  isFixed: false,
-                                  participant: provider.focusTrack.value!,
-                                  onTap: () {},
-                                )
-                              : const SizedBox(),
-                        ),
-                      ),
-                      if (provider.room.localParticipant != null)
-                        SizeTransition(
-                          sizeFactor: _controlsAnimation,
-                          axis: Axis.vertical,
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            child: ControlsWidget(
-                              provider.room,
-                              provider.room.localParticipant!,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 0,
+                  SizeTransition(
+                    sizeFactor: _controlsAnimation,
+                    axis: Axis.vertical,
                     child: SizedBox(
-                      height: 128,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount:
-                            math.max(0, provider.participantTracks.length),
-                        itemBuilder: (BuildContext context, int index) {
-                          final track = provider.participantTracks[index];
-                          if (track.participant.sid ==
-                              provider.focusTrack.value?.participant.sid) {
-                            return Container();
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8, left: 8),
-                            child: ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              child: InteractiveParticipantWidget(
-                                isFixed: true,
-                                width: 120,
-                                height: 120,
-                                color: Theme.of(context).cardColor,
-                                participant: track,
-                                onTap: () {
-                                  if (track.participant.sid !=
-                                      provider
-                                          .focusTrack.value?.participant.sid) {
-                                    provider.changeFocusTrack(track);
-                                  }
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      width: MediaQuery.of(context).size.width,
+                      height: 64,
+                      child: Row(
+                        children: [
+                          const Expanded(child: SizedBox()),
+                          IconButton(
+                            icon: _layoutMode == 0
+                                ? const Icon(Icons.view_list)
+                                : const Icon(Icons.grid_view),
+                            onPressed: () {
+                              _switchLayout();
+                            },
+                          ),
+                        ],
+                      ).paddingSymmetric(horizontal: 10),
                     ),
                   ),
+                  Expanded(
+                    child: Builder(
+                      builder: (context) {
+                        switch (_layoutMode) {
+                          case 1:
+                            return _buildGridLayout();
+                          default:
+                            return _buildListLayout();
+                        }
+                      },
+                    ),
+                  ),
+                  if (provider.room.localParticipant != null)
+                    SizeTransition(
+                      sizeFactor: _controlsAnimation,
+                      axis: Axis.vertical,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: ControlsWidget(
+                          provider.room,
+                          provider.room.localParticipant!,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
