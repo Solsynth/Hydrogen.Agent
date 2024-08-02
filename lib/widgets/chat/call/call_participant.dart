@@ -217,28 +217,25 @@ class InteractiveParticipantWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: GestureDetector(
-        child: Container(
-          width: width,
-          height: height,
-          color: color,
-          child: ParticipantWidget.widgetFor(participant, isFixed: isFixed),
-        ),
-        onTap: () => onTap(),
-        onLongPress: () {
-          if (participant.participant is LocalParticipant) return;
-          showModalBottomSheet(
-            context: context,
-            builder: (context) => ParticipantMenu(
-              participant: participant.participant as RemoteParticipant,
-              videoTrack: participant.videoTrack,
-              isScreenShare: participant.isScreenShare,
-            ),
-          );
-        },
+    return GestureDetector(
+      child: Container(
+        width: width,
+        height: height,
+        color: color,
+        child: ParticipantWidget.widgetFor(participant, isFixed: isFixed),
       ),
+      onTap: () => onTap(),
+      onLongPress: () {
+        if (participant.participant is LocalParticipant) return;
+        showModalBottomSheet(
+          context: context,
+          builder: (context) => ParticipantMenu(
+            participant: participant.participant as RemoteParticipant,
+            videoTrack: participant.videoTrack,
+            isScreenShare: participant.isScreenShare,
+          ),
+        );
+      },
     );
   }
 }

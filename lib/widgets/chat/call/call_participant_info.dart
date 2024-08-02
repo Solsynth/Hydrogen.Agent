@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 
 class ParticipantInfoWidget extends StatelessWidget {
@@ -34,38 +35,42 @@ class ParticipantInfoWidget extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
+            const SizedBox(width: 5),
             isScreenShare
-                ? const Padding(
-                    padding: EdgeInsets.only(left: 5),
-                    child: Icon(
-                      Icons.monitor,
-                      color: Colors.white,
-                      size: 16,
-                    ),
+                ? const Icon(
+                    Icons.monitor,
+                    color: Colors.white,
+                    size: 16,
                   )
-                : Padding(
-                    padding: const EdgeInsets.only(left: 5),
-                    child: Icon(
-                      audioAvailable ? Icons.mic : Icons.mic_off,
-                      color: audioAvailable ? Colors.white : Colors.red,
-                      size: 16,
-                    ),
+                : Icon(
+                    audioAvailable ? Icons.mic : Icons.mic_off,
+                    color: audioAvailable ? Colors.white : Colors.red,
+                    size: 16,
                   ),
+            const SizedBox(width: 3),
             if (connectionQuality != ConnectionQuality.unknown)
-              Padding(
-                padding: const EdgeInsets.only(left: 5),
-                child: Icon(
-                  connectionQuality == ConnectionQuality.poor
-                      ? Icons.wifi_off_outlined
-                      : Icons.wifi,
-                  color: {
-                    ConnectionQuality.excellent: Colors.green,
-                    ConnectionQuality.good: Colors.orange,
-                    ConnectionQuality.poor: Colors.red,
-                  }[connectionQuality],
-                  size: 16,
+              Icon(
+                {
+                  ConnectionQuality.excellent: Icons.signal_cellular_alt,
+                  ConnectionQuality.good: Icons.signal_cellular_alt_2_bar,
+                  ConnectionQuality.poor: Icons.signal_cellular_alt_1_bar,
+                }[connectionQuality],
+                color: {
+                  ConnectionQuality.excellent: Colors.green,
+                  ConnectionQuality.good: Colors.orange,
+                  ConnectionQuality.poor: Colors.red,
+                }[connectionQuality],
+                size: 16,
+              )
+            else
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
                 ),
-              ),
+              ).paddingAll(3),
           ],
         ),
       );
