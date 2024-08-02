@@ -201,7 +201,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
   final double? width;
   final double? height;
   final Color? color;
-  final bool isFixed;
+  final bool isFixedAvatar;
   final ParticipantTrack participant;
   final Function() onTap;
 
@@ -210,7 +210,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
     this.width,
     this.height,
     this.color,
-    this.isFixed = false,
+    this.isFixedAvatar = false,
     required this.participant,
     required this.onTap,
   });
@@ -222,7 +222,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
         width: width,
         height: height,
         color: color,
-        child: ParticipantWidget.widgetFor(participant, isFixed: isFixed),
+        child: ParticipantWidget.widgetFor(participant, isFixed: isFixedAvatar),
       ),
       onTap: () => onTap(),
       onLongPress: () {

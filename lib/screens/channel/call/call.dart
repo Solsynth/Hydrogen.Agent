@@ -87,75 +87,77 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   Widget _buildListLayout() {
     final ChatCallProvider call = Get.find();
-    return Stack(
-      children: [
-        Container(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          child: call.focusTrack.value != null
-              ? InteractiveParticipantWidget(
-                  isFixed: false,
-                  participant: call.focusTrack.value!,
-                  onTap: () {},
-                )
-              : const SizedBox(),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          child: SizedBox(
-            height: 128,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: math.max(0, call.participantTracks.length),
-              itemBuilder: (BuildContext context, int index) {
-                final track = call.participantTracks[index];
-                if (track.participant.sid ==
-                    call.focusTrack.value?.participant.sid) {
-                  return Container();
-                }
+    return Obx(
+      () => Stack(
+        children: [
+          Container(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            child: call.focusTrack.value != null
+                ? InteractiveParticipantWidget(
+                    isFixedAvatar: false,
+                    participant: call.focusTrack.value!,
+                    onTap: () {},
+                  )
+                : const SizedBox(),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            child: SizedBox(
+              height: 128,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: math.max(0, call.participantTracks.length),
+                itemBuilder: (BuildContext context, int index) {
+                  final track = call.participantTracks[index];
+                  if (track.participant.sid ==
+                      call.focusTrack.value?.participant.sid) {
+                    return Container();
+                  }
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 8, left: 8),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child: InteractiveParticipantWidget(
-                      isFixed: true,
-                      width: 120,
-                      height: 120,
-                      color: Theme.of(context).cardColor,
-                      participant: track,
-                      onTap: () {
-                        if (track.participant.sid !=
-                            call.focusTrack.value?.participant.sid) {
-                          call.changeFocusTrack(track);
-                        }
-                      },
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8, left: 8),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child: InteractiveParticipantWidget(
+                        isFixedAvatar: true,
+                        width: 120,
+                        height: 120,
+                        color: Theme.of(context).cardColor,
+                        participant: track,
+                        onTap: () {
+                          if (track.participant.sid !=
+                              call.focusTrack.value?.participant.sid) {
+                            call.changeFocusTrack(track);
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildGridLayout() {
     final ChatCallProvider call = Get.find();
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double screenWidth = constraints.maxWidth;
-        double screenHeight = constraints.maxHeight;
+    return LayoutBuilder(builder: (context, constraints) {
+      double screenWidth = constraints.maxWidth;
+      double screenHeight = constraints.maxHeight;
 
-        int columns = (math.sqrt(call.participantTracks.length)).ceil();
-        int rows = (call.participantTracks.length / columns).ceil();
+      int columns = (math.sqrt(call.participantTracks.length)).ceil();
+      int rows = (call.participantTracks.length / columns).ceil();
 
-        double tileWidth = screenWidth / columns;
-        double tileHeight = screenHeight / rows;
+      double tileWidth = screenWidth / columns;
+      double tileHeight = screenHeight / rows;
 
-        return GridView.builder(
+      return Obx(
+        () => GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
             childAspectRatio: tileWidth / tileHeight,
@@ -165,25 +167,26 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             final track = call.participantTracks[index];
             return Padding(
               padding: const EdgeInsets.all(16),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: InteractiveParticipantWidget(
-                  isFixed: true,
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  participant: track,
-                  onTap: () {
-                    if (track.participant.sid !=
-                        call.focusTrack.value?.participant.sid) {
-                      call.changeFocusTrack(track);
-                    }
-                  },
+              child: Card(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  child: InteractiveParticipantWidget(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    participant: track,
+                    onTap: () {
+                      if (track.participant.sid !=
+                          call.focusTrack.value?.participant.sid) {
+                        call.changeFocusTrack(track);
+                      }
+                    },
+                  ),
                 ),
               ),
             );
           },
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 
   @override
@@ -234,31 +237,33 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         body: SafeArea(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
-            child: Obx(
-              () => Column(
-                children: [
-                  SizeTransition(
-                    sizeFactor: _controlsAnimation,
-                    axis: Axis.vertical,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: 64,
-                      child: Row(
-                        children: [
-                          const Expanded(child: SizedBox()),
-                          IconButton(
-                            icon: _layoutMode == 0
-                                ? const Icon(Icons.view_list)
-                                : const Icon(Icons.grid_view),
-                            onPressed: () {
-                              _switchLayout();
-                            },
-                          ),
-                        ],
-                      ).paddingSymmetric(horizontal: 10),
-                    ),
+            child: Column(
+              children: [
+                SizeTransition(
+                  sizeFactor: _controlsAnimation,
+                  axis: Axis.vertical,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 64,
+                    child: Row(
+                      children: [
+                        const Expanded(child: SizedBox()),
+                        IconButton(
+                          icon: _layoutMode == 0
+                              ? const Icon(Icons.view_list)
+                              : const Icon(Icons.grid_view),
+                          onPressed: () {
+                            _switchLayout();
+                          },
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 10),
                   ),
-                  Expanded(
+                ),
+                Expanded(
+                  child: Material(
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
+                    elevation: 2,
                     child: Builder(
                       builder: (context) {
                         switch (_layoutMode) {
@@ -270,20 +275,20 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       },
                     ),
                   ),
-                  if (provider.room.localParticipant != null)
-                    SizeTransition(
-                      sizeFactor: _controlsAnimation,
-                      axis: Axis.vertical,
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: ControlsWidget(
-                          provider.room,
-                          provider.room.localParticipant!,
-                        ),
+                ),
+                if (provider.room.localParticipant != null)
+                  SizeTransition(
+                    sizeFactor: _controlsAnimation,
+                    axis: Axis.vertical,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: ControlsWidget(
+                        provider.room,
+                        provider.room.localParticipant!,
                       ),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
             onTap: () {
               _toggleControls();
