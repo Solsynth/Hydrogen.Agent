@@ -58,6 +58,7 @@ class _AttachmentListState extends State<AttachmentList> {
         _attachmentsMeta = result;
         _isLoading = false;
       });
+      _calculateAspectRatio();
     });
   }
 

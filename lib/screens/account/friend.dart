@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/relations.dart';
 import 'package:solian/providers/relation.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/relative_list.dart';
 
 class FriendScreen extends StatefulWidget {
@@ -21,15 +21,15 @@ class _FriendScreenState extends State<FriendScreen>
 
   List<Relationship> _relations = List.empty();
 
-  List<Relationship> filterByStatus(int status) {
+  List<Relationship> _filterByStatus(int status) {
     return _relations.where((x) => x.status == status).toList();
   }
 
-  Future<void> loadRelations() async {
+  Future<void> _loadRelations() async {
     setState(() => _isBusy = true);
 
-    final RelationshipProvider provider = Get.find();
-    final resp = await provider.listRelation();
+    final RelationshipProvider relations = Get.find();
+    final resp = await relations.listRelation();
 
     setState(() {
       _relations = resp.body
@@ -104,8 +104,8 @@ class _FriendScreenState extends State<FriendScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
 
-    loadRelations().then((_) {
-      if (filterByStatus(0).isEmpty) {
+    _loadRelations().then((_) {
+      if (_filterByStatus(0).isEmpty) {
         _tabController.animateTo(1);
       }
     });
@@ -119,6 +119,19 @@ class _FriendScreenState extends State<FriendScreen>
         appBar: AppBar(
           centerTitle: false,
           title: Text('accountFriend'.tr),
+          actions: [
+            if (_isBusy)
+              SizedBox(
+                height: 48,
+                width: 48,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 3,
+                ).paddingAll(14),
+              ),
+            SizedBox(
+              width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+            ),
+          ],
           bottom: TabBar(
             controller: _tabController,
             tabs: const [
@@ -136,46 +149,34 @@ class _FriendScreenState extends State<FriendScreen>
           controller: _tabController,
           children: [
             RefreshIndicator(
-              onRefresh: () => loadRelations(),
+              onRefresh: () => _loadRelations(),
               child: CustomScrollView(
                 slivers: [
-                  if (_isBusy)
-                    SliverToBoxAdapter(
-                      child: const LinearProgressIndicator().animate().scaleX(),
-                    ),
                   SilverRelativeList(
-                    items: filterByStatus(0),
-                    onUpdate: () => loadRelations(),
+                    items: _filterByStatus(0),
+                    onUpdate: () => _loadRelations(),
                   ),
                 ],
               ),
             ),
             RefreshIndicator(
-              onRefresh: () => loadRelations(),
+              onRefresh: () => _loadRelations(),
               child: CustomScrollView(
                 slivers: [
-                  if (_isBusy)
-                    SliverToBoxAdapter(
-                      child: const LinearProgressIndicator().animate().scaleX(),
-                    ),
                   SilverRelativeList(
-                    items: filterByStatus(1),
-                    onUpdate: () => loadRelations(),
+                    items: _filterByStatus(1),
+                    onUpdate: () => _loadRelations(),
                   ),
                 ],
               ),
             ),
             RefreshIndicator(
-              onRefresh: () => loadRelations(),
+              onRefresh: () => _loadRelations(),
               child: CustomScrollView(
                 slivers: [
-                  if (_isBusy)
-                    SliverToBoxAdapter(
-                      child: const LinearProgressIndicator().animate().scaleX(),
-                    ),
                   SilverRelativeList(
-                    items: filterByStatus(3),
-                    onUpdate: () => loadRelations(),
+                    items: _filterByStatus(3),
+                    onUpdate: () => _loadRelations(),
                   ),
                 ],
               ),
