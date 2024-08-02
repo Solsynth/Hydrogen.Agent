@@ -219,7 +219,7 @@ class InteractiveParticipantWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: InkWell(
+      child: GestureDetector(
         child: Container(
           width: width,
           height: height,

@@ -23,7 +23,7 @@ class ControlsWidget extends StatefulWidget {
 }
 
 class _ControlsWidgetState extends State<ControlsWidget> {
-  CameraPosition position = CameraPosition.front;
+  CameraPosition _position = CameraPosition.front;
 
   List<MediaDevice>? _audioInputs;
   List<MediaDevice>? _audioOutputs;
@@ -36,25 +36,25 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   @override
   void initState() {
     super.initState();
-    participant.addListener(onChange);
+    _participant.addListener(onChange);
     _subscription = Hardware.instance.onDeviceChange.stream
         .listen((List<MediaDevice> devices) {
-      revertDevices(devices);
+      _revertDevices(devices);
     });
-    Hardware.instance.enumerateDevices().then(revertDevices);
+    Hardware.instance.enumerateDevices().then(_revertDevices);
     _speakerphoneOn = Hardware.instance.speakerOn ?? false;
   }
 
   @override
   void dispose() {
     _subscription?.cancel();
-    participant.removeListener(onChange);
+    _participant.removeListener(onChange);
     super.dispose();
   }
 
-  LocalParticipant get participant => widget.participant;
+  LocalParticipant get _participant => widget.participant;
 
-  void revertDevices(List<MediaDevice> devices) async {
+  void _revertDevices(List<MediaDevice> devices) async {
     _audioInputs = devices.where((d) => d.kind == 'audioinput').toList();
     _audioOutputs = devices.where((d) => d.kind == 'audiooutput').toList();
     _videoInputs = devices.where((d) => d.kind == 'videoinput').toList();
@@ -63,7 +63,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
 
   void onChange() => setState(() {});
 
-  bool get isMuted => participant.isMuted;
+  bool get isMuted => _participant.isMuted;
 
   Future<bool?> showDisconnectDialog() {
     return showDialog<bool>(
@@ -85,7 +85,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
     );
   }
 
-  void disconnect() async {
+  void _disconnect() async {
     if (await showDisconnectDialog() != true) return;
 
     final ChatCallProvider provider = Get.find();
@@ -95,59 +95,59 @@ class _ControlsWidgetState extends State<ControlsWidget> {
     }
   }
 
-  void disableAudio() async {
-    await participant.setMicrophoneEnabled(false);
+  void _disableAudio() async {
+    await _participant.setMicrophoneEnabled(false);
   }
 
-  void enableAudio() async {
-    await participant.setMicrophoneEnabled(true);
+  void _enableAudio() async {
+    await _participant.setMicrophoneEnabled(true);
   }
 
-  void disableVideo() async {
-    await participant.setCameraEnabled(false);
+  void _disableVideo() async {
+    await _participant.setCameraEnabled(false);
   }
 
-  void enableVideo() async {
-    await participant.setCameraEnabled(true);
+  void _enableVideo() async {
+    await _participant.setCameraEnabled(true);
   }
 
-  void selectAudioOutput(MediaDevice device) async {
+  void _selectAudioOutput(MediaDevice device) async {
     await widget.room.setAudioOutputDevice(device);
     setState(() {});
   }
 
-  void selectAudioInput(MediaDevice device) async {
+  void _selectAudioInput(MediaDevice device) async {
     await widget.room.setAudioInputDevice(device);
     setState(() {});
   }
 
-  void selectVideoInput(MediaDevice device) async {
+  void _selectVideoInput(MediaDevice device) async {
     await widget.room.setVideoInputDevice(device);
     setState(() {});
   }
 
-  void setSpeakerphoneOn() {
+  void _setSpeakerphoneOn() {
     _speakerphoneOn = !_speakerphoneOn;
     Hardware.instance.setSpeakerphoneOn(_speakerphoneOn);
     setState(() {});
   }
 
-  void toggleCamera() async {
-    final track = participant.videoTrackPublications.firstOrNull?.track;
+  void _toggleCamera() async {
+    final track = _participant.videoTrackPublications.firstOrNull?.track;
     if (track == null) return;
 
     try {
-      final newPosition = position.switched();
+      final newPosition = _position.switched();
       await track.setCameraPosition(newPosition);
       setState(() {
-        position = newPosition;
+        _position = newPosition;
       });
     } catch (error) {
       return;
     }
   }
 
-  void enableScreenShare() async {
+  void _enableScreenShare() async {
     if (lkPlatformIsDesktop()) {
       try {
         final source = await showDialog<DesktopCapturerSource>(
@@ -163,7 +163,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             maxFrameRate: 15.0,
           ),
         );
-        await participant.publishVideoTrack(track);
+        await _participant.publishVideoTrack(track);
       } catch (e) {
         final message = e.toString();
         context.showErrorDialog(message);
@@ -177,7 +177,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
           maxFrameRate: 30.0,
         ),
       );
-      await participant.publishVideoTrack(track);
+      await _participant.publishVideoTrack(track);
       return;
     }
 
@@ -188,11 +188,11 @@ class _ControlsWidgetState extends State<ControlsWidget> {
       return;
     }
 
-    await participant.setScreenShareEnabled(true, captureScreenAudio: true);
+    await _participant.setScreenShareEnabled(true, captureScreenAudio: true);
   }
 
-  void disableScreenShare() async {
-    await participant.setScreenShareEnabled(false);
+  void _disableScreenShare() async {
+    await _participant.setScreenShareEnabled(false);
   }
 
   @override
@@ -210,12 +210,12 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             icon: Transform.flip(
                 flipX: true, child: const Icon(Icons.exit_to_app)),
             color: Theme.of(context).colorScheme.onSurface,
-            onPressed: disconnect,
+            onPressed: _disconnect,
           ),
-          if (participant.isMicrophoneEnabled())
+          if (_participant.isMicrophoneEnabled())
             if (lkPlatformIs(PlatformType.android))
               IconButton(
-                onPressed: disableAudio,
+                onPressed: _disableAudio,
                 icon: const Icon(Icons.mic),
                 color: Theme.of(context).colorScheme.onSurface,
                 tooltip: 'callMicrophoneOff'.tr,
@@ -227,7 +227,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                   return [
                     PopupMenuItem<MediaDevice>(
                       value: null,
-                      onTap: isMuted ? enableAudio : disableAudio,
+                      onTap: isMuted ? _enableAudio : _disableAudio,
                       child: ListTile(
                         leading: const Icon(Icons.mic_off),
                         title: Text(isMuted
@@ -246,7 +246,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                                 : const Icon(Icons.check_box_outline_blank),
                             title: Text(device.label),
                           ),
-                          onTap: () => selectAudioInput(device),
+                          onTap: () => _selectAudioInput(device),
                         );
                       })
                   ];
@@ -254,19 +254,19 @@ class _ControlsWidgetState extends State<ControlsWidget> {
               )
           else
             IconButton(
-              onPressed: enableAudio,
+              onPressed: _enableAudio,
               icon: const Icon(Icons.mic_off),
               color: Theme.of(context).colorScheme.onSurface,
               tooltip: 'callMicrophoneOn'.tr,
             ),
-          if (participant.isCameraEnabled())
+          if (_participant.isCameraEnabled())
             PopupMenuButton<MediaDevice>(
               icon: const Icon(Icons.videocam_sharp),
               itemBuilder: (BuildContext context) {
                 return [
                   PopupMenuItem<MediaDevice>(
                     value: null,
-                    onTap: disableVideo,
+                    onTap: _disableVideo,
                     child: ListTile(
                       leading: const Icon(Icons.videocam_off),
                       title: Text('callCameraOff'.tr),
@@ -283,7 +283,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                               : const Icon(Icons.check_box_outline_blank),
                           title: Text(device.label),
                         ),
-                        onTap: () => selectVideoInput(device),
+                        onTap: () => _selectVideoInput(device),
                       );
                     })
                 ];
@@ -291,17 +291,17 @@ class _ControlsWidgetState extends State<ControlsWidget> {
             )
           else
             IconButton(
-              onPressed: enableVideo,
+              onPressed: _enableVideo,
               icon: const Icon(Icons.videocam_off),
               color: Theme.of(context).colorScheme.onSurface,
               tooltip: 'callCameraOn'.tr,
             ),
           IconButton(
-            icon: Icon(position == CameraPosition.back
+            icon: Icon(_position == CameraPosition.back
                 ? Icons.video_camera_back
                 : Icons.video_camera_front),
             color: Theme.of(context).colorScheme.onSurface,
-            onPressed: () => toggleCamera(),
+            onPressed: () => _toggleCamera(),
             tooltip: 'callVideoFlip'.tr,
           ),
           if (!lkPlatformIs(PlatformType.iOS))
@@ -327,7 +327,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
                               : const Icon(Icons.check_box_outline_blank),
                           title: Text(device.label),
                         ),
-                        onTap: () => selectAudioOutput(device),
+                        onTap: () => _selectAudioOutput(device),
                       );
                     })
                 ];
@@ -336,7 +336,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
           if (!kIsWeb && lkPlatformIs(PlatformType.iOS))
             IconButton(
               onPressed: Hardware.instance.canSwitchSpeakerphone
-                  ? setSpeakerphoneOn
+                  ? _setSpeakerphoneOn
                   : null,
               color: Theme.of(context).colorScheme.onSurface,
               icon: Icon(
@@ -344,18 +344,18 @@ class _ControlsWidgetState extends State<ControlsWidget> {
               ),
               tooltip: 'callSpeakerphoneToggle'.tr,
             ),
-          if (participant.isScreenShareEnabled())
+          if (_participant.isScreenShareEnabled())
             IconButton(
               icon: const Icon(Icons.monitor_outlined),
               color: Theme.of(context).colorScheme.onSurface,
-              onPressed: () => disableScreenShare(),
+              onPressed: () => _disableScreenShare(),
               tooltip: 'callScreenOff'.tr,
             )
           else
             IconButton(
               icon: const Icon(Icons.monitor),
               color: Theme.of(context).colorScheme.onSurface,
-              onPressed: () => enableScreenShare(),
+              onPressed: () => _enableScreenShare(),
               tooltip: 'callScreenOn'.tr,
             ),
         ],

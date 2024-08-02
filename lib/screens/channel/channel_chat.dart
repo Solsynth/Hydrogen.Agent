@@ -109,10 +109,15 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           break;
         case 'calls.new':
           final payload = Call.fromJson(event.payload!);
-          setState(() => _ongoingCall = payload);
+          if (payload.channel.id == _channel!.id) {
+            setState(() => _ongoingCall = payload);
+          }
           break;
         case 'calls.end':
-          setState(() => _ongoingCall = null);
+          final payload = Call.fromJson(event.payload!);
+          if (payload.channel.id == _channel!.id) {
+            setState(() => _ongoingCall = null);
+          }
           break;
       }
     });

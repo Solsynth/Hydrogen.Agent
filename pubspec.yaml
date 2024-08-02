@@ -68,6 +68,7 @@ dependencies:
   markdown_toolbar: ^0.5.0
   animations: ^2.0.11
   avatar_stack: ^1.2.0
+  async: ^2.11.0
 
 dev_dependencies:
   flutter_test:

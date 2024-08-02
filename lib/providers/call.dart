@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:solian/models/call.dart';
@@ -16,6 +17,7 @@ class ChatCallProvider extends GetxController {
 
   RxBool isReady = false.obs;
   RxBool isMounted = false.obs;
+  RxBool isInitialized = false.obs;
 
   String? token;
   String? endpoint;
@@ -151,6 +153,8 @@ class ChatCallProvider extends GetxController {
   void onRoomDidUpdate() => sortParticipants();
 
   void setupRoom() {
+    if(isInitialized.value) return;
+
     sortParticipants();
     room.addListener(onRoomDidUpdate);
     WidgetsBindingCompatible.instance?.addPostFrameCallback(
@@ -160,6 +164,8 @@ class ChatCallProvider extends GetxController {
     if (lkPlatformIsMobile()) {
       Hardware.instance.setSpeakerphoneOn(true);
     }
+
+    isInitialized.value = true;
   }
 
   void setupRoomListeners({
@@ -362,6 +368,7 @@ class ChatCallProvider extends GetxController {
 
   void disposeRoom() {
     isMounted.value = false;
+    isInitialized.value = false;
     current.value = null;
     channel.value = null;
     room.removeListener(onRoomDidUpdate);

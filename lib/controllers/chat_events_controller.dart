@@ -131,6 +131,8 @@ class ChatEventController {
   }
 
   insertEvent(LocalEvent entry) {
+    if (entry.channelId != channel?.id) return;
+
     final idx = currentEvents.indexWhere((x) => x.data.uuid == entry.data.uuid);
     if (idx != -1) {
       currentEvents[idx] = entry;

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/call.dart';
@@ -16,11 +17,24 @@ class CallScreen extends StatefulWidget {
   State<CallScreen> createState() => _CallScreenState();
 }
 
-class _CallScreenState extends State<CallScreen> {
-  Timer? timer;
-  String currentDuration = '00:00:00';
+class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
+  Timer? _timer;
+  String _currentDuration = '00:00:00';
 
-  String parseDuration() {
+  bool _showControls = true;
+  CancelableOperation? _hideControlsOperation;
+
+  late final AnimationController _controlsAnimationController =
+      AnimationController(
+    duration: const Duration(milliseconds: 500),
+    vsync: this,
+  );
+  late final Animation<double> _controlsAnimation = CurvedAnimation(
+    parent: _controlsAnimationController,
+    curve: Curves.fastOutSlowIn,
+  );
+
+  String _parseDuration() {
     final ChatCallProvider provider = Get.find();
     if (provider.current.value == null) return '00:00:00';
     Duration duration =
@@ -34,10 +48,31 @@ class _CallScreenState extends State<CallScreen> {
     return formattedTime;
   }
 
-  void updateDuration() {
+  void _updateDuration() {
     setState(() {
-      currentDuration = parseDuration();
+      _currentDuration = _parseDuration();
     });
+  }
+
+  void _toggleControls() {
+    if (_showControls) {
+      setState(() => _showControls = false);
+      _controlsAnimationController.animateTo(0);
+      _hideControlsOperation?.cancel();
+    } else {
+      setState(() => _showControls = true);
+      _controlsAnimationController.animateTo(1);
+      _planAutoHideControls();
+    }
+  }
+
+  void _planAutoHideControls() {
+    _hideControlsOperation = CancelableOperation.fromFuture(
+      Future.delayed(const Duration(seconds: 3), () {
+        if (!mounted) return;
+        if (_showControls) _toggleControls();
+      }),
+    );
   }
 
   @override
@@ -45,7 +80,18 @@ class _CallScreenState extends State<CallScreen> {
     Get.find<ChatCallProvider>().setupRoom();
     super.initState();
 
-    timer = Timer.periodic(const Duration(seconds: 1), (_) => updateDuration());
+    _updateDuration();
+    _planAutoHideControls();
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _updateDuration(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controlsAnimationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,80 +114,94 @@ class _CallScreenState extends State<CallScreen> {
               ),
               const TextSpan(text: '\n'),
               TextSpan(
-                text: currentDuration,
+                text: _currentDuration,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ]),
           ),
         ),
         body: SafeArea(
-          child: Obx(
-            () => Stack(
-              children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                        child: provider.focusTrack.value != null
-                            ? InteractiveParticipantWidget(
-                                isFixed: false,
-                                participant: provider.focusTrack.value!,
-                                onTap: () {},
-                              )
-                            : const SizedBox(),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            child: Obx(
+              () => Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          child: provider.focusTrack.value != null
+                              ? InteractiveParticipantWidget(
+                                  isFixed: false,
+                                  participant: provider.focusTrack.value!,
+                                  onTap: () {},
+                                )
+                              : const SizedBox(),
+                        ),
                       ),
-                    ),
-                    if (provider.room.localParticipant != null)
-                      ControlsWidget(
-                        provider.room,
-                        provider.room.localParticipant!,
-                      ),
-                  ],
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  child: SizedBox(
-                    height: 128,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: math.max(0, provider.participantTracks.length),
-                      itemBuilder: (BuildContext context, int index) {
-                        final track = provider.participantTracks[index];
-                        if (track.participant.sid ==
-                            provider.focusTrack.value?.participant.sid) {
-                          return Container();
-                        }
-
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8, left: 8),
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                            child: InteractiveParticipantWidget(
-                              isFixed: true,
-                              width: 120,
-                              height: 120,
-                              color: Theme.of(context).cardColor,
-                              participant: track,
-                              onTap: () {
-                                if (track.participant.sid !=
-                                    provider
-                                        .focusTrack.value?.participant.sid) {
-                                  provider.changeFocusTrack(track);
-                                }
-                              },
+                      if (provider.room.localParticipant != null)
+                        SizeTransition(
+                          sizeFactor: _controlsAnimation,
+                          axis: Axis.vertical,
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: ControlsWidget(
+                              provider.room,
+                              provider.room.localParticipant!,
                             ),
                           ),
-                        );
-                      },
+                        ),
+                    ],
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: SizedBox(
+                      height: 128,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount:
+                            math.max(0, provider.participantTracks.length),
+                        itemBuilder: (BuildContext context, int index) {
+                          final track = provider.participantTracks[index];
+                          if (track.participant.sid ==
+                              provider.focusTrack.value?.participant.sid) {
+                            return Container();
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8, left: 8),
+                            child: ClipRRect(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              child: InteractiveParticipantWidget(
+                                isFixed: true,
+                                width: 120,
+                                height: 120,
+                                color: Theme.of(context).cardColor,
+                                participant: track,
+                                onTap: () {
+                                  if (track.participant.sid !=
+                                      provider
+                                          .focusTrack.value?.participant.sid) {
+                                    provider.changeFocusTrack(track);
+                                  }
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+            onTap: () {
+              _toggleControls();
+            },
           ),
         ),
       ),
@@ -150,16 +210,16 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void deactivate() {
-    timer?.cancel();
-    timer = null;
+    _timer?.cancel();
+    _timer = null;
     super.deactivate();
   }
 
   @override
   void activate() {
-    timer ??= Timer.periodic(
+    _timer ??= Timer.periodic(
       const Duration(seconds: 1),
-      (_) => updateDuration(),
+      (_) => _updateDuration(),
     );
     super.activate();
   }
