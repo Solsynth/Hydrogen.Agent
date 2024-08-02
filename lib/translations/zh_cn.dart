@@ -238,6 +238,8 @@ const i18nSimplifiedChinese = {
   'messageDeletionConfirmCaption': '你确定要删除消息 @id 吗？该操作不可撤销。',
   'call': '通话',
   'callOngoing': '一则通话正在进行中…',
+  'callOngoingEmpty': '一则通话待机中…',
+  'callOngoingParticipants': '@count 人正在进行通话…',
   'callJoin': '加入',
   'callResume': '恢复',
   'callMicrophone': '麦克风',

@@ -11,7 +11,6 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
@@ -19,7 +18,7 @@ import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
-import 'package:solian/widgets/chat/call/call_prejoin.dart';
+import 'package:solian/widgets/channel/channel_call_indicator.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:solian/widgets/chat/chat_event_list.dart';
@@ -53,7 +52,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
 
   late final ChatEventController _chatController;
 
-  getChannel({String? alias}) async {
+  _getChannel({String? alias}) async {
     final ChannelProvider provider = Get.find();
 
     setState(() => _isBusy = true);
@@ -80,7 +79,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     setState(() => _isBusy = false);
   }
 
-  getOngoingCall() async {
+  _getOngoingCall() async {
     final ChannelProvider provider = Get.find();
 
     setState(() => _isBusy = true);
@@ -100,7 +99,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     setState(() => _isBusy = false);
   }
 
-  void listenMessages() {
+  void _listenMessages() {
     final WebSocketProvider provider = Get.find();
     _subscription = provider.stream.stream.listen((event) {
       switch (event.method) {
@@ -117,17 +116,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           break;
       }
     });
-  }
-
-  void showCallPrejoin() {
-    showModalBottomSheet(
-      useRootNavigator: true,
-      context: context,
-      builder: (context) => ChatCallPrejoinPopup(
-        ongoingCall: _ongoingCall!,
-        channel: _channel!,
-      ),
-    );
   }
 
   Event? _messageToReplying;
@@ -149,12 +137,11 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     _chatController = ChatEventController();
     _chatController.initialize();
 
-    getChannel().then((_) {
+    _getOngoingCall();
+    _getChannel().then((_) {
       _chatController.getEvents(_channel!, widget.realm);
-      listenMessages();
+      _listenMessages();
     });
-
-    getOngoingCall();
 
     super.initState();
   }
@@ -182,8 +169,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         {'channel': '@${otherside.account.name}'},
       );
     }
-
-    final ChatCallProvider call = Get.find();
 
     return Scaffold(
       appBar: AppBar(
@@ -219,7 +204,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
                 if (value == false) AppRouter.instance.pop();
                 if (value != null) {
                   final resp = Channel.fromJson(value as Map<String, dynamic>);
-                  getChannel(alias: resp.alias);
+                  _getChannel(alias: resp.alias);
                 }
               });
             },
@@ -232,32 +217,9 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       body: Column(
         children: [
           if (_ongoingCall != null)
-            MaterialBanner(
-              padding: const EdgeInsets.only(left: 16, top: 4, bottom: 4),
-              leading: const Icon(Icons.call_received),
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-              dividerColor: Colors.transparent,
-              content: Text('callOngoing'.tr),
-              actions: [
-                Obx(() {
-                  if (call.current.value == null) {
-                    return TextButton(
-                      onPressed: showCallPrejoin,
-                      child: Text('callJoin'.tr),
-                    );
-                  } else if (call.channel.value?.id == _channel?.id) {
-                    return TextButton(
-                      onPressed: () => call.gotoScreen(context),
-                      child: Text('callResume'.tr),
-                    );
-                  } else {
-                    return TextButton(
-                      onPressed: null,
-                      child: Text('callJoin'.tr),
-                    );
-                  }
-                })
-              ],
+            ChannelCallIndicator(
+              channel: _channel!,
+              ongoingCall: _ongoingCall!,
             ),
           Expanded(
             child: ChatEventList(

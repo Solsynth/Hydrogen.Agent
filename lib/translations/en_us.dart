@@ -257,6 +257,8 @@ const i18nEnglish = {
       'Are your sure to delete message @id? This action cannot be undone!',
   'call': 'Call',
   'callOngoing': 'A call is ongoing...',
+  'callOngoingEmpty': 'A call is on hold...',
+  'callOngoingParticipants': '@count people are calling...',
   'callJoin': 'Join',
   'callResume': 'Resume',
   'callMicrophone': 'Microphone',

@@ -10,6 +10,7 @@ class Call {
   String externalId;
   int founderId;
   int channelId;
+  List<dynamic> participants;
   Channel channel;
 
   Call({
@@ -21,6 +22,7 @@ class Call {
     required this.externalId,
     required this.founderId,
     required this.channelId,
+    required this.participants,
     required this.channel,
   });
 
@@ -34,6 +36,7 @@ class Call {
         externalId: json['external_id'],
         founderId: json['founder_id'],
         channelId: json['channel_id'],
+        participants: json['participants'] ?? List.empty(),
         channel: Channel.fromJson(json['channel']),
       );
 
@@ -46,6 +49,7 @@ class Call {
         'external_id': externalId,
         'founder_id': founderId,
         'channel_id': channelId,
+        'participants': participants,
         'channel': channel.toJson(),
       };
 }
@@ -63,6 +67,7 @@ class ParticipantTrack {
       {required this.participant,
       required this.videoTrack,
       required this.isScreenShare});
+
   VideoTrack? videoTrack;
   Participant participant;
   bool isScreenShare;
