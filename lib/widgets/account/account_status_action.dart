@@ -226,7 +226,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 8),
             TextField(
               controller: _clearAtController,
               readOnly: true,
@@ -238,7 +238,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
               ),
               onTap: () => selectClearAt(),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Wrap(
@@ -281,7 +281,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Wrap(

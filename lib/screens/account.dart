@@ -46,6 +46,11 @@ class _AccountScreenState extends State<AccountScreen> {
         'accountFriend'.tr,
         'accountFriend',
       ),
+      (
+      const Icon(Icons.emoji_symbols),
+      'accountStickers'.tr,
+      'accountStickers',
+      ),
     ];
 
     final AuthProvider auth = Get.find();

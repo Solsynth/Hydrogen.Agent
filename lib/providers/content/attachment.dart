@@ -26,6 +26,8 @@ class AttachmentProvider extends GetConnect {
     List<int> id, {
     noCache = false,
   }) async {
+    if (id.isEmpty) return List.empty();
+
     List<Attachment?> result = List.filled(id.length, null);
     List<int> pendingQuery = List.empty(growable: true);
     if (!noCache) {

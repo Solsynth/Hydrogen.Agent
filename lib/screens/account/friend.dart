@@ -43,7 +43,7 @@ class _FriendScreenState extends State<FriendScreen>
         _relations.where((x) => x.status == 0).length;
   }
 
-  void promptAddFriend() async {
+  void _promptAddFriend() async {
     final RelationshipProvider provider = Get.find();
 
     final controller = TextEditingController();
@@ -146,7 +146,7 @@ class _FriendScreenState extends State<FriendScreen>
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () => promptAddFriend(),
+          onPressed: () => _promptAddFriend(),
         ),
         body: TabBarView(
           controller: _tabController,

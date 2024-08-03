@@ -52,6 +52,7 @@ const i18nEnglish = {
   'account': 'Account',
   'accountPersonalize': 'Personalize',
   'accountPersonalizeApplied': 'Account personalize settings has been saved.',
+  'accountStickers': 'Stickers',
   'accountFriend': 'Friend',
   'accountFriendNew': 'New friend',
   'accountFriendNewHint':
@@ -339,4 +340,13 @@ const i18nEnglish = {
   'themeColorApplied': 'Global theme color has been applied.',
   'attachmentSaved': 'Attachment saved to your system album.',
   'cropImage': 'Crop Image',
+  'stickerUploader': 'Upload sticker',
+  'stickerUploaderAttachmentNew': 'Upload new attachment',
+  'stickerUploaderAttachment': 'Attachment serial number',
+  'stickerUploaderPack': 'Sticker pack serial number',
+  'stickerUploaderPackHint': 'Don\'t have pack id? Head to creator platform and create one!',
+  'stickerUploaderAlias': 'Alias',
+  'stickerUploaderAliasHint': 'Will be used as a placeholder with the sticker pack prefix when entered.',
+  'stickerUploaderName': 'Name',
+  'stickerUploaderNameHint': 'A human-friendly name given to the user in the sticker selection interface.',
 };

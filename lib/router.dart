@@ -7,6 +7,7 @@ import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/account/profile_page.dart';
+import 'package:solian/screens/account/stickers.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
@@ -225,6 +226,14 @@ abstract class AppRouter {
         path: '/account/friend',
         name: 'accountFriend',
         builder: (context, state) => const FriendScreen(),
+      ),
+      GoRoute(
+        path: '/account/stickers',
+        name: 'accountStickers',
+        builder: (context, state) => TitleShell(
+          state: state,
+          child: const StickerScreen(),
+        ),
       ),
       GoRoute(
         path: '/account/personalize',

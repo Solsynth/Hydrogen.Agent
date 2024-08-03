@@ -57,7 +57,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
     setState(() => _isBusy = false);
   }
 
-  void promptAddMember() async {
+  void _promptAddMember() async {
     final input = await showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -141,7 +141,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
               'channelMembersAddHint'
                   .trParams({'channel': '#${widget.channel.alias}'}),
             ),
-            onTap: () => promptAddMember(),
+            onTap: () => _promptAddMember(),
           ),
           Expanded(
             child: ListView.builder(

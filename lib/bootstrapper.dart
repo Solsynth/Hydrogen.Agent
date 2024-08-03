@@ -141,7 +141,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
     try {
       for (var idx = 0; idx < _periods.length; idx++) {
         await _periods[idx].action();
-        if (_isErrored) break;
+        if (_isErrored && !_isDismissable) break;
         if (_periodCursor < _periods.length - 1) {
           setState(() => _periodCursor++);
         }
@@ -179,11 +179,11 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
             GestureDetector(
               child: Column(
                 children: [
-                  if (_isErrored && !_isDismissable)
+                  if (_isErrored && !_isDismissable && !_isBusy)
                     const Icon(Icons.cancel, size: 24),
                   if (_isErrored && _isDismissable)
                     const Icon(Icons.warning, size: 24),
-                  if (!_isErrored && _isBusy)
+                  if ((_isErrored && _isDismissable && _isBusy) || _isBusy)
                     const SizedBox(
                       width: 24,
                       height: 24,

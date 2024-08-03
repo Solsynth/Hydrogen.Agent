@@ -86,11 +86,17 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
           toolbarTitle: 'cropImage'.tr,
           toolbarColor: Theme.of(context).colorScheme.primary,
           toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
-          aspectRatioPresets: [CropAspectRatioPreset.square],
+          aspectRatioPresets: [
+            if (position == 'avatar') CropAspectRatioPreset.square,
+            if (position == 'banner') _BannerCropAspectRatioPreset(),
+          ],
         ),
         IOSUiSettings(
           title: 'cropImage'.tr,
-          aspectRatioPresets: [CropAspectRatioPreset.square],
+          aspectRatioPresets: [
+            if (position == 'avatar') CropAspectRatioPreset.square,
+            if (position == 'banner') _BannerCropAspectRatioPreset(),
+          ],
         ),
         WebUiSettings(
           context: context,
@@ -345,4 +351,12 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     _birthdayController.dispose();
     super.dispose();
   }
+}
+
+class _BannerCropAspectRatioPreset extends CropAspectRatioPresetData {
+  @override
+  (int, int)? get data => (16, 7);
+
+  @override
+  String get name => '16x7';
 }

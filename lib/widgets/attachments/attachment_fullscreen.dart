@@ -257,6 +257,10 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                       child: Wrap(
                         spacing: 6,
                         children: [
+                          Text(
+                            '#${widget.item.id}',
+                            style: metaTextStyle,
+                          ),
                           if (widget.item.metadata?['width'] != null &&
                               widget.item.metadata?['height'] != null)
                             Text(

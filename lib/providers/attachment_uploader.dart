@@ -14,6 +14,7 @@ class AttachmentUploadTask {
   double progress = 0;
   bool isUploading = false;
   bool isCompleted = false;
+  dynamic error;
 
   AttachmentUploadTask({
     required this.file,
@@ -66,7 +67,7 @@ class AttachmentUploaderController extends GetxController {
     queueOfUpload.remove(task);
   }
 
-  Future<Attachment> performSingleTask(int queueIndex) async {
+  Future<Attachment?> performSingleTask(int queueIndex) async {
     isUploading.value = true;
     progressOfUpload.value = 0;
 
@@ -83,9 +84,15 @@ class AttachmentUploaderController extends GetxController {
         queueOfUpload[queueIndex].progress = value;
         _progressOfUpload = value;
       },
+      onError: (err) {
+        queueOfUpload[queueIndex].error = err;
+        queueOfUpload[queueIndex].isUploading = false;
+      },
     );
 
-    queueOfUpload.removeAt(queueIndex);
+    if (queueOfUpload[queueIndex].error == null) {
+      queueOfUpload.removeAt(queueIndex);
+    }
     _stopProgressSyncTimer();
     _syncProgress();
 
@@ -103,6 +110,10 @@ class AttachmentUploaderController extends GetxController {
     _startProgressSyncTimer();
 
     for (var idx = 0; idx < queueOfUpload.length; idx++) {
+      if (queueOfUpload[idx].isUploading || queueOfUpload[idx].error != null) {
+        continue;
+      }
+
       queueOfUpload[idx].isUploading = true;
 
       final task = queueOfUpload[idx];
@@ -115,15 +126,20 @@ class AttachmentUploaderController extends GetxController {
           queueOfUpload[idx].progress = value;
           _progressOfUpload = (idx + value) / queueOfUpload.length;
         },
+        onError: (err) {
+          queueOfUpload[idx].error = err;
+          queueOfUpload[idx].isUploading = false;
+        },
       );
       _progressOfUpload = (idx + 1) / queueOfUpload.length;
-      onData(result);
+      if (result != null) onData(result);
 
       queueOfUpload[idx].isUploading = false;
-      queueOfUpload[idx].isCompleted = false;
+      queueOfUpload[idx].isCompleted = true;
     }
 
-    queueOfUpload.clear();
+    queueOfUpload.value =
+        queueOfUpload.where((x) => x.error == null).toList(growable: true);
     _stopProgressSyncTimer();
     _syncProgress();
 
@@ -135,7 +151,7 @@ class AttachmentUploaderController extends GetxController {
     String path,
     String usage,
     Map<String, dynamic>? metadata,
-    Function(Attachment) callback,
+    Function(Attachment?) callback,
   ) async {
     if (isUploading.value) throw Exception('uploading blocked');
 
@@ -153,7 +169,7 @@ class AttachmentUploaderController extends GetxController {
     callback(result);
   }
 
-  Future<Attachment> uploadAttachment(
+  Future<Attachment?> uploadAttachment(
     Uint8List data,
     String path,
     String usage,
@@ -175,9 +191,9 @@ class AttachmentUploaderController extends GetxController {
     return result;
   }
 
-  Future<Attachment> _rawUploadAttachment(
+  Future<Attachment?> _rawUploadAttachment(
       Uint8List data, String path, String usage, Map<String, dynamic>? metadata,
-      {Function(double)? onProgress}) async {
+      {Function(double)? onProgress, Function(dynamic err)? onError}) async {
     final AttachmentProvider provider = Get.find();
     try {
       final result = await provider.createAttachment(
@@ -189,7 +205,10 @@ class AttachmentUploaderController extends GetxController {
       );
       return result;
     } catch (err) {
-      rethrow;
+      if (onError != null) {
+        onError(err);
+      }
+      return null;
     }
   }
 }

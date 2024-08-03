@@ -23,16 +23,26 @@ import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
 
 class AttachmentEditorPopup extends StatefulWidget {
   final String usage;
-  final List<int> initialAttachments;
+  final bool singleMode;
+  final bool imageOnly;
+  final bool autoUpload;
+  final double? imageMaxWidth;
+  final double? imageMaxHeight;
+  final List<int>? initialAttachments;
   final void Function(int) onAdd;
   final void Function(int) onRemove;
 
   const AttachmentEditorPopup({
     super.key,
     required this.usage,
-    required this.initialAttachments,
     required this.onAdd,
     required this.onRemove,
+    this.singleMode = false,
+    this.imageOnly = false,
+    this.autoUpload = false,
+    this.imageMaxWidth,
+    this.imageMaxHeight,
+    this.initialAttachments,
   });
 
   @override
@@ -43,7 +53,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
   final _imagePicker = ImagePicker();
   final AttachmentUploaderController _uploadController = Get.find();
 
-  bool _isAutoUpload = false;
+  late bool _isAutoUpload = widget.autoUpload;
 
   bool _isBusy = false;
   bool _isFirstTimeBusy = true;
@@ -54,13 +64,28 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    final medias = await _imagePicker.pickMultiImage();
-    if (medias.isEmpty) return;
+    if (widget.singleMode) {
+      final medias = await _imagePicker.pickMultiImage(
+        maxWidth: widget.imageMaxWidth,
+        maxHeight: widget.imageMaxHeight,
+      );
+      if (medias.isEmpty) return;
 
-    _enqueueTaskBatch(medias.map((x) {
-      final file = File(x.path);
-      return AttachmentUploadTask(file: file, usage: widget.usage);
-    }));
+      _enqueueTaskBatch(medias.map((x) {
+        final file = File(x.path);
+        return AttachmentUploadTask(file: file, usage: widget.usage);
+      }));
+    } else {
+      final media = await _imagePicker.pickMedia(
+        maxWidth: widget.imageMaxWidth,
+        maxHeight: widget.imageMaxHeight,
+      );
+      if (media == null) return;
+
+      _enqueueTask(
+        AttachmentUploadTask(file: File(media.path), usage: widget.usage),
+      );
+    }
   }
 
   Future<void> _pickVideoToUpload() async {
@@ -164,6 +189,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     if (result != null) {
       widget.onAdd(result.id);
       setState(() => _attachments.add(result));
+      if (widget.singleMode) Navigator.pop(context);
     }
   }
 
@@ -179,9 +205,11 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       widget.usage,
       null,
       (item) {
+        if (item == null) return;
         widget.onAdd(item.id);
         if (mounted) {
           setState(() => _attachments.add(item));
+          if (widget.singleMode) Navigator.pop(context);
         }
       },
     );
@@ -209,12 +237,12 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
   void _revertMetadataList() {
     final AttachmentProvider attach = Get.find();
 
-    if (widget.initialAttachments.isEmpty) {
+    if (widget.initialAttachments?.isEmpty ?? true) {
       _isFirstTimeBusy = false;
       return;
     } else {
       _attachments = List.filled(
-        widget.initialAttachments.length,
+        widget.initialAttachments!.length,
         null,
         growable: true,
       );
@@ -222,7 +250,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     setState(() => _isBusy = true);
 
-    attach.listMetadata(widget.initialAttachments).then((result) {
+    attach
+        .listMetadata(widget.initialAttachments ?? List.empty())
+        .then((result) {
       setState(() {
         _attachments = result;
         _isBusy = false;
@@ -349,7 +379,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         child: Icon(Icons.check),
                       ),
                     ),
-                  if (!element.isCompleted && canBeCrop)
+                  if (element.error != null)
+                    IconButton(
+                      tooltip: element.error!.toString(),
+                      icon: const Icon(Icons.warning),
+                      onPressed: () {},
+                    ),
+                  if (!element.isCompleted && element.error == null && canBeCrop)
                     Obx(
                       () => IconButton(
                         color: Colors.teal,
@@ -362,7 +398,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                               },
                       ),
                     ),
-                  if (!element.isCompleted && !element.isUploading)
+                  if (!element.isCompleted && !element.isUploading && element.error == null)
                     Obx(
                       () => IconButton(
                         color: Colors.green,
@@ -374,9 +410,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                                 _uploadController
                                     .performSingleTask(index)
                                     .then((r) {
+                                  if (r == null) return;
                                   widget.onAdd(r.id);
                                   if (mounted) {
                                     setState(() => _attachments.add(r));
+                                    if (widget.singleMode) {
+                                      Navigator.pop(context);
+                                    }
                                   }
                                 });
                               },
@@ -519,6 +559,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       widget.onAdd(r.id);
       if (mounted) {
         setState(() => _attachments.add(r));
+        if (widget.singleMode) Navigator.pop(context);
       }
     });
   }
@@ -670,6 +711,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                 ignoring: _uploadController.isUploading.value,
                 child: Container(
                   height: 64,
+                  width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     border: Border(
                       top: BorderSide(
@@ -686,9 +728,10 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                       alignment: WrapAlignment.center,
                       runAlignment: WrapAlignment.center,
                       children: [
-                        if (PlatformInfo.isDesktop ||
-                            PlatformInfo.isIOS ||
-                            PlatformInfo.isWeb)
+                        if ((PlatformInfo.isDesktop ||
+                                PlatformInfo.isIOS ||
+                                PlatformInfo.isWeb) &&
+                            !widget.imageOnly)
                           ElevatedButton.icon(
                             icon: const Icon(Icons.paste),
                             label: Text('attachmentAddClipboard'.tr),
@@ -701,36 +744,40 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           style: const ButtonStyle(visualDensity: density),
                           onPressed: () => _pickPhotoToUpload(),
                         ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.add_road),
-                          label: Text('attachmentAddGalleryVideo'.tr),
-                          style: const ButtonStyle(visualDensity: density),
-                          onPressed: () => _pickVideoToUpload(),
-                        ),
+                        if (!widget.imageOnly)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add_road),
+                            label: Text('attachmentAddGalleryVideo'.tr),
+                            style: const ButtonStyle(visualDensity: density),
+                            onPressed: () => _pickVideoToUpload(),
+                          ),
                         ElevatedButton.icon(
                           icon: const Icon(Icons.photo_camera_back),
                           label: Text('attachmentAddCameraPhoto'.tr),
                           style: const ButtonStyle(visualDensity: density),
                           onPressed: () => _takeMediaToUpload(false),
                         ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.video_camera_back_outlined),
-                          label: Text('attachmentAddCameraVideo'.tr),
-                          style: const ButtonStyle(visualDensity: density),
-                          onPressed: () => _takeMediaToUpload(true),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.file_present_rounded),
-                          label: Text('attachmentAddFile'.tr),
-                          style: const ButtonStyle(visualDensity: density),
-                          onPressed: () => _pickFileToUpload(),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.link),
-                          label: Text('attachmentAddFile'.tr),
-                          style: const ButtonStyle(visualDensity: density),
-                          onPressed: () => _linkAttachments(),
-                        ),
+                        if (!widget.imageOnly)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.video_camera_back_outlined),
+                            label: Text('attachmentAddCameraVideo'.tr),
+                            style: const ButtonStyle(visualDensity: density),
+                            onPressed: () => _takeMediaToUpload(true),
+                          ),
+                        if (!widget.imageOnly)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.file_present_rounded),
+                            label: Text('attachmentAddFile'.tr),
+                            style: const ButtonStyle(visualDensity: density),
+                            onPressed: () => _pickFileToUpload(),
+                          ),
+                        if (!widget.imageOnly)
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.link),
+                            label: Text('attachmentAddFile'.tr),
+                            style: const ButtonStyle(visualDensity: density),
+                            onPressed: () => _linkAttachments(),
+                          ),
                       ],
                     ).paddingSymmetric(horizontal: 12),
                   ),
