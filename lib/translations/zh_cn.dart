@@ -315,6 +315,8 @@ const i18nSimplifiedChinese = {
   'themeColorKagamine': '镜音黄',
   'themeColorLuka': '流音粉',
   'themeColorApplied': '全局主题颜色已应用',
+  'stickerDeletionConfirm': '确认删除贴图',
+  'stickerDeletionConfirmCaption': '你确认要删除贴图 @name 吗？该操作不可撤销。',
   'attachmentSaved': '附件已保存到系统相册',
   'cropImage': '裁剪图片',
   'stickerUploader': '上传贴图',

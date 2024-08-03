@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/stickers.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 
 class StickerUploadDialog extends StatefulWidget {
-  const StickerUploadDialog({super.key});
+  final Sticker? edit;
+
+  const StickerUploadDialog({super.key, this.edit});
 
   @override
   State<StickerUploadDialog> createState() => _StickerUploadDialogState();
@@ -56,18 +59,43 @@ class _StickerUploadDialogState extends State<StickerUploadDialog> {
       return;
     }
 
+    setState(() => _isBusy = true);
+
+    Response resp;
     final client = auth.configureClient('files');
-    final resp = await client.post('/stickers', {
-      'name': _nameController.text,
-      'alias': _aliasController.text,
-      'pack_id': int.tryParse(_packController.text),
-      'attachment_id': int.tryParse(_attachmentController.text),
-    });
+    if (widget.edit == null) {
+      resp = await client.post('/stickers', {
+        'name': _nameController.text,
+        'alias': _aliasController.text,
+        'pack_id': int.tryParse(_packController.text),
+        'attachment_id': int.tryParse(_attachmentController.text),
+      });
+    } else {
+      resp = await client.put('/stickers/${widget.edit!.id}', {
+        'name': _nameController.text,
+        'alias': _aliasController.text,
+        'pack_id': int.tryParse(_packController.text),
+        'attachment_id': int.tryParse(_attachmentController.text),
+      });
+    }
+
+    setState(() => _isBusy = false);
 
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else {
       Navigator.pop(context, true);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.edit != null) {
+      _attachmentController.text = widget.edit!.attachmentId.toString();
+      _packController.text = widget.edit!.packId.toString();
+      _aliasController.text = widget.edit!.alias;
+      _nameController.text = widget.edit!.name;
     }
   }
 
@@ -164,7 +192,7 @@ class _StickerUploadDialogState extends State<StickerUploadDialog> {
           ),
         ],
       ),
-      actions: <Widget>[
+      actions: [
         TextButton(
           style: TextButton.styleFrom(
             foregroundColor:

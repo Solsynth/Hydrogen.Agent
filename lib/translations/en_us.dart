@@ -163,9 +163,11 @@ const i18nEnglish = {
   'attachmentAutoUpload': 'Auto Upload',
   'attachmentUploadQueue': 'Upload Queue',
   'attachmentUploadQueueStart': 'Start All',
-  'attachmentUploadInProgress': 'There are attachments being uploaded. Please wait until all attachments have been uploaded before proceeding...',
+  'attachmentUploadInProgress':
+      'There are attachments being uploaded. Please wait until all attachments have been uploaded before proceeding...',
   'attachmentAttached': 'Exists Files',
-  'attachmentUploadBlocked': 'Upload blocked, there is currently a task in progress...',
+  'attachmentUploadBlocked':
+      'Upload blocked, there is currently a task in progress...',
   'attachmentAdd': 'Attach attachments',
   'attachmentAddGalleryPhoto': 'Gallery photo',
   'attachmentAddGalleryVideo': 'Gallery video',
@@ -174,7 +176,8 @@ const i18nEnglish = {
   'attachmentAddClipboard': 'Paste file',
   'attachmentAddFile': 'Attach file',
   'attachmentAddLink': 'Link attachments',
-  'attachmentAddLinkHint': 'Enter attachment serial number to link that attachment',
+  'attachmentAddLinkHint':
+      'Enter attachment serial number to link that attachment',
   'attachmentAddLinkInput': 'Serial number',
   'attachmentSetting': 'Adjust attachment',
   'attachmentAlt': 'Alternative text',
@@ -318,8 +321,10 @@ const i18nEnglish = {
   'bsCheckForUpdate': 'Checking For Updates',
   'bsCheckForUpdateFailed': 'Unable to Check Updates',
   'bsCheckForUpdateNew': 'Found New Version',
-  'bsCheckForUpdateDescApple': 'Please head to TestFlight and update your app to latest version to prevent error happens and get latest functions.',
-  'bsCheckForUpdateDescCommon': 'Please head to our website download and install latest version of application to prevent error happens and get latest functions.',
+  'bsCheckForUpdateDescApple':
+      'Please head to TestFlight and update your app to latest version to prevent error happens and get latest functions.',
+  'bsCheckForUpdateDescCommon':
+      'Please head to our website download and install latest version of application to prevent error happens and get latest functions.',
   'bsCheckingServer': 'Checking Server Status',
   'bsCheckingServerFail':
       'Unable connect to server, check your network connection',
@@ -337,6 +342,9 @@ const i18nEnglish = {
   'themeColorMiku': 'Miku Blue',
   'themeColorKagamine': 'Kagamine Yellow',
   'themeColorLuka': 'Luka Pink',
+  'stickerDeletionConfirm': 'Confirm sticker delete',
+  'stickerDeletionConfirmCaption':
+      'Are you sure to delete sticker @name? This action cannot be undo.',
   'themeColorApplied': 'Global theme color has been applied.',
   'attachmentSaved': 'Attachment saved to your system album.',
   'cropImage': 'Crop Image',
@@ -344,9 +352,12 @@ const i18nEnglish = {
   'stickerUploaderAttachmentNew': 'Upload new attachment',
   'stickerUploaderAttachment': 'Attachment serial number',
   'stickerUploaderPack': 'Sticker pack serial number',
-  'stickerUploaderPackHint': 'Don\'t have pack id? Head to creator platform and create one!',
+  'stickerUploaderPackHint':
+      'Don\'t have pack id? Head to creator platform and create one!',
   'stickerUploaderAlias': 'Alias',
-  'stickerUploaderAliasHint': 'Will be used as a placeholder with the sticker pack prefix when entered.',
+  'stickerUploaderAliasHint':
+      'Will be used as a placeholder with the sticker pack prefix when entered.',
   'stickerUploaderName': 'Name',
-  'stickerUploaderNameHint': 'A human-friendly name given to the user in the sticker selection interface.',
+  'stickerUploaderNameHint':
+      'A human-friendly name given to the user in the sticker selection interface.',
 };

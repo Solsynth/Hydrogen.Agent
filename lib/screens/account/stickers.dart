@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
+import 'package:solian/models/stickers.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/stickers/sticker_uploader.dart';
@@ -14,13 +17,92 @@ class StickerScreen extends StatefulWidget {
 }
 
 class _StickerScreenState extends State<StickerScreen> {
-  final PagingController<int, dynamic> _pagingController =
+  final PagingController<int, StickerPack> _pagingController =
       PagingController(firstPageKey: 0);
 
-  Future<bool?> _promptUploadSticker() {
+  Future<bool> _promptDelete(Sticker item, String prefix) async {
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) return false;
+
+    final confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('stickerDeletionConfirm'.tr),
+        content: Text(
+          'stickerDeletionConfirmCaption'.trParams({
+            'name': ':${'$prefix${item.alias}'.camelCase}:',
+          }),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('cancel'.tr),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('confirm'.tr),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return false;
+
+    final client = auth.configureClient('files');
+    final resp = await client.delete('/stickers/${item.id}');
+
+    return resp.statusCode == 200;
+  }
+
+  Future<bool?> _promptUploadSticker({Sticker? edit}) {
     return showDialog(
       context: context,
-      builder: (context) => const StickerUploadDialog(),
+      builder: (context) => StickerUploadDialog(
+        edit: edit,
+      ),
+    );
+  }
+
+  Widget _buildEmoteEntry(Sticker item, String prefix) {
+    final imageUrl = ServiceFinder.buildUrl(
+      'files',
+      '/attachments/${item.attachmentId}',
+    );
+    return ListTile(
+      title: Text(item.name),
+      subtitle: Text(':${'$prefix${item.alias}'.camelCase}:'),
+      contentPadding: const EdgeInsets.only(left: 16, right: 14),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.edit_square),
+            onPressed: () {
+              _promptUploadSticker(edit: item).then((value) {
+                if (value == true) _pagingController.refresh();
+              });
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              _promptDelete(item, prefix).then((value) {
+                if (value == true) _pagingController.refresh();
+              });
+            },
+          ),
+        ],
+      ),
+      leading: PlatformInfo.canCacheImage
+          ? CachedNetworkImage(
+              imageUrl: imageUrl,
+              width: 28,
+              height: 28,
+            )
+          : Image.network(
+              imageUrl,
+              width: 28,
+              height: 28,
+            ),
     );
   }
 
@@ -30,13 +112,12 @@ class _StickerScreenState extends State<StickerScreen> {
     final name = auth.userProfile.value!['name'];
     _pagingController.addPageRequestListener((pageKey) async {
       final client = ServiceFinder.configureClient('files');
-      final resp =
-          await client.get('/stickers?take=10&offset=$pageKey&author=$name');
+      final resp = await client.get(
+        '/stickers/manifest?take=10&offset=$pageKey&author=$name',
+      );
       if (resp.statusCode == 200) {
         final result = PaginationResult.fromJson(resp.body);
-        final out = result.data
-            ?.map((e) => e) // TODO transform object
-            .toList();
+        final out = result.data?.map((e) => StickerPack.fromJson(e)).toList();
         if (out != null && result.data!.length >= 10) {
           _pagingController.appendPage(out, pageKey + out.length);
         } else if (out != null) {
@@ -70,11 +151,22 @@ class _StickerScreenState extends State<StickerScreen> {
         onRefresh: () => Future.sync(() => _pagingController.refresh()),
         child: CustomScrollView(
           slivers: [
-            PagedSliverList(
+            PagedSliverList<int, StickerPack>(
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate(
                 itemBuilder: (BuildContext context, item, int index) {
-                  return const SizedBox();
+                  return ExpansionTile(
+                    title: Text(item.name),
+                    subtitle: Text(
+                      item.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    children: item.stickers
+                            ?.map((x) => _buildEmoteEntry(x, item.prefix))
+                            .toList() ??
+                        List.empty(),
+                  );
                 },
               ),
             ),
