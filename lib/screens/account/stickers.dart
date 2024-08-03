@@ -6,6 +6,7 @@ import 'package:solian/models/pagination.dart';
 import 'package:solian/models/stickers.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/stickers.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/stickers/sticker_uploader.dart';
 
@@ -132,6 +133,8 @@ class _StickerScreenState extends State<StickerScreen> {
 
   @override
   void dispose() {
+    final StickerProvider sticker = Get.find();
+    sticker.refreshAvailableStickers();
     _pagingController.dispose();
     super.dispose();
   }

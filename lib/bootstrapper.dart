@@ -8,6 +8,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/relation.dart';
+import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
@@ -116,6 +117,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
             Get.find<RealmProvider>().refreshAvailableRealms(),
             Get.find<ChannelProvider>().refreshAvailableChannel(),
             Get.find<RelationshipProvider>().refreshRelativeList(),
+            Get.find<StickerProvider>().refreshAvailableStickers(),
           ]);
         }
       },
