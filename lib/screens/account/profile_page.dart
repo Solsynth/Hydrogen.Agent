@@ -40,7 +40,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   List<Post> _pinnedPosts = List.empty();
   int _totalUpvote = 0, _totalDownvote = 0;
 
-  Future<void> getUserinfo() async {
+  Future<void> _getUserinfo() async {
     setState(() => _isBusy = true);
 
     var client = ServiceFinder.configureClient('auth');
@@ -114,7 +114,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       }
     });
 
-    getUserinfo();
+    _getUserinfo();
     getPinnedPosts();
   }
 
@@ -189,8 +189,11 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                             : () async {
                                 setState(() => _isMakingFriend = true);
                                 try {
-                                  await _relationshipProvider.makeFriend(widget.name);
-                                  context.showSnackbar('accountFriendRequestSent'.tr);
+                                  await _relationshipProvider
+                                      .makeFriend(widget.name);
+                                  context.showSnackbar(
+                                    'accountFriendRequestSent'.tr,
+                                  );
                                 } catch (e) {
                                   context.showErrorDialog(e);
                                 } finally {
@@ -274,6 +277,8 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         color:
                             Theme.of(context).colorScheme.surfaceContainerLow,
                         child: PostListEntryWidget(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surfaceContainerLow,
                           item: element,
                           isClickable: true,
                           isNestedClickable: true,
