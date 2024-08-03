@@ -11,6 +11,7 @@ import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
+import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
@@ -120,6 +121,7 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => AuthProvider());
     Get.lazyPut(() => RelationshipProvider());
     Get.lazyPut(() => PostProvider());
+    Get.lazyPut(() => StickerProvider());
     Get.lazyPut(() => AttachmentProvider());
     Get.lazyPut(() => WebSocketProvider());
     Get.lazyPut(() => StatusProvider());

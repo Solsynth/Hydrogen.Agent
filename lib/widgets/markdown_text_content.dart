@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown.dart';
+import 'package:get/get.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:markdown/markdown.dart';
+import 'package:solian/providers/stickers.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'account/account_profile_popup.dart';
@@ -101,10 +103,15 @@ class _CustomEmoteInlineSyntax extends InlineSyntax {
 
   @override
   bool onMatch(markdown.InlineParser parser, Match match) {
-    // final alias = match[1]!;
-    // TODO mapping things...
+    final StickerProvider sticker = Get.find();
+    final alias = match[1]!;
+    if (sticker.aliasImageMapping[alias] == null) {
+      parser.advanceBy(1);
+      return false;
+    }
+
     final element = markdown.Element.empty('img');
-    element.attributes['src'] = 'https://www.twitch.tv/creatorcamp/assets/uploads/lul.png';
+    element.attributes['src'] = sticker.aliasImageMapping[alias]!;
     parser.addNode(element);
 
     return true;
