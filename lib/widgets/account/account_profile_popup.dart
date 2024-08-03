@@ -8,9 +8,9 @@ import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_heading.dart';
 
 class AccountProfilePopup extends StatefulWidget {
-  final Account account;
+  final String name;
 
-  const AccountProfilePopup({super.key, required this.account});
+  const AccountProfilePopup({super.key, required this.name});
 
   @override
   State<AccountProfilePopup> createState() => _AccountProfilePopupState();
@@ -21,11 +21,11 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
 
   Account? _userinfo;
 
-  void getUserinfo() async {
+  void _getUserinfo() async {
     setState(() => _isBusy = true);
 
     final client = ServiceFinder.configureClient('auth');
-    final resp = await client.get('/users/${widget.account.name}');
+    final resp = await client.get('/users/${widget.name}');
     if (resp.statusCode == 200) {
       _userinfo = Account.fromJson(resp.body);
       setState(() => _isBusy = false);
@@ -38,7 +38,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
   @override
   void initState() {
     super.initState();
-    getUserinfo();
+    _getUserinfo();
   }
 
   @override

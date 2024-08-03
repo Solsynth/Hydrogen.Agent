@@ -243,7 +243,7 @@ class ChatEvent extends StatelessWidget {
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     context: context,
                     builder: (context) => AccountProfilePopup(
-                      account: item.sender.account,
+                      name: item.sender.account.name,
                     ),
                   );
                 },

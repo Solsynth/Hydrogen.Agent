@@ -310,7 +310,7 @@ class _PostItemState extends State<PostItem> {
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     context: context,
                     builder: (context) => AccountProfilePopup(
-                      account: item.author,
+                      name: item.author.name,
                     ),
                   );
                 },

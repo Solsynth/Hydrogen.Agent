@@ -160,7 +160,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
                         backgroundColor: Theme.of(context).colorScheme.surface,
                         context: context,
                         builder: (context) => AccountProfilePopup(
-                          account: element.account,
+                          name: element.account.name,
                         ),
                       );
                     },

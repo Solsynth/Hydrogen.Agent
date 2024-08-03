@@ -35,7 +35,7 @@ class SilverRelativeList extends StatelessWidget {
             context: context,
             builder: (context) =>
                 AccountProfilePopup(
-                  account: element.related,
+                  name: element.related.name,
                 ),
           );
         },

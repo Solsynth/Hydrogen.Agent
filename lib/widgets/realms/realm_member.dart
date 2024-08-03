@@ -157,7 +157,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
                         backgroundColor: Theme.of(context).colorScheme.surface,
                         context: context,
                         builder: (context) => AccountProfilePopup(
-                          account: element.account,
+                          name: element.account.name,
                         ),
                       );
                     },
