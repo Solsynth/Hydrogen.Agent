@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -171,9 +170,10 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
               height: 280,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Image.asset('assets/logo.png', width: 80, height: 80)
-                    .animate(onPlay: (c) => c.repeat())
-                    .rotate(duration: 850.ms, curve: Curves.easeInOut),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                  child: Image.asset('assets/logo.png', width: 80, height: 80),
+                ),
               ),
             ),
             GestureDetector(

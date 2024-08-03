@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -18,9 +17,11 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/logo.png', width: 64, height: 64)
-                .animate(onPlay: (c) => c.repeat())
-                .rotate(duration: 1000.ms),
+            ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(16)),
+              child: Image.asset('assets/logo.png', width: 120, height: 120),
+            ),
+            const SizedBox(height: 8),
             Text(
               'Solian',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -56,10 +57,9 @@ class AboutScreen extends StatelessWidget {
                   applicationVersion: '${info.version} (${info.buildNumber})',
                   applicationLegalese:
                       'The Solar Network App is an intuitive and self-hostable social network and computing platform. Experience the freedom of a user-friendly design that empowers you to create and connect with communities on your own terms. Embrace the future of social networking with a platform that prioritizes your independence and privacy.',
-                  applicationIcon: Image.asset(
-                    'assets/logo.png',
-                    width: 56,
-                    height: 56,
+                  applicationIcon: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    child: Image.asset('assets/logo.png', width: 60, height: 60),
                   ),
                 );
               },
