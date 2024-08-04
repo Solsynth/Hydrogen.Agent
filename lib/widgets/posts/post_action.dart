@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_editor.dart';
@@ -38,19 +39,32 @@ class _PostActionState extends State<PostAction> {
     });
   }
 
-  Future<void> _doShare() async {
+  Future<void> _doShare({bool noUri = false}) async {
     final box = context.findRenderObject() as RenderBox?;
-    await Share.share(
-      'postShareContent'.trParams({
-        'username': widget.item.author.nick,
-        'content': widget.item.body['content'] ?? 'no content',
-        'link': 'https://sn.solsynth.dev/posts/view/${widget.item.id}',
-      }),
-      subject: 'postShareSubject'.trParams({
-        'username': widget.item.author.nick,
-      }),
-      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-    );
+    if ((PlatformInfo.isAndroid || PlatformInfo.isIOS) && !noUri) {
+      await Share.shareUri(
+        Uri.parse('https://sn.solsynth.dev/posts/view/${widget.item.id}'),
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    } else {
+      final extraContent = [
+        widget.item.body['title'],
+        widget.item.body['description'],
+      ];
+      final isExtraNotEmpty = extraContent.any((x) => x != null);
+      await Share.share(
+        'postShareContent'.trParams({
+          'username': widget.item.author.nick,
+          'content':
+              '${extraContent.join('\n')}${isExtraNotEmpty ? '\n\n' : ''}${widget.item.body['content'] ?? 'no content'}',
+          'link': 'https://sn.solsynth.dev/posts/view/${widget.item.id}',
+        }),
+        subject: 'postShareSubject'.trParams({
+          'username': widget.item.author.nick,
+        }),
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    }
   }
 
   @override
@@ -86,6 +100,16 @@ class _PostActionState extends State<PostAction> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                   leading: const Icon(Icons.share),
                   title: Text('share'.tr),
+                  trailing: PlatformInfo.isIOS || PlatformInfo.isAndroid
+                      ? IconButton(
+                          icon: const Icon(Icons.link_off),
+                          tooltip: 'shareNoUri'.tr,
+                          onPressed: () async {
+                            await _doShare(noUri: true);
+                            Navigator.pop(context);
+                          },
+                        )
+                      : null,
                   onTap: () async {
                     await _doShare();
                     Navigator.pop(context);

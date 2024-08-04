@@ -12,6 +12,7 @@ const i18nEnglish = {
   'draftBox': 'Draft Box',
   'more': 'More',
   'share': 'Share',
+  'shareNoUri': 'Share text content',
   'feed': 'Feed',
   'unlink': 'Unlink',
   'feedSearch': 'Search Feed',

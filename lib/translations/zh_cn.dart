@@ -20,6 +20,7 @@ const i18nSimplifiedChinese = {
   'draftBox': '草稿箱',
   'more': '更多',
   'share': '分享',
+  'shareNoUri': '分享文字内容',
   'feed': '资讯',
   'unlink': '移除链接',
   'feedSearch': '搜索资讯',
