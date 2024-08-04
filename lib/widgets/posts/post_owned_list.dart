@@ -6,12 +6,14 @@ import 'package:solian/widgets/posts/post_item.dart';
 class PostOwnedListEntry extends StatelessWidget {
   final Post item;
   final Function onTap;
+  final bool isFullContent;
   final Color? backgroundColor;
 
   const PostOwnedListEntry({
     super.key,
     required this.item,
     required this.onTap,
+    this.isFullContent = false,
     this.backgroundColor,
   });
 
@@ -29,6 +31,7 @@ class PostOwnedListEntry extends StatelessWidget {
               isClickable: false,
               isShowReply: false,
               isReactable: false,
+              isFullContent: isFullContent,
               backgroundColor: backgroundColor,
             ).paddingSymmetric(vertical: 8),
           ],

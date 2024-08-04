@@ -273,14 +273,49 @@ class _PostItemState extends State<PostItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader().paddingSymmetric(horizontal: 12),
-          MarkdownTextContent(
-            content: item.body['content'],
-            isSelectable: widget.isContentSelectable,
-          ).paddingOnly(
-            left: 16,
-            right: 12,
-            top: 2,
-            bottom: hasAttachment ? 4 : 0,
+          Stack(
+            children: [
+              SizedContainer(
+                maxWidth: 640,
+                maxHeight: widget.isFullContent ? double.infinity : 80,
+                child: _MeasureSize(
+                  onChange: (size) {
+                    setState(() => _contentHeight = size.height);
+                  },
+                  child: MarkdownTextContent(
+                    content: item.body['content'],
+                    isSelectable: widget.isContentSelectable,
+                  ).paddingOnly(
+                    left: 16,
+                    right: 12,
+                    top: 2,
+                    bottom: hasAttachment ? 4 : 0,
+                  ),
+                ),
+              ),
+              if (_contentHeight >= 80 && !widget.isFullContent)
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Theme.of(context).colorScheme.surfaceContainerLow,
+                            Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withOpacity(0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
           _buildFooter().paddingOnly(left: 16),
           if (attachments.isNotEmpty)
@@ -330,33 +365,46 @@ class _PostItemState extends State<PostItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(),
-                    SizedContainer(
-                      maxWidth: 640,
-                      maxHeight: widget.isFullContent ? double.infinity : 320,
-                      child: _MeasureSize(
-                        onChange: (size) {
-                          _contentHeight = size.height;
-                        },
-                        child: MarkdownTextContent(
-                          content: item.body['content'],
-                          isSelectable: widget.isContentSelectable,
-                        ).paddingOnly(left: 12, right: 8),
-                      ),
-                    ),
-                    if (_contentHeight >= 320 &&
-                        widget.isClickable &&
-                        !widget.isFullContent)
-                      InkWell(
-                        child: Text(
-                          'readMore'.tr,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
+                    Stack(
+                      children: [
+                        SizedContainer(
+                          maxWidth: 640,
+                          maxHeight:
+                              widget.isFullContent ? double.infinity : 320,
+                          child: _MeasureSize(
+                            onChange: (size) {
+                              setState(() => _contentHeight = size.height);
+                            },
+                            child: MarkdownTextContent(
+                              content: item.body['content'],
+                              isSelectable: widget.isContentSelectable,
+                            ).paddingOnly(left: 12, right: 8),
                           ),
                         ),
-                        onTap: () {
-                          openContainer();
-                        },
-                      ).paddingOnly(left: 12, top: 4),
+                        if (_contentHeight >= 320 && !widget.isFullContent)
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: IgnorePointer(
+                              child: Container(
+                                height: 320,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Theme.of(context).colorScheme.surface,
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .surface
+                                          .withOpacity(0),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                     if (widget.item.replyTo != null && widget.isShowEmbed)
                       _buildReply(context).paddingOnly(top: 4),
                     if (widget.item.repostTo != null && widget.isShowEmbed)

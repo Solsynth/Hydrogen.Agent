@@ -21,7 +21,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
   final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 
-  getPosts(int pageKey) async {
+  _getPosts(int pageKey) async {
     final PostProvider provider = Get.find();
 
     Response resp;
@@ -49,7 +49,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
   @override
   void initState() {
     super.initState();
-    _pagingController.addPageRequestListener(getPosts);
+    _pagingController.addPageRequestListener(_getPosts);
   }
 
   @override
@@ -76,6 +76,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
               itemBuilder: (context, item, index) {
                 return PostOwnedListEntry(
                   item: item,
+                  isFullContent: true,
                   backgroundColor:
                       Theme.of(context).colorScheme.surfaceContainerLow,
                   onTap: () async {
