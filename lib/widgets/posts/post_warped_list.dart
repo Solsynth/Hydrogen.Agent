@@ -9,6 +9,7 @@ class PostWarpedListWidget extends StatelessWidget {
   final bool isNestedClickable;
   final bool isPinned;
   final PagingController<int, Post> controller;
+  final Function? onUpdate;
 
   const PostWarpedListWidget({
     super.key,
@@ -17,6 +18,7 @@ class PostWarpedListWidget extends StatelessWidget {
     this.isClickable = true,
     this.isNestedClickable = true,
     this.isPinned = true,
+    this.onUpdate,
   });
 
   @override
@@ -35,9 +37,7 @@ class PostWarpedListWidget extends StatelessWidget {
             isNestedClickable: isNestedClickable,
             isClickable: isClickable,
             item: item,
-            onUpdate: () {
-              controller.refresh();
-            },
+            onUpdate: onUpdate ?? () {},
           );
         },
       ),

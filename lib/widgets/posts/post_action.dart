@@ -97,13 +97,13 @@ class _PostActionState extends State<PostAction> {
                     leading: const FaIcon(FontAwesomeIcons.reply, size: 20),
                     title: Text('reply'.tr),
                     onTap: () async {
-                      final value = await AppRouter.instance.pushNamed(
-                        'postEditor',
-                        extra: PostPublishArguments(reply: widget.item),
+                      Navigator.pop(
+                        context,
+                        AppRouter.instance.pushNamed(
+                          'postEditor',
+                          extra: PostPublishArguments(reply: widget.item),
+                        ),
                       );
-                      if (value != null) {
-                        Navigator.pop(context, true);
-                      }
                     },
                   ),
                 if (!widget.noReact)
@@ -112,13 +112,13 @@ class _PostActionState extends State<PostAction> {
                     leading: const FaIcon(FontAwesomeIcons.retweet, size: 20),
                     title: Text('repost'.tr),
                     onTap: () async {
-                      final value = await AppRouter.instance.pushNamed(
-                        'postEditor',
-                        extra: PostPublishArguments(repost: widget.item),
+                      Navigator.pop(
+                        context,
+                        AppRouter.instance.pushNamed(
+                          'postEditor',
+                          extra: PostPublishArguments(repost: widget.item),
+                        ),
                       );
-                      if (value != null) {
-                        Navigator.pop(context, true);
-                      }
                     },
                   ),
                 if (_canModifyContent && !widget.noReact)
@@ -146,13 +146,13 @@ class _PostActionState extends State<PostAction> {
                     leading: const Icon(Icons.edit),
                     title: Text('edit'.tr),
                     onTap: () async {
-                      final value = await AppRouter.instance.pushNamed(
-                        'postEditor',
-                        extra: PostPublishArguments(edit: widget.item),
+                      Navigator.pop(
+                        context,
+                        AppRouter.instance.pushNamed(
+                          'postEditor',
+                          extra: PostPublishArguments(edit: widget.item),
+                        ),
                       );
-                      if (value != null) {
-                        Navigator.pop(context, true);
-                      }
                     },
                   ),
                 if (_canModifyContent)

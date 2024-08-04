@@ -4,7 +4,6 @@ import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
-import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
@@ -47,15 +46,20 @@ class _HomeScreenState extends State<HomeScreen>
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () {
-            showModalBottomSheet(
+          onPressed: () async {
+            final value = await showModalBottomSheet(
               useRootNavigator: true,
               isScrollControlled: true,
               context: context,
-              builder: (context) => PostCreatePopup(
-                controller: _postController,
-              ),
+              builder: (context) => const PostCreatePopup(),
             );
+            if (value is Future) {
+              value.then((_) {
+                _postController.reloadAllOver();
+              });
+            } else if (value != null) {
+              _postController.reloadAllOver();
+            }
           },
         ),
         body: NestedScrollView(
@@ -100,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen>
                   child: CustomScrollView(slivers: [
                     PostWarpedListWidget(
                       controller: _postController.pagingController,
+                      onUpdate: () => _postController.reloadAllOver(),
                     ),
                   ]),
                 ),
@@ -121,12 +126,10 @@ class _HomeScreenState extends State<HomeScreen>
 
 class PostCreatePopup extends StatelessWidget {
   final bool hideDraftBox;
-  final PostListController controller;
 
   const PostCreatePopup({
     super.key,
     this.hideDraftBox = false,
-    required this.controller,
   });
 
   @override
@@ -142,13 +145,14 @@ class PostCreatePopup extends StatelessWidget {
         icon: const Icon(Icons.post_add),
         label: 'postEditorModeStory'.tr,
         onTap: () {
-          Navigator.pop(context);
-          AppRouter.instance.pushNamed(
-            'postEditor',
-            extra: PostPublishArguments(postListController: controller),
-            queryParameters: {
-              'mode': 0.toString(),
-            },
+          Navigator.pop(
+            context,
+            AppRouter.instance.pushNamed(
+              'postEditor',
+              queryParameters: {
+                'mode': 0.toString(),
+              },
+            ),
           );
         },
       ),
@@ -156,13 +160,14 @@ class PostCreatePopup extends StatelessWidget {
         icon: const Icon(Icons.description),
         label: 'postEditorModeArticle'.tr,
         onTap: () {
-          Navigator.pop(context);
-          AppRouter.instance.pushNamed(
-            'postEditor',
-            extra: PostPublishArguments(postListController: controller),
-            queryParameters: {
-              'mode': 1.toString(),
-            },
+          Navigator.pop(
+            context,
+            AppRouter.instance.pushNamed(
+              'postEditor',
+              queryParameters: {
+                'mode': 1.toString(),
+              },
+            ),
           );
         },
       ),
@@ -170,8 +175,10 @@ class PostCreatePopup extends StatelessWidget {
         icon: const Icon(Icons.drafts),
         label: 'draftBoxOpen'.tr,
         onTap: () {
-          Navigator.pop(context);
-          AppRouter.instance.pushNamed('draftBox');
+          Navigator.pop(
+            context,
+            AppRouter.instance.pushNamed('draftBox'),
+          );
         },
       ),
     ];

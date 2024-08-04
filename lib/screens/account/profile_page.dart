@@ -300,6 +300,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                     PostWarpedListWidget(
                       isPinned: false,
                       controller: _postController.pagingController,
+                      onUpdate: () => _postController.reloadAllOver(),
                     ),
                 ]),
               ),

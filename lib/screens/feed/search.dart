@@ -77,7 +77,10 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
                 onRefresh: () => Future.sync(() => _pagingController.refresh()),
                 child: CustomScrollView(
                   slivers: [
-                    PostWarpedListWidget(controller: _pagingController),
+                    PostWarpedListWidget(
+                      controller: _pagingController,
+                      onUpdate: () => _pagingController.refresh(),
+                    ),
                   ],
                 ),
               ),

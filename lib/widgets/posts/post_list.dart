@@ -85,7 +85,13 @@ class PostListEntryWidget extends StatelessWidget {
           context: context,
           builder: (context) => PostAction(item: item),
         ).then((value) {
-          if (value != null) onUpdate();
+          if (value is Future) {
+            value.then((_) {
+              onUpdate();
+            });
+          } else if (value != null) {
+            onUpdate();
+          }
         });
       },
     );

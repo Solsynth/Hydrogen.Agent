@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/router.dart';
@@ -18,22 +17,37 @@ class AccountProfilePopup extends StatefulWidget {
 
 class _AccountProfilePopupState extends State<AccountProfilePopup> {
   bool _isBusy = true;
+  dynamic _hasError;
 
   Account? _userinfo;
 
   void _getUserinfo() async {
     setState(() => _isBusy = true);
 
-    final client = ServiceFinder.configureClient('auth');
-    final resp = await client.get('/users/${widget.name}');
-    if (resp.statusCode == 200) {
-      _userinfo = Account.fromJson(resp.body);
-      setState(() => _isBusy = false);
-    } else {
-      context.showErrorDialog(resp.bodyString);
-      Navigator.pop(context);
+    try {
+      final client = ServiceFinder.configureClient('auth');
+      final resp = await client.get('/users/${widget.name}');
+      if (resp.statusCode == 200) {
+        setState(() {
+          _userinfo = Account.fromJson(resp.body);
+          _isBusy = false;
+        });
+      } else {
+        setState(() {
+          _hasError = resp.bodyString;
+          _isBusy = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _hasError = e;
+        _isBusy = false;
+      });
     }
   }
+
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   @override
   void initState() {
@@ -43,10 +57,32 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isBusy || _userinfo == null) {
+    if (_isBusy) {
       return SizedBox(
         height: MediaQuery.of(context).size.height * 0.75,
         child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_hasError != null) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.75,
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cancel, size: 24),
+            const SizedBox(height: 12),
+            Text(
+              _hasError.toString(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: _unFocusColor,
+              ),
+            ),
+          ],
+        ),
       );
     }
 

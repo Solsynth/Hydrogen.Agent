@@ -104,7 +104,6 @@ abstract class AppRouter {
               reply: arguments?.reply,
               repost: arguments?.repost,
               realm: arguments?.realm,
-              postListController: arguments?.postListController,
               mode: int.tryParse(state.uri.queryParameters['mode'] ?? '0') ?? 0,
             ),
             transitionsBuilder:

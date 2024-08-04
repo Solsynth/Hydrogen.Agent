@@ -87,7 +87,13 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
                         noReact: true,
                       ),
                     ).then((value) {
-                      if (value != null) _pagingController.refresh();
+                      if (value is Future) {
+                        value.then((_) {
+                          _pagingController.refresh();
+                        });
+                      } else if (value != null) {
+                        _pagingController.refresh();
+                      }
                     });
                   },
                 ).paddingOnly(left: 12, right: 12, bottom: 4);
