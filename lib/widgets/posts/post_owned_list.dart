@@ -6,18 +6,19 @@ import 'package:solian/widgets/posts/post_item.dart';
 class PostOwnedListEntry extends StatelessWidget {
   final Post item;
   final Function onTap;
+  final Color? backgroundColor;
 
   const PostOwnedListEntry({
     super.key,
     required this.item,
     required this.onTap,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: InkWell(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
+      child: GestureDetector(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -28,6 +29,7 @@ class PostOwnedListEntry extends StatelessWidget {
               isClickable: false,
               isShowReply: false,
               isReactable: false,
+              backgroundColor: backgroundColor,
             ).paddingSymmetric(vertical: 8),
           ],
         ),

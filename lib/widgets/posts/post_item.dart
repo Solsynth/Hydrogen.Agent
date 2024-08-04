@@ -164,6 +164,7 @@ class _PostItemState extends State<PostItem> {
 
   Widget _buildReply(BuildContext context) {
     return OpenContainer(
+      tappable: widget.isClickable,
       closedBuilder: (_, openContainer) => Column(
         children: [
           Row(
@@ -202,13 +203,15 @@ class _PostItemState extends State<PostItem> {
       ),
       closedElevation: 0,
       openElevation: 0,
-      closedColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
+      closedColor:
+          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }
 
   Widget _buildRepost(BuildContext context) {
     return OpenContainer(
+      tappable: widget.isClickable,
       closedBuilder: (_, openContainer) => Column(
         children: [
           Row(
@@ -247,7 +250,8 @@ class _PostItemState extends State<PostItem> {
       ),
       closedElevation: 0,
       openElevation: 0,
-      closedColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
+      closedColor:
+          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }
@@ -295,6 +299,7 @@ class _PostItemState extends State<PostItem> {
     }
 
     return OpenContainer(
+      tappable: widget.isClickable,
       closedBuilder: (_, openContainer) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -377,7 +382,8 @@ class _PostItemState extends State<PostItem> {
       ),
       closedElevation: 0,
       openElevation: 0,
-      closedColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
+      closedColor:
+          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }

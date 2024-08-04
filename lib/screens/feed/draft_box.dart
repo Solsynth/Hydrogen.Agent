@@ -76,6 +76,8 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
               itemBuilder: (context, item, index) {
                 return PostOwnedListEntry(
                   item: item,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerLow,
                   onTap: () async {
                     showModalBottomSheet(
                       useRootNavigator: true,
