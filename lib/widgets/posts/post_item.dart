@@ -76,12 +76,13 @@ class _PostItemState extends State<PostItem> {
 
   Widget _buildHeader() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.isCompact)
           AccountAvatar(
             content: item.author.avatar.toString(),
             radius: 10,
-          ).paddingOnly(left: 2),
+          ).paddingOnly(left: 2, top: 1),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,16 +109,24 @@ class _PostItemState extends State<PostItem> {
                   item.body['description'],
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-              if (item.body['description'] != null ||
-                  item.body['title'] != null)
-                const Divider(thickness: 0.3, height: 1).paddingSymmetric(
-                  vertical: 8,
-                ),
             ],
           ).paddingOnly(left: widget.isCompact ? 6 : 12),
         ),
+        if (widget.item.type == 'article')
+          Badge(
+            label: Text('article'.tr),
+          ).paddingOnly(top: 3),
       ],
     );
+  }
+
+  Widget _buildHeaderDivider() {
+    if (item.body['description'] != null || item.body['title'] != null) {
+      return const Divider(thickness: 0.3, height: 1).paddingSymmetric(
+        vertical: 8,
+      );
+    }
+    return const SizedBox();
   }
 
   Widget _buildFooter() {
@@ -273,6 +282,7 @@ class _PostItemState extends State<PostItem> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader().paddingSymmetric(horizontal: 12),
+          _buildHeaderDivider().paddingSymmetric(horizontal: 12),
           Stack(
             children: [
               SizedContainer(
@@ -365,6 +375,7 @@ class _PostItemState extends State<PostItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(),
+                    _buildHeaderDivider(),
                     Stack(
                       children: [
                         SizedContainer(
