@@ -138,8 +138,9 @@ class AttachmentUploaderController extends GetxController {
       queueOfUpload[idx].isCompleted = true;
     }
 
-    queueOfUpload.value =
-        queueOfUpload.where((x) => x.error == null).toList(growable: true);
+    queueOfUpload.value = queueOfUpload
+        .where((x) => x.error == null && x.isCompleted)
+        .toList(growable: true);
     _stopProgressSyncTimer();
     _syncProgress();
 

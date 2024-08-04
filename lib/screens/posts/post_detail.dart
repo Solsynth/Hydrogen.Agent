@@ -59,7 +59,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               SliverToBoxAdapter(
                 child: PostItem(
                   item: item!,
-                  isClickable: true,
+                  isClickable: false,
+                  isOverrideEmbedClickable: true,
                   isFullDate: true,
                   isFullContent: true,
                   isShowReply: false,

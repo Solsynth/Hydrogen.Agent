@@ -89,6 +89,8 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
+    await auth.ensureCredentials();
+
     final filePayload =
         dio.MultipartFile.fromBytes(data, filename: basename(path));
     final fileAlt = basename(path).contains('.')

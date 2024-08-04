@@ -597,30 +597,39 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Expanded(
-                        child: Text(
-                          'attachmentAdd'.tr,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                          maxLines: 2,
-                          overflow: TextOverflow.fade,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'attachmentAdd'.tr,
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Obx(() {
+                              if (_uploadController.isUploading.value) {
+                                return SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    value: _uploadController
+                                        .progressOfUpload.value,
+                                  ),
+                                );
+                              }
+                              return const SizedBox();
+                            }),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Obx(() {
-                        if (_uploadController.isUploading.value) {
-                          return SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              value: _uploadController.progressOfUpload.value,
-                            ),
-                          );
-                        }
-                        return const SizedBox();
-                      }),
                     ],
                   ),
                 ),
+                const SizedBox(width: 20),
                 Text('attachmentAutoUpload'.tr),
                 const SizedBox(width: 8),
                 Switch(

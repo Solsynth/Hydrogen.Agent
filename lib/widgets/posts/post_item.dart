@@ -23,6 +23,7 @@ class PostItem extends StatefulWidget {
   final bool isReactable;
   final bool isShowReply;
   final bool isShowEmbed;
+  final bool isOverrideEmbedClickable;
   final bool isFullDate;
   final bool isFullContent;
   final bool isContentSelectable;
@@ -37,6 +38,7 @@ class PostItem extends StatefulWidget {
     this.isReactable = true,
     this.isShowReply = true,
     this.isShowEmbed = true,
+    this.isOverrideEmbedClickable = false,
     this.isFullDate = false,
     this.isFullContent = false,
     this.isContentSelectable = false,
@@ -176,7 +178,7 @@ class _PostItemState extends State<PostItem> {
 
   Widget _buildReply(BuildContext context) {
     return OpenContainer(
-      tappable: widget.isClickable,
+      tappable: widget.isClickable || widget.isOverrideEmbedClickable,
       closedBuilder: (_, openContainer) => Column(
         children: [
           Row(
@@ -223,7 +225,7 @@ class _PostItemState extends State<PostItem> {
 
   Widget _buildRepost(BuildContext context) {
     return OpenContainer(
-      tappable: widget.isClickable,
+      tappable: widget.isClickable || widget.isOverrideEmbedClickable,
       closedBuilder: (_, openContainer) => Column(
         children: [
           Row(
