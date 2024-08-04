@@ -329,4 +329,5 @@ const i18nSimplifiedChinese = {
   'stickerUploaderAliasHint': '将会在输入时使用和贴图包前缀组成占位符。',
   'stickerUploaderName': '贴图名称',
   'stickerUploaderNameHint': '在贴图选择界面提供给用户的人类友好名称。',
+  'readMore': '阅读更多',
 };

@@ -361,4 +361,5 @@ const i18nEnglish = {
   'stickerUploaderName': 'Name',
   'stickerUploaderNameHint':
       'A human-friendly name given to the user in the sticker selection interface.',
+  'readMore': 'Read more',
 };

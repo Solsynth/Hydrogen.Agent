@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +24,7 @@ class PostItem extends StatefulWidget {
   final bool isShowReply;
   final bool isShowEmbed;
   final bool isFullDate;
+  final bool isFullContent;
   final bool isContentSelectable;
   final String? attachmentParent;
   final Color? backgroundColor;
@@ -36,6 +38,7 @@ class PostItem extends StatefulWidget {
     this.isShowReply = true,
     this.isShowEmbed = true,
     this.isFullDate = false,
+    this.isFullContent = false,
     this.isContentSelectable = false,
     this.attachmentParent,
     this.backgroundColor,
@@ -256,6 +259,8 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
+  double _contentHeight = 0;
+
   @override
   Widget build(BuildContext context) {
     final List<int> attachments = item.body['attachments'] is List
@@ -327,11 +332,31 @@ class _PostItemState extends State<PostItem> {
                     _buildHeader(),
                     SizedContainer(
                       maxWidth: 640,
-                      child: MarkdownTextContent(
-                        content: item.body['content'],
-                        isSelectable: widget.isContentSelectable,
-                      ).paddingOnly(left: 12, right: 8),
+                      maxHeight: widget.isFullContent ? double.infinity : 320,
+                      child: _MeasureSize(
+                        onChange: (size) {
+                          _contentHeight = size.height;
+                        },
+                        child: MarkdownTextContent(
+                          content: item.body['content'],
+                          isSelectable: widget.isContentSelectable,
+                        ).paddingOnly(left: 12, right: 8),
+                      ),
                     ),
+                    if (_contentHeight >= 320 &&
+                        widget.isClickable &&
+                        !widget.isFullContent)
+                      InkWell(
+                        child: Text(
+                          'readMore'.tr,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onTap: () {
+                          openContainer();
+                        },
+                      ).paddingOnly(left: 12, top: 4),
                     if (widget.item.replyTo != null && widget.isShowEmbed)
                       _buildReply(context).paddingOnly(top: 4),
                     if (widget.item.repostTo != null && widget.isShowEmbed)
@@ -386,5 +411,48 @@ class _PostItemState extends State<PostItem> {
           widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
     );
+  }
+}
+
+typedef _OnWidgetSizeChange = void Function(Size size);
+
+class _MeasureSizeRenderObject extends RenderProxyBox {
+  Size? oldSize;
+  _OnWidgetSizeChange onChange;
+
+  _MeasureSizeRenderObject(this.onChange);
+
+  @override
+  void performLayout() {
+    super.performLayout();
+
+    Size newSize = child!.size;
+    if (oldSize == newSize) return;
+
+    oldSize = newSize;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onChange(newSize);
+    });
+  }
+}
+
+class _MeasureSize extends SingleChildRenderObjectWidget {
+  final _OnWidgetSizeChange onChange;
+
+  const _MeasureSize({
+    super.key,
+    required this.onChange,
+    required Widget super.child,
+  });
+
+  @override
+  RenderObject createRenderObject(BuildContext context) {
+    return _MeasureSizeRenderObject(onChange);
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, covariant _MeasureSizeRenderObject renderObject) {
+    renderObject.onChange = onChange;
   }
 }
