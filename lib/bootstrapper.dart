@@ -184,7 +184,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                 children: [
                   if (_isErrored && !_isDismissable && !_isBusy)
                     const Icon(Icons.cancel, size: 24),
-                  if (_isErrored && _isDismissable)
+                  if (_isErrored && _isDismissable && !_isBusy)
                     const Icon(Icons.warning, size: 24),
                   if ((_isErrored && _isDismissable && _isBusy) || _isBusy)
                     const SizedBox(
