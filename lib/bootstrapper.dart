@@ -163,24 +163,25 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
   @override
   Widget build(BuildContext context) {
     if (_isBusy || _isErrored) {
-      return Material(
-        color: Theme.of(context).colorScheme.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox(
-              height: 280,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(16)),
-                  child: Image.asset('assets/logo.png', width: 80, height: 80),
+      return GestureDetector(
+        child: Material(
+          color: Theme.of(context).colorScheme.surface,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                height: 280,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    child:
+                        Image.asset('assets/logo.png', width: 80, height: 80),
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              child: Column(
+              Column(
                 children: [
                   if (_isErrored && !_isDismissable && !_isBusy)
                     const Icon(Icons.cancel, size: 24),
@@ -215,6 +216,15 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                               color: _unFocusColor,
                             ),
                           ).paddingOnly(bottom: 4),
+                        if (!_isBusy && _isErrored && _isDismissable)
+                          Text(
+                            'bsDismissibleErrorHint'.tr,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: _unFocusColor,
+                            ),
+                          ).paddingOnly(bottom: 5),
                         Text(
                           '2024 © Solsynth LLC',
                           textAlign: TextAlign.center,
@@ -228,25 +238,25 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                   ),
                 ],
               ),
-              onTap: () {
-                if (_isBusy) return;
-                if (_isDismissable) {
-                  setState(() {
-                    _isBusy = false;
-                    _isErrored = false;
-                  });
-                } else {
-                  setState(() {
-                    _isBusy = true;
-                    _isErrored = false;
-                    _periodCursor = 0;
-                  });
-                  _runPeriods();
-                }
-              },
-            )
-          ],
+            ],
+          ),
         ),
+        onTap: () {
+          if (_isBusy) return;
+          if (_isDismissable) {
+            setState(() {
+              _isBusy = false;
+              _isErrored = false;
+            });
+          } else {
+            setState(() {
+              _isBusy = true;
+              _isErrored = false;
+              _periodCursor = 0;
+            });
+            _runPeriods();
+          }
+        },
       );
     }
 

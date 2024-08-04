@@ -306,6 +306,7 @@ const i18nSimplifiedChinese = {
   'bsEstablishingConn': '部署连接中',
   'bsPreparingData': '正在准备用户资料',
   'bsRegisteringPushNotify': '正在启用推送通知',
+  'bsDismissibleErrorHint': '点击任意地方忽略此错误',
   'postShareContent': '@content\n\n@username 在 Solar Network\n原帖地址：@link',
   'postShareSubject': '@username 在 Solar Network 上发布了一篇帖子',
   'themeColor': '全局主题色',

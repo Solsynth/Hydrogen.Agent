@@ -333,6 +333,7 @@ const i18nEnglish = {
   'bsEstablishingConn': 'Establishing Connection',
   'bsPreparingData': 'Preparing User Data',
   'bsRegisteringPushNotify': 'Enabling Push Notifications',
+  'bsDismissibleErrorHint': 'Click anywhere to ignore this error',
   'postShareContent':
       '@content\n\n@username on the Solar Network\nCheck it out: @link',
   'postShareSubject': '@username posted a post on the Solar Network',
