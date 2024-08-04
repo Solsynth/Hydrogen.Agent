@@ -112,14 +112,15 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       label: 'bsPreparingData',
       action: () async {
         final AuthProvider auth = Get.find();
-        if (auth.isAuthorized.isTrue) {
-          await Future.wait([
-            Get.find<RealmProvider>().refreshAvailableRealms(),
+        await Future.wait([
+          Get.find<StickerProvider>().refreshAvailableStickers(),
+          if (auth.isAuthorized.isTrue)
             Get.find<ChannelProvider>().refreshAvailableChannel(),
+          if (auth.isAuthorized.isTrue)
             Get.find<RelationshipProvider>().refreshRelativeList(),
-            Get.find<StickerProvider>().refreshAvailableStickers(),
-          ]);
-        }
+          if (auth.isAuthorized.isTrue)
+            Get.find<RealmProvider>().refreshAvailableRealms(),
+        ]);
       },
     ),
     (
