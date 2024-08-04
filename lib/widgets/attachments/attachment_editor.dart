@@ -385,7 +385,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                       icon: const Icon(Icons.warning),
                       onPressed: () {},
                     ),
-                  if (!element.isCompleted && element.error == null && canBeCrop)
+                  if (!element.isCompleted &&
+                      element.error == null &&
+                      canBeCrop)
                     Obx(
                       () => IconButton(
                         color: Colors.teal,
@@ -398,7 +400,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                               },
                       ),
                     ),
-                  if (!element.isCompleted && !element.isUploading && element.error == null)
+                  if (!element.isCompleted &&
+                      !element.isUploading &&
+                      element.error == null)
                     Obx(
                       () => IconButton(
                         color: Colors.green,
@@ -592,9 +596,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'attachmentAdd'.tr,
-                        style: Theme.of(context).textTheme.headlineSmall,
+                      Expanded(
+                        child: Text(
+                          'attachmentAdd'.tr,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Obx(() {

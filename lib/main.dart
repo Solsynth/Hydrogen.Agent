@@ -100,7 +100,7 @@ class SolianApp extends StatelessWidget {
           routeInformationProvider: AppRouter.instance.routeInformationProvider,
           backButtonDispatcher: AppRouter.instance.backButtonDispatcher,
           translations: SolianMessages(),
-          locale: Get.deviceLocale,
+          locale: const Locale('en', 'US'),
           fallbackLocale: const Locale('en', 'US'),
           onInit: () => _initializeProviders(context),
           builder: (context, child) {
