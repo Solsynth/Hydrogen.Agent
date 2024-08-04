@@ -128,7 +128,15 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.edit == null) _editorController.localRead();
+    if (widget.edit == null && widget.reply == null && widget.repost == null) {
+      _editorController.localRead();
+    }
+    if (widget.reply != null) {
+      _editorController.replyTo.value = widget.reply;
+    }
+    if (widget.repost != null) {
+      _editorController.repostTo.value = widget.repost;
+    }
     _editorController.contentController.addListener(() => setState(() {}));
     _syncWidget();
   }
@@ -219,10 +227,15 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 collapsedBackgroundColor:
                     Theme.of(context).colorScheme.surfaceContainer,
                 children: [
-                  PostItem(
-                    item: _replyTo!,
-                    isReactable: false,
-                  ).paddingOnly(bottom: 8),
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 280),
+                    child: SingleChildScrollView(
+                      child: PostItem(
+                        item: _replyTo!,
+                        isReactable: false,
+                      ).paddingOnly(bottom: 8),
+                    ),
+                  ),
                 ],
               ),
             if (_repostTo != null)
@@ -237,10 +250,15 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 collapsedBackgroundColor:
                     Theme.of(context).colorScheme.surfaceContainer,
                 children: [
-                  PostItem(
-                    item: _repostTo!,
-                    isReactable: false,
-                  ).paddingOnly(bottom: 8),
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 280),
+                    child: SingleChildScrollView(
+                      child: PostItem(
+                        item: _repostTo!,
+                        isReactable: false,
+                      ).paddingOnly(bottom: 8),
+                    ),
+                  ),
                 ],
               ),
             Expanded(
