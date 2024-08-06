@@ -503,7 +503,6 @@ class _MeasureSize extends SingleChildRenderObjectWidget {
   final _OnWidgetSizeChange onChange;
 
   const _MeasureSize({
-    super.key,
     required this.onChange,
     required Widget super.child,
   });

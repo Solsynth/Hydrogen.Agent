@@ -11,6 +11,7 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/stickers.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:badges/badges.dart' as badges;
@@ -55,8 +56,8 @@ class ChatMessageInput extends StatefulWidget {
 }
 
 class _ChatMessageInputState extends State<ChatMessageInput> {
-  TextEditingController _textController = TextEditingController();
-  FocusNode _focusNode = FocusNode();
+  final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   final List<int> _attachments = List.empty(growable: true);
 
@@ -241,6 +242,14 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       );
     }
 
+    if (suggestion.type == 'users') {
+      insertText = '${suggestion.content} ';
+      startText = replaceText.replaceFirstMapped(
+        RegExp(r'(?:\s|^)@([a-z0-9_+-]+)$'),
+        (Match m) => insertText,
+      );
+    }
+
     if (insertText.isNotEmpty && startText.isNotEmpty) {
       _textController.text = startText + afterText;
       _textController.selection = TextSelection(
@@ -311,13 +320,11 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                   controller: _textController,
                   focusNode: _focusNode,
                   hideOnSelect: false,
-                  debounceDuration: const Duration(milliseconds: 50),
+                  debounceDuration: const Duration(milliseconds: 500),
                   onSelected: (value) {
                     _insertSuggestion(value);
                   },
-                  itemBuilder: (context, item) {
-                    return _buildSuggestion(item);
-                  },
+                  itemBuilder: (context, item) => _buildSuggestion(item),
                   builder: (context, controller, focusNode) {
                     return TextField(
                       controller: _textController,
@@ -336,7 +343,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                           FocusManager.instance.primaryFocus?.unfocus(),
                     );
                   },
-                  suggestionsCallback: (search) {
+                  suggestionsCallback: (search) async {
                     final searchText = _textController.text
                         .substring(0, _textController.selection.baseOffset);
 
@@ -365,6 +372,33 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                                     ),
                               display: x.name,
                               content: x.textWarpedPlaceholder,
+                            ),
+                          )
+                          .toList();
+                    }
+
+                    final userMatch = RegExp(r'(?:\s|^)@([a-z0-9_+-]+)$')
+                        .firstMatch(searchText);
+                    if (userMatch != null) {
+                      final userSearch = userMatch[1]!.toLowerCase();
+                      final AuthProvider auth = Get.find();
+
+                      final client = auth.configureClient('auth');
+                      final resp = await client.get(
+                        '/users/search?probe=$userSearch',
+                      );
+
+                      final List<Account> result = resp.body
+                          .map((x) => Account.fromJson(x))
+                          .toList()
+                          .cast<Account>();
+                      return result
+                          .map(
+                            (x) => ChatMessageSuggestion(
+                              type: 'users',
+                              leading: AccountAvatar(content: x.avatar),
+                              display: x.nick,
+                              content: '@${x.name}',
                             ),
                           )
                           .toList();
