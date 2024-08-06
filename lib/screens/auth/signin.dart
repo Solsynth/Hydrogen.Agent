@@ -136,8 +136,10 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/logo.png', width: 64, height: 64)
-                  .paddingOnly(bottom: 4),
+              ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: Image.asset('assets/logo.png', width: 64, height: 64),
+              ).paddingOnly(bottom: 4),
               Text(
                 'signinGreeting'.tr,
                 style: const TextStyle(

@@ -70,8 +70,10 @@ class _SignUpPopupState extends State<SignUpPopup> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/logo.png', width: 64, height: 64)
-                  .paddingOnly(bottom: 4),
+              ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: Image.asset('assets/logo.png', width: 64, height: 64),
+              ).paddingOnly(bottom: 4),
               Text(
                 'signupGreeting'.tr,
                 style: const TextStyle(
