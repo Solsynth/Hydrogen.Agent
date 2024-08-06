@@ -24,6 +24,10 @@ class MarkdownTextContent extends StatelessWidget {
   });
 
   Widget _buildContent(BuildContext context) {
+    final emojiMatch = RegExp(r':([a-z0-9_+-]+):').allMatches(content);
+    final isOnlyEmoji =
+        content.replaceAll(RegExp(r':([a-z0-9_+-]+):'), '').trim().isEmpty;
+
     return Markdown(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -79,14 +83,24 @@ class MarkdownTextContent extends StatelessWidget {
       imageBuilder: (uri, title, alt) {
         var url = uri.toString();
         double? width, height;
+        BoxFit? fit;
         if (url.startsWith('solink://')) {
           final segments = url.replaceFirst('solink://', '').split('/');
           switch (segments[0]) {
             case 'stickers':
               final StickerProvider sticker = Get.find();
               url = sticker.aliasImageMapping[segments[1]]!;
-              width = 28;
-              height = 28;
+              if (emojiMatch.length <= 1 && isOnlyEmoji) {
+                width = 112;
+                height = 112;
+              } else if (emojiMatch.length <= 3 && isOnlyEmoji) {
+                width = 56;
+                height = 56;
+              } else {
+                width = 28;
+                height = 28;
+              }
+              fit = BoxFit.fill;
               break;
             case 'attachments':
               const radius = BorderRadius.all(Radius.circular(8));
@@ -105,8 +119,18 @@ class MarkdownTextContent extends StatelessWidget {
         }
 
         return PlatformInfo.canCacheImage
-            ? CachedNetworkImage(imageUrl: url, width: width, height: height)
-            : Image.network(url, width: width, height: height);
+            ? CachedNetworkImage(
+                imageUrl: url,
+                width: width,
+                height: height,
+                fit: fit,
+              )
+            : Image.network(
+                url,
+                width: width,
+                height: height,
+                fit: fit,
+              );
       },
     );
   }
