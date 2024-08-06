@@ -331,4 +331,6 @@ const i18nSimplifiedChinese = {
   'stickerUploaderName': '贴图名称',
   'stickerUploaderNameHint': '在贴图选择界面提供给用户的人类友好名称。',
   'readMore': '阅读更多',
+  'attachmentUnload': '附件未加载',
+  'attachmentUnloadCaption': '为了节省流量，本附件未自动加载，点一下来开始加载。',
 };

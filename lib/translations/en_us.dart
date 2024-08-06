@@ -363,4 +363,7 @@ const i18nEnglish = {
   'stickerUploaderNameHint':
       'A human-friendly name given to the user in the sticker selection interface.',
   'readMore': 'Read more',
+  'attachmentUnload': 'Not Loaded',
+  'attachmentUnloadCaption':
+      'In order to save traffic, this attachment is not loaded automatically. Click it to start loading.',
 };

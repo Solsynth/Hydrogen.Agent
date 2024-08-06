@@ -16,8 +16,9 @@ class SizedContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
+      child: LimitedBox(
+        maxWidth: maxWidth,
+        maxHeight: maxHeight,
         child: child,
       ),
     );
@@ -37,8 +38,8 @@ class CenteredContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
-        constraints: BoxConstraints(maxWidth: maxWidth),
+      child: LimitedBox(
+        maxWidth: maxWidth,
         child: child,
       ),
     );

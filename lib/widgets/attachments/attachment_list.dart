@@ -10,6 +10,7 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class AttachmentList extends StatefulWidget {
   final String parentId;
@@ -272,35 +273,33 @@ class AttachmentListEntry extends StatelessWidget {
                 ),
               ),
             if (item!.isMature && !showMature)
-              Center(
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 280),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.visibility_off,
-                        color: Colors.white,
-                        size: 32,
+              CenteredContainer(
+                maxWidth: 280,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.visibility_off,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    if (!isDense) const SizedBox(height: 8),
+                    if (!isDense)
+                      Text(
+                        'matureContent'.tr,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                      if (!isDense) const SizedBox(height: 8),
-                      if (!isDense)
-                        Text(
-                          'matureContent'.tr,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      if (!isDense)
-                        Text(
-                          'matureContentCaption'.tr,
-                          style: const TextStyle(color: Colors.white),
-                          textAlign: TextAlign.center,
-                        ),
-                    ],
-                  ),
+                    if (!isDense)
+                      Text(
+                        'matureContentCaption'.tr,
+                        style: const TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                  ],
                 ),
               ),
           ],

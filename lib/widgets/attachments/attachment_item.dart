@@ -7,6 +7,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AttachmentItem extends StatefulWidget {
@@ -213,8 +214,12 @@ class _AttachmentItemImage extends StatelessWidget {
 
 class _AttachmentItemVideo extends StatefulWidget {
   final Attachment item;
+  final bool autoload;
 
-  const _AttachmentItemVideo({required this.item});
+  const _AttachmentItemVideo({
+    required this.item,
+    this.autoload = false,
+  });
 
   @override
   State<_AttachmentItemVideo> createState() => _AttachmentItemVideoState();
@@ -226,21 +231,64 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
   );
   late final _controller = VideoController(_player);
 
+  bool _showContent = false;
+
+  void _startLoad() {
+    _player.open(
+      Media(ServiceFinder.buildUrl('files', '/attachments/${widget.item.id}')),
+      play: false,
+    );
+    setState(() => _showContent = true);
+  }
+
   @override
   void initState() {
     super.initState();
-    _player.open(
-      Media(
-        ServiceFinder.buildUrl('files', '/attachments/${widget.item.id}'),
-      ),
-      play: false,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
+    if (!_showContent) {
+      return GestureDetector(
+        child: AspectRatio(
+          aspectRatio: ratio,
+          child: CenteredContainer(
+            maxWidth: 280,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.not_started,
+                  color: Colors.white,
+                  size: 32,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'attachmentUnload'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  'attachmentUnloadCaption'.tr,
+                  style: const TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          _startLoad();
+        },
+      );
+    }
+
     return Video(
-      aspectRatio: widget.item.metadata?['ratio'] ?? 16 / 9,
+      aspectRatio: ratio,
       controller: _controller,
     );
   }
