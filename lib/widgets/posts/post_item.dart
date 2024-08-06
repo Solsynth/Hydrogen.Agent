@@ -335,10 +335,10 @@ class _PostItemState extends State<PostItem> {
             Row(
               children: [
                 Icon(
-                  Icons.attachment,
-                  size: 18,
+                  Icons.file_copy,
+                  size: 15,
                   color: _unFocusColor,
-                ).paddingOnly(right: 6),
+                ).paddingOnly(right: 5),
                 Text(
                   'attachmentHint'.trParams(
                     {'count': attachments.length.toString()},
@@ -440,7 +440,7 @@ class _PostItemState extends State<PostItem> {
             attachmentsId: attachments,
             isGrid: attachments.length > 1,
           ),
-          if (widget.isShowReply && widget.isReactable)
+          if (widget.isShowReply || widget.isReactable)
             PostQuickAction(
               isShowReply: widget.isShowReply,
               isReactable: widget.isReactable,

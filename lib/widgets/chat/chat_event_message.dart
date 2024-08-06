@@ -67,7 +67,9 @@ class ChatEventMessage extends StatelessWidget {
       left: isQuote ? 0 : 12,
       right: isQuote ? 0 : 12,
       top: body.quoteEvent == null ? 2 : 0,
-      bottom: hasAttachment && !isContentPreviewing ? 4 : (isHasMerged ? 2 : 0),
+      bottom: hasAttachment && !isContentPreviewing && !isQuote
+          ? 4
+          : (isHasMerged ? 2 : 0),
     );
   }
 }

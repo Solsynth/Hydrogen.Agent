@@ -50,10 +50,10 @@ class ChatEvent extends StatelessWidget {
       return Row(
         children: [
           Icon(
-            Icons.attachment,
-            size: 18,
+            Icons.file_copy,
+            size: 15,
             color: unFocusColor,
-          ).paddingOnly(right: 6),
+          ).paddingOnly(right: 5),
           Text(
             'attachmentHint'.trParams(
               {'count': attachments.length.toString()},
@@ -221,6 +221,8 @@ class ChatEvent extends StatelessWidget {
                     ],
                   ),
                   _buildContent().paddingOnly(left: 0.5),
+                  _buildAttachment(context, isMinimal: true)
+                      .paddingOnly(left: 0),
                 ],
               ),
             ),

@@ -208,6 +208,8 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       final body = EventMessageBody.fromJson(widget.edit!.body);
       _editTo = widget.edit!;
       _textController.text = body.text;
+      _attachments.addAll(
+          widget.edit!.body['attachments']?.cast<int>() ?? List.empty());
     }
     if (widget.reply != null) {
       _replyTo = widget.reply!;

@@ -31,7 +31,11 @@ class ChatEventMessageActionLog extends StatelessWidget {
       ).paddingOnly(
         left: isQuote ? 0 : (isMerged ? 64 : 12),
         top: 2,
-        bottom: isHasMerged ? 2 : 0,
+        bottom: isQuote
+            ? 0
+            : isHasMerged
+                ? 2
+                : 0,
       ),
     );
   }
