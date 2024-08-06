@@ -159,7 +159,16 @@ class _StickerScreenState extends State<StickerScreen> {
               builderDelegate: PagedChildBuilderDelegate(
                 itemBuilder: (BuildContext context, item, int index) {
                   return ExpansionTile(
-                    title: Text(item.name),
+                    title: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(item.name),
+                        const SizedBox(width: 6),
+                        Badge(
+                          label: Text('#${item.id}'),
+                        )
+                      ],
+                    ),
                     subtitle: Text(
                       item.description,
                       maxLines: 1,
