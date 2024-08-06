@@ -100,12 +100,12 @@ class MarkdownTextContent extends StatelessWidget {
                 width = 28;
                 height = 28;
               }
-              fit = BoxFit.fill;
+              fit = BoxFit.contain;
               break;
             case 'attachments':
               const radius = BorderRadius.all(Radius.circular(8));
               return LimitedBox(
-                maxHeight: 360,
+                maxHeight: MediaQuery.of(context).size.width,
                 child: ClipRRect(
                   borderRadius: radius,
                   child: AttachmentSelfContainedEntry(

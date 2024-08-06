@@ -237,7 +237,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     var insertText = '';
 
     if (suggestion.type == 'emotes') {
-      insertText = '${suggestion.content} ';
+      insertText = suggestion.content;
       startText = replaceText.replaceFirstMapped(
         RegExp(r':(?:([a-z0-9_+-]+)~)?([a-z0-9_+-]+)$'),
         (Match m) => insertText,
@@ -245,7 +245,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     }
 
     if (suggestion.type == 'users') {
-      insertText = '${suggestion.content} ';
+      insertText = suggestion.content;
       startText = replaceText.replaceFirstMapped(
         RegExp(r'(?:\s|^)@([a-z0-9_+-]+)$'),
         (Match m) => insertText,
