@@ -244,6 +244,7 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
   @override
   void initState() {
     super.initState();
+    _showContent = widget.autoload;
   }
 
   @override

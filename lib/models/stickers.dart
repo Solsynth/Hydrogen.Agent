@@ -1,4 +1,3 @@
-import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/services.dart';
