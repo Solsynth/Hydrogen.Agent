@@ -43,7 +43,11 @@ class ChatEventMessage extends StatelessWidget {
       );
     }
 
-    return MarkdownTextContent(content: body.text);
+    return MarkdownTextContent(
+      parentId: 'm${item.id}',
+      isSelectable: true,
+      content: body.text,
+    );
   }
 
   Widget _buildBody(BuildContext context) {

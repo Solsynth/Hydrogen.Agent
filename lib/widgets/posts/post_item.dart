@@ -295,6 +295,7 @@ class _PostItemState extends State<PostItem> {
                     setState(() => _contentHeight = size.height);
                   },
                   child: MarkdownTextContent(
+                    parentId: 'p${item.id}',
                     content: item.body['content'],
                     isSelectable: widget.isContentSelectable,
                   ).paddingOnly(
@@ -389,6 +390,7 @@ class _PostItemState extends State<PostItem> {
                               setState(() => _contentHeight = size.height);
                             },
                             child: MarkdownTextContent(
+                              parentId: 'p${item.id}',
                               content: item.body['content'],
                               isSelectable: widget.isContentSelectable,
                             ).paddingOnly(left: 12, right: 8),

@@ -322,3 +322,50 @@ class AttachmentListEntry extends StatelessWidget {
     );
   }
 }
+
+class AttachmentSelfContainedEntry extends StatefulWidget {
+  final int id;
+  final String parentId;
+  final bool isDense;
+
+  const AttachmentSelfContainedEntry({
+    super.key,
+    required this.id,
+    required this.parentId,
+    this.isDense = false,
+  });
+
+  @override
+  State<AttachmentSelfContainedEntry> createState() =>
+      _AttachmentSelfContainedEntryState();
+}
+
+class _AttachmentSelfContainedEntryState
+    extends State<AttachmentSelfContainedEntry> {
+  bool _showMature = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final AttachmentProvider attachments = Get.find();
+
+    return FutureBuilder(
+      future: attachments.getMetadata(widget.id),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Text('Loading...');
+        }
+
+        return AttachmentListEntry(
+          item: snapshot.data,
+          isDense: widget.isDense,
+          parentId: widget.parentId,
+          showMature: _showMature,
+          showBorder: true,
+          onReveal: (value) {
+            setState(() => _showMature = value);
+          },
+        );
+      },
+    );
+  }
+}
