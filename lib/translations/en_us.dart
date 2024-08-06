@@ -366,4 +366,8 @@ const i18nEnglish = {
   'attachmentUnload': 'Not Loaded',
   'attachmentUnloadCaption':
       'In order to save traffic, this attachment is not loaded automatically. Click it to start loading.',
+  'callStatusConnected': 'Connected',
+  'callStatusDisconnected': 'Disconnected',
+  'callStatusConnecting': 'Connecting',
+  'callStatusReconnected': 'Reconnecting',
 };
