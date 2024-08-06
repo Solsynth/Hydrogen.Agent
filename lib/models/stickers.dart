@@ -32,7 +32,7 @@ class Sticker {
     required this.account,
   });
 
-  String get textPlaceholder => '${pack?.prefix}$alias'.camelCase!;
+  String get textPlaceholder => '${pack?.prefix}$alias';
   String get textWarpedPlaceholder => ':$textPlaceholder:';
 
   String get imageUrl => ServiceFinder.buildUrl(

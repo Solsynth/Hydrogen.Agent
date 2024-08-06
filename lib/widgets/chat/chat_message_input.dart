@@ -239,7 +239,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     if (suggestion.type == 'emotes') {
       insertText = suggestion.content;
       startText = replaceText.replaceFirstMapped(
-        RegExp(r':(?:([a-z0-9_+-]+)~)?([a-z0-9_+-]+)$'),
+        RegExp(r':(?:([-\w]+)~)?([-\w]+)$'),
         (Match m) => insertText,
       );
     }
@@ -247,7 +247,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     if (suggestion.type == 'users') {
       insertText = suggestion.content;
       startText = replaceText.replaceFirstMapped(
-        RegExp(r'(?:\s|^)@([a-z0-9_+-]+)$'),
+        RegExp(r'(?:\s|^)@([-\w]+)$'),
         (Match m) => insertText,
       );
     }
@@ -349,15 +349,17 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                     final searchText = _textController.text
                         .substring(0, _textController.selection.baseOffset);
 
-                    final emojiMatch =
-                        RegExp(r':(?:([a-z0-9_+-]+)~)?([a-z0-9_+-]+)$')
-                            .firstMatch(searchText);
+                    final emojiMatch = RegExp(r':(?:([-\w]+)~)?([-\w]+)$')
+                        .firstMatch(searchText);
                     if (emojiMatch != null) {
                       final StickerProvider stickers = Get.find();
                       final emoteSearch = emojiMatch[2]!;
                       return stickers.availableStickers
-                          .where((x) =>
-                              x.textWarpedPlaceholder.contains(emoteSearch))
+                          .where(
+                            (x) => x.textWarpedPlaceholder
+                                .toUpperCase()
+                                .contains(emoteSearch.toUpperCase()),
+                          )
                           .map(
                             (x) => ChatMessageSuggestion(
                               type: 'emotes',
@@ -379,8 +381,8 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                           .toList();
                     }
 
-                    final userMatch = RegExp(r'(?:\s|^)@([a-z0-9_+-]+)$')
-                        .firstMatch(searchText);
+                    final userMatch =
+                        RegExp(r'(?:\s|^)@([-\w]+)$').firstMatch(searchText);
                     if (userMatch != null) {
                       final userSearch = userMatch[1]!.toLowerCase();
                       final AuthProvider auth = Get.find();

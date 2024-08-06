@@ -24,9 +24,9 @@ class MarkdownTextContent extends StatelessWidget {
   });
 
   Widget _buildContent(BuildContext context) {
-    final emojiMatch = RegExp(r':([a-z0-9_+-]+):').allMatches(content);
-    final isOnlyEmoji =
-        content.replaceAll(RegExp(r':([a-z0-9_+-]+):'), '').trim().isEmpty;
+    final emojiRegex = RegExp(r':([-\w]+):');
+    final emojiMatch = emojiRegex.allMatches(content);
+    final isOnlyEmoji = content.replaceAll(emojiRegex, '').trim().isEmpty;
 
     return Markdown(
       shrinkWrap: true,
@@ -89,7 +89,7 @@ class MarkdownTextContent extends StatelessWidget {
           switch (segments[0]) {
             case 'stickers':
               final StickerProvider sticker = Get.find();
-              url = sticker.aliasImageMapping[segments[1]]!;
+              url = sticker.aliasImageMapping[segments[1].toUpperCase()]!;
               if (emojiMatch.length <= 1 && isOnlyEmoji) {
                 width = 112;
                 height = 112;
@@ -161,12 +161,12 @@ class _UserNameCardInlineSyntax extends InlineSyntax {
 }
 
 class _CustomEmoteInlineSyntax extends InlineSyntax {
-  _CustomEmoteInlineSyntax() : super(r':([a-z0-9_+-]+):');
+  _CustomEmoteInlineSyntax() : super(r':([-\w]+):');
 
   @override
   bool onMatch(markdown.InlineParser parser, Match match) {
     final StickerProvider sticker = Get.find();
-    final alias = match[1]!;
+    final alias = match[1]!.toUpperCase();
     if (sticker.aliasImageMapping[alias] == null) {
       parser.advanceBy(1);
       return false;

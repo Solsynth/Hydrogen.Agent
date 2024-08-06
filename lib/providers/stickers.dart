@@ -8,6 +8,9 @@ class StickerProvider extends GetxController {
   final RxList<Sticker> availableStickers = RxList.empty(growable: true);
 
   Future<void> refreshAvailableStickers() async {
+    availableStickers.clear();
+    aliasImageMapping.clear();
+
     final client = ServiceFinder.configureClient('files');
     final resp = await client.get(
       '/stickers/manifest?take=100',
@@ -20,7 +23,7 @@ class StickerProvider extends GetxController {
       for (final pack in out) {
         for (final sticker in (pack.stickers ?? List<Sticker>.empty())) {
           sticker.pack = pack;
-          aliasImageMapping['${pack.prefix}${sticker.alias}'.camelCase!] =
+          aliasImageMapping[sticker.textPlaceholder.toUpperCase()] =
               sticker.imageUrl;
           availableStickers.add(sticker);
         }

@@ -70,7 +70,7 @@ class _StickerScreenState extends State<StickerScreen> {
     );
     return ListTile(
       title: Text(item.name),
-      subtitle: Text(':${'$prefix${item.alias}'.camelCase}:'),
+      subtitle: Text(item.textWarpedPlaceholder),
       contentPadding: const EdgeInsets.only(left: 16, right: 14),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -174,9 +174,10 @@ class _StickerScreenState extends State<StickerScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    children: item.stickers
-                            ?.map((x) => _buildEmoteEntry(x, item.prefix))
-                            .toList() ??
+                    children: item.stickers?.map((x) {
+                          x.pack = item;
+                          return _buildEmoteEntry(x, item.prefix);
+                        }).toList() ??
                         List.empty(),
                   );
                 },
