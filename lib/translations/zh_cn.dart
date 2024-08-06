@@ -333,4 +333,8 @@ const i18nSimplifiedChinese = {
   'readMore': '阅读更多',
   'attachmentUnload': '附件未加载',
   'attachmentUnloadCaption': '为了节省流量，本附件未自动加载，点一下来开始加载。',
+  'callStatusConnected': '已连接',
+  'callStatusDisconnected': '已断开',
+  'callStatusConnecting': '连接中',
+  'callStatusReconnected': '重连中',
 };

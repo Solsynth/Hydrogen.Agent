@@ -9,6 +9,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/chat/call/call_controls.dart';
 import 'package:solian/widgets/chat/call/call_participant.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit;
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
@@ -161,31 +162,30 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
             childAspectRatio: tileWidth / tileHeight,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
           ),
           itemCount: math.max(0, call.participantTracks.length),
           itemBuilder: (BuildContext context, int index) {
             final track = call.participantTracks[index];
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Card(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child: InteractiveParticipantWidget(
-                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                    participant: track,
-                    onTap: () {
-                      if (track.participant.sid !=
-                          call.focusTrack.value?.participant.sid) {
-                        call.changeFocusTrack(track);
-                      }
-                    },
-                  ),
+            return Card(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: InteractiveParticipantWidget(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  participant: track,
+                  onTap: () {
+                    if (track.participant.sid !=
+                        call.focusTrack.value?.participant.sid) {
+                      call.changeFocusTrack(track);
+                    }
+                  },
                 ),
               ),
             );
           },
         ),
-      );
+      ).paddingAll(8);
     });
   }
 
@@ -246,8 +246,77 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     width: MediaQuery.of(context).size.width,
                     height: 64,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Expanded(child: SizedBox()),
+                        Builder(builder: (context) {
+                          final call = Get.find<ChatCallProvider>();
+                          final connectionQuality =
+                              call.room.localParticipant?.connectionQuality ??
+                                  livekit.ConnectionQuality.unknown;
+                          return Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(call.room.serverRegion ?? 'unknown'),
+                                    const SizedBox(width: 6),
+                                    Text(call.room.serverVersion ?? 'unknown')
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      {
+                                        livekit.ConnectionState.disconnected:
+                                            'callStatusDisconnected'.tr,
+                                        livekit.ConnectionState.connected:
+                                            'callStatusConnected'.tr,
+                                        livekit.ConnectionState.connecting:
+                                            'callStatusConnecting'.tr,
+                                        livekit.ConnectionState.reconnecting:
+                                            'callStatusReconnecting'.tr,
+                                      }[call.room.connectionState]!,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    if (connectionQuality !=
+                                        livekit.ConnectionQuality.unknown)
+                                      Icon(
+                                        {
+                                          livekit.ConnectionQuality.excellent:
+                                              Icons.signal_cellular_alt,
+                                          livekit.ConnectionQuality.good:
+                                              Icons.signal_cellular_alt_2_bar,
+                                          livekit.ConnectionQuality.poor:
+                                              Icons.signal_cellular_alt_1_bar,
+                                        }[connectionQuality],
+                                        color: {
+                                          livekit.ConnectionQuality.excellent:
+                                              Colors.green,
+                                          livekit.ConnectionQuality.good:
+                                              Colors.orange,
+                                          livekit.ConnectionQuality.poor:
+                                              Colors.red,
+                                        }[connectionQuality],
+                                        size: 16,
+                                      )
+                                    else
+                                      const SizedBox(
+                                        width: 12,
+                                        height: 12,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      ).paddingAll(3),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
                         IconButton(
                           icon: _layoutMode == 0
                               ? const Icon(Icons.view_list)
@@ -257,7 +326,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                           },
                         ),
                       ],
-                    ).paddingSymmetric(horizontal: 10),
+                    ).paddingOnly(left: 20, right: 16),
                   ),
                 ),
                 Expanded(
