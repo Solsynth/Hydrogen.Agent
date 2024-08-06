@@ -5,7 +5,7 @@ import 'package:solian/services.dart';
 
 class StickerProvider extends GetxController {
   final RxMap<String, String> aliasImageMapping = RxMap();
-  final RxMap<String, List<Sticker>> availableStickers = RxMap();
+  final RxList<Sticker> availableStickers = RxList.empty(growable: true);
 
   Future<void> refreshAvailableStickers() async {
     final client = ServiceFinder.configureClient('files');
@@ -20,16 +20,9 @@ class StickerProvider extends GetxController {
       for (final pack in out) {
         for (final sticker in (pack.stickers ?? List<Sticker>.empty())) {
           sticker.pack = pack;
-          final imageUrl = ServiceFinder.buildUrl(
-            'files',
-            '/attachments/${sticker.attachmentId}',
-          );
           aliasImageMapping['${pack.prefix}${sticker.alias}'.camelCase!] =
-              imageUrl;
-          if (availableStickers[pack.prefix] == null) {
-            availableStickers[pack.prefix] = List.empty(growable: true);
-          }
-          availableStickers[pack.prefix]!.add(sticker);
+              sticker.imageUrl;
+          availableStickers.add(sticker);
         }
       }
     }

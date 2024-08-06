@@ -1,5 +1,7 @@
+import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
+import 'package:solian/services.dart';
 
 class Sticker {
   int id;
@@ -29,6 +31,14 @@ class Sticker {
     required this.accountId,
     required this.account,
   });
+
+  String get textPlaceholder => '${pack?.prefix}$alias'.camelCase!;
+  String get textWarpedPlaceholder => ':$textPlaceholder:';
+
+  String get imageUrl => ServiceFinder.buildUrl(
+        'files',
+        '/attachments/$attachmentId',
+      );
 
   factory Sticker.fromJson(Map<String, dynamic> json) => Sticker(
         id: json['id'],

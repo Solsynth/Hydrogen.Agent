@@ -1,16 +1,34 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/stickers.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:uuid/uuid.dart';
+
+class ChatMessageSuggestion {
+  final String type;
+  final Widget leading;
+  final String display;
+  final String content;
+
+  ChatMessageSuggestion({
+    required this.type,
+    required this.leading,
+    required this.display,
+    required this.content,
+  });
+}
 
 class ChatMessageInput extends StatefulWidget {
   final Event? edit;
@@ -37,8 +55,8 @@ class ChatMessageInput extends StatefulWidget {
 }
 
 class _ChatMessageInputState extends State<ChatMessageInput> {
-  final TextEditingController _textController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  TextEditingController _textController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
 
   final List<int> _attachments = List.empty(growable: true);
 
@@ -156,7 +174,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       widget.onSent(message);
     }
 
-    resetInput();
+    _resetInput();
 
     if (_editTo != null) {
       resp = await client.put(
@@ -175,7 +193,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     }
   }
 
-  void resetInput() {
+  void _resetInput() {
     if (widget.onReset != null) widget.onReset!();
     _editTo = null;
     _replyTo = null;
@@ -184,7 +202,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     setState(() {});
   }
 
-  void syncWidget() {
+  void _syncWidget() {
     if (widget.edit != null && widget.edit!.type.startsWith('messages')) {
       final body = EventMessageBody.fromJson(widget.edit!.body);
       _editTo = widget.edit!;
@@ -197,9 +215,44 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     setState(() {});
   }
 
+  Widget _buildSuggestion(ChatMessageSuggestion suggestion) {
+    return ListTile(
+      leading: suggestion.leading,
+      title: Text(suggestion.display),
+      subtitle: Text(suggestion.content),
+    );
+  }
+
+  void _insertSuggestion(ChatMessageSuggestion suggestion) {
+    final replaceText =
+        _textController.text.substring(0, _textController.selection.baseOffset);
+    var startText = '';
+    final afterText = replaceText == _textController.text
+        ? ''
+        : _textController.text
+            .substring(_textController.selection.baseOffset + 1);
+    var insertText = '';
+
+    if (suggestion.type == 'emotes') {
+      insertText = '${suggestion.content} ';
+      startText = replaceText.replaceFirstMapped(
+        RegExp(r':(?:([a-z0-9_+-]+)~)?([a-z0-9_+-]+)$'),
+        (Match m) => insertText,
+      );
+    }
+
+    if (insertText.isNotEmpty && startText.isNotEmpty) {
+      _textController.text = startText + afterText;
+      _textController.selection = TextSelection(
+        baseOffset: startText.length,
+        extentOffset: startText.length,
+      );
+    }
+  }
+
   @override
   void didUpdateWidget(covariant ChatMessageInput oldWidget) {
-    syncWidget();
+    _syncWidget();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -207,7 +260,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   Widget build(BuildContext context) {
     final notifyBannerActions = [
       TextButton(
-        onPressed: resetInput,
+        onPressed: _resetInput,
         child: Text('cancel'.tr),
       )
     ];
@@ -251,21 +304,74 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
-                child: TextField(
+                child: TypeAheadField<ChatMessageSuggestion>(
+                  direction: VerticalDirection.up,
+                  hideOnEmpty: true,
+                  hideOnLoading: true,
                   controller: _textController,
                   focusNode: _focusNode,
-                  maxLines: null,
-                  autocorrect: true,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration.collapsed(
-                    hintText: widget.placeholder ??
-                        'messageInputPlaceholder'.trParams(
-                          {'channel': '#${widget.channel.alias}'},
-                        ),
-                  ),
-                  onSubmitted: (_) => _sendMessage(),
-                  onTapOutside: (_) =>
-                      FocusManager.instance.primaryFocus?.unfocus(),
+                  hideOnSelect: false,
+                  debounceDuration: const Duration(milliseconds: 50),
+                  onSelected: (value) {
+                    _insertSuggestion(value);
+                  },
+                  itemBuilder: (context, item) {
+                    return _buildSuggestion(item);
+                  },
+                  builder: (context, controller, focusNode) {
+                    return TextField(
+                      controller: _textController,
+                      focusNode: _focusNode,
+                      maxLines: null,
+                      autocorrect: true,
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration.collapsed(
+                        hintText: widget.placeholder ??
+                            'messageInputPlaceholder'.trParams({
+                              'channel': '#${widget.channel.alias}',
+                            }),
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    );
+                  },
+                  suggestionsCallback: (search) {
+                    final searchText = _textController.text
+                        .substring(0, _textController.selection.baseOffset);
+
+                    final emojiMatch =
+                        RegExp(r':(?:([a-z0-9_+-]+)~)?([a-z0-9_+-]+)$')
+                            .firstMatch(searchText);
+                    if (emojiMatch != null) {
+                      final StickerProvider stickers = Get.find();
+                      final emoteSearch = emojiMatch[2]!;
+                      return stickers.availableStickers
+                          .where((x) =>
+                              x.textWarpedPlaceholder.contains(emoteSearch))
+                          .map(
+                            (x) => ChatMessageSuggestion(
+                              type: 'emotes',
+                              leading: PlatformInfo.canCacheImage
+                                  ? CachedNetworkImage(
+                                      imageUrl: x.imageUrl,
+                                      width: 28,
+                                      height: 28,
+                                    )
+                                  : Image.network(
+                                      x.imageUrl,
+                                      width: 28,
+                                      height: 28,
+                                    ),
+                              display: x.name,
+                              content: x.textWarpedPlaceholder,
+                            ),
+                          )
+                          .toList();
+                    }
+
+                    return null;
+                  },
                 ),
               ),
               IconButton(
