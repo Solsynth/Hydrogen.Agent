@@ -436,6 +436,7 @@ class _PostItemState extends State<PostItem> {
             left: 16,
           ),
           AttachmentList(
+            flatMaxHeight: MediaQuery.of(context).size.width,
             parentId: widget.item.id.toString(),
             attachmentsId: attachments,
             isGrid: attachments.length > 1,
