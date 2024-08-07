@@ -88,20 +88,40 @@ class MarkdownTextContent extends StatelessWidget {
           final segments = url.replaceFirst('solink://', '').split('/');
           switch (segments[0]) {
             case 'stickers':
+              double radius = 8;
               final StickerProvider sticker = Get.find();
               url = sticker.aliasImageMapping[segments[1].toUpperCase()]!;
               if (emojiMatch.length <= 1 && isOnlyEmoji) {
-                width = 112;
-                height = 112;
+                width = 128;
+                height = 128;
               } else if (emojiMatch.length <= 3 && isOnlyEmoji) {
-                width = 56;
-                height = 56;
+                width = 32;
+                height = 32;
               } else {
-                width = 28;
-                height = 28;
+                radius = 4;
+                width = 16;
+                height = 16;
               }
               fit = BoxFit.contain;
-              break;
+              return ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(radius)),
+                child: Container(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  child: PlatformInfo.canCacheImage
+                      ? CachedNetworkImage(
+                          imageUrl: url,
+                          width: width,
+                          height: height,
+                          fit: fit,
+                        )
+                      : Image.network(
+                          url,
+                          width: width,
+                          height: height,
+                          fit: fit,
+                        ),
+                ),
+              ).paddingSymmetric(vertical: 4);
             case 'attachments':
               const radius = BorderRadius.all(Radius.circular(8));
               return LimitedBox(
