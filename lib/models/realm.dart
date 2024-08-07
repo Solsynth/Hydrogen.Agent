@@ -52,6 +52,17 @@ class Realm {
         'is_community': isCommunity,
         'account_id': accountId,
       };
+
+  @override
+  bool operator ==(Object other) {
+    if (other is Realm) {
+      return other.id == id;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => id;
 }
 
 class RealmMember {
