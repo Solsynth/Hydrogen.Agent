@@ -129,6 +129,8 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
     client = auth.configureClient('messaging');
 
+    if (_textController.text.trim().isEmpty && _attachments.isEmpty) return;
+
     const uuid = Uuid();
     final payload = {
       'uuid': uuid.v4(),
