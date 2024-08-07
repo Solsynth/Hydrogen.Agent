@@ -23,16 +23,19 @@ class ChatEventMessage extends StatelessWidget {
     final body = EventMessageBody.fromJson(item.body);
     final hasAttachment = body.attachments?.isNotEmpty ?? false;
 
-    if (body.text.isEmpty && hasAttachment) {
+    if (body.text.isEmpty &&
+        hasAttachment &&
+        !isContentPreviewing &&
+        !isQuote) {
       final unFocusColor =
           Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
       return Row(
         children: [
           Icon(
-            Icons.attachment,
-            size: 18,
+            Icons.file_copy,
+            size: 15,
             color: unFocusColor,
-          ).paddingOnly(right: 6),
+          ).paddingOnly(right: 5),
           Text(
             'attachmentHint'.trParams(
               {'count': body.attachments?.length.toString() ?? 0.toString()},
