@@ -134,7 +134,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       'uuid': uuid.v4(),
       'type': _editTo == null ? 'messages.new' : 'messages.edit',
       'body': {
-        'text': _textController.text,
+        'text': _textController.text.trim(),
         'algorithm': 'plain',
         'attachments': List.from(_attachments),
         'related_users': [
