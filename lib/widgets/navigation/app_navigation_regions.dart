@@ -68,6 +68,7 @@ class AppNavigationRegions extends StatelessWidget {
                 .map((element) {
               return ExpansionTile(
                 minTileHeight: 0,
+                initiallyExpanded: true,
                 tilePadding: const EdgeInsets.only(left: 20, right: 24),
                 backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
                 collapsedBackgroundColor:
@@ -80,6 +81,7 @@ class AppNavigationRegions extends StatelessWidget {
               );
             }).toList(),
           ),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 8)),
         ],
       );
     });

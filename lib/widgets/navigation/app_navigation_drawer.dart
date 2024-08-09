@@ -40,15 +40,6 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     rootScaffoldKey.currentState!.closeDrawer();
   }
 
-  Widget _buildSettingButton() {
-    return IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: () {
-          AppRouter.instance.pushNamed('settings');
-          _closeDrawer();
-        });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -72,7 +63,6 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                   leading: const Icon(Icons.account_circle),
                   title: Text('guest'.tr),
                   subtitle: Text('unsignedIn'.tr),
-                  trailing: _buildSettingButton(),
                   onTap: () {
                     AppRouter.instance.goNamed('account');
                     _closeDrawer();
@@ -137,7 +127,6 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                     ),
                   );
                 }),
-                trailing: _buildSettingButton(),
                 onTap: () {
                   AppRouter.instance.goNamed('account');
                   _closeDrawer();
@@ -182,6 +171,23 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                 },
               ),
             ),
+            const Divider(thickness: 0.3, height: 1),
+            Column(
+              children: [
+                ListTile(
+                  minTileHeight: 0,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  leading: const Icon(Icons.settings, size: 20).paddingAll(2),
+                  title: Text('settings'.tr),
+                  onTap: () {
+                    AppRouter.instance.pushNamed('settings');
+                    _closeDrawer();
+                  },
+                ),
+              ],
+            ).paddingOnly(top: 8)
           ],
         ),
       ),
