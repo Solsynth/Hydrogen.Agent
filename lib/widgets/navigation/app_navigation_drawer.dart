@@ -81,7 +81,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               }
 
               return ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                contentPadding: const EdgeInsets.only(left: 20, right: 20),
                 title: Text(
                   auth.userProfile.value!['nick'],
                   maxLines: 1,
@@ -154,7 +154,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                   });
                 },
               );
-            }).paddingOnly(top: 8),
+            }).paddingSymmetric(vertical: 8),
             const Divider(thickness: 0.3, height: 1),
             Column(
               children: AppNavigation.destinations
@@ -163,7 +163,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                       ),
-                      leading: e.icon,
+                      leading: Icon(e.icon, size: 20).paddingAll(2),
                       title: Text(e.label),
                       enabled: true,
                       onTap: () {
