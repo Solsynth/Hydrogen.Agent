@@ -159,8 +159,9 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         }
         var track = await LocalVideoTrack.createScreenShareTrack(
           ScreenShareCaptureOptions(
+            captureScreenAudio: true,
             sourceId: source.id,
-            maxFrameRate: 15.0,
+            maxFrameRate: 30.0,
           ),
         );
         await _participant.publishVideoTrack(track);
@@ -174,6 +175,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
       var track = await LocalVideoTrack.createScreenShareTrack(
         const ScreenShareCaptureOptions(
           useiOSBroadcastExtension: true,
+          captureScreenAudio: true,
           maxFrameRate: 30.0,
         ),
       );
