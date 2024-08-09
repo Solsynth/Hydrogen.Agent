@@ -260,10 +260,17 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
             ),
             if (_isOutOfSyncSince != null)
               ListTile(
+                contentPadding: const EdgeInsets.only(left: 16, right: 8),
                 tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
                 leading: const Icon(Icons.history_toggle_off),
                 title: Text('messageOutOfSync'.tr),
                 subtitle: Text('messageOutOfSyncCaption'.tr),
+                trailing: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    setState(() => _isOutOfSyncSince = null);
+                  },
+                ),
                 onTap: _isBusy
                     ? null
                     : () {
