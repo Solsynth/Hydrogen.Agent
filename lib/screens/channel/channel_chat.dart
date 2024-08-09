@@ -20,7 +20,6 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/channel/channel_call_indicator.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
-import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:solian/widgets/chat/chat_event_list.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
 import 'package:solian/widgets/current_state_action.dart';
@@ -39,7 +38,10 @@ class ChannelChatScreen extends StatefulWidget {
   State<ChannelChatScreen> createState() => _ChannelChatScreenState();
 }
 
-class _ChannelChatScreenState extends State<ChannelChatScreen> {
+class _ChannelChatScreenState extends State<ChannelChatScreen>
+    with WidgetsBindingObserver {
+  DateTime? _isOutOfSyncSince;
+
   bool _isBusy = false;
   int? _accountId;
 
@@ -123,20 +125,38 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
     });
   }
 
+  void _keepUpdateWithServer() {
+    _getOngoingCall();
+    _chatController.getEvents(_channel!, widget.realm);
+    setState(() => _isOutOfSyncSince = null);
+  }
+
   Event? _messageToReplying;
   Event? _messageToEditing;
 
-  Widget buildHistoryBody(Event item, {bool isMerged = false}) {
-    return ChatEvent(
-      key: Key('m${item.uuid}'),
-      item: item,
-      isMerged: isMerged,
-      chatController: _chatController,
-    );
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (_isOutOfSyncSince == null) break;
+        if (DateTime.now().difference(_isOutOfSyncSince!).inSeconds < 60) break;
+        _keepUpdateWithServer();
+        break;
+      case AppLifecycleState.paused:
+        if (mounted) {
+          setState(() => _isOutOfSyncSince = DateTime.now());
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   @override
   void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     _accountId = Get.find<AuthProvider>().userProfile.value!['id'];
 
     _chatController = ChatEventController();
@@ -147,21 +167,10 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
       _chatController.getEvents(_channel!, widget.realm);
       _listenMessages();
     });
-
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isBusy || _channel == null) {
-      return Material(
-        color: Theme.of(context).colorScheme.surface,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     String title = _channel?.name ?? 'loading'.tr;
     String? placeholder;
 
@@ -185,7 +194,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
         actions: [
           const BackgroundStateWidget(),
           Builder(builder: (context) {
-            if (_isBusy) return const SizedBox();
+            if (_isBusy || _channel == null) return const SizedBox();
+
             return ChatCallButton(
               realm: _channel!.realm,
               channel: _channel!,
@@ -195,6 +205,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
+              if (_channel == null) return;
+
               AppRouter.instance
                   .pushNamed(
                 'channelDetail',
@@ -219,66 +231,87 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          if (_ongoingCall != null)
-            ChannelCallIndicator(
-              channel: _channel!,
-              ongoingCall: _ongoingCall!,
+      body: Builder(builder: (context) {
+        if (_isBusy || _channel == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        return Column(
+          children: [
+            if (_ongoingCall != null)
+              ChannelCallIndicator(
+                channel: _channel!,
+                ongoingCall: _ongoingCall!,
+              ),
+            Expanded(
+              child: ChatEventList(
+                scope: widget.realm,
+                channel: _channel!,
+                chatController: _chatController,
+                onEdit: (item) {
+                  setState(() => _messageToEditing = item);
+                },
+                onReply: (item) {
+                  setState(() => _messageToReplying = item);
+                },
+              ),
             ),
-          Expanded(
-            child: ChatEventList(
-              scope: widget.realm,
-              channel: _channel!,
-              chatController: _chatController,
-              onEdit: (item) {
-                setState(() => _messageToEditing = item);
-              },
-              onReply: (item) {
-                setState(() => _messageToReplying = item);
-              },
-            ),
-          ),
-          Obx(() {
-            if (_chatController.isLoading.isTrue) {
-              return const LinearProgressIndicator().animate().slideY();
-            } else {
-              return const SizedBox();
-            }
-          }),
-          ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-              child: SafeArea(
-                child: ChatMessageInput(
-                  edit: _messageToEditing,
-                  reply: _messageToReplying,
-                  realm: widget.realm,
-                  placeholder: placeholder,
-                  channel: _channel!,
-                  onSent: (Event item) {
-                    setState(() {
-                      _chatController.addPendingEvent(item);
-                    });
-                  },
-                  onReset: () {
-                    setState(() {
-                      _messageToReplying = null;
-                      _messageToEditing = null;
-                    });
-                  },
+            if (_isOutOfSyncSince != null)
+              ListTile(
+                tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                leading: const Icon(Icons.history_toggle_off),
+                title: Text('messageOutOfSync'.tr),
+                subtitle: Text('messageOutOfSyncCaption'.tr),
+                onTap: _isBusy
+                    ? null
+                    : () {
+                        _keepUpdateWithServer();
+                      },
+              ),
+            Obx(() {
+              if (_chatController.isLoading.isTrue) {
+                return const LinearProgressIndicator().animate().slideY();
+              } else {
+                return const SizedBox();
+              }
+            }),
+            ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: SafeArea(
+                  child: ChatMessageInput(
+                    edit: _messageToEditing,
+                    reply: _messageToReplying,
+                    realm: widget.realm,
+                    placeholder: placeholder,
+                    channel: _channel!,
+                    onSent: (Event item) {
+                      setState(() {
+                        _chatController.addPendingEvent(item);
+                      });
+                    },
+                    onReset: () {
+                      setState(() {
+                        _messageToReplying = null;
+                        _messageToEditing = null;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
     );
   }
 
   @override
   void dispose() {
     _subscription?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 }

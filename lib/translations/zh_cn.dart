@@ -337,4 +337,6 @@ const i18nSimplifiedChinese = {
   'callStatusDisconnected': '已断开',
   'callStatusConnecting': '连接中',
   'callStatusReconnected': '重连中',
+  'messageOutOfSync': '消息可能与服务器脱节',
+  'messageOutOfSyncCaption': '由于 App 进入后台，消息列表可能与服务器存在时差，点击刷新。',
 };

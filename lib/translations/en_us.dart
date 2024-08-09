@@ -370,4 +370,7 @@ const i18nEnglish = {
   'callStatusDisconnected': 'Disconnected',
   'callStatusConnecting': 'Connecting',
   'callStatusReconnected': 'Reconnecting',
+  'messageOutOfSync': 'May Out of Sync with Server',
+  'messageOutOfSyncCaption':
+      'Since the App has entered the background, there may be a time difference between the message list and the server. Click to Refresh.',
 };
