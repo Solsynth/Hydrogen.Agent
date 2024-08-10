@@ -43,7 +43,7 @@ class _PostActionState extends State<PostAction> {
     final box = context.findRenderObject() as RenderBox?;
     if ((PlatformInfo.isAndroid || PlatformInfo.isIOS) && !noUri) {
       await Share.shareUri(
-        Uri.parse('https://sn.solsynth.dev/posts/view/${widget.item.id}'),
+        Uri.parse('https://solsynth.dev/posts/${widget.item.id}'),
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
     } else {
@@ -57,7 +57,7 @@ class _PostActionState extends State<PostAction> {
           'username': widget.item.author.nick,
           'content':
               '${extraContent.join('\n')}${isExtraNotEmpty ? '\n\n' : ''}${widget.item.body['content'] ?? 'no content'}',
-          'link': 'https://sn.solsynth.dev/posts/view/${widget.item.id}',
+          'link': 'https://solsynth.dev/posts/${widget.item.id}',
         }),
         subject: 'postShareSubject'.trParams({
           'username': widget.item.author.nick,
