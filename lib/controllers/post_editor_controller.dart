@@ -208,6 +208,7 @@ class PostEditorController extends GetxController {
     tags.refresh();
     attachments.value = value.body['attachments']?.cast<int>() ?? List.empty();
     attachments.refresh();
+    thumbnail.value = value.body['thumbnail'];
 
     contentLength.value = contentController.text.length;
   }
