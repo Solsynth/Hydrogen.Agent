@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
@@ -91,6 +92,18 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Text('about'.tr),
                 onPressed: () {
                   AppRouter.instance.pushNamed('about');
+                },
+              ),
+              TextButton(
+                style: const ButtonStyle(
+                  visualDensity: VisualDensity(horizontal: -4, vertical: -4),
+                ),
+                child: Text('messageHistoryWipe'.tr),
+                onPressed: () {
+                  final chatHistory = ChatEventController();
+                  chatHistory.initialize().then((_) async {
+                    await chatHistory.database.localEvents.wipeLocalEvents();
+                  });
                 },
               ),
             ],

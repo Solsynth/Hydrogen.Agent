@@ -339,4 +339,5 @@ const i18nSimplifiedChinese = {
   'callStatusReconnected': '重连中',
   'messageOutOfSync': '消息可能与服务器脱节',
   'messageOutOfSyncCaption': '由于 App 进入后台，消息列表可能与服务器存在时差，点击刷新。',
+  'messageHistoryWipe': '清除消息记录',
 };

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account_status.dart';
@@ -54,6 +56,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
       backgroundColor:
           SolianTheme.isLargeScreen(context) ? Colors.transparent : null,
       child: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             Obx(() {
@@ -187,7 +190,10 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                   },
                 ),
               ],
-            ).paddingOnly(top: 8)
+            ).paddingOnly(
+              top: 8,
+              bottom: math.max(8, MediaQuery.of(context).padding.bottom),
+            ),
           ],
         ),
       ),
