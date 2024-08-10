@@ -119,6 +119,9 @@ const i18nEnglish = {
   'postVisibleUsers': 'Visible users',
   'postInvisibleUsers': 'Invisible users',
   'postOverview': 'Overview',
+  'postThumbnail': 'Thumbnail',
+  'postThumbnailAttachmentNew': 'Upload thumbnail',
+  'postThumbnailAttachment': 'Attachment serial number',
   'postPinned': 'Pinned',
   'postListNews': 'News',
   'postListShuffle': 'Random',
@@ -351,7 +354,7 @@ const i18nEnglish = {
   'attachmentSaved': 'Attachment saved to your system album.',
   'cropImage': 'Crop Image',
   'stickerUploader': 'Upload sticker',
-  'stickerUploaderAttachmentNew': 'Upload new attachment',
+  'stickerUploaderAttachmentNew': 'Upload sticker',
   'stickerUploaderAttachment': 'Attachment serial number',
   'stickerUploaderPack': 'Sticker pack serial number',
   'stickerUploaderPackHint':

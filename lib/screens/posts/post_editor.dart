@@ -457,6 +457,23 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                           icon: Obx(() {
                             return badges.Badge(
                               showBadge:
+                                  _editorController.thumbnail.value != null,
+                              position: badges.BadgePosition.topEnd(
+                                top: -4,
+                                end: -6,
+                              ),
+                              child: const Icon(Icons.preview),
+                            );
+                          }),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () {
+                            _editorController.editThumbnail(context);
+                          },
+                        ),
+                        IconButton(
+                          icon: Obx(() {
+                            return badges.Badge(
+                              showBadge:
                                   _editorController.publishedAt.value != null ||
                                       _editorController.publishedUntil.value !=
                                           null,
@@ -475,14 +492,15 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                         MarkdownToolbar(
                           hideImage: true,
                           useIncludedTextField: false,
-                          backgroundColor: Colors.transparent,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surface,
                           iconColor: Theme.of(context).colorScheme.onSurface,
                           controller: _editorController.contentController,
                           focusNode: _contentFocusNode,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
                           width: 40,
-                        ).paddingSymmetric(horizontal: 4),
+                        ).paddingSymmetric(horizontal: 2),
                       ],
                     ).paddingSymmetric(horizontal: 6, vertical: 8),
                   ),

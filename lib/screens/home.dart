@@ -208,7 +208,12 @@ class PostCreatePopup extends StatelessWidget {
                             children: [
                               x.icon,
                               const SizedBox(height: 8),
-                              Text(x.label),
+                              Expanded(
+                                child: Text(
+                                  x.label,
+                                  overflow: TextOverflow.fade,
+                                ),
+                              ),
                             ],
                           ).paddingAll(18),
                         ),

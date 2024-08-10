@@ -10,6 +10,7 @@ import 'package:solian/widgets/posts/editor/post_editor_categories_tags.dart';
 import 'package:solian/widgets/posts/editor/post_editor_date.dart';
 import 'package:solian/widgets/posts/editor/post_editor_overview.dart';
 import 'package:solian/widgets/posts/editor/post_editor_publish_zone.dart';
+import 'package:solian/widgets/posts/editor/post_editor_thumbnail.dart';
 import 'package:solian/widgets/posts/editor/post_editor_visibility.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +32,7 @@ class PostEditorController extends GetxController {
   Rx<DateTime?> publishedUntil = Rx(null);
   RxList<int> attachments = RxList<int>.empty(growable: true);
   RxList<String> tags = RxList<String>.empty(growable: true);
+  Rx<int?> thumbnail = Rx(null);
 
   RxList<int> visibleUsers = RxList.empty(growable: true);
   RxList<int> invisibleUsers = RxList.empty(growable: true);
@@ -125,6 +127,15 @@ class PostEditorController extends GetxController {
     );
   }
 
+  Future<void> editThumbnail(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => PostEditorThumbnailDialog(
+        controller: this,
+      ),
+    );
+  }
+
   void toggleDraftMode() {
     isDraft.value = !isDraft.value;
   }
@@ -165,6 +176,7 @@ class PostEditorController extends GetxController {
     visibleUsers.clear();
     invisibleUsers.clear();
     visibility.value = 0;
+    thumbnail.value = 0;
     publishedAt.value = null;
     publishedUntil.value = null;
     isDraft.value = false;
@@ -246,6 +258,7 @@ class PostEditorController extends GetxController {
       'title': title,
       'description': description,
       'content': contentController.text,
+      'thumbnail': thumbnail.value,
       'tags': tags.map((x) => {'alias': x}).toList(),
       'attachments': attachments,
       'visible_users': visibleUsers,
@@ -269,6 +282,7 @@ class PostEditorController extends GetxController {
     contentController.text = value['content'] ?? '';
     attachments.value = value['attachments'].cast<int>() ?? List.empty();
     attachments.refresh();
+    thumbnail.value = value['thumbnail'];
     visibility.value = value['visibility'];
     isDraft.value = value['is_draft'];
     if (value['visible_users'] != null) {
@@ -308,7 +322,8 @@ class PostEditorController extends GetxController {
       descriptionController.text.isNotEmpty,
       contentController.text.isNotEmpty,
       attachments.isNotEmpty,
-      tags.isNotEmpty
+      tags.isNotEmpty,
+      thumbnail.value != null,
     ].any((x) => x);
   }
 
