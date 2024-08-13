@@ -79,8 +79,8 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
                 onPressed: () {
                   const redirect = 'solink://auth?status=done';
                   launchUrlString(
-                    ServiceFinder.buildUrl('passport',
-                        '/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}'),
+                    ServiceFinder.buildUrl('capital',
+                        '/auth/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}'),
                     mode: LaunchMode.inAppWebView,
                   );
                   Navigator.pop(context);

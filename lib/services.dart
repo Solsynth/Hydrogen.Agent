@@ -5,15 +5,15 @@ abstract class ServiceFinder {
 
   static const String dealerUrl =
       devFlag ? 'http://localhost:8442' : 'https://api.sn.solsynth.dev';
-  static const String passportUrl =
-      devFlag ? 'http://localhost:8444' : 'https://id.solsynth.dev';
+  static const String capitalUrl =
+      devFlag ? 'http://localhost:8444' : 'https://solsynth.dev';
 
   static String buildUrl(String serviceName, String? append) {
     append ??= '';
     if (serviceName == 'dealer') {
       return '$dealerUrl$append';
-    } else if (serviceName == 'passport') {
-      return '$passportUrl$append';
+    } else if (serviceName == 'capital') {
+      return '$capitalUrl$append';
     }
     return '$dealerUrl/cgi/$serviceName$append';
   }

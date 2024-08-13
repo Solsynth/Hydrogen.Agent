@@ -176,7 +176,7 @@ class PostEditorController extends GetxController {
     visibleUsers.clear();
     invisibleUsers.clear();
     visibility.value = 0;
-    thumbnail.value = 0;
+    thumbnail.value = null;
     publishedAt.value = null;
     publishedUntil.value = null;
     isDraft.value = false;
