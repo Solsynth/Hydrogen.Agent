@@ -14,6 +14,7 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -90,6 +91,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       context.showErrorDialog(resp.bodyString);
     } else {
       _editorController.localClear();
+      _editorController.currentClear();
       AppRouter.instance.pop(resp.body);
     }
 
@@ -254,30 +256,51 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 ],
               ),
             Expanded(
-              child: ListView(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_isBusy)
-                    const LinearProgressIndicator().animate().scaleX(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: TextField(
-                      maxLines: null,
-                      autofocus: true,
-                      autocorrect: true,
-                      keyboardType: TextInputType.multiline,
-                      controller: _editorController.contentController,
-                      focusNode: _contentFocusNode,
-                      decoration: InputDecoration.collapsed(
-                        hintText: 'postContentPlaceholder'.tr,
-                      ),
-                      onTapOutside: (_) =>
-                          FocusManager.instance.primaryFocus?.unfocus(),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        if (_isBusy)
+                          const LinearProgressIndicator().animate().scaleX(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: TextField(
+                            maxLines: null,
+                            autofocus: true,
+                            autocorrect: true,
+                            keyboardType: TextInputType.multiline,
+                            controller: _editorController.contentController,
+                            focusNode: _contentFocusNode,
+                            decoration: InputDecoration.collapsed(
+                              hintText: 'postContentPlaceholder'.tr,
+                            ),
+                            onTapOutside: (_) =>
+                                FocusManager.instance.primaryFocus?.unfocus(),
+                          ),
+                        ),
+                        const SizedBox(height: 120)
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 120)
+                  if (SolianTheme.isLargeScreen(context))
+                    const VerticalDivider(width: 0.3, thickness: 0.3)
+                        .paddingSymmetric(
+                      horizontal: 8,
+                    ),
+                  if (SolianTheme.isLargeScreen(context))
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: MarkdownTextContent(
+                          content: _editorController.contentController.text,
+                          parentId: 'post-editor-preview',
+                        ).paddingOnly(top: 8),
+                      ),
+                    ),
                 ],
               ),
             ),
