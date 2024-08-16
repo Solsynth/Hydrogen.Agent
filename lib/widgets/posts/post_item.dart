@@ -465,6 +465,7 @@ class _PostItemState extends State<PostItem> {
             flatMaxHeight: MediaQuery.of(context).size.width,
             parentId: widget.item.id.toString(),
             attachmentsId: attachments,
+            autoload: true,
             isGrid: attachments.length > 1,
           ),
           if (widget.isShowReply || widget.isReactable)

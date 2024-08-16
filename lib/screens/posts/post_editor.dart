@@ -260,37 +260,104 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: ListView(
+                    child: Column(
                       children: [
-                        if (_isBusy)
-                          const LinearProgressIndicator().animate().scaleX(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: TextField(
-                            maxLines: null,
-                            autofocus: true,
-                            autocorrect: true,
-                            keyboardType: TextInputType.multiline,
-                            controller: _editorController.contentController,
-                            focusNode: _contentFocusNode,
-                            decoration: InputDecoration.collapsed(
-                              hintText: 'postContentPlaceholder'.tr,
-                            ),
-                            onTapOutside: (_) =>
-                                FocusManager.instance.primaryFocus?.unfocus(),
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              if (_isBusy)
+                                const LinearProgressIndicator()
+                                    .animate()
+                                    .scaleX(),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                child: TextField(
+                                  maxLines: null,
+                                  autofocus: true,
+                                  autocorrect: true,
+                                  keyboardType: TextInputType.multiline,
+                                  controller:
+                                      _editorController.contentController,
+                                  focusNode: _contentFocusNode,
+                                  decoration: InputDecoration.collapsed(
+                                    hintText: 'postContentPlaceholder'.tr,
+                                  ),
+                                  onTapOutside: (_) => FocusManager
+                                      .instance.primaryFocus
+                                      ?.unfocus(),
+                                ),
+                              ),
+                              const SizedBox(height: 120)
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 120)
+                        Obx(() {
+                          final textStyle = TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.75),
+                          );
+                          final showFactors = [
+                            _editorController.isRestoreFromLocal.value,
+                            _editorController.lastSaveTime.value != null,
+                          ];
+                          final doShow = showFactors.any((x) => x);
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 16,
+                            ),
+                            child: Row(
+                              children: [
+                                if (showFactors[0])
+                                  Text('postRestoreFromLocal'.tr,
+                                          style: textStyle)
+                                      .paddingOnly(right: 4),
+                                if (showFactors[0])
+                                  InkWell(
+                                    child: Text('clear'.tr, style: textStyle),
+                                    onTap: () {
+                                      _editorController.localClear();
+                                      _editorController.currentClear();
+                                      setState(() {});
+                                    },
+                                  ),
+                                if (showFactors.where((x) => x).length > 1)
+                                  Text(
+                                    '·',
+                                    style: textStyle,
+                                  ).paddingSymmetric(horizontal: 8),
+                                if (showFactors[1])
+                                  Text(
+                                    'postAutoSaveAt'.trParams({
+                                      'date': DateFormat('HH:mm:ss').format(
+                                        _editorController.lastSaveTime.value ??
+                                            DateTime.now(),
+                                      )
+                                    }),
+                                    style: textStyle,
+                                  ),
+                              ],
+                            ),
+                          )
+                              .animate(
+                                key: const Key('post-editor-hint-animation'),
+                                target: doShow ? 1 : 0,
+                              )
+                              .fade(curve: Curves.easeInOut, duration: 300.ms);
+                        }),
                       ],
                     ),
                   ),
                   if (SolianTheme.isLargeScreen(context))
                     const VerticalDivider(width: 0.3, thickness: 0.3)
                         .paddingSymmetric(
-                      horizontal: 8,
+                      horizontal: 16,
                     ),
                   if (SolianTheme.isLargeScreen(context))
                     Expanded(
@@ -298,7 +365,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                         child: MarkdownTextContent(
                           content: _editorController.contentController.text,
                           parentId: 'post-editor-preview',
-                        ).paddingOnly(top: 8),
+                        ).paddingOnly(top: 12, right: 16),
                       ),
                     ),
                 ],
@@ -309,85 +376,39 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Obx(() {
-                    final textStyle = TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.75),
-                    );
-                    final showFactors = [
-                      _editorController.isRestoreFromLocal.value,
-                      _editorController.lastSaveTime.value != null,
-                    ];
-                    final doShow = showFactors.any((x) => x);
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 4,
-                        horizontal: 16,
-                      ),
-                      child: Row(
-                        children: [
-                          if (showFactors[0])
-                            Text('postRestoreFromLocal'.tr, style: textStyle)
-                                .paddingOnly(right: 4),
-                          if (showFactors[0])
-                            InkWell(
-                              child: Text('clear'.tr, style: textStyle),
-                              onTap: () {
-                                _editorController.localClear();
-                                _editorController.currentClear();
-                                setState(() {});
-                              },
-                            ),
-                          if (showFactors.where((x) => x).length > 1)
-                            Text(
-                              '·',
-                              style: textStyle,
-                            ).paddingSymmetric(horizontal: 8),
-                          if (showFactors[1])
-                            Text(
-                              'postAutoSaveAt'.trParams({
-                                'date': DateFormat('HH:mm:ss').format(
-                                  _editorController.lastSaveTime.value ??
-                                      DateTime.now(),
-                                )
-                              }),
-                              style: textStyle,
-                            ),
-                        ],
-                      ),
-                    )
-                        .animate(
-                          key: const Key('post-editor-hint-animation'),
-                          target: doShow ? 1 : 0,
-                        )
-                        .fade(curve: Curves.easeInOut, duration: 300.ms);
-                  }),
-                  if (_editorController.mode.value == 0)
-                    Obx(
-                      () => TweenAnimationBuilder<double>(
-                        tween: Tween(
-                          begin: 0,
-                          end: _editorController.contentLength.value / 4096,
-                        ),
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        builder: (context, value, _) => LinearProgressIndicator(
-                          minHeight: 2,
-                          color: _editorController.contentLength.value > 4096
-                              ? Colors.red[900]
-                              : Theme.of(context).colorScheme.primary,
-                          value: value,
-                        ),
-                      ),
-                    ),
+                  const Divider(thickness: 0.3, height: 0.3),
                   SizedBox(
                     height: 56,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
+                        if (_editorController.mode.value == 0)
+                          Obx(
+                            () => TweenAnimationBuilder<double>(
+                              tween: Tween(
+                                begin: 0,
+                                end: _editorController.contentLength.value /
+                                    4096,
+                              ),
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              builder: (context, value, _) => SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .secondaryContainer,
+                                  color: _editorController.contentLength.value >
+                                          4096
+                                      ? Colors.red[900]
+                                      : Theme.of(context).colorScheme.primary,
+                                  value: value,
+                                ),
+                              ).paddingAll(10),
+                            ),
+                          ).paddingSymmetric(horizontal: 4),
                         Obx(() {
                           final isDraft = _editorController.isDraft.value;
                           return IconButton(

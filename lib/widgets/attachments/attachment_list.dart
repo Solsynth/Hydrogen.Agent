@@ -17,6 +17,7 @@ class AttachmentList extends StatefulWidget {
   final List<int> attachmentsId;
   final bool isGrid;
   final bool isForceGrid;
+  final bool autoload;
   final double flatMaxHeight;
 
   final double? width;
@@ -28,6 +29,7 @@ class AttachmentList extends StatefulWidget {
     required this.attachmentsId,
     this.isGrid = false,
     this.isForceGrid = false,
+    this.autoload = false,
     this.flatMaxHeight = 720,
     this.width,
     this.viewport,
@@ -208,6 +210,7 @@ class AttachmentListEntry extends StatelessWidget {
   final bool showBadge;
   final bool showMature;
   final bool isDense;
+  final bool autoload;
   final Function(bool) onReveal;
 
   const AttachmentListEntry({
@@ -221,6 +224,7 @@ class AttachmentListEntry extends StatelessWidget {
     this.showBadge = false,
     this.showMature = false,
     this.isDense = false,
+    this.autoload = false,
   });
 
   @override
@@ -259,6 +263,7 @@ class AttachmentListEntry extends StatelessWidget {
               item: item!,
               badge: showBadge ? badgeContent : null,
               showHideButton: !item!.isMature || showMature,
+              autoload: autoload,
               onHide: () {
                 onReveal(false);
               },

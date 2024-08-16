@@ -15,6 +15,7 @@ class AttachmentItem extends StatefulWidget {
   final Attachment item;
   final bool showBadge;
   final bool showHideButton;
+  final bool autoload;
   final BoxFit fit;
   final String? badge;
   final Function? onHide;
@@ -27,6 +28,7 @@ class AttachmentItem extends StatefulWidget {
     this.fit = BoxFit.cover,
     this.showBadge = true,
     this.showHideButton = true,
+    this.autoload = false,
     this.onHide,
   });
 
@@ -49,7 +51,10 @@ class _AttachmentItemState extends State<AttachmentItem> {
           onHide: widget.onHide,
         );
       case 'video':
-        return _AttachmentItemVideo(item: widget.item);
+        return _AttachmentItemVideo(
+          item: widget.item,
+          autoload: widget.autoload,
+        );
       default:
         return Center(
           child: Container(
