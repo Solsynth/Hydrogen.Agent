@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -40,9 +41,10 @@ class _PostActionState extends State<PostAction> {
   }
 
   Future<void> _doShare({bool noUri = false}) async {
+    ShareResult result;
     final box = context.findRenderObject() as RenderBox?;
     if ((PlatformInfo.isAndroid || PlatformInfo.isIOS) && !noUri) {
-      await Share.shareUri(
+      result = await Share.shareUri(
         Uri.parse('https://solsynth.dev/posts/${widget.item.id}'),
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
@@ -52,7 +54,7 @@ class _PostActionState extends State<PostAction> {
         widget.item.body['description'],
       ];
       final isExtraNotEmpty = extraContent.any((x) => x != null);
-      await Share.share(
+      result = await Share.share(
         'postShareContent'.trParams({
           'username': widget.item.author.nick,
           'content':
@@ -63,6 +65,14 @@ class _PostActionState extends State<PostAction> {
           'username': widget.item.author.nick,
         }),
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    }
+
+    if (result.status != ShareResultStatus.dismissed) {
+      await FirebaseAnalytics.instance.logShare(
+        contentType: 'Post',
+        itemId: widget.item.id.toString(),
+        method: result.raw,
       );
     }
   }
