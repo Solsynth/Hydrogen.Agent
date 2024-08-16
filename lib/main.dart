@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
@@ -6,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
@@ -29,32 +31,29 @@ import 'package:solian/translations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 void main() async {
-  await SentryFlutter.init(
-    (options) {
-      options.dsn =
-          'https://55438cdff9048aa2225df72fdc629c42@o4506965897117696.ingest.us.sentry.io/4507357676437504';
-      options.tracesSampleRate = 1.0;
-      options.profilesSampleRate = 1.0;
-    },
-    appRunner: () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      MediaKit.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
 
-      await Future.wait([
-        _initializeFirebase(),
-        _initializePlatformComponents(),
-      ]);
+  await Future.wait([
+    _initializeFirebase(),
+    _initializePlatformComponents(),
+  ]);
 
-      GoRouter.optionURLReflectsImperativeAPIs = true;
+  GoRouter.optionURLReflectsImperativeAPIs = true;
 
-      usePathUrlStrategy();
-      runApp(const SolianApp());
-    },
-  );
+  usePathUrlStrategy();
+  runApp(const SolianApp());
 }
 
 Future<void> _initializeFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 }
 
 Future<void> _initializePlatformComponents() async {

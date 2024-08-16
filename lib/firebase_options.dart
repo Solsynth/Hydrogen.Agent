@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'solian-0x001.appspot.com',
     measurementId: 'G-EF9BZMKBC3',
   );
+
 }
