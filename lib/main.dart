@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/bootstrapper.dart';
@@ -32,7 +31,6 @@ import 'package:flutter_web_plugins/url_strategy.dart' show usePathUrlStrategy;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
 
   await Future.wait([
     _initializeFirebase(),
