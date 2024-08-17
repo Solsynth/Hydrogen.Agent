@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PostEditorController extends GetxController {
   late final SharedPreferences _prefs;
 
+  final aliasController = TextEditingController();
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final contentController = TextEditingController();
@@ -197,16 +198,23 @@ class PostEditorController extends GetxController {
 
     type = value.type;
     editTo.value = value;
+    realmZone.value = value.realm;
     isDraft.value = value.isDraft ?? false;
+    aliasController.text = value.alias ?? '';
     titleController.text = value.body['title'] ?? '';
     descriptionController.text = value.body['description'] ?? '';
     contentController.text = value.body['content'] ?? '';
     publishedAt.value = value.publishedAt;
     publishedUntil.value = value.publishedUntil;
-    tags.value =
-        value.body['tags']?.map((x) => x['alias']).toList() ?? List.empty();
+    tags.value = List.from(
+      value.body['tags']?.map((x) => x['alias']).toList() ?? List.empty(),
+      growable: true,
+    );
     tags.refresh();
-    attachments.value = value.body['attachments']?.cast<int>() ?? List.empty();
+    attachments.value = List.from(
+      value.body['attachments'] ?? List.empty(),
+      growable: true,
+    );
     attachments.refresh();
     thumbnail.value = value.body['thumbnail'];
 
@@ -256,6 +264,7 @@ class PostEditorController extends GetxController {
 
   Map<String, dynamic> get payload {
     return {
+      'alias': aliasController.text,
       'title': title,
       'description': description,
       'content': contentController.text,
@@ -277,20 +286,33 @@ class PostEditorController extends GetxController {
 
   set payload(Map<String, dynamic> value) {
     type = value['type'];
-    tags.value = value['tags'].map((x) => x['alias']).toList().cast<String>();
+    tags.value = List.from(
+      value['tags'].map((x) => x['alias']).toList(),
+      growable: true,
+    );
+    aliasController.text = value['alias'] ?? '';
     titleController.text = value['title'] ?? '';
     descriptionController.text = value['description'] ?? '';
     contentController.text = value['content'] ?? '';
-    attachments.value = value['attachments'].cast<int>() ?? List.empty();
+    attachments.value = List.from(
+      value['attachments'] ?? List.empty(),
+      growable: true,
+    );
     attachments.refresh();
     thumbnail.value = value['thumbnail'];
     visibility.value = value['visibility'];
     isDraft.value = value['is_draft'];
     if (value['visible_users'] != null) {
-      visibleUsers.value = value['visible_users'].cast<int>();
+      visibleUsers.value = List.from(
+        value['visible_users'],
+        growable: true,
+      );
     }
     if (value['invisible_users'] != null) {
-      invisibleUsers.value = value['invisible_users'].cast<int>();
+      invisibleUsers.value = List.from(
+        value['invisible_users'],
+        growable: true,
+      );
     }
     if (value['published_at'] != null) {
       publishedAt.value = DateTime.parse(value['published_at']).toLocal();
@@ -319,6 +341,7 @@ class PostEditorController extends GetxController {
 
   bool get isNotEmpty {
     return [
+      aliasController.text.isNotEmpty,
       titleController.text.isNotEmpty,
       descriptionController.text.isNotEmpty,
       contentController.text.isNotEmpty,

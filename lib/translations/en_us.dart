@@ -13,6 +13,7 @@ const i18nEnglish = {
   'more': 'More',
   'share': 'Share',
   'shareNoUri': 'Share text content',
+  'alias': 'Alias',
   'feed': 'Feed',
   'unlink': 'Unlink',
   'feedSearch': 'Search Feed',

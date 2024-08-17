@@ -8,6 +8,8 @@ class Post {
   DateTime updatedAt;
   DateTime? editedAt;
   DateTime? deletedAt;
+  String? alias;
+  String? areaAlias;
   dynamic body;
   List<Tag>? tags;
   List<Category>? categories;
@@ -33,6 +35,8 @@ class Post {
     required this.updatedAt,
     required this.editedAt,
     required this.deletedAt,
+    required this.alias,
+    required this.areaAlias,
     required this.type,
     required this.body,
     required this.tags,
@@ -60,6 +64,8 @@ class Post {
         deletedAt: json['deleted_at'] != null
             ? DateTime.parse(json['deleted_at'])
             : null,
+        alias: json['alias'],
+        areaAlias: json['area_alias'],
         type: json['type'],
         body: json['body'],
         tags: json['tags']?.map((x) => Tag.fromJson(x)).toList().cast<Tag>(),
@@ -101,6 +107,8 @@ class Post {
         'updated_at': updatedAt.toIso8601String(),
         'edited_at': editedAt?.toIso8601String(),
         'deleted_at': deletedAt?.toIso8601String(),
+        'alias': alias,
+        'area_alias': areaAlias,
         'type': type,
         'body': body,
         'tags': tags,

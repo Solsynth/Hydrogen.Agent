@@ -17,9 +17,22 @@ class PostEditorOverviewDialog extends StatelessWidget {
           TextField(
             autofocus: true,
             autocorrect: true,
+            controller: controller.aliasController,
+            decoration: InputDecoration(
+              isDense: true,
+              border: const OutlineInputBorder(),
+              hintText: 'alias'.tr,
+            ),
+            onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            autofocus: true,
+            autocorrect: true,
             controller: controller.titleController,
             decoration: InputDecoration(
-              border: const UnderlineInputBorder(),
+              isDense: true,
+              border: const OutlineInputBorder(),
               hintText: 'title'.tr,
             ),
             onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
@@ -33,7 +46,8 @@ class PostEditorOverviewDialog extends StatelessWidget {
             keyboardType: TextInputType.multiline,
             controller: controller.descriptionController,
             decoration: InputDecoration(
-              border: const UnderlineInputBorder(),
+              isDense: true,
+              border: const OutlineInputBorder(),
               hintText: 'description'.tr,
             ),
             onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),

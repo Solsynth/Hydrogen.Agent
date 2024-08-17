@@ -21,6 +21,7 @@ const i18nSimplifiedChinese = {
   'more': '更多',
   'share': '分享',
   'shareNoUri': '分享文字内容',
+  'alias': '别名',
   'feed': '资讯',
   'unlink': '移除链接',
   'feedSearch': '搜索资讯',

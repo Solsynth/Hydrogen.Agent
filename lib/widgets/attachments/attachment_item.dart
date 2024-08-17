@@ -238,8 +238,8 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
 
   bool _showContent = false;
 
-  void _startLoad() {
-    _player.open(
+  Future<void> _startLoad() async {
+    await _player.open(
       Media(ServiceFinder.buildUrl('files', '/attachments/${widget.item.id}')),
       play: false,
     );
@@ -249,7 +249,9 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
   @override
   void initState() {
     super.initState();
-    _showContent = widget.autoload;
+    if (widget.autoload) {
+      _startLoad();
+    }
   }
 
   @override

@@ -176,10 +176,19 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           children: [
             ListTile(
               tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-              title: Text(
-                _editorController.title ?? 'title'.tr,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              title: Row(
+                children: [
+                  Text(
+                    _editorController.title ?? 'title'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(width: 6),
+                  if (_editorController.aliasController.text.isNotEmpty)
+                    Badge(
+                      label: Text('#${_editorController.aliasController.text}'),
+                    ),
+                ],
               ),
               subtitle: Text(
                 _editorController.description ?? 'description'.tr,
@@ -255,6 +264,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                   ),
                 ],
               ),
+            if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,10 +275,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                         Expanded(
                           child: ListView(
                             children: [
-                              if (_isBusy)
-                                const LinearProgressIndicator()
-                                    .animate()
-                                    .scaleX(),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,

@@ -42,10 +42,16 @@ class _PostActionState extends State<PostAction> {
 
   Future<void> _doShare({bool noUri = false}) async {
     ShareResult result;
+    String id;
     final box = context.findRenderObject() as RenderBox?;
+    if (widget.item.alias?.isNotEmpty ?? false) {
+      id = '${widget.item.areaAlias}:${widget.item.alias}';
+    } else {
+      id = '${widget.item.id}';
+    }
     if ((PlatformInfo.isAndroid || PlatformInfo.isIOS) && !noUri) {
       result = await Share.shareUri(
-        Uri.parse('https://solsynth.dev/posts/${widget.item.id}'),
+        Uri.parse('https://solsynth.dev/posts/$id'),
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
     } else {
@@ -59,7 +65,7 @@ class _PostActionState extends State<PostAction> {
           'username': widget.item.author.nick,
           'content':
               '${extraContent.join('\n')}${isExtraNotEmpty ? '\n\n' : ''}${widget.item.body['content'] ?? 'no content'}',
-          'link': 'https://solsynth.dev/posts/${widget.item.id}',
+          'link': 'https://solsynth.dev/posts/$id',
         }),
         subject: 'postShareSubject'.trParams({
           'username': widget.item.author.nick,
@@ -96,9 +102,27 @@ class _PostActionState extends State<PostAction> {
                 'postActionList'.tr,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              Text(
-                '#${widget.item.id.toString().padLeft(8, '0')}',
-                style: Theme.of(context).textTheme.bodySmall,
+              Row(
+                children: [
+                  Text(
+                    '#${widget.item.id.toString().padLeft(8, '0')}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  if (widget.item.alias?.isNotEmpty ?? false)
+                    Text(
+                      '·',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ).paddingSymmetric(horizontal: 6),
+                  if (widget.item.alias?.isNotEmpty ?? false)
+                    Expanded(
+                      child: Text(
+                        '${widget.item.areaAlias}:${widget.item.alias}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                ],
               ),
             ],
           ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),

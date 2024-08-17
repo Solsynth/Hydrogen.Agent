@@ -78,23 +78,17 @@ class _PostItemState extends State<PostItem> {
 
   Widget _buildThumbnail() {
     if (widget.item.body['thumbnail'] == null) return const SizedBox();
-    const radius = BorderRadius.all(Radius.circular(8));
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).dividerColor,
-            width: 0.3,
-          ),
-          borderRadius: radius,
-        ),
-        child: ClipRRect(
-          borderRadius: radius,
-          child: AttachmentSelfContainedEntry(
-            id: widget.item.body['thumbnail'],
-            parentId: 'p${item.id}-thumbnail',
-          ),
+    final border = BorderSide(
+      color: Theme.of(context).dividerColor,
+      width: 0.3,
+    );
+    return Container(
+      decoration: BoxDecoration(border: Border(top: border, bottom: border)),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: AttachmentSelfContainedEntry(
+          id: widget.item.body['thumbnail'],
+          parentId: 'p${item.id}-thumbnail',
         ),
       ),
     );
@@ -307,7 +301,7 @@ class _PostItemState extends State<PostItem> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildThumbnail().paddingSymmetric(horizontal: 12, vertical: 4),
+          _buildThumbnail(),
           _buildHeader().paddingSymmetric(horizontal: 12),
           _buildHeaderDivider().paddingSymmetric(horizontal: 12),
           Stack(
@@ -381,7 +375,7 @@ class _PostItemState extends State<PostItem> {
       closedBuilder: (_, openContainer) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildThumbnail().paddingSymmetric(horizontal: 12, vertical: 4),
+          _buildThumbnail().paddingOnly(bottom: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

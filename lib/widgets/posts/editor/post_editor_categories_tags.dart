@@ -19,7 +19,7 @@ class PostEditorCategoriesDialog extends StatelessWidget {
             initialTags: controller.tags,
             hintText: 'postTagsPlaceholder'.tr,
             onUpdate: (value) {
-              controller.tags.value = value;
+              controller.tags.value = List.from(value, growable: true);
               controller.tags.refresh();
             },
           ),
