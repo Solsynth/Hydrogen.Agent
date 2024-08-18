@@ -20,22 +20,22 @@ class AttachmentProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.buildUrl('files', null);
   }
 
-  final Map<int, Attachment> _cachedResponses = {};
+  final Map<String, Attachment> _cachedResponses = {};
 
   Future<List<Attachment?>> listMetadata(
-    List<int> id, {
+    List<String> rid, {
     noCache = false,
   }) async {
-    if (id.isEmpty) return List.empty();
+    if (rid.isEmpty) return List.empty();
 
-    List<Attachment?> result = List.filled(id.length, null);
-    List<int> pendingQuery = List.empty(growable: true);
+    List<Attachment?> result = List.filled(rid.length, null);
+    List<String> pendingQuery = List.empty(growable: true);
     if (!noCache) {
-      for (var idx = 0; idx < id.length; idx++) {
-        if (_cachedResponses.containsKey(id[idx])) {
-          result[idx] = _cachedResponses[id[idx]];
+      for (var idx = 0; idx < rid.length; idx++) {
+        if (_cachedResponses.containsKey(rid[idx])) {
+          result[idx] = _cachedResponses[rid[idx]];
         } else {
-          pendingQuery.add(id[idx]);
+          pendingQuery.add(rid[idx]);
         }
       }
     }
@@ -52,12 +52,12 @@ class AttachmentProvider extends GetConnect {
         rawOut.data!.map((x) => Attachment.fromJson(x)).toList();
     for (final item in out) {
       if (item.destination != 0 && item.isAnalyzed) {
-        _cachedResponses[item.id] = item;
+        _cachedResponses[item.rid] = item;
       }
     }
     for (var i = 0; i < out.length; i++) {
-      for (var j = 0; j < id.length; j++) {
-        if (out[i].id == id[j]) {
+      for (var j = 0; j < rid.length; j++) {
+        if (out[i].rid == rid[j]) {
           result[j] = out[i];
         }
       }
@@ -66,16 +66,16 @@ class AttachmentProvider extends GetConnect {
     return result;
   }
 
-  Future<Attachment?> getMetadata(int id, {noCache = false}) async {
-    if (!noCache && _cachedResponses.containsKey(id)) {
-      return _cachedResponses[id]!;
+  Future<Attachment?> getMetadata(String rid, {noCache = false}) async {
+    if (!noCache && _cachedResponses.containsKey(rid)) {
+      return _cachedResponses[rid]!;
     }
 
-    final resp = await get('/attachments/$id/meta');
+    final resp = await get('/attachments/$rid/meta');
     if (resp.statusCode == 200) {
       final result = Attachment.fromJson(resp.body);
       if (result.destination != 0 && result.isAnalyzed) {
-        _cachedResponses[id] = result;
+        _cachedResponses[rid] = result;
       }
       return result;
     }
@@ -84,7 +84,7 @@ class AttachmentProvider extends GetConnect {
   }
 
   Future<Attachment> createAttachment(
-      Uint8List data, String path, String usage, Map<String, dynamic>? metadata,
+      Uint8List data, String path, String pool, Map<String, dynamic>? metadata,
       {Function(double)? onProgress}) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
@@ -108,7 +108,7 @@ class AttachmentProvider extends GetConnect {
     final payload = dio.FormData.fromMap({
       'alt': fileAlt,
       'file': filePayload,
-      'usage': usage,
+      'pool': pool,
       if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
       'metadata': jsonEncode(metadata),
     });
@@ -133,8 +133,7 @@ class AttachmentProvider extends GetConnect {
 
   Future<Response> updateAttachment(
     int id,
-    String alt,
-    String usage, {
+    String alt, {
     bool isMature = false,
   }) async {
     final AuthProvider auth = Get.find();
@@ -144,7 +143,6 @@ class AttachmentProvider extends GetConnect {
 
     var resp = await client.put('/attachments/$id', {
       'alt': alt,
-      'usage': usage,
       'is_mature': isMature,
     });
 

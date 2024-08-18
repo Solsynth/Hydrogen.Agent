@@ -67,9 +67,10 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
   Future<void> _saveToAlbum() async {
     final url = ServiceFinder.buildUrl(
       'files',
-      '/attachments/${widget.item.id}',
+      '/attachments/${widget.item.rid}',
     );
 
+    print(url);
     if (PlatformInfo.isWeb || PlatformInfo.isDesktop) {
       await launchUrlString(url);
       return;
@@ -258,7 +259,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                         spacing: 6,
                         children: [
                           Text(
-                            '#${widget.item.id}',
+                            '#${widget.item.rid}',
                             style: metaTextStyle,
                           ),
                           if (widget.item.metadata?['width'] != null &&

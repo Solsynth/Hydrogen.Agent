@@ -24,7 +24,6 @@ class AccountAvatar extends StatelessWidget {
     if (content is String) {
       direct = content.startsWith('http');
       if (!isEmpty) isEmpty = content.isEmpty;
-      if (!isEmpty) isEmpty = content.endsWith('/attachments/0');
     }
 
     final url = direct

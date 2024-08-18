@@ -59,7 +59,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  final List<int> _attachments = List.empty(growable: true);
+  final List<String> _attachments = List.empty(growable: true);
 
   Event? _editTo;
   Event? _replyTo;
@@ -68,7 +68,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditorPopup(
-        usage: 'm.attachment',
+        pool: 'messaging',
         initialAttachments: _attachments,
         onAdd: (value) {
           setState(() {
@@ -103,7 +103,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
 
     final AttachmentUploaderController uploader = Get.find();
     if (uploader.queueOfUpload.any(
-      ((x) => x.usage == 'm.attachment' && x.isUploading),
+      ((x) => x.isUploading),
     )) {
       context.showErrorDialog('attachmentUploadInProgress'.tr);
       return;

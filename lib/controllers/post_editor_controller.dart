@@ -31,9 +31,9 @@ class PostEditorController extends GetxController {
   Rx<Realm?> realmZone = Rx(null);
   Rx<DateTime?> publishedAt = Rx(null);
   Rx<DateTime?> publishedUntil = Rx(null);
-  RxList<int> attachments = RxList<int>.empty(growable: true);
+  RxList<String> attachments = RxList<String>.empty(growable: true);
   RxList<String> tags = RxList<String>.empty(growable: true);
-  Rx<int?> thumbnail = Rx(null);
+  Rx<String?> thumbnail = Rx(null);
 
   RxList<int> visibleUsers = RxList.empty(growable: true);
   RxList<int> invisibleUsers = RxList.empty(growable: true);
@@ -116,12 +116,12 @@ class PostEditorController extends GetxController {
     return showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditorPopup(
-        usage: 'i.attachment',
+        pool: 'interactive',
         initialAttachments: attachments,
-        onAdd: (int value) {
+        onAdd: (String value) {
           attachments.add(value);
         },
-        onRemove: (int value) {
+        onRemove: (String value) {
           attachments.remove(value);
         },
       ),
@@ -169,6 +169,7 @@ class PostEditorController extends GetxController {
   }
 
   void currentClear() {
+    aliasController.clear();
     titleController.clear();
     descriptionController.clear();
     contentController.clear();

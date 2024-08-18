@@ -148,7 +148,7 @@ class AttachmentUploaderController extends GetxController {
   Future<void> uploadAttachmentWithCallback(
     Uint8List data,
     String path,
-    String usage,
+    String pool,
     Map<String, dynamic>? metadata,
     Function(Attachment?) callback,
   ) async {
@@ -158,7 +158,7 @@ class AttachmentUploaderController extends GetxController {
     final result = await _rawUploadAttachment(
       data,
       path,
-      usage,
+      pool,
       metadata,
       onProgress: (progress) {
         progressOfUpload.value = progress;
@@ -171,7 +171,7 @@ class AttachmentUploaderController extends GetxController {
   Future<Attachment?> uploadAttachment(
     Uint8List data,
     String path,
-    String usage,
+    String pool,
     Map<String, dynamic>? metadata,
   ) async {
     if (isUploading.value) throw Exception('uploading blocked');
@@ -180,7 +180,7 @@ class AttachmentUploaderController extends GetxController {
     final result = await _rawUploadAttachment(
       data,
       path,
-      usage,
+      pool,
       metadata,
       onProgress: (progress) {
         progressOfUpload.value = progress;
@@ -191,14 +191,14 @@ class AttachmentUploaderController extends GetxController {
   }
 
   Future<Attachment?> _rawUploadAttachment(
-      Uint8List data, String path, String usage, Map<String, dynamic>? metadata,
+      Uint8List data, String path, String pool, Map<String, dynamic>? metadata,
       {Function(double)? onProgress, Function(dynamic err)? onError}) async {
     final AttachmentProvider provider = Get.find();
     try {
       final result = await provider.createAttachment(
         data,
         path,
-        usage,
+        pool,
         metadata,
         onProgress: onProgress,
       );

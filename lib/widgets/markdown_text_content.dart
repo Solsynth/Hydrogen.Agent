@@ -131,7 +131,7 @@ class MarkdownTextContent extends StatelessWidget {
                   child: AttachmentSelfContainedEntry(
                     isDense: true,
                     parentId: parentId,
-                    id: int.parse(segments[1]),
+                    rid: segments[1],
                   ),
                 ),
               ).paddingSymmetric(vertical: 4);

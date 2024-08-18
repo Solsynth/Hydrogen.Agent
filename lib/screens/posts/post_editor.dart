@@ -65,7 +65,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
     final AttachmentUploaderController uploader = Get.find();
     if (uploader.queueOfUpload.any(
-      ((x) => x.usage == 'i.attachment' && x.isUploading),
+      ((x) => x.isUploading),
     )) {
       context.showErrorDialog('attachmentUploadInProgress'.tr);
       return;
@@ -90,8 +90,8 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else {
-      _editorController.localClear();
       _editorController.currentClear();
+      _editorController.localClear();
       AppRouter.instance.pop(resp.body);
     }
 

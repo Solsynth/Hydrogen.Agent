@@ -91,7 +91,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
                     launchUrlString(
                       ServiceFinder.buildUrl(
                         'files',
-                        '/attachments/${widget.item.id}',
+                        '/attachments/${widget.item.rid}',
                       ),
                     );
                   },
@@ -135,7 +135,7 @@ class _AttachmentItemImage extends StatelessWidget {
               fit: fit,
               imageUrl: ServiceFinder.buildUrl(
                 'files',
-                '/attachments/${item.id}',
+                '/attachments/${item.rid}',
               ),
               progressIndicatorBuilder: (context, url, downloadProgress) {
                 return Center(
@@ -240,7 +240,7 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
     final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
     _playerController = VideoPlayerController.networkUrl(
       Uri.parse(
-        ServiceFinder.buildUrl('files', '/attachments/${widget.item.id}'),
+        ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}'),
       ),
     );
     _playerController!.initialize();

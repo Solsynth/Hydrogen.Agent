@@ -16,10 +16,12 @@ class AttachmentAttrEditorDialog extends StatefulWidget {
   });
 
   @override
-  State<AttachmentAttrEditorDialog> createState() => _AttachmentAttrEditorDialogState();
+  State<AttachmentAttrEditorDialog> createState() =>
+      _AttachmentAttrEditorDialogState();
 }
 
-class _AttachmentAttrEditorDialogState extends State<AttachmentAttrEditorDialog> {
+class _AttachmentAttrEditorDialogState
+    extends State<AttachmentAttrEditorDialog> {
   final _altController = TextEditingController();
 
   bool _isBusy = false;
@@ -33,7 +35,6 @@ class _AttachmentAttrEditorDialogState extends State<AttachmentAttrEditorDialog>
       final resp = await provider.updateAttachment(
         widget.item.id,
         _altController.value.text,
-        widget.item.usage,
         isMature: _isMature,
       );
 
@@ -109,7 +110,7 @@ class _AttachmentAttrEditorDialogState extends State<AttachmentAttrEditorDialog>
             TextButton(
               style: TextButton.styleFrom(
                   foregroundColor:
-                  Theme.of(context).colorScheme.onSurfaceVariant),
+                      Theme.of(context).colorScheme.onSurfaceVariant),
               onPressed: () => Navigator.pop(context),
               child: Text('cancel'.tr),
             ),

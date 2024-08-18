@@ -39,8 +39,8 @@ class ChatEvent extends StatelessWidget {
 
   Widget _buildAttachment(BuildContext context, {bool isMinimal = false}) {
     final attachments = item.body['attachments'] != null
-        ? List<int>.from(item.body['attachments'].map((x) => x))
-        : List<int>.empty();
+        ? List<String>.from(item.body['attachments'].map((x) => x))
+        : List<String>.empty();
 
     if (attachments.isEmpty) return const SizedBox();
 

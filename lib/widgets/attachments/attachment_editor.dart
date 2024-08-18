@@ -22,19 +22,19 @@ import 'package:solian/widgets/attachments/attachment_attr_editor.dart';
 import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
 
 class AttachmentEditorPopup extends StatefulWidget {
-  final String usage;
+  final String pool;
   final bool singleMode;
   final bool imageOnly;
   final bool autoUpload;
   final double? imageMaxWidth;
   final double? imageMaxHeight;
-  final List<int>? initialAttachments;
-  final void Function(int) onAdd;
-  final void Function(int) onRemove;
+  final List<String>? initialAttachments;
+  final void Function(String) onAdd;
+  final void Function(String) onRemove;
 
   const AttachmentEditorPopup({
     super.key,
-    required this.usage,
+    required this.pool,
     required this.onAdd,
     required this.onRemove,
     this.singleMode = false,
@@ -73,7 +73,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
       _enqueueTaskBatch(medias.map((x) {
         final file = File(x.path);
-        return AttachmentUploadTask(file: file, usage: widget.usage);
+        return AttachmentUploadTask(file: file, usage: widget.pool);
       }));
     } else {
       final media = await _imagePicker.pickMedia(
@@ -83,7 +83,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       if (media == null) return;
 
       _enqueueTask(
-        AttachmentUploadTask(file: File(media.path), usage: widget.usage),
+        AttachmentUploadTask(file: File(media.path), usage: widget.pool),
       );
     }
   }
@@ -97,7 +97,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     final file = File(media.path);
     _enqueueTask(
-      AttachmentUploadTask(file: file, usage: widget.usage),
+      AttachmentUploadTask(file: file, usage: widget.pool),
     );
   }
 
@@ -113,7 +113,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
     _enqueueTaskBatch(files.map((x) {
-      return AttachmentUploadTask(file: x, usage: widget.usage);
+      return AttachmentUploadTask(file: x, usage: widget.pool);
     }));
   }
 
@@ -131,7 +131,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     final file = File(media.path);
     _enqueueTask(
-      AttachmentUploadTask(file: file, usage: widget.usage),
+      AttachmentUploadTask(file: file, usage: widget.pool),
     );
   }
 
@@ -181,13 +181,11 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
 
     if (input == null || input.isEmpty) return;
-    final value = int.tryParse(input);
-    if (value == null) return;
 
     final AttachmentProvider attach = Get.find();
-    final result = await attach.getMetadata(value);
+    final result = await attach.getMetadata(input);
     if (result != null) {
-      widget.onAdd(result.id);
+      widget.onAdd(result.rid);
       setState(() => _attachments.add(result));
       if (widget.singleMode) Navigator.pop(context);
     }
@@ -202,11 +200,11 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     _uploadController.uploadAttachmentWithCallback(
       data,
       'Pasted Image',
-      widget.usage,
+      widget.pool,
       null,
       (item) {
         if (item == null) return;
-        widget.onAdd(item.id);
+        widget.onAdd(item.rid);
         if (mounted) {
           setState(() => _attachments.add(item));
           if (widget.singleMode) Navigator.pop(context);
@@ -413,11 +411,11 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                             : () {
                                 _uploadController
                                     .performSingleTask(index)
-                                    .then((r) {
-                                  if (r == null) return;
-                                  widget.onAdd(r.id);
+                                    .then((out) {
+                                  if (out == null) return;
+                                  widget.onAdd(out.rid);
                                   if (mounted) {
-                                    setState(() => _attachments.add(r));
+                                    setState(() => _attachments.add(out));
                                     if (widget.singleMode) {
                                       Navigator.pop(context);
                                     }
@@ -515,7 +513,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         ),
                         onTap: () {
                           _deleteAttachment(element).then((_) {
-                            widget.onRemove(element.id);
+                            widget.onRemove(element.rid);
                             setState(() => _attachments.removeAt(index));
                           });
                         },
@@ -529,7 +527,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           ),
                         ),
                         onTap: () {
-                          widget.onRemove(element.id);
+                          widget.onRemove(element.rid);
                           setState(() => _attachments.removeAt(index));
                         },
                       ),
@@ -560,7 +558,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
   void _startUploading() {
     _uploadController.performUploadQueue(onData: (r) {
-      widget.onAdd(r.id);
+      widget.onAdd(r.rid);
       if (mounted) {
         setState(() => _attachments.add(r));
         if (widget.singleMode) Navigator.pop(context);
@@ -584,7 +582,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
           if (_uploadController.isUploading.value) return;
           _enqueueTaskBatch(detail.files.map((x) {
             final file = File(x.path);
-            return AttachmentUploadTask(file: file, usage: widget.usage);
+            return AttachmentUploadTask(file: file, usage: widget.pool);
           }));
         },
         child: Column(

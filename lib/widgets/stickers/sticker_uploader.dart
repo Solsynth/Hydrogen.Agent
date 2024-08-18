@@ -29,7 +29,7 @@ class _StickerUploadDialogState extends State<StickerUploadDialog> {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditorPopup(
-        usage: 'sticker',
+        pool: 'sticker',
         singleMode: true,
         imageOnly: true,
         autoUpload: true,

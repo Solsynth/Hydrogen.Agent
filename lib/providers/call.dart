@@ -88,7 +88,30 @@ class ChatCallProvider extends GetxController {
 
   void initRoom() {
     initHardware();
-    room = Room();
+    room = Room(
+      roomOptions: const RoomOptions(
+        dynacast: true,
+        adaptiveStream: true,
+        defaultAudioPublishOptions: AudioPublishOptions(
+          name: 'call_voice',
+          stream: 'call_stream',
+        ),
+        defaultVideoPublishOptions: VideoPublishOptions(
+          name: 'call_video',
+          stream: 'call_stream',
+          simulcast: true,
+          backupVideoCodec: BackupVideoCodec(enabled: true),
+        ),
+        defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
+          useiOSBroadcastExtension: true,
+          params: VideoParametersPresets.screenShareH1080FPS30,
+        ),
+        defaultCameraCaptureOptions: CameraCaptureOptions(
+          maxFrameRate: 30,
+          params: VideoParametersPresets.h1080_169,
+        ),
+      ),
+    );
     listener = room.createListener();
     WakelockPlus.enable();
   }
@@ -104,28 +127,6 @@ class ChatCallProvider extends GetxController {
       await room.connect(
         url,
         token,
-        roomOptions: const RoomOptions(
-          dynacast: true,
-          adaptiveStream: true,
-          defaultAudioPublishOptions: AudioPublishOptions(
-            name: 'call_voice',
-            stream: 'call_stream',
-          ),
-          defaultVideoPublishOptions: VideoPublishOptions(
-            name: 'call_video',
-            stream: 'call_stream',
-            simulcast: true,
-            backupVideoCodec: BackupVideoCodec(enabled: true),
-          ),
-          defaultScreenShareCaptureOptions: ScreenShareCaptureOptions(
-            useiOSBroadcastExtension: true,
-            params: VideoParametersPresets.screenShareH1080FPS30,
-          ),
-          defaultCameraCaptureOptions: CameraCaptureOptions(
-            maxFrameRate: 30,
-            params: VideoParametersPresets.h1080_169,
-          ),
-        ),
         fastConnectOptions: FastConnectOptions(
           microphone: TrackOption(track: audioTrack.value),
           camera: TrackOption(track: videoTrack.value),
@@ -152,7 +153,7 @@ class ChatCallProvider extends GetxController {
   void onRoomDidUpdate() => sortParticipants();
 
   void setupRoom() {
-    if(isInitialized.value) return;
+    if (isInitialized.value) return;
 
     sortParticipants();
     room.addListener(onRoomDidUpdate);

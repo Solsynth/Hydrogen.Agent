@@ -14,7 +14,7 @@ import 'package:solian/widgets/sized_container.dart';
 
 class AttachmentList extends StatefulWidget {
   final String parentId;
-  final List<int> attachmentsId;
+  final List<String> attachmentsId;
   final bool isGrid;
   final bool isForceGrid;
   final bool autoload;
@@ -334,13 +334,13 @@ class AttachmentListEntry extends StatelessWidget {
 }
 
 class AttachmentSelfContainedEntry extends StatefulWidget {
-  final int id;
+  final String rid;
   final String parentId;
   final bool isDense;
 
   const AttachmentSelfContainedEntry({
     super.key,
-    required this.id,
+    required this.rid,
     required this.parentId,
     this.isDense = false,
   });
@@ -359,10 +359,12 @@ class _AttachmentSelfContainedEntryState
     final AttachmentProvider attachments = Get.find();
 
     return FutureBuilder(
-      future: attachments.getMetadata(widget.id),
+      future: attachments.getMetadata(widget.rid),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Text('Loading...');
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         }
 
         return AttachmentListEntry(

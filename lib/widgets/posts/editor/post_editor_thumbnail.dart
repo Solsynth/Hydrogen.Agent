@@ -20,7 +20,7 @@ class _PostEditorThumbnailDialogState extends State<PostEditorThumbnailDialog> {
     showModalBottomSheet(
       context: context,
       builder: (context) => AttachmentEditorPopup(
-        usage: 'i.attachment',
+        pool: 'interactive',
         singleMode: true,
         imageOnly: true,
         autoUpload: true,
@@ -84,8 +84,7 @@ class _PostEditorThumbnailDialogState extends State<PostEditorThumbnailDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.controller.thumbnail.value =
-                int.tryParse(_attachmentController.text);
+            widget.controller.thumbnail.value = _attachmentController.text;
             Navigator.pop(context);
           },
           child: Text('confirm'.tr),

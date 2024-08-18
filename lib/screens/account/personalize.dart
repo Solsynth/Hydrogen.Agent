@@ -116,7 +116,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       attachResult = await provider.createAttachment(
         await file.readAsBytes(),
         file.path,
-        'p.$position',
+        'avatar',
         null,
       );
     } catch (e) {
