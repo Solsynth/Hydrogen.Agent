@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
@@ -28,6 +29,15 @@ class RootShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routeName = state.topRoute?.name;
+
+    if (routeName != null) {
+      FirebaseAnalytics.instance.logEvent(
+        name: 'screen_view',
+        parameters: {
+          'firebase_screen': routeName,
+        },
+      );
+    }
 
     return Scaffold(
       key: rootScaffoldKey,

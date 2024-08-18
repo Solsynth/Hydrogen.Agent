@@ -66,7 +66,7 @@ class _StickerScreenState extends State<StickerScreen> {
   Widget _buildEmoteEntry(Sticker item, String prefix) {
     final imageUrl = ServiceFinder.buildUrl(
       'files',
-      '/attachments/${item.attachmentId}',
+      '/attachments/${item.attachment.rid}',
     );
     return ListTile(
       title: Text(item.name),

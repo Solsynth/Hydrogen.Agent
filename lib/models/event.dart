@@ -63,7 +63,7 @@ class Event {
 class EventMessageBody {
   String text;
   String algorithm;
-  List<int>? attachments;
+  List<String>? attachments;
   int? quoteEvent;
   int? relatedEvent;
   List<int>? relatedUsers;
@@ -82,7 +82,7 @@ class EventMessageBody {
         text: json['text'] ?? '',
         algorithm: json['algorithm'] ?? 'plain',
         attachments: json['attachments'] != null
-            ? List<int>.from(json['attachments'].map((x) => x))
+            ? List<String>.from(json['attachments'].map((x) => x))
             : null,
         quoteEvent: json['quote_event'],
         relatedEvent: json['related_event'],

@@ -36,7 +36,7 @@ class Sticker {
 
   String get imageUrl => ServiceFinder.buildUrl(
         'files',
-        '/attachments/$attachmentId',
+        '/attachments/${attachment.rid}',
       );
 
   factory Sticker.fromJson(Map<String, dynamic> json) => Sticker(

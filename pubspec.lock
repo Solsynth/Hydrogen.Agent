@@ -550,6 +550,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.8.12"
+  firebase_performance:
+    dependency: "direct main"
+    description:
+      name: firebase_performance
+      sha256: "6d17133458b9627f15f278d6f71bebbbce885d393f3462b690e55deeb5c36b90"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.0+4"
+  firebase_performance_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_performance_platform_interface
+      sha256: "28dc0a70a3459fe51d1c1be5754803a9a0db0e210322ec7526f6ce42bf6ad83e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4+40"
+  firebase_performance_web:
+    dependency: transitive
+    description:
+      name: firebase_performance_web
+      sha256: db91d86b34280f5253d2913945fdd51d7114486584a298a7bedf1c4b2ab08f79
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.6+12"
   fixnum:
     dependency: transitive
     description:
@@ -1630,10 +1654,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: c5e5b2a142a893a752cb36ae5888680248686725a54afceff31f9a3a76bc53c2
+      sha256: "7b41b6c3507854a159e24ae90a8e3e9cc01eb26a477c118d6dca065b5f55453e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4+1"
+    version: "2.5.4+2"
   sqflite_common_ffi:
     dependency: "direct dev"
     description:
