@@ -70,7 +70,6 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
       '/attachments/${widget.item.rid}',
     );
 
-    print(url);
     if (PlatformInfo.isWeb || PlatformInfo.isDesktop) {
       await launchUrlString(url);
       return;

@@ -38,7 +38,7 @@ class _AttachmentAttrEditorDialogState
         isMature: _isMature,
       );
 
-      Get.find<AttachmentProvider>().clearCache(id: widget.item.id);
+      Get.find<AttachmentProvider>().clearCache(id: widget.item.rid);
 
       setState(() => _isBusy = false);
       return Attachment.fromJson(resp.body);

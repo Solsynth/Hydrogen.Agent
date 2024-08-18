@@ -167,7 +167,7 @@ class AttachmentProvider extends GetConnect {
     return resp;
   }
 
-  void clearCache({int? id}) {
+  void clearCache({String? id}) {
     if (id != null) {
       _cachedResponses.remove(id);
     } else {

@@ -9,11 +9,11 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listRecommendations(int page,
-      {int? realm, String? channel}) async {
+      {String? realm, String? channel}) async {
     final queries = [
       'take=${10}',
       'offset=$page',
-      if (realm != null) 'realmId=$realm',
+      if (realm != null) 'realm=$realm',
     ];
     final resp = await get(
       channel == null
@@ -45,14 +45,14 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listPost(int page,
-      {int? realm, String? author, tag, category}) async {
+      {String? realm, String? author, tag, category}) async {
     final queries = [
       'take=${10}',
       'offset=$page',
       if (tag != null) 'tag=$tag',
       if (category != null) 'category=$category',
       if (author != null) 'author=$author',
-      if (realm != null) 'realmId=$realm',
+      if (realm != null) 'realm=$realm',
     ];
     final resp = await get('/posts?${queries.join('&')}');
     if (resp.statusCode != 200) {

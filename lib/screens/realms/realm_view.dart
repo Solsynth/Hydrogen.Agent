@@ -171,7 +171,7 @@ class _RealmPostListWidgetState extends State<RealmPostListWidget> {
 
     Response resp;
     try {
-      resp = await provider.listPost(pageKey, realm: widget.realm.id);
+      resp = await provider.listPost(pageKey, realm: widget.realm.alias);
     } catch (e) {
       _pagingController.error = e;
       return;
