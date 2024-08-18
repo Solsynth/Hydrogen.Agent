@@ -372,7 +372,6 @@ class _AttachmentSelfContainedEntryState
           isDense: widget.isDense,
           parentId: widget.parentId,
           showMature: _showMature,
-          showBorder: true,
           onReveal: (value) {
             setState(() => _showMature = value);
           },

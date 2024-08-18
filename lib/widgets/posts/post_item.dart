@@ -301,7 +301,7 @@ class _PostItemState extends State<PostItem> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildThumbnail(),
+          _buildThumbnail().paddingOnly(bottom: 8),
           _buildHeader().paddingSymmetric(horizontal: 12),
           _buildHeaderDivider().paddingSymmetric(horizontal: 12),
           Stack(
