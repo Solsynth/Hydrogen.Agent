@@ -125,6 +125,7 @@ const i18nSimplifiedChinese = {
   'articleDetail': '文章详情',
   'draftBoxOpen': '打开草稿箱',
   'postListNews': '新鲜事',
+  'postListFriends': '好友圈',
   'postListShuffle': '打乱看',
   'postNew': '创建新帖子',
   'postNewInRealmHint': '在领域 @realm 里发表新帖子',

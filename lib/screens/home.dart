@@ -5,6 +5,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
@@ -27,20 +28,18 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _postController = PostListController();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
-      switch (_tabController.index) {
-        case 0:
-        case 1:
-          if (_postController.mode.value == _tabController.index) return;
-          _postController.mode.value = _tabController.index;
-          _postController.reloadAllOver();
-      }
+      if (_postController.mode.value == _tabController.index) return;
+      _postController.mode.value = _tabController.index;
+      _postController.reloadAllOver();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final AuthProvider auth = Get.find();
+
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
@@ -82,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen>
                   controller: _tabController,
                   tabs: [
                     Tab(text: 'postListNews'.tr),
+                    Tab(text: 'postListFriends'.tr),
                     Tab(text: 'postListShuffle'.tr),
                   ],
                 ),
@@ -108,6 +108,23 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ]),
                 ),
+                Obx(() {
+                  if (auth.isAuthorized.value) {
+                    return RefreshIndicator(
+                      onRefresh: () => _postController.reloadAllOver(),
+                      child: CustomScrollView(slivers: [
+                        PostWarpedListWidget(
+                          controller: _postController.pagingController,
+                          onUpdate: () => _postController.reloadAllOver(),
+                        ),
+                      ]),
+                    );
+                  } else {
+                    return SigninRequiredOverlay(
+                      onSignedIn: () => _postController.reloadAllOver(),
+                    );
+                  }
+                }),
                 PostShuffleSwiper(controller: _postController),
               ],
             );

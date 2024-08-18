@@ -125,6 +125,7 @@ const i18nEnglish = {
   'postThumbnailAttachment': 'Attachment serial number',
   'postPinned': 'Pinned',
   'postListNews': 'News',
+  'postListFriends': 'Friends',
   'postListShuffle': 'Random',
   'postEditorModeStory': 'Post a post',
   'postEditorModeArticle': 'Post an article',

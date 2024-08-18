@@ -9,11 +9,12 @@ class PostListController extends GetxController {
 
   /// The polling source modifier.
   /// - `0`: default recommendations
-  /// - `1`: shuffle mode
+  /// - `1`: friend mode
+  /// - `2`: shuffle mode
   RxInt mode = 0.obs;
 
   /// The paging controller for infinite loading.
-  /// Only available when mode is `0`.
+  /// Only available when mode is `0` or `1`.
   PagingController<int, Post> pagingController =
       PagingController(firstPageKey: 0);
 
@@ -111,10 +112,23 @@ class PostListController extends GetxController {
           author: author,
         );
       } else {
-        resp = await provider.listRecommendations(
-          pageKey,
-          channel: mode.value == 0 ? null : 'shuffle',
-        );
+        switch (mode.value) {
+          case 2:
+            resp = await provider.listRecommendations(
+              pageKey,
+              channel: 'shuffle',
+            );
+            break;
+          case 1:
+            resp = await provider.listRecommendations(
+              pageKey,
+              channel: 'friends',
+            );
+            break;
+          default:
+            resp = await provider.listRecommendations(pageKey);
+            break;
+        }
       }
     } catch (e) {
       rethrow;

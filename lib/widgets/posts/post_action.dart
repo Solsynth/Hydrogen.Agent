@@ -45,7 +45,7 @@ class _PostActionState extends State<PostAction> {
     String id;
     final box = context.findRenderObject() as RenderBox?;
     if (widget.item.alias?.isNotEmpty ?? false) {
-      id = '${widget.item.areaAlias}:${widget.item.alias}';
+      id = '${widget.item.areaAlias}/${widget.item.alias}';
     } else {
       id = '${widget.item.id}';
     }
@@ -55,10 +55,10 @@ class _PostActionState extends State<PostAction> {
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
     } else {
-      final extraContent = [
+      final extraContent = <String?>[
         widget.item.body['title'],
         widget.item.body['description'],
-      ];
+      ].where((x) => x != null && x.isNotEmpty).toList();
       final isExtraNotEmpty = extraContent.any((x) => x != null);
       result = await Share.share(
         'postShareContent'.trParams({

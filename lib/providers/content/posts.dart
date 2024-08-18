@@ -10,12 +10,19 @@ class PostProvider extends GetConnect {
 
   Future<Response> listRecommendations(int page,
       {String? realm, String? channel}) async {
+    GetConnect client;
+    final AuthProvider auth = Get.find();
     final queries = [
       'take=${10}',
       'offset=$page',
       if (realm != null) 'realm=$realm',
     ];
-    final resp = await get(
+    if (auth.isAuthorized.value) {
+      client = auth.configureClient('co');
+    } else {
+      client = ServiceFinder.configureClient('co');
+    }
+    final resp = await client.get(
       channel == null
           ? '/recommendations?${queries.join('&')}'
           : '/recommendations/$channel?${queries.join('&')}',
