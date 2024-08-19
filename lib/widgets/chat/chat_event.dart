@@ -73,7 +73,7 @@ class ChatEvent extends StatelessWidget {
     return Container(
       key: Key('m${item.uuid}attachments-box'),
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.only(top: isMerged ? 0 : 4),
+      padding: EdgeInsets.only(top: isMerged ? 0 : 4, bottom: 4),
       constraints: const BoxConstraints(
         maxHeight: 720,
       ),
