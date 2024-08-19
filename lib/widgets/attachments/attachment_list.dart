@@ -72,6 +72,7 @@ class _AttachmentListState extends State<AttachmentList> {
     double? consistentValue;
     int portrait = 0, square = 0, landscape = 0;
     for (var entry in _attachmentsMeta) {
+      if (entry == null) continue;
       if (entry!.metadata?['ratio'] != null) {
         if (entry.metadata?['ratio'] is int) {
           consistentValue ??= entry.metadata?['ratio'].toDouble();

@@ -293,7 +293,7 @@ class _PostItemState extends State<PostItem> {
   @override
   Widget build(BuildContext context) {
     final List<String> attachments = item.body['attachments'] is List
-        ? item.body['attachments']?.cast<String>()
+        ? List.from(item.body['attachments']?.whereType<String>())
         : List.empty();
     final hasAttachment = attachments.isNotEmpty;
 

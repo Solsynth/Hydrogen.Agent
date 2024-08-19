@@ -82,7 +82,7 @@ class EventMessageBody {
         text: json['text'] ?? '',
         algorithm: json['algorithm'] ?? 'plain',
         attachments: json['attachments'] != null
-            ? List<String>.from(json['attachments'].map((x) => x))
+            ? List<String>.from(json['attachments']?.whereType<String>())
             : null,
         quoteEvent: json['quote_event'],
         relatedEvent: json['related_event'],
