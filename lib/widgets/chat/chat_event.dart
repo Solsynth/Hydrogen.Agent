@@ -8,6 +8,7 @@ import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/chat/chat_event_action_log.dart';
 import 'package:solian/widgets/chat/chat_event_message.dart';
+import 'package:solian/widgets/link_expansion.dart';
 import 'package:timeago/timeago.dart' show format;
 
 class ChatEvent extends StatelessWidget {
@@ -35,6 +36,11 @@ class ChatEvent extends StatelessWidget {
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60).abs());
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60).abs());
     return '$negativeSign${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds';
+  }
+
+  Widget _buildLinkExpansion() {
+    if (item.body['text'] == null) return const SizedBox();
+    return LinkExpansion(content: item.body['text']);
   }
 
   Widget _buildAttachment(BuildContext context, {bool isMinimal = false}) {
@@ -188,8 +194,9 @@ class ChatEvent extends StatelessWidget {
                 ),
             ],
           ).paddingOnly(right: 12),
-          _buildAttachment(context, isMinimal: isContentPreviewing)
-              .paddingOnly(left: isContentPreviewing ? 12 : 56),
+          _buildAttachment(context, isMinimal: isContentPreviewing).paddingOnly(
+            left: isContentPreviewing ? 12 : 56,
+          ),
         ],
       );
     } else if (isQuote) {
@@ -210,7 +217,9 @@ class ChatEvent extends StatelessWidget {
                   Row(
                     children: [
                       AccountAvatar(
-                          content: item.sender.account.avatar, radius: 9),
+                        content: item.sender.account.avatar,
+                        radius: 9,
+                      ),
                       const SizedBox(width: 5),
                       Text(
                         item.sender.account.nick,
@@ -283,6 +292,7 @@ class ChatEvent extends StatelessWidget {
               ),
             ],
           ).paddingSymmetric(horizontal: 12),
+          _buildLinkExpansion().paddingOnly(left: 52),
           _buildAttachment(context).paddingOnly(left: 56),
         ],
       );

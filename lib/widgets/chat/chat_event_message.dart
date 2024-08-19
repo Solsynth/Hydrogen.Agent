@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/event.dart';
-import 'package:solian/widgets/link_expansion.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 
 class ChatEventMessage extends StatelessWidget {
@@ -54,28 +53,11 @@ class ChatEventMessage extends StatelessWidget {
     );
   }
 
-  Widget _buildLinkExpansion() {
-    final body = EventMessageBody.fromJson(item.body);
-    return LinkExpansion(content: body.text);
-  }
-
   Widget _buildBody(BuildContext context) {
     if (isMerged) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildContent(context).paddingOnly(left: 4),
-          _buildLinkExpansion(),
-        ],
-      ).paddingOnly(left: 48);
+      return _buildContent(context).paddingOnly(left: 52);
     } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildContent(context),
-          _buildLinkExpansion(),
-        ],
-      );
+      return _buildContent(context);
     }
   }
 

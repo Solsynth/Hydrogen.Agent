@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
@@ -83,12 +82,7 @@ class ChatEventList extends StatelessWidget {
                     ),
                   );
                 },
-              ).animate(key: Key('m-animation${item.uuid}')).slideY(
-                    duration: 250.ms,
-                    curve: Curves.fastEaseInToSlowEaseOut,
-                    end: 0,
-                    begin: 0.5,
-                  );
+              );
             },
           );
         }),
