@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
   final String parentId;
@@ -231,22 +231,20 @@ class _AttachmentItemVideo extends StatefulWidget {
 }
 
 class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
-  VideoPlayerController? _playerController;
-  ChewieController? _chewieController;
+  late final _player = Player(
+    configuration: const PlayerConfiguration(
+      logLevel: MPVLogLevel.error,
+    ),
+  );
+
+  late final _controller = VideoController(_player);
 
   bool _showContent = false;
 
   Future<void> _startLoad() async {
-    final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
-    _playerController = VideoPlayerController.networkUrl(
-      Uri.parse(
-        ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}'),
-      ),
-    );
-    _playerController!.initialize();
-    _chewieController = ChewieController(
-      aspectRatio: ratio,
-      videoPlayerController: _playerController!,
+    await _player.open(
+      Media(ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}')),
+      play: false,
     );
     setState(() => _showContent = true);
   }
@@ -260,16 +258,9 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
   }
 
   @override
-  void dispose() {
-    _playerController?.dispose();
-    _chewieController?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
-    if (!_showContent || _chewieController == null) {
+    if (!_showContent) {
       return GestureDetector(
         child: AspectRatio(
           aspectRatio: ratio,
@@ -307,8 +298,15 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
       );
     }
 
-    return Chewie(
-      controller: _chewieController!,
+    return Video(
+      aspectRatio: ratio,
+      controller: _controller,
     );
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
   }
 }
