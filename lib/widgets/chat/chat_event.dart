@@ -239,6 +239,7 @@ class ChatEvent extends StatelessWidget {
       ).paddingOnly(left: isMerged ? 52 : 0, right: 4);
     } else {
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         key: Key('m${item.uuid}'),
         children: [
           Row(
