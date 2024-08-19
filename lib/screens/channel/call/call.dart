@@ -246,7 +246,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                                   return Row(
                                     children: [
                                       Text(
-                                        call.channel.value!.name,
+                                        call.channel.value?.name ??
+                                            'unknown'.tr,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),

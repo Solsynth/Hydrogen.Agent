@@ -380,4 +380,5 @@ const i18nEnglish = {
   'messageOutOfSyncCaption':
       'Since the App has entered the background, there may be a time difference between the message list and the server. Click to Refresh.',
   'messageHistoryWipe': 'Wipe local message history',
+  'unknown': 'Unknown',
 };

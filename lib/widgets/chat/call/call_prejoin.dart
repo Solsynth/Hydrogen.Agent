@@ -11,11 +11,13 @@ import 'package:solian/providers/call.dart';
 class ChatCallPrejoinPopup extends StatefulWidget {
   final Call ongoingCall;
   final Channel channel;
+  final Function onJoin;
 
   const ChatCallPrejoinPopup({
     super.key,
     required this.ongoingCall,
     required this.channel,
+    required this.onJoin,
   });
 
   @override
@@ -56,6 +58,7 @@ class _ChatCallPrejoinPopupState extends State<ChatCallPrejoinPopup> {
       context.showErrorDialog(e);
     }
 
+    widget.onJoin();
     setState(() => _isBusy = false);
   }
 

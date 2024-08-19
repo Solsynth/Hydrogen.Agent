@@ -31,6 +31,7 @@ class ChannelCallIndicator extends StatelessWidget {
       builder: (context) => ChatCallPrejoinPopup(
         ongoingCall: ongoingCall,
         channel: channel,
+        onJoin: onJoin,
       ),
     );
   }

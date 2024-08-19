@@ -400,6 +400,7 @@ class ChatCallProvider extends GetxController {
   }
 
   void disposeRoom() {
+    isBusy.value = false;
     isMounted.value = false;
     isInitialized.value = false;
     current.value = null;
