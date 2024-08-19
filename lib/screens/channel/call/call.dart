@@ -12,16 +12,15 @@ import 'package:solian/widgets/chat/call/call_participant.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit;
 
 class CallScreen extends StatefulWidget {
-  const CallScreen({super.key});
+  final bool hideAppBar;
+
+  const CallScreen({super.key, this.hideAppBar = false});
 
   @override
   State<CallScreen> createState() => _CallScreenState();
 }
 
 class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
-  Timer? _timer;
-  String _currentDuration = '00:00:00';
-
   int _layoutMode = 0;
 
   bool _showControls = true;
@@ -36,26 +35,6 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     parent: _controlsAnimationController,
     curve: Curves.fastOutSlowIn,
   );
-
-  String _parseDuration() {
-    final ChatCallProvider provider = Get.find();
-    if (provider.current.value == null) return '00:00:00';
-    Duration duration =
-        DateTime.now().difference(provider.current.value!.createdAt);
-
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String formattedTime = '${twoDigits(duration.inHours)}:'
-        '${twoDigits(duration.inMinutes.remainder(60))}:'
-        '${twoDigits(duration.inSeconds.remainder(60))}';
-
-    return formattedTime;
-  }
-
-  void _updateDuration() {
-    setState(() {
-      _currentDuration = _parseDuration();
-    });
-  }
 
   void _switchLayout() {
     if (_layoutMode < 1) {
@@ -191,15 +170,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    Get.find<ChatCallProvider>().setupRoom();
     super.initState();
 
-    _updateDuration();
-    _planAutoHideControls();
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _updateDuration(),
-    );
+    Future.delayed(Duration.zero, () {
+      Get.find<ChatCallProvider>()
+        ..setupRoom()
+        ..enableDurationUpdater();
+
+      _planAutoHideControls();
+    });
   }
 
   @override
@@ -210,30 +189,34 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final ChatCallProvider provider = Get.find();
+    final ChatCallProvider ctrl = Get.find();
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
-        appBar: AppBar(
-          leading: AppBarLeadingButton.adaptive(context),
-          centerTitle: true,
-          toolbarHeight: SolianTheme.toolbarHeight(context),
-          title: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(children: [
-              TextSpan(
-                text: 'call'.tr,
-                style: Theme.of(context).textTheme.titleLarge,
+        appBar: widget.hideAppBar
+            ? null
+            : AppBar(
+                leading: AppBarLeadingButton.adaptive(context),
+                centerTitle: true,
+                toolbarHeight: SolianTheme.toolbarHeight(context),
+                title: Obx(
+                  () => RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(children: [
+                      TextSpan(
+                        text: 'call'.tr,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const TextSpan(text: '\n'),
+                      TextSpan(
+                        text: ctrl.lastDuration.value,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ]),
+                  ),
+                ),
               ),
-              const TextSpan(text: '\n'),
-              TextSpan(
-                text: _currentDuration,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ]),
-          ),
-        ),
         body: SafeArea(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
@@ -259,13 +242,20 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(call.room.serverRegion ?? 'unknown'),
-                                    const SizedBox(width: 6),
-                                    Text(call.room.serverVersion ?? 'unknown')
-                                  ],
-                                ),
+                                Obx(() {
+                                  return Row(
+                                    children: [
+                                      Text(
+                                        call.channel.value!.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(call.lastDuration.value)
+                                    ],
+                                  );
+                                }),
                                 Row(
                                   children: [
                                     Text(
@@ -332,7 +322,6 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 Expanded(
                   child: Material(
                     color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    elevation: 2,
                     child: Builder(
                       builder: (context) {
                         switch (_layoutMode) {
@@ -345,15 +334,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                if (provider.room.localParticipant != null)
+                if (ctrl.room.localParticipant != null)
                   SizeTransition(
                     sizeFactor: _controlsAnimation,
                     axis: Axis.vertical,
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: ControlsWidget(
-                        provider.room,
-                        provider.room.localParticipant!,
+                        ctrl.room,
+                        ctrl.room.localParticipant!,
                       ),
                     ),
                   ),
@@ -370,17 +359,13 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   @override
   void deactivate() {
-    _timer?.cancel();
-    _timer = null;
+    Get.find<ChatCallProvider>().disableDurationUpdater();
     super.deactivate();
   }
 
   @override
   void activate() {
-    _timer ??= Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _updateDuration(),
-    );
+    Get.find<ChatCallProvider>().enableDurationUpdater();
     super.activate();
   }
 }

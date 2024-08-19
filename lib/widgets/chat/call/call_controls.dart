@@ -88,10 +88,12 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   void _disconnect() async {
     if (await showDisconnectDialog() != true) return;
 
-    final ChatCallProvider provider = Get.find();
-    if (provider.current.value != null) {
-      provider.disposeRoom();
-      Navigator.pop(context);
+    final ChatCallProvider call = Get.find();
+    if (call.current.value != null) {
+      call.disposeRoom();
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -209,8 +211,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
         runSpacing: 5,
         children: [
           IconButton(
-            icon: Transform.flip(
-                flipX: true, child: const Icon(Icons.exit_to_app)),
+            icon: const Icon(Icons.exit_to_app),
             color: Theme.of(context).colorScheme.onSurface,
             onPressed: _disconnect,
           ),

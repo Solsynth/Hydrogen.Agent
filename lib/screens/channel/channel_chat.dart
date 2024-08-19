@@ -11,9 +11,11 @@ import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/call.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
+import 'package:solian/screens/channel/call/call.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
@@ -39,7 +41,7 @@ class ChannelChatScreen extends StatefulWidget {
 }
 
 class _ChannelChatScreenState extends State<ChannelChatScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   DateTime? _isOutOfSyncSince;
 
   bool _isBusy = false;
@@ -238,77 +240,104 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
           );
         }
 
-        return Column(
+        return Row(
           children: [
-            if (_ongoingCall != null)
-              ChannelCallIndicator(
-                channel: _channel!,
-                ongoingCall: _ongoingCall!,
-              ),
             Expanded(
-              child: ChatEventList(
-                scope: widget.realm,
-                channel: _channel!,
-                chatController: _chatController,
-                onEdit: (item) {
-                  setState(() => _messageToEditing = item);
-                },
-                onReply: (item) {
-                  setState(() => _messageToReplying = item);
-                },
-              ),
-            ),
-            if (_isOutOfSyncSince != null)
-              ListTile(
-                contentPadding: const EdgeInsets.only(left: 16, right: 8),
-                tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                leading: const Icon(Icons.history_toggle_off),
-                title: Text('messageOutOfSync'.tr),
-                subtitle: Text('messageOutOfSyncCaption'.tr),
-                trailing: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    setState(() => _isOutOfSyncSince = null);
-                  },
-                ),
-                onTap: _isBusy
-                    ? null
-                    : () {
-                        _keepUpdateWithServer();
+              child: Column(
+                children: [
+                  if (_ongoingCall != null)
+                    ChannelCallIndicator(
+                      channel: _channel!,
+                      ongoingCall: _ongoingCall!,
+                      onJoin: () {
+                        if (!SolianTheme.isLargeScreen(context)) {
+                          final ChatCallProvider call = Get.find();
+                          call.gotoScreen(context);
+                        }
                       },
-              ),
-            Obx(() {
-              if (_chatController.isLoading.isTrue) {
-                return const LinearProgressIndicator().animate().slideY();
-              } else {
-                return const SizedBox();
-              }
-            }),
-            ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                child: SafeArea(
-                  child: ChatMessageInput(
-                    edit: _messageToEditing,
-                    reply: _messageToReplying,
-                    realm: widget.realm,
-                    placeholder: placeholder,
-                    channel: _channel!,
-                    onSent: (Event item) {
-                      setState(() {
-                        _chatController.addPendingEvent(item);
-                      });
-                    },
-                    onReset: () {
-                      setState(() {
-                        _messageToReplying = null;
-                        _messageToEditing = null;
-                      });
-                    },
+                    ),
+                  Expanded(
+                    child: ChatEventList(
+                      scope: widget.realm,
+                      channel: _channel!,
+                      chatController: _chatController,
+                      onEdit: (item) {
+                        setState(() => _messageToEditing = item);
+                      },
+                      onReply: (item) {
+                        setState(() => _messageToReplying = item);
+                      },
+                    ),
                   ),
-                ),
+                  if (_isOutOfSyncSince != null)
+                    ListTile(
+                      contentPadding: const EdgeInsets.only(left: 16, right: 8),
+                      tileColor:
+                          Theme.of(context).colorScheme.surfaceContainerLow,
+                      leading: const Icon(Icons.history_toggle_off),
+                      title: Text('messageOutOfSync'.tr),
+                      subtitle: Text('messageOutOfSyncCaption'.tr),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          setState(() => _isOutOfSyncSince = null);
+                        },
+                      ),
+                      onTap: _isBusy
+                          ? null
+                          : () {
+                              _keepUpdateWithServer();
+                            },
+                    ),
+                  Obx(() {
+                    if (_chatController.isLoading.isTrue) {
+                      return const LinearProgressIndicator().animate().slideY();
+                    } else {
+                      return const SizedBox();
+                    }
+                  }),
+                  ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                      child: SafeArea(
+                        child: ChatMessageInput(
+                          edit: _messageToEditing,
+                          reply: _messageToReplying,
+                          realm: widget.realm,
+                          placeholder: placeholder,
+                          channel: _channel!,
+                          onSent: (Event item) {
+                            setState(() {
+                              _chatController.addPendingEvent(item);
+                            });
+                          },
+                          onReset: () {
+                            setState(() {
+                              _messageToReplying = null;
+                              _messageToEditing = null;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+            Obx(() {
+              final ChatCallProvider call = Get.find();
+              if (call.isMounted.value && SolianTheme.isLargeScreen(context)) {
+                return const Expanded(
+                  child: Row(children: [
+                    VerticalDivider(width: 0.3, thickness: 0.3),
+                    Expanded(
+                      child: CallScreen(hideAppBar: true),
+                    ),
+                  ]),
+                );
+              }
+              return const SizedBox();
+            }),
           ],
         );
       }),

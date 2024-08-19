@@ -7,10 +7,10 @@ class ChatCallCurrentIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ChatCallProvider provider = Get.find();
+    final ChatCallProvider call = Get.find();
 
     return Obx(() {
-      if (provider.current.value == null || provider.channel.value == null) {
+      if (call.current.value == null || call.channel.value == null) {
         return const SizedBox();
       }
 
@@ -18,11 +18,8 @@ class ChatCallCurrentIndicator extends StatelessWidget {
         tileColor: Theme.of(context).colorScheme.surfaceContainerHigh,
         contentPadding: const EdgeInsets.symmetric(horizontal: 32),
         leading: const Icon(Icons.call),
-        title: Text(provider.channel.value!.name),
+        title: Text(call.channel.value!.name),
         subtitle: Text('callAlreadyOngoing'.tr),
-        onTap: () {
-          provider.gotoScreen(context);
-        },
       );
     });
   }

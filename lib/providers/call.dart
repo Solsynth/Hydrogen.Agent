@@ -17,6 +17,10 @@ class ChatCallProvider extends GetxController {
   RxBool isReady = false.obs;
   RxBool isMounted = false.obs;
   RxBool isInitialized = false.obs;
+  RxBool isBusy = false.obs;
+
+  RxString lastDuration = '00:00:00'.obs;
+  Timer? lastDurationUpdateTimer;
 
   String? token;
   String? endpoint;
@@ -37,6 +41,34 @@ class ChatCallProvider extends GetxController {
 
   RxList<ParticipantTrack> participantTracks = RxList.empty(growable: true);
   Rx<ParticipantTrack?> focusTrack = Rx(null);
+
+  void _updateDuration() {
+    if (current.value == null) {
+      lastDuration.value = '00:00:00';
+      return;
+    }
+
+    Duration duration = DateTime.now().difference(current.value!.createdAt);
+
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String formattedTime = '${twoDigits(duration.inHours)}:'
+        '${twoDigits(duration.inMinutes.remainder(60))}:'
+        '${twoDigits(duration.inSeconds.remainder(60))}';
+    lastDuration.value = formattedTime;
+  }
+
+  void enableDurationUpdater() {
+    _updateDuration();
+    lastDurationUpdateTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _updateDuration(),
+    );
+  }
+
+  void disableDurationUpdater() {
+    lastDurationUpdateTimer?.cancel();
+    lastDurationUpdateTimer = null;
+  }
 
   Future<void> checkPermissions() async {
     if (lkPlatformIs(PlatformType.macOS) || lkPlatformIs(PlatformType.linux)) {
@@ -119,8 +151,6 @@ class ChatCallProvider extends GetxController {
   void joinRoom(String url, String token) async {
     if (isMounted.value) {
       return;
-    } else {
-      isMounted.value = true;
     }
 
     try {
@@ -134,6 +164,8 @@ class ChatCallProvider extends GetxController {
       );
     } catch (e) {
       rethrow;
+    } finally {
+      isMounted.value = true;
     }
   }
 
@@ -165,6 +197,7 @@ class ChatCallProvider extends GetxController {
       Hardware.instance.setSpeakerphoneOn(true);
     }
 
+    isBusy.value = false;
     isInitialized.value = true;
   }
 

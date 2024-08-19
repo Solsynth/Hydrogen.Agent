@@ -269,6 +269,7 @@ const i18nEnglish = {
   'callOngoing': 'A call is ongoing...',
   'callOngoingEmpty': 'A call is on hold...',
   'callOngoingParticipants': '@count people are calling...',
+  'callOngoingJoined': 'Call last @duration',
   'callJoin': 'Join',
   'callResume': 'Resume',
   'callMicrophone': 'Microphone',

@@ -9,14 +9,20 @@ import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/call.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 
 class ChannelCallIndicator extends StatelessWidget {
   final Channel channel;
   final Call ongoingCall;
+  final Function onJoin;
 
-  const ChannelCallIndicator(
-      {super.key, required this.channel, required this.ongoingCall});
+  const ChannelCallIndicator({
+    super.key,
+    required this.channel,
+    required this.ongoingCall,
+    required this.onJoin,
+  });
 
   void _showCallPrejoin(BuildContext context) {
     showModalBottomSheet(
@@ -40,48 +46,72 @@ class ChannelCallIndicator extends StatelessWidget {
       dividerColor: Colors.transparent,
       content: Row(
         children: [
-          if (ongoingCall.participants.isEmpty) Text('callOngoingEmpty'.tr),
-          if (ongoingCall.participants.isNotEmpty)
-            Text('callOngoingParticipants'.trParams({
-              'count': ongoingCall.participants.length.toString(),
-            })),
+          Obx(() {
+            if (call.isInitialized.value) {
+              return Text('callOngoingJoined'.trParams({
+                'duration': call.lastDuration.value,
+              }));
+            } else if (ongoingCall.participants.isEmpty) {
+              return Text('callOngoingEmpty'.tr);
+            } else {
+              return Text('callOngoingParticipants'.trParams({
+                'count': ongoingCall.participants.length.toString(),
+              }));
+            }
+          }),
           const SizedBox(width: 6),
-          if (ongoingCall.participants.isNotEmpty)
-            Container(
-              height: 28,
-              constraints: const BoxConstraints(maxWidth: 120),
-              child: AvatarStack(
+          Obx(() {
+            if (call.isInitialized.value) {
+              return const SizedBox();
+            }
+            if (ongoingCall.participants.isNotEmpty) {
+              return Container(
                 height: 28,
-                borderWidth: 0,
-                avatars: ongoingCall.participants.map((x) {
-                  final userinfo = Account.fromJson(jsonDecode(x['metadata']));
-                  return PlatformInfo.canCacheImage
-                      ? CachedNetworkImageProvider(userinfo.avatar)
-                          as ImageProvider
-                      : NetworkImage(userinfo.avatar) as ImageProvider;
-                }).toList(),
-              ),
-            ),
+                constraints: const BoxConstraints(maxWidth: 120),
+                child: AvatarStack(
+                  height: 28,
+                  borderWidth: 0,
+                  avatars: ongoingCall.participants.map((x) {
+                    final userinfo =
+                        Account.fromJson(jsonDecode(x['metadata']));
+                    return PlatformInfo.canCacheImage
+                        ? CachedNetworkImageProvider(userinfo.avatar)
+                            as ImageProvider
+                        : NetworkImage(userinfo.avatar) as ImageProvider;
+                  }).toList(),
+                ),
+              );
+            }
+            return const SizedBox();
+          })
         ],
       ),
       actions: [
         Obx(() {
-          if (call.current.value == null) {
+          if (call.isBusy.value) {
+            return const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 3),
+            ).paddingAll(16);
+          } else if (call.current.value == null) {
             return TextButton(
               onPressed: () => _showCallPrejoin(context),
               child: Text('callJoin'.tr),
             );
-          } else if (call.channel.value?.id == channel.id) {
+          } else if (call.channel.value?.id == channel.id &&
+              !SolianTheme.isLargeScreen(context)) {
             return TextButton(
-              onPressed: () => call.gotoScreen(context),
+              onPressed: () => onJoin(),
               child: Text('callResume'.tr),
             );
-          } else {
+          } else if (!SolianTheme.isLargeScreen(context)) {
             return TextButton(
               onPressed: null,
               child: Text('callJoin'.tr),
             );
           }
+          return const SizedBox();
         })
       ],
     );

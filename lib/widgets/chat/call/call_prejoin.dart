@@ -25,22 +25,23 @@ class ChatCallPrejoinPopup extends StatefulWidget {
 class _ChatCallPrejoinPopupState extends State<ChatCallPrejoinPopup> {
   bool _isBusy = false;
 
-  void performJoin() async {
+  void _performJoin() async {
     final AuthProvider auth = Get.find();
-    final ChatCallProvider provider = Get.find();
+    final ChatCallProvider call = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
     setState(() => _isBusy = true);
 
-    provider.setCall(widget.ongoingCall, widget.channel);
+    call.setCall(widget.ongoingCall, widget.channel);
+    call.isBusy.value = true;
 
     try {
-      final resp = await provider.getRoomToken();
+      final resp = await call.getRoomToken();
       final token = resp.$1;
       final endpoint = resp.$2;
 
-      provider.initRoom();
-      provider.setupRoomListeners(
+      call.initRoom();
+      call.setupRoomListeners(
         onDisconnected: (reason) {
           context.showSnackbar(
             'callDisconnected'.trParams({'reason': reason.toString()}),
@@ -48,11 +49,9 @@ class _ChatCallPrejoinPopupState extends State<ChatCallPrejoinPopup> {
         },
       );
 
-      provider.joinRoom(endpoint, token);
+      call.joinRoom(endpoint, token);
 
-      provider.gotoScreen(context).then((_) {
-        Navigator.pop(context);
-      });
+      Navigator.pop(context);
     } catch (e) {
       context.showErrorDialog(e);
     }
@@ -62,9 +61,9 @@ class _ChatCallPrejoinPopupState extends State<ChatCallPrejoinPopup> {
 
   @override
   void initState() {
-    final ChatCallProvider provider = Get.find();
-    provider.checkPermissions().then((_) {
-      provider.initHardware();
+    final ChatCallProvider call = Get.find();
+    call.checkPermissions().then((_) {
+      call.initHardware();
     });
 
     super.initState();
@@ -169,7 +168,7 @@ class _ChatCallPrejoinPopupState extends State<ChatCallPrejoinPopup> {
                     backgroundColor:
                         Theme.of(context).colorScheme.primaryContainer,
                   ),
-                  onPressed: _isBusy ? null : performJoin,
+                  onPressed: _isBusy ? null : _performJoin,
                   child: Text('callJoin'.tr),
                 ),
             ],
