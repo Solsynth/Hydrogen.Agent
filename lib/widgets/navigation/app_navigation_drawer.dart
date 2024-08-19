@@ -33,9 +33,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     final resp = await provider.getCurrentStatus();
     final status = AccountStatus.fromJson(resp.body);
 
-    setState(() {
-      _accountStatus = status;
-    });
+    if (mounted) {
+      setState(() {
+        _accountStatus = status;
+      });
+    }
   }
 
   void _closeDrawer() {

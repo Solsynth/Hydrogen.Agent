@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/link_expander.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -8,6 +10,12 @@ class LinkExpansion extends StatelessWidget {
   final String content;
 
   const LinkExpansion({super.key, required this.content});
+
+  Widget _buildImage(String url, {double? width, double? height}) {
+    return PlatformInfo.canCacheImage
+        ? CachedNetworkImage(imageUrl: url, width: width, height: height)
+        : Image.network(url, width: width, height: height);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,20 +51,17 @@ class LinkExpansion extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if ([
-                      snapshot.data!.icon != null &&
-                          (snapshot.data!.icon?.startsWith('http') ?? false),
+                      (snapshot.data!.icon?.isNotEmpty ?? false),
                       snapshot.data!.siteName != null
                     ].any((x) => x))
                       Row(
                         children: [
-                          if (snapshot.data!.icon != null &&
-                              (snapshot.data!.icon?.startsWith('http') ??
-                                  false))
+                          if (snapshot.data!.icon?.isNotEmpty ?? false)
                             ClipRRect(
                               borderRadius: const BorderRadius.all(
                                 Radius.circular(8),
                               ),
-                              child: Image.network(
+                              child: _buildImage(
                                 snapshot.data!.icon!,
                                 width: 32,
                                 height: 32,
@@ -68,14 +73,17 @@ class LinkExpansion extends StatelessWidget {
                               style: Theme.of(context).textTheme.labelLarge,
                             ),
                         ],
-                      ).paddingOnly(bottom: 8),
+                      ).paddingOnly(
+                        bottom:
+                            (snapshot.data!.icon?.isNotEmpty ?? false) ? 8 : 4,
+                      ),
                     if (snapshot.data!.image != null &&
                         (snapshot.data!.image?.startsWith('http') ?? false))
                       ClipRRect(
                         borderRadius: const BorderRadius.all(
                           Radius.circular(8),
                         ),
-                        child: Image.network(
+                        child: _buildImage(
                           snapshot.data!.image!,
                         ),
                       ).paddingOnly(bottom: 8),

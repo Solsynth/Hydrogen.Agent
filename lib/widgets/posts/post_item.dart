@@ -10,6 +10,7 @@ import 'package:solian/shells/title_shell.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
+import 'package:solian/widgets/link_expansion.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/posts/post_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
@@ -349,6 +350,11 @@ class _PostItemState extends State<PostItem> {
                 ),
             ],
           ),
+          LinkExpansion(content: item.body['content']).paddingOnly(
+            left: 8,
+            right: 8,
+            top: 4,
+          ),
           _buildFooter().paddingOnly(left: 16),
           if (attachments.isNotEmpty)
             Row(
@@ -445,6 +451,8 @@ class _PostItemState extends State<PostItem> {
                     if (widget.item.repostTo != null && widget.isShowEmbed)
                       _buildRepost(context).paddingOnly(top: 4),
                     _buildFooter().paddingOnly(left: 12),
+                    LinkExpansion(content: item.body['content'])
+                        .paddingOnly(top: 4),
                   ],
                 ),
               ),
