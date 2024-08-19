@@ -75,7 +75,7 @@ class ChatEvent extends StatelessWidget {
         key: Key('m${item.uuid}attachments'),
         parentId: item.uuid,
         attachmentsId: attachments,
-        viewport: 1,
+        isColumn: true,
       ),
     );
   }
@@ -189,7 +189,7 @@ class ChatEvent extends StatelessWidget {
             ],
           ).paddingOnly(right: 12),
           _buildAttachment(context, isMinimal: isContentPreviewing)
-              .paddingOnly(left: isContentPreviewing ? 12 : 0),
+              .paddingOnly(left: isContentPreviewing ? 12 : 56),
         ],
       );
     } else if (isQuote) {
@@ -221,8 +221,7 @@ class ChatEvent extends StatelessWidget {
                     ],
                   ),
                   _buildContent().paddingOnly(left: 0.5),
-                  _buildAttachment(context, isMinimal: true)
-                      .paddingOnly(left: 0),
+                  _buildAttachment(context, isMinimal: true),
                 ],
               ),
             ),
@@ -284,7 +283,7 @@ class ChatEvent extends StatelessWidget {
               ),
             ],
           ).paddingSymmetric(horizontal: 12),
-          _buildAttachment(context),
+          _buildAttachment(context).paddingOnly(left: 56),
         ],
       );
     }

@@ -289,6 +289,35 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
+  Widget _buildAttachments() {
+    final List<String> attachments = item.body['attachments'] is List
+        ? List.from(item.body['attachments']?.whereType<String>())
+        : List.empty();
+
+    if (attachments.length > 3) {
+      return AttachmentList(
+        parentId: widget.item.id.toString(),
+        attachmentsId: attachments,
+        autoload: true,
+        isGrid: true,
+      ).paddingOnly(left: 36, top: 4, bottom: 4);
+    } else if (attachments.length > 1) {
+      return AttachmentList(
+        parentId: widget.item.id.toString(),
+        attachmentsId: attachments,
+        autoload: true,
+        isColumn: true,
+      ).paddingOnly(left: 60, right: 24);
+    } else {
+      return AttachmentList(
+        flatMaxHeight: MediaQuery.of(context).size.width,
+        parentId: widget.item.id.toString(),
+        attachmentsId: attachments,
+        autoload: true,
+      );
+    }
+  }
+
   double _contentHeight = 0;
 
   @override
@@ -467,17 +496,11 @@ class _PostItemState extends State<PostItem> {
             ],
           ).paddingOnly(
             top: 10,
-            bottom: hasAttachment ? 10 : 0,
+            bottom: attachments.length == 1 ? 10 : 0,
             right: 16,
             left: 16,
           ),
-          AttachmentList(
-            flatMaxHeight: MediaQuery.of(context).size.width,
-            parentId: widget.item.id.toString(),
-            attachmentsId: attachments,
-            autoload: true,
-            isGrid: attachments.length > 1,
-          ),
+          _buildAttachments(),
           if (widget.isShowReply || widget.isReactable)
             PostQuickAction(
               isShowReply: widget.isShowReply,
@@ -490,8 +513,8 @@ class _PostItemState extends State<PostItem> {
                 });
               },
             ).paddingOnly(
-              top: hasAttachment ? 10 : 6,
-              left: hasAttachment ? 24 : 60,
+              top: attachments.length == 1 ? 10 : 6,
+              left: attachments.length == 1 ? 24 : 60,
               right: 16,
               bottom: 10,
             )

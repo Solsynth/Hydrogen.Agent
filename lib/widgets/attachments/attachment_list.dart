@@ -1,4 +1,4 @@
-import 'dart:math' show min;
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -16,9 +16,11 @@ class AttachmentList extends StatefulWidget {
   final String parentId;
   final List<String> attachmentsId;
   final bool isGrid;
+  final bool isColumn;
   final bool isForceGrid;
   final bool autoload;
   final double flatMaxHeight;
+  final double columnMaxWidth;
 
   final double? width;
   final double? viewport;
@@ -28,9 +30,11 @@ class AttachmentList extends StatefulWidget {
     required this.parentId,
     required this.attachmentsId,
     this.isGrid = false,
+    this.isColumn = false,
     this.isForceGrid = false,
     this.autoload = false,
     this.flatMaxHeight = 720,
+    this.columnMaxWidth = 480,
     this.width,
     this.viewport,
   });
@@ -105,13 +109,14 @@ class _AttachmentListState extends State<AttachmentList> {
     }
   }
 
-  Widget _buildEntry(Attachment? element, int idx) {
+  Widget _buildEntry(Attachment? element, int idx, {double? width}) {
     return AttachmentListEntry(
       item: element,
       parentId: widget.parentId,
-      width: widget.width,
+      width: width ?? widget.width,
       badgeContent: '${idx + 1}/${_attachmentsMeta.length}',
-      showBadge: _attachmentsMeta.length > 1 && !widget.isGrid,
+      showBadge:
+          _attachmentsMeta.length > 1 && !widget.isGrid && !widget.isColumn,
       showBorder: widget.attachmentsId.length > 1,
       showMature: _showMature,
       autoload: widget.autoload,
@@ -142,6 +147,43 @@ class _AttachmentListState extends State<AttachmentList> {
       );
     }
 
+    if (widget.isColumn) {
+      var idx = 0;
+      const radius = BorderRadius.all(Radius.circular(8));
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: widget.attachmentsId.map((x) {
+          final element = _attachmentsMeta[idx];
+          idx++;
+          if (element == null) return const SizedBox();
+          double ratio = element.metadata!['ratio']?.toDouble() ?? 16 / 9;
+          return Container(
+            constraints: BoxConstraints(
+              maxWidth: widget.columnMaxWidth,
+              maxHeight: 640,
+            ),
+            child: AspectRatio(
+              aspectRatio: ratio,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
+                    width: 1,
+                  ),
+                  borderRadius: radius,
+                ),
+                child: ClipRRect(
+                  borderRadius: radius,
+                  child: _buildEntry(element, idx),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    }
+
     final isNotPureImage = _attachmentsMeta.any(
       (x) => x?.mimetype.split('/').firstOrNull != 'image',
     );
@@ -153,7 +195,7 @@ class _AttachmentListState extends State<AttachmentList> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: min(3, widget.attachmentsId.length),
+          crossAxisCount: math.min(3, widget.attachmentsId.length),
           mainAxisSpacing: 8.0,
           crossAxisSpacing: 8.0,
         ),
@@ -213,6 +255,7 @@ class AttachmentListEntry extends StatelessWidget {
   final Attachment? item;
   final String? badgeContent;
   final double? width;
+  final double? height;
   final bool showBorder;
   final bool showBadge;
   final bool showMature;
@@ -227,6 +270,7 @@ class AttachmentListEntry extends StatelessWidget {
     this.item,
     this.badgeContent,
     this.width,
+    this.height,
     this.showBorder = false,
     this.showBadge = false,
     this.showMature = false,
@@ -251,6 +295,7 @@ class AttachmentListEntry extends StatelessWidget {
     return GestureDetector(
       child: Container(
         width: width ?? MediaQuery.of(context).size.width,
+        height: height,
         decoration: BoxDecoration(
           border: showBorder
               ? Border.symmetric(
