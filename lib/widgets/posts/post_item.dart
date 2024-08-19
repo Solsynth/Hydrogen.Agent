@@ -447,9 +447,17 @@ class _PostItemState extends State<PostItem> {
                       ],
                     ),
                     if (widget.item.replyTo != null && widget.isShowEmbed)
-                      _buildReply(context).paddingOnly(top: 4),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        padding: const EdgeInsets.only(top: 4),
+                        child: _buildReply(context),
+                      ),
                     if (widget.item.repostTo != null && widget.isShowEmbed)
-                      _buildRepost(context).paddingOnly(top: 4),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        padding: const EdgeInsets.only(top: 4),
+                        child: _buildRepost(context),
+                      ),
                     _buildFooter().paddingOnly(left: 12),
                     LinkExpansion(content: item.body['content'])
                         .paddingOnly(top: 4),

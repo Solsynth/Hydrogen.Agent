@@ -32,83 +32,90 @@ class LinkExpansion extends StatelessWidget {
 
     final LinkExpandController expandController = Get.find();
 
-    return Column(
+    return Wrap(
       children: matches.map((x) {
-        return FutureBuilder(
-          future: expandController.expandLink(x.group(0)!),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const SizedBox();
-            }
+        return Container(
+          constraints: BoxConstraints(
+            maxWidth: matches.length == 1 ? 480 : 340,
+          ),
+          child: FutureBuilder(
+            future: expandController.expandLink(x.group(0)!),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const SizedBox();
+              }
 
-            final isRichDescription = [
-              "solsynth.dev",
-            ].contains(Uri.parse(snapshot.data!.url).host);
+              final isRichDescription = [
+                "solsynth.dev",
+              ].contains(Uri.parse(snapshot.data!.url).host);
 
-            return GestureDetector(
-              child: Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if ([
-                      (snapshot.data!.icon?.isNotEmpty ?? false),
-                      snapshot.data!.siteName != null
-                    ].any((x) => x))
-                      Row(
-                        children: [
-                          if (snapshot.data!.icon?.isNotEmpty ?? false)
-                            ClipRRect(
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(8),
+              return GestureDetector(
+                child: Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if ([
+                        (snapshot.data!.icon?.isNotEmpty ?? false),
+                        snapshot.data!.siteName != null
+                      ].any((x) => x))
+                        Row(
+                          children: [
+                            if (snapshot.data!.icon?.isNotEmpty ?? false)
+                              ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                                child: _buildImage(
+                                  snapshot.data!.icon!,
+                                  width: 32,
+                                  height: 32,
+                                ),
+                              ).paddingOnly(right: 8),
+                            if (snapshot.data!.siteName != null)
+                              Text(
+                                snapshot.data!.siteName!,
+                                style: Theme.of(context).textTheme.labelLarge,
                               ),
-                              child: _buildImage(
-                                snapshot.data!.icon!,
-                                width: 32,
-                                height: 32,
-                              ),
-                            ).paddingOnly(right: 8),
-                          if (snapshot.data!.siteName != null)
-                            Text(
-                              snapshot.data!.siteName!,
-                              style: Theme.of(context).textTheme.labelLarge,
-                            ),
-                        ],
-                      ).paddingOnly(
-                        bottom:
-                            (snapshot.data!.icon?.isNotEmpty ?? false) ? 8 : 4,
-                      ),
-                    if (snapshot.data!.image != null &&
-                        (snapshot.data!.image?.startsWith('http') ?? false))
-                      ClipRRect(
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(8),
+                          ],
+                        ).paddingOnly(
+                          bottom: (snapshot.data!.icon?.isNotEmpty ?? false)
+                              ? 8
+                              : 4,
                         ),
-                        child: _buildImage(
-                          snapshot.data!.image!,
-                        ),
-                      ).paddingOnly(bottom: 8),
-                    Text(
-                      snapshot.data!.title ?? 'No Title',
-                      maxLines: 1,
-                      overflow: TextOverflow.fade,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    if (snapshot.data!.description != null && isRichDescription)
-                      MarkdownBody(data: snapshot.data!.description!)
-                    else if (snapshot.data!.description != null)
+                      if (snapshot.data!.image != null &&
+                          (snapshot.data!.image?.startsWith('http') ?? false))
+                        ClipRRect(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(8),
+                          ),
+                          child: _buildImage(
+                            snapshot.data!.image!,
+                          ),
+                        ).paddingOnly(bottom: 8),
                       Text(
-                        snapshot.data!.description!,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
+                        snapshot.data!.title ?? 'No Title',
+                        maxLines: 1,
+                        overflow: TextOverflow.fade,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                  ],
-                ).paddingAll(12),
-              ),
-              onTap: () {
-                launchUrlString(x.group(0)!);
-              },
-            );
-          },
+                      if (snapshot.data!.description != null &&
+                          isRichDescription)
+                        MarkdownBody(data: snapshot.data!.description!)
+                      else if (snapshot.data!.description != null)
+                        Text(
+                          snapshot.data!.description!,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ).paddingAll(12),
+                ),
+                onTap: () {
+                  launchUrlString(x.group(0)!);
+                },
+              );
+            },
+          ),
         );
       }).toList(),
     );
