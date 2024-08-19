@@ -96,10 +96,13 @@ class ChatEvent extends StatelessWidget {
           return const SizedBox();
         }
 
-        return ChatEvent(
-          item: snapshot.data!.data,
-          isMerged: false,
-          isQuote: true,
+        return Container(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: ChatEvent(
+            item: snapshot.data!.data,
+            isMerged: false,
+            isQuote: true,
+          ),
         ).paddingOnly(left: isMerged ? 52 : 0);
       },
     );
