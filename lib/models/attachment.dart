@@ -1,5 +1,30 @@
 import 'package:solian/models/account.dart';
 
+class AttachmentPlaceholder {
+  int chunkCount;
+  int chunkSize;
+  Attachment meta;
+
+  AttachmentPlaceholder({
+    required this.chunkCount,
+    required this.chunkSize,
+    required this.meta,
+  });
+
+  factory AttachmentPlaceholder.fromJson(Map<String, dynamic> json) =>
+      AttachmentPlaceholder(
+        chunkCount: json['chunk_count'],
+        chunkSize: json['chunk_size'],
+        meta: Attachment.fromJson(json['meta']),
+      );
+
+  Map<String, dynamic> toJson() => {
+        'chunk_count': chunkCount,
+        'chunk_size': chunkSize,
+        'meta': meta.toJson(),
+      };
+}
+
 class Attachment {
   int id;
   DateTime createdAt;
@@ -14,7 +39,9 @@ class Attachment {
   String hash;
   int destination;
   bool isAnalyzed;
+  bool isUploaded;
   Map<String, dynamic>? metadata;
+  Map<String, dynamic>? fileChunks;
   bool isMature;
   Account? account;
   int? accountId;
@@ -33,7 +60,9 @@ class Attachment {
     required this.hash,
     required this.destination,
     required this.isAnalyzed,
+    required this.isUploaded,
     required this.metadata,
+    required this.fileChunks,
     required this.isMature,
     required this.account,
     required this.accountId,
@@ -55,7 +84,9 @@ class Attachment {
         hash: json['hash'],
         destination: json['destination'],
         isAnalyzed: json['is_analyzed'],
+        isUploaded: json['is_uploaded'],
         metadata: json['metadata'],
+        fileChunks: json['file_chunks'],
         isMature: json['is_mature'],
         account:
             json['account'] != null ? Account.fromJson(json['account']) : null,
@@ -76,7 +107,9 @@ class Attachment {
         'hash': hash,
         'destination': destination,
         'is_analyzed': isAnalyzed,
+        'is_uploaded': isUploaded,
         'metadata': metadata,
+        'file_chunks': fileChunks,
         'is_mature': isMature,
         'account': account?.toJson(),
         'account_id': accountId,

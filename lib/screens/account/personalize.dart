@@ -113,7 +113,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     Attachment? attachResult;
     try {
-      attachResult = await provider.createAttachment(
+      attachResult = await provider.createAttachmentDirectly(
         await file.readAsBytes(),
         file.path,
         'avatar',

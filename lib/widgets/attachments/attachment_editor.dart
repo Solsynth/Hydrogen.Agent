@@ -72,8 +72,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       if (medias.isEmpty) return;
 
       _enqueueTaskBatch(medias.map((x) {
-        final file = File(x.path);
-        return AttachmentUploadTask(file: file, usage: widget.pool);
+        final file = XFile(x.path);
+        return AttachmentUploadTask(file: file, pool: widget.pool);
       }));
     } else {
       final media = await _imagePicker.pickMedia(
@@ -83,7 +83,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       if (media == null) return;
 
       _enqueueTask(
-        AttachmentUploadTask(file: File(media.path), usage: widget.pool),
+        AttachmentUploadTask(file: XFile(media.path), pool: widget.pool),
       );
     }
   }
@@ -95,9 +95,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     final media = await _imagePicker.pickVideo(source: ImageSource.gallery);
     if (media == null) return;
 
-    final file = File(media.path);
     _enqueueTask(
-      AttachmentUploadTask(file: file, usage: widget.pool),
+      AttachmentUploadTask(file: XFile(media.path), pool: widget.pool),
     );
   }
 
@@ -113,7 +112,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     List<File> files = result.paths.map((path) => File(path!)).toList();
 
     _enqueueTaskBatch(files.map((x) {
-      return AttachmentUploadTask(file: x, usage: widget.pool);
+      return AttachmentUploadTask(file: XFile(x.path), pool: widget.pool);
     }));
   }
 
@@ -129,9 +128,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     }
     if (media == null) return;
 
-    final file = File(media.path);
     _enqueueTask(
-      AttachmentUploadTask(file: file, usage: widget.pool),
+      AttachmentUploadTask(file: XFile(media.path), pool: widget.pool),
     );
   }
 
@@ -197,20 +195,16 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
 
     if (_uploadController.isUploading.value) return;
 
-    _uploadController.uploadAttachmentWithCallback(
-      data,
-      'Pasted Image',
-      widget.pool,
-      null,
-      (item) {
-        if (item == null) return;
-        widget.onAdd(item.rid);
-        if (mounted) {
-          setState(() => _attachments.add(item));
-          if (widget.singleMode) Navigator.pop(context);
-        }
-      },
-    );
+    _uploadController
+        .uploadAttachmentFromData(data, 'Pasted Image', widget.pool, null)
+        .then((item) {
+      if (item == null) return;
+      widget.onAdd(item.rid);
+      if (mounted) {
+        setState(() => _attachments.add(item));
+        if (widget.singleMode) Navigator.pop(context);
+      }
+    });
   }
 
   String _formatBytes(int bytes, {int decimals = 2}) {
@@ -304,7 +298,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
       ],
     );
     if (croppedFile == null) return;
-    _uploadController.queueOfUpload[queueIndex].file = File(croppedFile.path);
+    _uploadController.queueOfUpload[queueIndex].file = XFile(croppedFile.path);
     _uploadController.queueOfUpload.refresh();
   }
 
@@ -581,8 +575,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
         onDragDone: (detail) async {
           if (_uploadController.isUploading.value) return;
           _enqueueTaskBatch(detail.files.map((x) {
-            final file = File(x.path);
-            return AttachmentUploadTask(file: file, usage: widget.pool);
+            final file = XFile(x.path);
+            return AttachmentUploadTask(file: file, pool: widget.pool);
           }));
         },
         child: Column(

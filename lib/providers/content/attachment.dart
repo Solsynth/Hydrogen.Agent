@@ -7,7 +7,6 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
-import 'package:dio/dio.dart' as dio;
 
 class AttachmentProvider extends GetConnect {
   static Map<String, String> mimetypeOverrides = {
@@ -83,16 +82,21 @@ class AttachmentProvider extends GetConnect {
     return null;
   }
 
-  Future<Attachment> createAttachment(
-      Uint8List data, String path, String pool, Map<String, dynamic>? metadata,
-      {Function(double)? onProgress}) async {
+  Future<Attachment> createAttachmentDirectly(
+    Uint8List data,
+    String path,
+    String pool,
+    Map<String, dynamic>? metadata,
+  ) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
 
-    await auth.ensureCredentials();
+    final client = auth.configureClient(
+      'uc',
+      timeout: const Duration(minutes: 3),
+    );
 
-    final filePayload =
-        dio.MultipartFile.fromBytes(data, filename: basename(path));
+    final filePayload = MultipartFile(data, filename: basename(path));
     final fileAlt = basename(path).contains('.')
         ? basename(path).substring(0, basename(path).lastIndexOf('.'))
         : basename(path);
@@ -105,30 +109,82 @@ class AttachmentProvider extends GetConnect {
     if (mimetypeOverrides.keys.contains(fileExt)) {
       mimetypeOverride = mimetypeOverrides[fileExt];
     }
-    final payload = dio.FormData.fromMap({
+    final payload = FormData({
       'alt': fileAlt,
       'file': filePayload,
       'pool': pool,
       if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
       'metadata': jsonEncode(metadata),
     });
-    final resp = await dio.Dio(
-      dio.BaseOptions(
-        baseUrl: ServiceFinder.buildUrl('files', null),
-        headers: {'Authorization': 'Bearer ${auth.credentials!.accessToken}'},
-      ),
-    ).post(
-      '/attachments',
-      data: payload,
-      onSendProgress: (count, total) {
-        if (onProgress != null) onProgress(count / total);
-      },
-    );
+    final resp = await client.post('/attachments', payload);
     if (resp.statusCode != 200) {
-      throw Exception(resp.data);
+      throw Exception(resp.bodyString);
     }
 
-    return Attachment.fromJson(resp.data);
+    return Attachment.fromJson(resp.body);
+  }
+
+  Future<AttachmentPlaceholder> createAttachmentMultipartPlaceholder(
+    int size,
+    String path,
+    String pool,
+    Map<String, dynamic>? metadata,
+  ) async {
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+
+    final client = auth.configureClient('uc');
+
+    final fileAlt = basename(path).contains('.')
+        ? basename(path).substring(0, basename(path).lastIndexOf('.'))
+        : basename(path);
+    final fileExt = basename(path)
+        .substring(basename(path).lastIndexOf('.') + 1)
+        .toLowerCase();
+
+    // Override for some files cannot be detected mimetype by server-side
+    String? mimetypeOverride;
+    if (mimetypeOverrides.keys.contains(fileExt)) {
+      mimetypeOverride = mimetypeOverrides[fileExt];
+    }
+    final resp = await client.post('/attachments/multipart', {
+      'alt': fileAlt,
+      'name': basename(path),
+      'size': size,
+      'pool': pool,
+      if (mimetypeOverride != null) 'mimetype': mimetypeOverride,
+      'metadata': metadata,
+    });
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    }
+
+    return AttachmentPlaceholder.fromJson(resp.body);
+  }
+
+  Future<Attachment> uploadAttachmentMultipartChunk(
+    Uint8List data,
+    String name,
+    String rid,
+    String cid,
+  ) async {
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+
+    final client = auth.configureClient(
+      'uc',
+      timeout: const Duration(minutes: 3),
+    );
+
+    final payload = FormData({
+      'file': MultipartFile(data, filename: name),
+    });
+    final resp = await client.post('/attachments/multipart/$rid/$cid', payload);
+    if (resp.statusCode != 200) {
+      throw Exception(resp.bodyString);
+    }
+
+    return Attachment.fromJson(resp.body);
   }
 
   Future<Response> updateAttachment(

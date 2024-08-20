@@ -1,15 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart' show basename;
 import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/content/attachment.dart';
 
 class AttachmentUploadTask {
-  File file;
-  String usage;
+  XFile file;
+  String pool;
   Map<String, dynamic>? metadata;
+  Map<String, int>? chunkFiles;
 
   double progress = 0;
   bool isUploading = false;
@@ -18,7 +20,7 @@ class AttachmentUploadTask {
 
   AttachmentUploadTask({
     required this.file,
-    required this.usage,
+    required this.pool,
     this.metadata,
   });
 }
@@ -75,30 +77,33 @@ class AttachmentUploaderController extends GetxController {
     queueOfUpload[queueIndex].isUploading = true;
 
     final task = queueOfUpload[queueIndex];
-    final result = await _rawUploadAttachment(
-      await task.file.readAsBytes(),
-      task.file.path,
-      task.usage,
-      null,
-      onProgress: (value) {
-        queueOfUpload[queueIndex].progress = value;
-        _progressOfUpload = value;
-      },
-      onError: (err) {
-        queueOfUpload[queueIndex].error = err;
-        queueOfUpload[queueIndex].isUploading = false;
-      },
-    );
+    try {
+      final result = await _chunkedUploadAttachment(
+        task.file,
+        task.pool,
+        null,
+        onData: (_) {},
+        onProgress: (progress) {
+          queueOfUpload[queueIndex].progress = progress;
+          _progressOfUpload = progress;
+        },
+      );
+      return result;
+    } catch (err) {
+      queueOfUpload[queueIndex].error = err;
+      queueOfUpload[queueIndex].isUploading = false;
+    } finally {
+      _progressOfUpload = 1;
+      if (queueOfUpload[queueIndex].error == null) {
+        queueOfUpload.removeAt(queueIndex);
+      }
+      _stopProgressSyncTimer();
+      _syncProgress();
 
-    if (queueOfUpload[queueIndex].error == null) {
-      queueOfUpload.removeAt(queueIndex);
+      isUploading.value = false;
     }
-    _stopProgressSyncTimer();
-    _syncProgress();
 
-    isUploading.value = false;
-
-    return result;
+    return null;
   }
 
   Future<void> performUploadQueue({
@@ -117,22 +122,23 @@ class AttachmentUploaderController extends GetxController {
       queueOfUpload[idx].isUploading = true;
 
       final task = queueOfUpload[idx];
-      final result = await _rawUploadAttachment(
-        await task.file.readAsBytes(),
-        task.file.path,
-        task.usage,
-        null,
-        onProgress: (value) {
-          queueOfUpload[idx].progress = value;
-          _progressOfUpload = (idx + value) / queueOfUpload.length;
-        },
-        onError: (err) {
-          queueOfUpload[idx].error = err;
-          queueOfUpload[idx].isUploading = false;
-        },
-      );
-      _progressOfUpload = (idx + 1) / queueOfUpload.length;
-      if (result != null) onData(result);
+      try {
+        final result = await _chunkedUploadAttachment(
+          task.file,
+          task.pool,
+          null,
+          onData: (_) {},
+          onProgress: (progress) {
+            queueOfUpload[idx].progress = progress;
+          },
+        );
+        if (result != null) onData(result);
+      } catch (err) {
+        queueOfUpload[idx].error = err;
+        queueOfUpload[idx].isUploading = false;
+      } finally {
+        _progressOfUpload = (idx + 1) / queueOfUpload.length;
+      }
 
       queueOfUpload[idx].isUploading = false;
       queueOfUpload[idx].isCompleted = true;
@@ -145,69 +151,75 @@ class AttachmentUploaderController extends GetxController {
     isUploading.value = false;
   }
 
-  Future<void> uploadAttachmentWithCallback(
-    Uint8List data,
-    String path,
-    String pool,
-    Map<String, dynamic>? metadata,
-    Function(Attachment?) callback,
-  ) async {
-    if (isUploading.value) throw Exception('uploading blocked');
-
-    isUploading.value = true;
-    final result = await _rawUploadAttachment(
-      data,
-      path,
-      pool,
-      metadata,
-      onProgress: (progress) {
-        progressOfUpload.value = progress;
-      },
-    );
-    isUploading.value = false;
-    callback(result);
-  }
-
-  Future<Attachment?> uploadAttachment(
+  Future<Attachment?> uploadAttachmentFromData(
     Uint8List data,
     String path,
     String pool,
     Map<String, dynamic>? metadata,
   ) async {
     if (isUploading.value) throw Exception('uploading blocked');
-
     isUploading.value = true;
-    final result = await _rawUploadAttachment(
-      data,
-      path,
-      pool,
-      metadata,
-      onProgress: (progress) {
-        progressOfUpload.value = progress;
-      },
-    );
-    isUploading.value = false;
-    return result;
-  }
 
-  Future<Attachment?> _rawUploadAttachment(
-      Uint8List data, String path, String pool, Map<String, dynamic>? metadata,
-      {Function(double)? onProgress, Function(dynamic err)? onError}) async {
-    final AttachmentProvider provider = Get.find();
+    final AttachmentProvider attach = Get.find();
+
     try {
-      final result = await provider.createAttachment(
+      final result = await attach.createAttachmentDirectly(
         data,
         path,
         pool,
         metadata,
-        onProgress: onProgress,
       );
       return result;
-    } catch (err) {
-      if (onError != null) {
-        onError(err);
-      }
+    } catch (_) {
       return null;
+    } finally {
+      isUploading.value = false;
     }
+  }
+
+  Future<Attachment?> _chunkedUploadAttachment(
+    XFile file,
+    String pool,
+    Map<String, dynamic>? metadata, {
+    required Function(AttachmentPlaceholder) onData,
+    required Function(double) onProgress,
+  }) async {
+    final AttachmentProvider attach = Get.find();
+
+    final holder = await attach.createAttachmentMultipartPlaceholder(
+      await file.length(),
+      file.path,
+      pool,
+      metadata,
+    );
+    onData(holder);
+
+    onProgress(0);
+
+    final filename = basename(file.path);
+    final chunks = holder.meta.fileChunks ?? {};
+    var currentTask = 0;
+    for (final entry in chunks.entries) {
+      final beginCursor = entry.value * holder.chunkSize;
+      final endCursor = (entry.value + 1) * holder.chunkSize;
+      final data = Uint8List.fromList(await file
+          .openRead(beginCursor, endCursor)
+          .expand((chunk) => chunk)
+          .toList());
+
+      final out = await attach.uploadAttachmentMultipartChunk(
+        data,
+        filename,
+        holder.meta.rid,
+        entry.key,
+      );
+      holder.meta = out;
+
+      currentTask++;
+      onProgress(currentTask / chunks.length);
+      onData(holder);
+    }
+
+    return holder.meta;
   }
 }
