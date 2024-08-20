@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/link_expander.dart';
@@ -12,6 +13,9 @@ class LinkExpansion extends StatelessWidget {
   const LinkExpansion({super.key, required this.content});
 
   Widget _buildImage(String url, {double? width, double? height}) {
+    if (url.endsWith('svg')) {
+      return SvgPicture.network(url, width: width, height: height);
+    }
     return PlatformInfo.canCacheImage
         ? CachedNetworkImage(imageUrl: url, width: width, height: height)
         : Image.network(url, width: width, height: height);
@@ -46,7 +50,7 @@ class LinkExpansion extends StatelessWidget {
               }
 
               final isRichDescription = [
-                "solsynth.dev",
+                'solsynth.dev',
               ].contains(Uri.parse(snapshot.data!.url).host);
 
               return GestureDetector(
