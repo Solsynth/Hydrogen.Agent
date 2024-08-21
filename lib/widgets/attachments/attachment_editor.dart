@@ -64,7 +64,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    if (widget.singleMode) {
+    if (!widget.singleMode) {
       final medias = await _imagePicker.pickMultiImage(
         maxWidth: widget.imageMaxWidth,
         maxHeight: widget.imageMaxHeight,
@@ -341,9 +341,25 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                             fontFamily: 'monospace',
                           ),
                         ),
-                        Text(
-                          'In queue #${index + 1}',
-                          style: const TextStyle(fontSize: 12),
+                        Row(
+                          children: [
+                            FutureBuilder(
+                              future: element.file.length(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const SizedBox();
+                                return Text(
+                                  _formatBytes(snapshot.data!),
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 6),
+                            if (element.progress != null)
+                              Text(
+                                '${(element.progress! * 100).toStringAsFixed(2)}%',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                          ],
                         ),
                       ],
                     ),
@@ -590,15 +606,13 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                     children: [
                       Expanded(
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Expanded(
-                              child: Text(
-                                'attachmentAdd'.tr,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            Text(
+                              'attachmentAdd'.tr,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(width: 10),
                             Obx(() {

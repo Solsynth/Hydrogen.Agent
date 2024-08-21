@@ -14,7 +14,7 @@ class AttachmentUploadTask {
   Map<String, dynamic>? metadata;
   Map<String, int>? chunkFiles;
 
-  double progress = 0;
+  double? progress;
   bool isUploading = false;
   bool isCompleted = false;
   dynamic error;
@@ -76,6 +76,7 @@ class AttachmentUploaderController extends GetxController {
 
     _startProgressSyncTimer();
     queueOfUpload[queueIndex].isUploading = true;
+    queueOfUpload[queueIndex].progress = 0;
 
     final task = queueOfUpload[queueIndex];
     try {
@@ -121,6 +122,7 @@ class AttachmentUploaderController extends GetxController {
       }
 
       queueOfUpload[idx].isUploading = true;
+      queueOfUpload[idx].progress = 0;
 
       final task = queueOfUpload[idx];
       try {

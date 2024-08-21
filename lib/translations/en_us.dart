@@ -174,7 +174,7 @@ const i18nEnglish = {
   'attachmentAttached': 'Exists Files',
   'attachmentUploadBlocked':
       'Upload blocked, there is currently a task in progress...',
-  'attachmentAdd': 'Attach attachments',
+  'attachmentAdd': 'Attach file',
   'attachmentAddGalleryPhoto': 'Gallery photo',
   'attachmentAddGalleryVideo': 'Gallery video',
   'attachmentAddCameraPhoto': 'Capture photo',
