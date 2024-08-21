@@ -141,7 +141,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     switch (state) {
       case AppLifecycleState.resumed:
         if (_isOutOfSyncSince == null) break;
-        if (DateTime.now().difference(_isOutOfSyncSince!).inSeconds < 60) break;
+        if (DateTime.now().difference(_isOutOfSyncSince!).inSeconds < 30) break;
         _keepUpdateWithServer();
         break;
       case AppLifecycleState.paused:
@@ -269,26 +269,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                       },
                     ),
                   ),
-                  if (_isOutOfSyncSince != null)
-                    ListTile(
-                      contentPadding: const EdgeInsets.only(left: 16, right: 8),
-                      tileColor:
-                          Theme.of(context).colorScheme.surfaceContainerLow,
-                      leading: const Icon(Icons.history_toggle_off),
-                      title: Text('messageOutOfSync'.tr),
-                      subtitle: Text('messageOutOfSyncCaption'.tr),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          setState(() => _isOutOfSyncSince = null);
-                        },
-                      ),
-                      onTap: _isBusy
-                          ? null
-                          : () {
-                              _keepUpdateWithServer();
-                            },
-                    ),
                   Obx(() {
                     if (_chatController.isLoading.isTrue) {
                       return const LinearProgressIndicator().animate().slideY();
@@ -331,7 +311,10 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                   child: Row(children: [
                     VerticalDivider(width: 0.3, thickness: 0.3),
                     Expanded(
-                      child: CallScreen(hideAppBar: true),
+                      child: CallScreen(
+                        hideAppBar: true,
+                        isExpandable: true,
+                      ),
                     ),
                   ]),
                 );

@@ -13,8 +13,13 @@ import 'package:livekit_client/livekit_client.dart' as livekit;
 
 class CallScreen extends StatefulWidget {
   final bool hideAppBar;
+  final bool isExpandable;
 
-  const CallScreen({super.key, this.hideAppBar = false});
+  const CallScreen({
+    super.key,
+    this.hideAppBar = false,
+    this.isExpandable = false,
+  });
 
   @override
   State<CallScreen> createState() => _CallScreenState();
@@ -308,13 +313,24 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                             ),
                           );
                         }),
-                        IconButton(
-                          icon: _layoutMode == 0
-                              ? const Icon(Icons.view_list)
-                              : const Icon(Icons.grid_view),
-                          onPressed: () {
-                            _switchLayout();
-                          },
+                        Row(
+                          children: [
+                            if (widget.isExpandable)
+                              IconButton(
+                                icon: const Icon(Icons.fullscreen),
+                                onPressed: () {
+                                  ctrl.gotoScreen(context);
+                                },
+                              ),
+                            IconButton(
+                              icon: _layoutMode == 0
+                                  ? const Icon(Icons.view_list)
+                                  : const Icon(Icons.grid_view),
+                              onPressed: () {
+                                _switchLayout();
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ).paddingOnly(left: 20, right: 16),
