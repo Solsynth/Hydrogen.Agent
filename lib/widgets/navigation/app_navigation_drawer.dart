@@ -241,15 +241,18 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
               children: AppNavigation.destinations
                   .map(
                     (e) => _isCollapsed
-                        ? InkWell(
-                            child: Icon(e.icon, size: 20).paddingSymmetric(
-                              horizontal: 28,
-                              vertical: 16,
+                        ? Tooltip(
+                            message: e.label,
+                            child: InkWell(
+                              child: Icon(e.icon, size: 20).paddingSymmetric(
+                                horizontal: 28,
+                                vertical: 16,
+                              ),
+                              onTap: () {
+                                AppRouter.instance.goNamed(e.page);
+                                _closeDrawer();
+                              },
                             ),
-                            onTap: () {
-                              AppRouter.instance.goNamed(e.page);
-                              _closeDrawer();
-                            },
                           )
                         : ListTile(
                             contentPadding: const EdgeInsets.symmetric(
@@ -279,18 +282,21 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
             Column(
               children: [
                 if (_isCollapsed)
-                  InkWell(
-                    child: const Icon(
-                      Icons.settings,
-                      size: 20,
-                    ).paddingSymmetric(
-                      horizontal: 28,
-                      vertical: 10,
+                  Tooltip(
+                    message: 'settings'.tr,
+                    child: InkWell(
+                      child: const Icon(
+                        Icons.settings,
+                        size: 20,
+                      ).paddingSymmetric(
+                        horizontal: 28,
+                        vertical: 10,
+                      ),
+                      onTap: () {
+                        AppRouter.instance.pushNamed('settings');
+                        _closeDrawer();
+                      },
                     ),
-                    onTap: () {
-                      AppRouter.instance.pushNamed('settings');
-                      _closeDrawer();
-                    },
                   )
                 else
                   ListTile(
@@ -306,15 +312,18 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
                     },
                   ),
                 if (_isCollapsed)
-                  InkWell(
-                    child: const Icon(Icons.chevron_right, size: 20)
-                        .paddingSymmetric(
-                      horizontal: 28,
-                      vertical: 10,
+                  Tooltip(
+                    message: 'expand'.tr,
+                    child: InkWell(
+                      child: const Icon(Icons.chevron_right, size: 20)
+                          .paddingSymmetric(
+                        horizontal: 28,
+                        vertical: 10,
+                      ),
+                      onTap: () {
+                        _expandDrawer();
+                      },
                     ),
-                    onTap: () {
-                      _expandDrawer();
-                    },
                   )
                 else
                   ListTile(

@@ -77,7 +77,10 @@ class AppNavigationRegion extends StatelessWidget {
                 final element = index >= noRealmGroupChannels.length
                     ? hasRealmGroupChannels[index - noRealmGroupChannels.length]
                     : noRealmGroupChannels[index];
-                return _buildEntry(context, element);
+                return Tooltip(
+                  message: element.name,
+                  child: _buildEntry(context, element),
+                );
               },
             ),
           ],
