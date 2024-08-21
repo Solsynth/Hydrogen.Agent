@@ -127,6 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         noCategory: true,
                         channels: _channels.directChannels,
                         selfId: selfId,
+                        useReplace: true,
                       ),
                     ),
                   ),
