@@ -25,6 +25,8 @@ class AppNavigationDrawer extends StatefulWidget {
 }
 
 class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
+  bool _isCollapsed = true;
+
   AccountStatus? _accountStatus;
 
   Future<void> _getStatus() async {
@@ -40,42 +42,69 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     }
   }
 
-  void _closeDrawer() {
-    rootScaffoldKey.currentState!.closeDrawer();
-  }
+  Widget _buildUserInfo() {
+    return Obx(() {
+      final AuthProvider auth = Get.find();
+      if (auth.isAuthorized.isFalse || auth.userProfile.value == null) {
+        if (_isCollapsed) {
+          return InkWell(
+            child: const Icon(Icons.account_circle).paddingAll(28),
+            onTap: () {
+              AppRouter.instance.goNamed('account');
+              _closeDrawer();
+            },
+          );
+        }
 
-  @override
-  void initState() {
-    super.initState();
-    _getStatus();
-  }
+        return ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+          leading: const Icon(Icons.account_circle),
+          title: !_isCollapsed ? Text('guest'.tr) : null,
+          subtitle: !_isCollapsed ? Text('unsignedIn'.tr) : null,
+          onTap: () {
+            AppRouter.instance.goNamed('account');
+            _closeDrawer();
+          },
+        );
+      }
 
-  @override
-  Widget build(BuildContext context) {
-    final AuthProvider auth = Get.find();
+      final leading = Obx(() {
+        final statusBadgeColor = _accountStatus != null
+            ? StatusProvider.determineStatus(
+                _accountStatus!,
+              ).$2
+            : Colors.grey;
 
-    return Drawer(
-      backgroundColor:
-          SolianTheme.isLargeScreen(context) ? Colors.transparent : null,
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Obx(() {
-              if (auth.isAuthorized.isFalse || auth.userProfile.value == null) {
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 28),
-                  leading: const Icon(Icons.account_circle),
-                  title: Text('guest'.tr),
-                  subtitle: Text('unsignedIn'.tr),
-                  onTap: () {
-                    AppRouter.instance.goNamed('account');
-                    _closeDrawer();
-                  },
-                );
-              }
+        final RelationshipProvider relations = Get.find();
+        final accountNotifications = relations.friendRequestCount.value;
 
-              return ListTile(
+        return badges.Badge(
+          badgeContent: Text(
+            accountNotifications.toString(),
+            style: const TextStyle(color: Colors.white),
+          ),
+          showBadge: accountNotifications > 0,
+          position: badges.BadgePosition.topEnd(
+            top: -10,
+            end: -6,
+          ),
+          child: badges.Badge(
+            showBadge: _accountStatus != null,
+            badgeStyle: badges.BadgeStyle(badgeColor: statusBadgeColor),
+            position: badges.BadgePosition.bottomEnd(
+              bottom: 0,
+              end: -2,
+            ),
+            child: AccountAvatar(
+              content: auth.userProfile.value!['avatar'],
+            ),
+          ),
+        );
+      });
+
+      return InkWell(
+        child: !_isCollapsed
+            ? ListTile(
                 contentPadding: const EdgeInsets.only(left: 20, right: 20),
                 title: Text(
                   auth.userProfile.value!['nick'],
@@ -97,80 +126,83 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                     );
                   },
                 ),
-                leading: Obx(() {
-                  final statusBadgeColor = _accountStatus != null
-                      ? StatusProvider.determineStatus(
-                          _accountStatus!,
-                        ).$2
-                      : Colors.grey;
+                leading: leading,
+              )
+            : leading.paddingAll(20),
+        onTap: () {
+          AppRouter.instance.goNamed('account');
+          _closeDrawer();
+        },
+        onLongPress: () {
+          showModalBottomSheet(
+            useRootNavigator: true,
+            context: context,
+            builder: (context) => AccountStatusAction(
+              currentStatus: _accountStatus!.status,
+            ),
+          ).then((val) {
+            if (val == true) _getStatus();
+          });
+        },
+      );
+    });
+  }
 
-                  final RelationshipProvider relations = Get.find();
-                  final accountNotifications =
-                      relations.friendRequestCount.value;
+  void _closeDrawer() {
+    rootScaffoldKey.currentState!.closeDrawer();
+  }
 
-                  return badges.Badge(
-                    badgeContent: Text(
-                      accountNotifications.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    showBadge: accountNotifications > 0,
-                    position: badges.BadgePosition.topEnd(
-                      top: -10,
-                      end: -6,
-                    ),
-                    child: badges.Badge(
-                      showBadge: _accountStatus != null,
-                      badgeStyle:
-                          badges.BadgeStyle(badgeColor: statusBadgeColor),
-                      position: badges.BadgePosition.bottomEnd(
-                        bottom: 0,
-                        end: -2,
-                      ),
-                      child: AccountAvatar(
-                        content: auth.userProfile.value!['avatar'],
-                      ),
-                    ),
-                  );
-                }),
-                onTap: () {
-                  AppRouter.instance.goNamed('account');
-                  _closeDrawer();
-                },
-                onLongPress: () {
-                  showModalBottomSheet(
-                    useRootNavigator: true,
-                    context: context,
-                    builder: (context) => AccountStatusAction(
-                      currentStatus: _accountStatus!.status,
-                    ),
-                  ).then((val) {
-                    if (val == true) _getStatus();
-                  });
-                },
-              );
-            }).paddingSymmetric(vertical: 8),
+  @override
+  void initState() {
+    super.initState();
+    _getStatus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      width: _isCollapsed ? 80 : null,
+      backgroundColor:
+          SolianTheme.isLargeScreen(context) ? Colors.transparent : null,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            _buildUserInfo().paddingSymmetric(vertical: 8),
             const Divider(thickness: 0.3, height: 1),
             Column(
               children: AppNavigation.destinations
                   .map(
-                    (e) => ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                      ),
-                      leading: Icon(e.icon, size: 20).paddingAll(2),
-                      title: Text(e.label),
-                      enabled: true,
-                      onTap: () {
-                        AppRouter.instance.goNamed(e.page);
-                        _closeDrawer();
-                      },
-                    ),
+                    (e) => _isCollapsed
+                        ? InkWell(
+                            child: Icon(e.icon, size: 22).paddingSymmetric(
+                              horizontal: 28,
+                              vertical: 16,
+                            ),
+                            onTap: () {
+                              AppRouter.instance.goNamed(e.page);
+                              _closeDrawer();
+                            },
+                          )
+                        : ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            leading: Icon(e.icon, size: 20).paddingAll(2),
+                            title: !_isCollapsed ? Text(e.label) : null,
+                            enabled: true,
+                            onTap: () {
+                              AppRouter.instance.goNamed(e.page);
+                              _closeDrawer();
+                            },
+                          ),
                   )
                   .toList(),
-            ).paddingSymmetric(vertical: 8),
+            ),
             const Divider(thickness: 0.3, height: 1),
             Expanded(
               child: AppNavigationRegions(
+                isCollapsed: _isCollapsed,
                 onSelected: (item) {
                   _closeDrawer();
                 },
@@ -179,18 +211,31 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
             const Divider(thickness: 0.3, height: 1),
             Column(
               children: [
-                ListTile(
-                  minTileHeight: 0,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
-                  leading: const Icon(Icons.settings, size: 20).paddingAll(2),
-                  title: Text('settings'.tr),
-                  onTap: () {
-                    AppRouter.instance.pushNamed('settings');
-                    _closeDrawer();
-                  },
-                ),
+                _isCollapsed
+                    ? InkWell(
+                        child: const Icon(Icons.settings, size: 22)
+                            .paddingSymmetric(
+                          horizontal: 28,
+                          vertical: 16,
+                        ),
+                        onTap: () {
+                          AppRouter.instance.pushNamed('settings');
+                          _closeDrawer();
+                        },
+                      )
+                    : ListTile(
+                        minTileHeight: 0,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        leading:
+                            const Icon(Icons.settings, size: 20).paddingAll(2),
+                        title: Text('settings'.tr),
+                        onTap: () {
+                          AppRouter.instance.pushNamed('settings');
+                          _closeDrawer();
+                        },
+                      ),
               ],
             ).paddingOnly(
               top: 8,

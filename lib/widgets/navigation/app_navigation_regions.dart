@@ -6,9 +6,14 @@ import 'package:solian/router.dart';
 import 'package:collection/collection.dart';
 
 class AppNavigationRegions extends StatelessWidget {
+  final bool isCollapsed;
   final Function(Channel item) onSelected;
 
-  const AppNavigationRegions({super.key, required this.onSelected});
+  const AppNavigationRegions({
+    super.key,
+    required this.onSelected,
+    this.isCollapsed = false,
+  });
 
   void _gotoChannel(Channel item) {
     AppRouter.instance.pushReplacementNamed(
@@ -24,6 +29,16 @@ class AppNavigationRegions extends StatelessWidget {
 
   Widget _buildEntry(BuildContext context, Channel item) {
     const padding = EdgeInsets.symmetric(horizontal: 20);
+
+    if (isCollapsed) {
+      return InkWell(
+        child: const Icon(Icons.tag_outlined).paddingSymmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        onTap: () => _gotoChannel(item),
+      );
+    }
 
     return ListTile(
       minTileHeight: 0,
@@ -50,6 +65,24 @@ class AppNavigationRegions extends StatelessWidget {
       final List<Channel> hasRealmGroupChannels = channels.availableChannels
           .where((x) => x.type == 0 && x.realmId != null)
           .toList();
+
+      if (isCollapsed) {
+        return CustomScrollView(
+          slivers: [
+            const SliverPadding(padding: EdgeInsets.only(top: 8)),
+            SliverList.builder(
+              itemCount:
+                  noRealmGroupChannels.length + hasRealmGroupChannels.length,
+              itemBuilder: (context, index) {
+                final element = index >= noRealmGroupChannels.length
+                    ? hasRealmGroupChannels[index - noRealmGroupChannels.length]
+                    : noRealmGroupChannels[index];
+                return _buildEntry(context, element);
+              },
+            ),
+          ],
+        );
+      }
 
       return CustomScrollView(
         slivers: [
