@@ -157,7 +157,7 @@ class _AttachmentListState extends State<AttachmentList> {
           final element = _attachmentsMeta[idx];
           idx++;
           if (element == null) return const SizedBox();
-          double ratio = element.metadata!['ratio']?.toDouble() ?? 16 / 9;
+          double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
             constraints: BoxConstraints(
               maxWidth: widget.columnMaxWidth,
