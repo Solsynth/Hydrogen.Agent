@@ -24,10 +24,7 @@ class LinkExpansion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final linkRegex = RegExp(
-      r'(?:(?:https?|ftp):\/\/|www\.)'
-      r'(?:[-_a-z0-9]+\.)*(?:[-a-z0-9]+\.[-a-z0-9]+)'
-      r'[^\s<]*'
-      r'[^\s<?!.,:*_~]',
+      r'(?<!\()(?:(?:https?):\/\/|www\.)(?:[-_a-z0-9]+\.)*(?:[-a-z0-9]+\.[-a-z0-9]+)[^\s<]*[^\s<?!.,:*_~]',
     );
     final matches = linkRegex.allMatches(content);
     if (matches.isEmpty) {
