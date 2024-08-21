@@ -196,6 +196,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
       _expandDrawer();
     } else if (SolianTheme.isLargeScreen(context)) {
       _collapseDrawer();
+    } else {
+      _drawerAnimationController.animateTo(
+        1,
+        duration: const Duration(milliseconds: 100),
+      );
     }
   }
 
