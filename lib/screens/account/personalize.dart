@@ -30,8 +30,8 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   final _descriptionController = TextEditingController();
   final _birthdayController = TextEditingController();
 
-  int? _avatar;
-  int? _banner;
+  String? _avatar;
+  String? _banner;
   DateTime? _birthday;
 
   bool _isBusy = false;
@@ -129,7 +129,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     final resp = await client.put(
       '/users/me/$position',
-      {'attachment': attachResult.id},
+      {'attachment': attachResult.rid},
     );
     if (resp.statusCode == 200) {
       _syncWidget();
