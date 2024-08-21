@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exceptions/unauthorized.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:solian/models/call.dart';
@@ -88,7 +89,7 @@ class ChatCallProvider extends GetxController {
 
   Future<(String, String)> getRoomToken() async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final client = auth.configureClient('messaging');
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:get/get.dart';
+import 'package:solian/exceptions/unauthorized.dart';
 import 'package:path/path.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
@@ -89,7 +90,7 @@ class AttachmentProvider extends GetConnect {
     Map<String, dynamic>? metadata,
   ) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final client = auth.configureClient(
       'uc',
@@ -131,7 +132,7 @@ class AttachmentProvider extends GetConnect {
     Map<String, dynamic>? metadata,
   ) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final client = auth.configureClient('uc');
 
@@ -169,7 +170,7 @@ class AttachmentProvider extends GetConnect {
     String cid,
   ) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final client = auth.configureClient(
       'uc',
@@ -193,7 +194,7 @@ class AttachmentProvider extends GetConnect {
     bool isMature = false,
   }) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final client = auth.configureClient('files');
 
@@ -211,7 +212,7 @@ class AttachmentProvider extends GetConnect {
 
   Future<Response> deleteAttachment(int id) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final client = auth.configureClient('files');
 

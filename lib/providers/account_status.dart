@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/models/account_status.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
@@ -33,15 +34,14 @@ class StatusProvider extends GetConnect {
 
   Future<Response> getCurrentStatus() async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('auth');
 
     return await client.get('/users/me/status');
   }
 
-  Future<Response> getSomeoneStatus(String name) =>
-      get('/users/$name/status');
+  Future<Response> getSomeoneStatus(String name) => get('/users/$name/status');
 
   Future<Response> setStatus(
     String type,
@@ -53,7 +53,7 @@ class StatusProvider extends GetConnect {
     DateTime? clearAt,
   }) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('auth');
 
@@ -82,7 +82,7 @@ class StatusProvider extends GetConnect {
 
   Future<Response> clearStatus() async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('auth');
 

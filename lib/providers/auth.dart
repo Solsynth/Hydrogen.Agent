@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
+import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 
@@ -128,7 +129,7 @@ class AuthProvider extends GetConnect {
   }
 
   Future<void> ensureCredentials() async {
-    if (isAuthorized.isFalse) throw Exception('unauthorized');
+    if (isAuthorized.isFalse) throw const UnauthorizedException();
     if (credentials == null) await loadCredentials();
 
     if (credentials!.isExpired) {

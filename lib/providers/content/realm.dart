@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 
@@ -8,7 +9,7 @@ class RealmProvider extends GetxController {
 
   Future<void> refreshAvailableRealms() async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     isLoading.value = true;
     final resp = await listAvailableRealm();
@@ -21,7 +22,7 @@ class RealmProvider extends GetxController {
 
   Future<Response> getRealm(String alias) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('auth');
 
@@ -35,7 +36,7 @@ class RealmProvider extends GetxController {
 
   Future<Response> listAvailableRealm() async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('auth');
 

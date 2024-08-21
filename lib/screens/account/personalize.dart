@@ -109,11 +109,11 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final AttachmentProvider provider = Get.find();
+    final AttachmentProvider attach = Get.find();
 
     Attachment? attachResult;
     try {
-      attachResult = await provider.createAttachmentDirectly(
+      attachResult = await attach.createAttachmentDirectly(
         await file.readAsBytes(),
         file.path,
         'avatar',

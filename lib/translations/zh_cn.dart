@@ -41,6 +41,7 @@ const i18nSimplifiedChinese = {
   'openInBrowser': '在浏览器中打开',
   'notification': '通知',
   'errorHappened': '发生错误了',
+  'errorHappenedUnauthorized': '未经授权的请求，请登录或尝试重新登录。',
   'forgotPassword': '忘记密码',
   'email': '邮件地址',
   'username': '用户名',

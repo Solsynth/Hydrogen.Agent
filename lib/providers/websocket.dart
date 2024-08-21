@@ -50,31 +50,31 @@ class WebSocketProvider extends GetxController {
     }
 
     final AuthProvider auth = Get.find();
-    await auth.ensureCredentials();
-
-    if (auth.credentials == null) await auth.loadCredentials();
-
-    final uri = Uri.parse(ServiceFinder.buildUrl(
-      'dealer',
-      '/api/ws?tk=${auth.credentials!.accessToken}',
-    ).replaceFirst('http', 'ws'));
-
-    isConnecting.value = true;
 
     try {
+      await auth.ensureCredentials();
+
+      final uri = Uri.parse(ServiceFinder.buildUrl(
+        'dealer',
+        '/api/ws?tk=${auth.credentials!.accessToken}',
+      ).replaceFirst('http', 'ws'));
+
+      isConnecting.value = true;
+
       websocket = WebSocketChannel.connect(uri);
       await websocket?.ready;
-    } catch (e) {
+      listen();
+
+      isConnected.value = true;
+    } catch (err) {
+      log('Unable connect dealer via websocket... $err');
       if (!noRetry) {
         await auth.refreshCredentials();
         return connect(noRetry: true);
       }
+    } finally {
+      isConnecting.value = false;
     }
-
-    listen();
-
-    isConnected.value = true;
-    isConnecting.value = false;
   }
 
   void disconnect() {

@@ -41,6 +41,8 @@ const i18nEnglish = {
   'openInBrowser': 'Open in browser',
   'notification': 'Notification',
   'errorHappened': 'An error occurred',
+  'errorHappenedUnauthorized':
+      'Unauthorized request, please sign in or try resign in.',
   'forgotPassword': 'Forgot password',
   'email': 'Email',
   'username': 'Username',

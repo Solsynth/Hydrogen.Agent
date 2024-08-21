@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
@@ -36,7 +37,7 @@ class PostProvider extends GetConnect {
 
   Future<Response> listDraft(int page) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw Exception('unauthorized');
+    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
 
     final queries = [
       'take=${10}',

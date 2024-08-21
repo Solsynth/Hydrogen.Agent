@@ -28,11 +28,11 @@ class _AttachmentAttrEditorDialogState
   bool _isMature = false;
 
   Future<Attachment?> _updateAttachment() async {
-    final AttachmentProvider provider = Get.find();
+    final AttachmentProvider attach = Get.find();
 
     setState(() => _isBusy = true);
     try {
-      final resp = await provider.updateAttachment(
+      final resp = await attach.updateAttachment(
         widget.item.id,
         _altController.value.text,
         isMature: _isMature,
