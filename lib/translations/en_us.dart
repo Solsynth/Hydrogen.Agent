@@ -383,4 +383,6 @@ const i18nEnglish = {
       'Since the App has entered the background, there may be a time difference between the message list and the server. Click to Refresh.',
   'messageHistoryWipe': 'Wipe local message history',
   'unknown': 'Unknown',
+  'collapse': 'Collapse',
+  'expand': 'Expand',
 };

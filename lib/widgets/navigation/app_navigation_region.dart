@@ -5,11 +5,11 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:collection/collection.dart';
 
-class AppNavigationRegions extends StatelessWidget {
+class AppNavigationRegion extends StatelessWidget {
   final bool isCollapsed;
   final Function(Channel item) onSelected;
 
-  const AppNavigationRegions({
+  const AppNavigationRegion({
     super.key,
     required this.onSelected,
     this.isCollapsed = false,
@@ -32,7 +32,7 @@ class AppNavigationRegions extends StatelessWidget {
 
     if (isCollapsed) {
       return InkWell(
-        child: const Icon(Icons.tag_outlined).paddingSymmetric(
+        child: const Icon(Icons.tag_outlined, size: 20).paddingSymmetric(
           horizontal: 20,
           vertical: 16,
         ),

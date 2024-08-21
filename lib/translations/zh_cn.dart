@@ -353,4 +353,6 @@ const i18nSimplifiedChinese = {
   'messageOutOfSyncCaption': '由于 App 进入后台，消息列表可能与服务器存在时差，点击刷新。',
   'messageHistoryWipe': '清除消息记录',
   'unknown': '未知',
+  'collapse': '折叠',
+  'expand': '展开',
 };
