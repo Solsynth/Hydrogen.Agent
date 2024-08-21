@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/models/notification.dart';
 import 'package:solian/models/packet.dart';
 import 'package:solian/models/pagination.dart';
@@ -148,7 +149,7 @@ class WebSocketProvider extends GetxController {
       'device_id': deviceUuid,
     });
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
   }
 

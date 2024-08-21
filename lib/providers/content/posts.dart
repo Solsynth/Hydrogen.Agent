@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
@@ -29,7 +30,7 @@ class PostProvider extends GetConnect {
           : '/recommendations/$channel?${queries.join('&')}',
     );
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -37,7 +38,7 @@ class PostProvider extends GetConnect {
 
   Future<Response> listDraft(int page) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final queries = [
       'take=${10}',
@@ -46,7 +47,7 @@ class PostProvider extends GetConnect {
     final client = auth.configureClient('interactive');
     final resp = await client.get('/posts/drafts?${queries.join('&')}');
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -64,7 +65,7 @@ class PostProvider extends GetConnect {
     ];
     final resp = await get('/posts?${queries.join('&')}');
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -73,7 +74,7 @@ class PostProvider extends GetConnect {
   Future<Response> listPostReplies(String alias, int page) async {
     final resp = await get('/posts/$alias/replies?take=${10}&offset=$page');
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -82,7 +83,7 @@ class PostProvider extends GetConnect {
   Future<Response> getPost(String alias) async {
     final resp = await get('/posts/$alias');
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -91,7 +92,7 @@ class PostProvider extends GetConnect {
   Future<Response> getArticle(String alias) async {
     final resp = await get('/articles/$alias');
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     }
 
     return resp;

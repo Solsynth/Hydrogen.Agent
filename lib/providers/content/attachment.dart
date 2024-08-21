@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:path/path.dart';
 import 'package:solian/models/attachment.dart';
@@ -90,7 +91,7 @@ class AttachmentProvider extends GetConnect {
     Map<String, dynamic>? metadata,
   ) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient(
       'uc',
@@ -119,7 +120,7 @@ class AttachmentProvider extends GetConnect {
     });
     final resp = await client.post('/attachments', payload);
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return Attachment.fromJson(resp.body);
@@ -132,7 +133,7 @@ class AttachmentProvider extends GetConnect {
     Map<String, dynamic>? metadata,
   ) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('uc');
 
@@ -157,7 +158,7 @@ class AttachmentProvider extends GetConnect {
       'metadata': metadata,
     });
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return AttachmentPlaceholder.fromJson(resp.body);
@@ -170,7 +171,7 @@ class AttachmentProvider extends GetConnect {
     String cid,
   ) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient(
       'uc',
@@ -182,7 +183,7 @@ class AttachmentProvider extends GetConnect {
     });
     final resp = await client.post('/attachments/multipart/$rid/$cid', payload);
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return Attachment.fromJson(resp.body);
@@ -194,7 +195,7 @@ class AttachmentProvider extends GetConnect {
     bool isMature = false,
   }) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('files');
 
@@ -204,7 +205,7 @@ class AttachmentProvider extends GetConnect {
     });
 
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -212,13 +213,13 @@ class AttachmentProvider extends GetConnect {
 
   Future<Response> deleteAttachment(int id) async {
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw UnauthorizedException();
+    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = auth.configureClient('files');
 
     var resp = await client.delete('/attachments/$id');
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;

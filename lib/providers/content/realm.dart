@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
@@ -28,7 +29,7 @@ class RealmProvider extends GetxController {
 
     final resp = await client.get('/realms/$alias');
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -42,7 +43,7 @@ class RealmProvider extends GetxController {
 
     final resp = await client.get('/realms/me/available');
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;

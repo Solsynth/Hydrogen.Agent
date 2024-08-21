@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/relations.dart';
 import 'package:solian/providers/auth.dart';
@@ -42,7 +43,7 @@ class RelationshipProvider extends GetxController {
     final client = auth.configureClient('auth');
     final resp = await client.post('/users/me/relations?related=$username', {});
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -57,7 +58,7 @@ class RelationshipProvider extends GetxController {
       {},
     );
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -71,7 +72,7 @@ class RelationshipProvider extends GetxController {
       {'status': status},
     );
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;

@@ -1,5 +1,6 @@
 import 'package:floor/floor.dart';
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/pagination.dart';
@@ -29,20 +30,20 @@ Future<Event?> getRemoteEvent(int id, Channel channel, String scope) async {
   if (resp.statusCode == 404) {
     return null;
   } else if (resp.statusCode != 200) {
-    throw Exception(resp.bodyString);
+    throw RequestException(resp);
   }
 
   return Event.fromJson(resp.body);
 }
 
 Future<(List<Event>, int)?> getRemoteEvents(
-    Channel channel,
-    String scope, {
-      required int remainDepth,
-      bool Function(List<Event> items)? onBrake,
-      take = 10,
-      offset = 0,
-    }) async {
+  Channel channel,
+  String scope, {
+  required int remainDepth,
+  bool Function(List<Event> items)? onBrake,
+  take = 10,
+  offset = 0,
+}) async {
   if (remainDepth <= 0) {
     return null;
   }
@@ -57,7 +58,7 @@ Future<(List<Event>, int)?> getRemoteEvents(
   );
 
   if (resp.statusCode != 200) {
-    throw Exception(resp.bodyString);
+    throw RequestException(resp);
   }
 
   final PaginationResult response = PaginationResult.fromJson(resp.body);
@@ -69,13 +70,13 @@ Future<(List<Event>, int)?> getRemoteEvents(
   }
 
   final expandResult = (await getRemoteEvents(
-    channel,
-    scope,
-    remainDepth: remainDepth - 1,
-    take: take,
-    offset: offset + result.length,
-  ))
-      ?.$1 ??
+        channel,
+        scope,
+        remainDepth: remainDepth - 1,
+        take: take,
+        offset: offset + result.length,
+      ))
+          ?.$1 ??
       List.empty();
 
   return ([...result, ...expandResult], response.count);

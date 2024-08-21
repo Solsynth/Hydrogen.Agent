@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 
 extension SolianExtenions on BuildContext {
@@ -52,6 +53,37 @@ extension SolianExtenions on BuildContext {
     Widget content = Text(exception.toString().capitalize!);
     if (exception is UnauthorizedException) {
       content = Text('errorHappenedUnauthorized'.tr);
+    }
+    if (exception is RequestException) {
+      String overall;
+      switch (exception.data.statusCode) {
+        case 400:
+          overall = 'errorHappenedRequestBad'.tr;
+          break;
+        case 401:
+          overall = 'errorHappenedUnauthorized'.tr;
+          break;
+        case 403:
+          overall = 'errorHappenedRequestForbidden'.tr;
+          break;
+        case 404:
+          overall = 'errorHappenedRequestNotFound'.tr;
+          break;
+        case null:
+          overall = 'errorHappenedRequestConnection'.tr;
+          break;
+        default:
+          overall = 'errorHappenedRequestUnknown'.tr;
+          break;
+      }
+
+      if (exception.data.statusCode != null) {
+        content = Text(
+          '$overall\n\n(${exception.data.statusCode}) ${exception.data.bodyString}',
+        );
+      } else {
+        content = Text(overall);
+      }
     }
 
     return showDialog<void>(

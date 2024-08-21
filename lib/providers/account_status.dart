@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/models/account_status.dart';
 import 'package:solian/providers/auth.dart';
@@ -74,7 +75,7 @@ class StatusProvider extends GetConnect {
     }
 
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;
@@ -88,7 +89,7 @@ class StatusProvider extends GetConnect {
 
     final resp = await client.delete('/users/me/status');
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     return resp;

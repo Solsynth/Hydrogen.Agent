@@ -80,13 +80,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                   onTap: () {
-                    final ChannelProvider provider = Get.find();
-                    provider
+                    final ChannelProvider channels = Get.find();
+                    channels
                         .createDirectChannel(context, 'global')
                         .then((resp) {
                       if (resp != null) {
                         _channels.refreshAvailableChannel();
                       }
+                    }).catchError((e) {
+                      context.showErrorDialog(e);
                     });
                   },
                 ),

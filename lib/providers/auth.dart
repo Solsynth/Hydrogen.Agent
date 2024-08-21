@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
@@ -82,7 +83,7 @@ class AuthProvider extends GetConnect {
         'grant_type': 'refresh_token',
       });
       if (resp.statusCode != 200) {
-        throw Exception(resp.bodyString);
+        throw RequestException(resp);
       }
       credentials = TokenSet(
         accessToken: resp.body['access_token'],
@@ -159,7 +160,7 @@ class AuthProvider extends GetConnect {
       'password': password,
     });
     if (resp.statusCode != 200) {
-      throw Exception(resp.body);
+      throw RequestException(resp);
     } else if (resp.body['is_finished'] == false) {
       throw RiskyAuthenticateException(resp.body['ticket']['id']);
     }
@@ -219,7 +220,7 @@ class AuthProvider extends GetConnect {
     final client = configureClient('auth');
     final resp = await client.get('/users/me');
     if (resp.statusCode != 200) {
-      throw Exception(resp.bodyString);
+      throw RequestException(resp);
     }
 
     userProfile.value = resp.body;
