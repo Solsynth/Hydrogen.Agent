@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:cross_file/cross_file.dart';
@@ -199,25 +200,44 @@ class AttachmentUploaderController extends GetxController {
     final filename = basename(file.path);
     final chunks = holder.meta.fileChunks ?? {};
     var currentTask = 0;
+
+    final queue = Queue<Future<void>>();
+    final activeTasks = <Future<void>>[];
+
     for (final entry in chunks.entries) {
-      final beginCursor = entry.value * holder.chunkSize;
-      final endCursor = (entry.value + 1) * holder.chunkSize;
-      final data = Uint8List.fromList(await file
-          .openRead(beginCursor, endCursor)
-          .expand((chunk) => chunk)
-          .toList());
+      queue.add(() async {
+        final beginCursor = entry.value * holder.chunkSize;
+        final endCursor = (entry.value + 1) * holder.chunkSize;
+        final data = Uint8List.fromList(await file
+            .openRead(beginCursor, endCursor)
+            .expand((chunk) => chunk)
+            .toList());
 
-      final out = await attach.uploadAttachmentMultipartChunk(
-        data,
-        filename,
-        holder.meta.rid,
-        entry.key,
-      );
-      holder.meta = out;
+        final out = await attach.uploadAttachmentMultipartChunk(
+          data,
+          filename,
+          holder.meta.rid,
+          entry.key,
+        );
+        holder.meta = out;
 
-      currentTask++;
-      onProgress(currentTask / chunks.length);
-      onData(holder);
+        currentTask++;
+        onProgress(currentTask / chunks.length);
+        onData(holder);
+      }());
+    }
+
+    while (queue.isNotEmpty || activeTasks.isNotEmpty) {
+      while (activeTasks.length < 3 && queue.isNotEmpty) {
+        final task = queue.removeFirst();
+        activeTasks.add(task);
+
+        task.then((_) => activeTasks.remove(task));
+      }
+
+      if (activeTasks.isNotEmpty) {
+        await Future.any(activeTasks);
+      }
     }
 
     return holder.meta;
