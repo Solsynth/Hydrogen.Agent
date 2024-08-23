@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -7,10 +10,12 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
+import 'package:solian/models/packet.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/stickers.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
@@ -196,6 +201,36 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     }
   }
 
+  Timer? _typingNotifyTimer;
+  bool _typingStatus = false;
+
+  Future<void> _sendTypingStatus() async {
+    final WebSocketProvider ws = Get.find();
+    ws.websocket?.sink.add(jsonEncode(
+      NetworkPackage(
+        method: 'status.typing',
+        endpoint: 'messaging',
+        payload: {
+          'channel_id': widget.channel.id,
+        },
+      ).toJson(),
+    ));
+  }
+
+  void _pingEnterMessageStatus() {
+    if (!_typingStatus) {
+      _sendTypingStatus();
+      _typingStatus = true;
+    }
+
+    if (_typingNotifyTimer == null || !_typingNotifyTimer!.isActive) {
+      _typingNotifyTimer?.cancel();
+      _typingNotifyTimer = Timer(const Duration(milliseconds: 1850), () {
+        _typingStatus = false;
+      });
+    }
+  }
+
   void _resetInput() {
     if (widget.onReset != null) widget.onReset!();
     _editTo = null;
@@ -267,6 +302,20 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
   void didUpdateWidget(covariant ChatMessageInput oldWidget) {
     _syncWidget();
     super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(_pingEnterMessageStatus);
+  }
+
+  @override
+  void dispose() {
+    _textController.removeListener(_pingEnterMessageStatus);
+    _textController.dispose();
+    _typingNotifyTimer?.cancel();
+    super.dispose();
   }
 
   @override

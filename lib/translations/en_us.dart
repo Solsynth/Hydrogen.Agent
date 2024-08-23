@@ -385,4 +385,5 @@ const i18nEnglish = {
   'unknown': 'Unknown',
   'collapse': 'Collapse',
   'expand': 'Expand',
+  'typingMessage': '@user are typing...',
 };

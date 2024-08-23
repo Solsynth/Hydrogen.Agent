@@ -355,4 +355,5 @@ const i18nSimplifiedChinese = {
   'unknown': '未知',
   'collapse': '折叠',
   'expand': '展开',
+  'typingMessage': '@user 正在输入中…',
 };

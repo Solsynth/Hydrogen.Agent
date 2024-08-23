@@ -88,6 +88,7 @@ class WebSocketProvider extends GetxController {
     websocket?.stream.listen(
       (event) {
         final packet = NetworkPackage.fromJson(jsonDecode(event));
+        log('Websocket incoming message: ${packet.method} ${packet.message}');
         stream.sink.add(packet);
       },
       onDone: () {

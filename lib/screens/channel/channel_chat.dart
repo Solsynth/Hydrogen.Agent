@@ -24,6 +24,7 @@ import 'package:solian/widgets/channel/channel_call_indicator.dart';
 import 'package:solian/widgets/chat/call/chat_call_action.dart';
 import 'package:solian/widgets/chat/chat_event_list.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
+import 'package:solian/widgets/chat/chat_typing_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
 
 class ChannelChatScreen extends StatefulWidget {
@@ -103,12 +104,18 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     setState(() => _isBusy = false);
   }
 
+  List<ChannelMember> _typingUsers = List.empty(growable: true);
+  Map<int, Timer> _typingInactiveTimer = {};
+
   void _listenMessages() {
-    final WebSocketProvider provider = Get.find();
-    _subscription = provider.stream.stream.listen((event) {
+    final WebSocketProvider ws = Get.find();
+    _subscription = ws.stream.stream.listen((event) {
       switch (event.method) {
         case 'events.new':
           final payload = Event.fromJson(event.payload!);
+          final typingIdx =
+              _typingUsers.indexWhere((x) => x.id == payload.senderId);
+          if (typingIdx != -1) _typingUsers.removeAt(typingIdx);
           _chatController.receiveEvent(payload);
           break;
         case 'calls.new':
@@ -123,6 +130,24 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
             setState(() => _ongoingCall = null);
           }
           break;
+        case 'status.typing':
+          if (event.payload?['channel_id'] != _channel!.id) break;
+          final member = ChannelMember.fromJson(event.payload!['member']);
+          if (!_typingUsers.any((x) => x.id == member.id)) {
+            setState(() {
+              _typingUsers.add(member);
+            });
+          }
+          _typingInactiveTimer[member.id]?.cancel();
+          _typingInactiveTimer[member.id] = Timer(
+            const Duration(seconds: 3),
+            () {
+              setState(() {
+                _typingUsers.removeWhere((x) => x.id == member.id);
+                _typingInactiveTimer.remove(member.id);
+              });
+            },
+          );
       }
     });
   }
@@ -280,23 +305,28 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                       child: SafeArea(
-                        child: ChatMessageInput(
-                          edit: _messageToEditing,
-                          reply: _messageToReplying,
-                          realm: widget.realm,
-                          placeholder: placeholder,
-                          channel: _channel!,
-                          onSent: (Event item) {
-                            setState(() {
-                              _chatController.addPendingEvent(item);
-                            });
-                          },
-                          onReset: () {
-                            setState(() {
-                              _messageToReplying = null;
-                              _messageToEditing = null;
-                            });
-                          },
+                        child: Column(
+                          children: [
+                            ChatTypingIndicator(users: _typingUsers),
+                            ChatMessageInput(
+                              edit: _messageToEditing,
+                              reply: _messageToReplying,
+                              realm: widget.realm,
+                              placeholder: placeholder,
+                              channel: _channel!,
+                              onSent: (Event item) {
+                                setState(() {
+                                  _chatController.addPendingEvent(item);
+                                });
+                              },
+                              onReset: () {
+                                setState(() {
+                                  _messageToReplying = null;
+                                  _messageToEditing = null;
+                                });
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -329,6 +359,9 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
 
   @override
   void dispose() {
+    for (var timer in _typingInactiveTimer.values) {
+      timer.cancel();
+    }
     _subscription?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
