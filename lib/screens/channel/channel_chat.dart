@@ -104,8 +104,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     setState(() => _isBusy = false);
   }
 
-  List<ChannelMember> _typingUsers = List.empty(growable: true);
-  Map<int, Timer> _typingInactiveTimer = {};
+  final List<ChannelMember> _typingUsers = List.empty(growable: true);
+  final Map<int, Timer> _typingInactiveTimer = {};
 
   void _listenMessages() {
     final WebSocketProvider ws = Get.find();
@@ -133,6 +133,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
         case 'status.typing':
           if (event.payload?['channel_id'] != _channel!.id) break;
           final member = ChannelMember.fromJson(event.payload!['member']);
+          if (member.id == _channelProfile!.id) break;
           if (!_typingUsers.any((x) => x.id == member.id)) {
             setState(() {
               _typingUsers.add(member);

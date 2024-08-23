@@ -149,7 +149,7 @@ class WebSocketProvider extends GetxController {
       'device_token': token,
       'device_id': deviceUuid,
     });
-    if (resp.statusCode != 200) {
+    if (resp.statusCode != 200 && resp.statusCode != 400) {
       throw RequestException(resp);
     }
   }
