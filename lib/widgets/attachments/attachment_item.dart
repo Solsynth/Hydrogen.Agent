@@ -147,17 +147,21 @@ class _AttachmentItemImage extends StatelessWidget {
               errorWidget: (context, url, error) {
                 return Material(
                   color: Theme.of(context).colorScheme.surface,
-                  child: Center(
-                    child: const Icon(Icons.close, size: 32)
-                        .animate(onPlay: (e) => e.repeat(reverse: true))
-                        .fade(duration: 500.ms),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.close, size: 32)
+                          .animate(onPlay: (e) => e.repeat(reverse: true))
+                          .fade(duration: 500.ms),
+                      Text(error.toString()),
+                    ],
                   ),
                 );
               },
             )
           else
             Image.network(
-              ServiceFinder.buildUrl('files', '/attachments/${item.id}'),
+              ServiceFinder.buildUrl('files', '/attachments/${item.rid}'),
               fit: fit,
               loadingBuilder: (BuildContext context, Widget child,
                   ImageChunkEvent? loadingProgress) {
@@ -174,10 +178,14 @@ class _AttachmentItemImage extends StatelessWidget {
               errorBuilder: (context, error, stackTrace) {
                 return Material(
                   color: Theme.of(context).colorScheme.surface,
-                  child: Center(
-                    child: const Icon(Icons.close, size: 32)
-                        .animate(onPlay: (e) => e.repeat(reverse: true))
-                        .fade(duration: 500.ms),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.close, size: 32)
+                          .animate(onPlay: (e) => e.repeat(reverse: true))
+                          .fade(duration: 500.ms),
+                      Text(error.toString()),
+                    ],
                   ),
                 );
               },

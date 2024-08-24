@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -17,8 +18,36 @@ class LinkExpansion extends StatelessWidget {
       return SvgPicture.network(url, width: width, height: height);
     }
     return PlatformInfo.canCacheImage
-        ? CachedNetworkImage(imageUrl: url, width: width, height: height)
-        : Image.network(url, width: width, height: height);
+        ? CachedNetworkImage(
+            imageUrl: url,
+            width: width,
+            height: height,
+            errorWidget: (context, url, error) {
+              return Material(
+                color: Theme.of(context).colorScheme.surface,
+                child: Center(
+                  child: const Icon(Icons.close, size: 32)
+                      .animate(onPlay: (e) => e.repeat(reverse: true))
+                      .fade(duration: 500.ms),
+                ),
+              );
+            },
+          )
+        : Image.network(
+            url,
+            width: width,
+            height: height,
+            errorBuilder: (context, error, stackTrace) {
+              return Material(
+                color: Theme.of(context).colorScheme.surface,
+                child: Center(
+                  child: const Icon(Icons.close, size: 32)
+                      .animate(onPlay: (e) => e.repeat(reverse: true))
+                      .fade(duration: 500.ms),
+                ),
+              );
+            },
+          );
   }
 
   @override

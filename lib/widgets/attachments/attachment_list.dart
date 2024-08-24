@@ -132,6 +132,9 @@ class _AttachmentListState extends State<AttachmentList> {
     _getMetadataList();
   }
 
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
   @override
   Widget build(BuildContext context) {
     if (widget.attachmentsId.isEmpty) {
@@ -139,12 +142,24 @@ class _AttachmentListState extends State<AttachmentList> {
     }
 
     if (_isLoading) {
-      return Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHigh,
-        ),
-        child: const LinearProgressIndicator(),
-      );
+      return Row(
+        children: [
+          Icon(
+            Icons.file_copy,
+            size: 12,
+            color: _unFocusColor,
+          ).paddingOnly(right: 5),
+          Text(
+            'attachmentHint'.trParams(
+              {'count': widget.attachmentsId.length.toString()},
+            ),
+            style: TextStyle(color: _unFocusColor, fontSize: 12),
+          )
+        ],
+      )
+          .paddingSymmetric(horizontal: 8)
+          .animate(onPlay: (c) => c.repeat(reverse: true))
+          .fadeIn(duration: 1250.ms);
     }
 
     if (widget.isColumn) {
@@ -159,6 +174,9 @@ class _AttachmentListState extends State<AttachmentList> {
           if (element == null) return const SizedBox();
           double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+            ),
             constraints: BoxConstraints(
               maxWidth: widget.columnMaxWidth,
               maxHeight: 640,
@@ -204,6 +222,7 @@ class _AttachmentListState extends State<AttachmentList> {
           final element = _attachmentsMeta[idx];
           return Container(
             decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
               border: Border.all(
                 color: Theme.of(context).dividerColor,
                 width: 1,
