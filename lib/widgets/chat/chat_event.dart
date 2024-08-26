@@ -197,8 +197,11 @@ class ChatEvent extends StatelessWidget {
                 ),
             ],
           ).paddingOnly(right: 12),
+          if (!isContentPreviewing)
+            _buildLinkExpansion().paddingOnly(left: 52, right: 8),
           _buildAttachment(context, isMinimal: isContentPreviewing).paddingOnly(
             left: isContentPreviewing ? 12 : 56,
+            right: 8,
           ),
         ],
       );

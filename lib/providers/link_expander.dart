@@ -9,6 +9,7 @@ class LinkExpandController extends GetxController {
   final Map<String, LinkMeta?> _cachedResponse = {};
 
   Future<LinkMeta?> expandLink(String url) async {
+    log('[LinkExpander] Expanding link... $url');
     final target = utf8.fuse(base64).encode(url);
     if (_cachedResponse.containsKey(target)) return _cachedResponse[target];
     final client = ServiceFinder.configureClient('dealer');
