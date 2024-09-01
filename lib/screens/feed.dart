@@ -12,14 +12,14 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/posts/post_shuffle_swiper.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class FeedScreen extends StatefulWidget {
+  const FeedScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<FeedScreen> createState() => _FeedScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _FeedScreenState extends State<FeedScreen>
     with SingleTickerProviderStateMixin {
   late final PostListController _postController;
   late final TabController _tabController;

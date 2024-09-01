@@ -8,6 +8,8 @@ const i18nEnglish = {
   'home': 'Home',
   'guest': 'Guest',
   'draft': 'Draft',
+  'dashboard': 'Dashboard',
+  'today': 'Today',
   'draftSave': 'Save',
   'draftBox': 'Draft Box',
   'more': 'More',
@@ -40,6 +42,7 @@ const i18nEnglish = {
   'openInAlbum': 'Open in album',
   'openInBrowser': 'Open in browser',
   'notification': 'Notification',
+  'notificationUnreadCount': '@count unread notifications',
   'errorHappened': 'An error occurred',
   'errorHappenedUnauthorized':
       'Unauthorized request, please sign in or try resign in.',

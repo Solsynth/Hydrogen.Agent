@@ -16,7 +16,7 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   bool _isBusy = false;
 
-  Future<void> markAllRead() async {
+  Future<void> _markAllRead() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -40,7 +40,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> markOneRead(notify.Notification element, int index) async {
+  Future<void> _markOneRead(notify.Notification element, int index) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
@@ -64,7 +64,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final WebSocketProvider provider = Get.find();
+    final WebSocketProvider ws = Get.find();
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -83,7 +83,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     SliverToBoxAdapter(
                       child: const LinearProgressIndicator().animate().scaleX(),
                     ),
-                  if (provider.notifications.isEmpty)
+                  if (ws.notifications.isEmpty)
                     SliverToBoxAdapter(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -96,7 +96,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                       ),
                     ),
-                  if (provider.notifications.isNotEmpty)
+                  if (ws.notifications.isNotEmpty)
                     SliverToBoxAdapter(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -104,14 +104,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         child: ListTile(
                           leading: const Icon(Icons.checklist),
                           title: Text('notifyAllRead'.tr),
-                          onTap: _isBusy ? null : () => markAllRead(),
+                          onTap: _isBusy ? null : () => _markAllRead(),
                         ),
                       ),
                     ),
                   SliverList.separated(
-                    itemCount: provider.notifications.length,
+                    itemCount: ws.notifications.length,
                     itemBuilder: (BuildContext context, int index) {
-                      var element = provider.notifications[index];
+                      var element = ws.notifications[index];
                       return Dismissible(
                         key: Key(const Uuid().v4()),
                         background: Container(
@@ -135,7 +135,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ],
                           ),
                         ),
-                        onDismissed: (_) => markOneRead(element, index),
+                        onDismissed: (_) => _markOneRead(element, index),
                       );
                     },
                     separatorBuilder: (_, __) =>

@@ -12,6 +12,7 @@ import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/chat.dart';
+import 'package:solian/screens/dashboard.dart';
 import 'package:solian/screens/feed/search.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/screens/feed/draft_box.dart';
@@ -19,7 +20,7 @@ import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
-import 'package:solian/screens/home.dart';
+import 'package:solian/screens/feed.dart';
 import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/screens/settings.dart';
 import 'package:solian/shells/root_shell.dart';
@@ -34,6 +35,14 @@ abstract class AppRouter {
           child: child,
         ),
         routes: [
+          GoRoute(
+            path: '/',
+            name: 'dashboard',
+            builder: (context, state) => TitleShell(
+              state: state,
+              child: const DashboardScreen(),
+            ),
+          ),
           _feedRoute,
           _chatRoute,
           _realmRoute,
@@ -63,9 +72,9 @@ abstract class AppRouter {
     builder: (context, state, child) => child,
     routes: [
       GoRoute(
-        path: '/',
-        name: 'home',
-        builder: (context, state) => const HomeScreen(),
+        path: '/feed',
+        name: 'feed',
+        builder: (context, state) => const FeedScreen(),
       ),
       GoRoute(
         path: '/feed/search',
