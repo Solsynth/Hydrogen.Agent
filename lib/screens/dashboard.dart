@@ -28,6 +28,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late final PostProvider _posts = Get.find();
   late final DailySignProvider _dailySign = Get.find();
 
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
   List<Post>? _currentPosts;
 
   Future<void> _pullPosts() async {
@@ -293,6 +296,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               )
             ],
           ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Powered by Solar Network',
+              style: TextStyle(color: _unFocusColor, fontSize: 12),
+            ),
+            Text(
+              '占卜多少都是玩，人生还得靠自己',
+              style:
+                  GoogleFonts.notoSerifHk(color: _unFocusColor, fontSize: 12),
+            )
+          ],
+        ).paddingAll(8),
       ],
     );
   }
