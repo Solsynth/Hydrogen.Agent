@@ -13,6 +13,7 @@ import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
+import 'package:solian/providers/daily_sign.dart';
 import 'package:solian/providers/link_expander.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/theme_switcher.dart';
@@ -129,6 +130,7 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => RealmProvider());
     Get.lazyPut(() => ChatCallProvider());
     Get.lazyPut(() => AttachmentUploaderController());
-    Get.lazyPut(() => LinkExpandController());
+    Get.lazyPut(() => LinkExpandProvider());
+    Get.lazyPut(() => DailySignProvider());
   }
 }

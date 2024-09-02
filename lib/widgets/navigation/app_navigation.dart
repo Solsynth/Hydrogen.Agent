@@ -4,9 +4,14 @@ import 'package:get/utils.dart';
 abstract class AppNavigation {
   static List<AppNavigationDestination> destinations = [
     AppNavigationDestination(
-      icon: Icons.home,
-      label: 'home'.tr,
-      page: 'home',
+      icon: Icons.dashboard,
+      label: 'dashboard'.tr,
+      page: 'dashboard',
+    ),
+    AppNavigationDestination(
+      icon: Icons.newspaper,
+      label: 'feed'.tr,
+      page: 'feed',
     ),
     AppNavigationDestination(
       icon: Icons.workspaces,

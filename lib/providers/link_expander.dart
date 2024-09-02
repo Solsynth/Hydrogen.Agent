@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:solian/models/link.dart';
 import 'package:solian/services.dart';
 
-class LinkExpandController extends GetxController {
+class LinkExpandProvider extends GetxController {
   final Map<String, LinkMeta?> _cachedResponse = {};
 
   Future<LinkMeta?> expandLink(String url) async {

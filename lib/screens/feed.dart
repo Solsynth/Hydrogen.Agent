@@ -65,7 +65,7 @@ class _FeedScreenState extends State<FeedScreen>
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                title: AppBarTitle('home'.tr),
+                title: AppBarTitle('feed'.tr),
                 centerTitle: false,
                 floating: true,
                 toolbarHeight: SolianTheme.toolbarHeight(context),

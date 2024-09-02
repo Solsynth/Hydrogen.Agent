@@ -60,7 +60,7 @@ class LinkExpansion extends StatelessWidget {
       return const SizedBox();
     }
 
-    final LinkExpandController expandController = Get.find();
+    final LinkExpandProvider expandController = Get.find();
 
     return Wrap(
       children: matches.map((x) {
