@@ -17,6 +17,27 @@ Future<MessageHistoryDb> createHistoryDb() async {
       .addMigrations([migration1to2]).build();
 }
 
+Future<(List<Event>, int)?> getWhatsNewEvents(int pivot, {take = 10}) async {
+  final AuthProvider auth = Get.find();
+  if (auth.isAuthorized.isFalse) return null;
+
+  final client = auth.configureClient('messaging');
+
+  final resp = await client.get(
+    '/whats-new?pivot=$pivot&take=$take',
+  );
+
+  if (resp.statusCode != 200) {
+    throw RequestException(resp);
+  }
+
+  final PaginationResult response = PaginationResult.fromJson(resp.body);
+  final result =
+      response.data?.map((e) => Event.fromJson(e)).toList() ?? List.empty();
+
+  return (result, response.count);
+}
+
 Future<Event?> getRemoteEvent(int id, Channel channel, String scope) async {
   final AuthProvider auth = Get.find();
   if (auth.isAuthorized.isFalse) return null;

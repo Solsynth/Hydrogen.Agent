@@ -2,14 +2,12 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
+import 'package:solian/providers/last_read.dart';
 
 class PostListController extends GetxController {
-  late final SharedPreferences _prefs;
-
   String? author;
 
   /// The polling source modifier.
@@ -19,19 +17,12 @@ class PostListController extends GetxController {
   RxInt mode = 0.obs;
 
   /// The paging controller for infinite loading.
-  /// Only available when mode is `0` or `1`.
+  /// Only available when mode is `0`, `1` or `2`.
   PagingController<int, Post> pagingController =
       PagingController(firstPageKey: 0);
 
   PostListController({this.author}) {
-    _initPreferences();
     _initPagingController();
-  }
-
-  void _initPreferences() {
-    SharedPreferences.getInstance().then((prefs) {
-      _prefs = prefs;
-    });
   }
 
   /// Initialize a compatibility layer to paging controller
@@ -109,11 +100,7 @@ class PostListController extends GetxController {
     postList.retainWhere((x) => idx.add(x.id));
 
     var lastId = postList.map((x) => x.id).reduce(max);
-    if (_prefs.containsKey('feed_last_read_at')) {
-      final storedId = _prefs.getInt('feed_last_read_at') ?? 0;
-      lastId = max(storedId, lastId);
-    }
-    _prefs.setInt('feed_last_read_at', lastId);
+    Get.find<LastReadProvider>().feedLastReadAt = lastId;
 
     return result;
   }

@@ -10,6 +10,22 @@ class PostProvider extends GetConnect {
     httpClient.baseUrl = ServiceFinder.buildUrl('interactive', null);
   }
 
+  Future<Response> seeWhatsNew(int pivot) async {
+    GetConnect client;
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.value) {
+      client = auth.configureClient('co');
+    } else {
+      client = ServiceFinder.configureClient('co');
+    }
+    final resp = await client.get('/whats-new?pivot=$pivot');
+    if (resp.statusCode != 200) {
+      throw RequestException(resp);
+    }
+
+    return resp;
+  }
+
   Future<Response> listRecommendations(int page,
       {String? realm, String? channel}) async {
     GetConnect client;

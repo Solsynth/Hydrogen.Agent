@@ -1,19 +1,24 @@
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/daily_sign.dart';
+import 'package:solian/models/event.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/daily_sign.dart';
+import 'package:solian/providers/last_read.dart';
+import 'package:solian/providers/message/adaptor.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
+import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -24,6 +29,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  late final LastReadProvider _lastRead = Get.find();
   late final WebSocketProvider _ws = Get.find();
   late final PostProvider _posts = Get.find();
   late final DailySignProvider _dailySign = Get.find();
@@ -32,20 +38,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   List<Post>? _currentPosts;
+  int? _currentPostsCount;
 
   Future<void> _pullPosts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final resp = await _posts.listRecommendations(0);
+    if (_lastRead.feedLastReadAt == null) return;
+    log('[Dashboard] Pulling posts with pivot: ${_lastRead.feedLastReadAt}');
+    final resp = await _posts.seeWhatsNew(_lastRead.feedLastReadAt!);
     final result = PaginationResult.fromJson(resp.body);
-    if (prefs.containsKey('feed_last_read_at')) {
-      final id = prefs.getInt('feed_last_read_at')!;
-      setState(() {
-        _currentPosts = result.data
-            ?.map((e) => Post.fromJson(e))
-            .where((x) => x.id > id)
-            .toList();
-      });
-    }
+    setState(() {
+      _currentPostsCount = result.count;
+      _currentPosts = result.data?.map((e) => Post.fromJson(e)).toList();
+    });
+  }
+
+  List<Event>? _currentMessages;
+  int? _currentMessagesCount;
+
+  Future<void> _pullMessages() async {
+    if (_lastRead.messagesLastReadAt == null) return;
+    log('[Dashboard] Pulling messages with pivot: ${_lastRead.messagesLastReadAt}');
+    final out = await getWhatsNewEvents(_lastRead.messagesLastReadAt!);
+    if (out == null) return;
+    setState(() {
+      _currentMessages = out.$1;
+      _currentMessagesCount = out.$2;
+    });
   }
 
   bool _signingDaily = true;
@@ -77,6 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _pullPosts();
+    _pullMessages();
     _pullDaily();
   }
 
@@ -126,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ).paddingSymmetric(horizontal: 9),
             ).paddingOnly(left: 4),
             title: _signRecord == null
-                ? const Text('诸事不宜')
+                ? const Text('签到')
                 : Text(_signRecord!.overviewSuggestion),
             subtitle: _signRecord == null
                 ? const Text('今日未拜访佛祖')
@@ -250,8 +268,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             .copyWith(fontSize: 18),
                       ),
                       Text(
-                        'notificationUnreadCount'.trParams({
-                          'count': (_currentPosts?.length ?? 0).toString(),
+                        'feedUnreadCount'.trParams({
+                          'count': (_currentPostsCount ?? 0).toString(),
                         }),
                       ),
                     ],
@@ -275,19 +293,111 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     return SizedBox(
                       width: width,
                       child: Card(
-                        child: Card(
-                          child: PostListEntryWidget(
-                            item: item,
-                            isClickable: true,
-                            isShowEmbed: true,
-                            isNestedClickable: true,
-                            onUpdate: (_) {
-                              _pullPosts();
-                            },
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
-                          ),
+                        child: PostListEntryWidget(
+                          item: item,
+                          isClickable: true,
+                          isShowEmbed: true,
+                          isNestedClickable: true,
+                          onUpdate: (_) {
+                            _pullPosts();
+                          },
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surfaceContainerLow,
+                        ),
+                      ).paddingSymmetric(horizontal: 8),
+                    );
+                  },
+                ),
+              )
+            ],
+          ),
+        if (_currentMessages?.isNotEmpty ?? false)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'messages'.tr,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(fontSize: 18),
+                      ),
+                      Text(
+                        'messagesUnreadCount'.trParams({
+                          'count': (_currentMessagesCount ?? 0).toString(),
+                        }),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      AppRouter.instance.goNamed('chat');
+                    },
+                  ),
+                ],
+              ).paddingOnly(left: 18, right: 18, bottom: 8),
+              SizedBox(
+                height: 240,
+                width: width,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _currentMessages!.length,
+                  itemBuilder: (context, idx) {
+                    final item = _currentMessages![idx];
+                    return SizedBox(
+                      width: width,
+                      child: Card(
+                        child: Column(
+                          children: [
+                            ListTile(
+                              tileColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHigh,
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                              )),
+                              leading: CircleAvatar(
+                                backgroundColor: item.channel!.realmId == null
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.transparent,
+                                radius: 20,
+                                child: FaIcon(
+                                  FontAwesomeIcons.hashtag,
+                                  color: item.channel!.realmId == null
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context).colorScheme.primary,
+                                  size: 16,
+                                ),
+                              ),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              title: Text(item.channel!.name),
+                              subtitle: Text(item.channel!.description),
+                              onTap: () {
+                                AppRouter.instance.pushNamed(
+                                  'channelChat',
+                                  pathParameters: {
+                                    'alias': item.channel!.alias
+                                  },
+                                  queryParameters: {
+                                    if (item.channel!.realmId != null)
+                                      'realm': item.channel!.realm!.alias,
+                                  },
+                                );
+                              },
+                            ),
+                            ChatEvent(item: item).paddingOnly(
+                                bottom: 8, top: 16, left: 8, right: 8),
+                          ],
                         ),
                       ).paddingSymmetric(horizontal: 8),
                     );
@@ -305,8 +415,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             Text(
               '占卜多少都是玩，人生还得靠自己',
-              style:
-                  GoogleFonts.notoSerifHk(color: _unFocusColor, fontSize: 12),
+              style: GoogleFonts.notoSerifHk(
+                color: _unFocusColor,
+                fontSize: 12,
+              ),
             )
           ],
         ).paddingAll(8),

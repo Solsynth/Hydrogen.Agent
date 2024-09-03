@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
+import 'package:solian/providers/last_read.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:solian/widgets/chat/chat_event_action.dart';
 
@@ -39,6 +40,9 @@ class ChatEventList extends StatelessWidget {
             key: Key('chat-history#${channel.id}'),
             itemCount: chatController.currentEvents.length,
             itemBuilder: (context, index) {
+              Get.find<LastReadProvider>().messagesLastReadAt =
+                  chatController.currentEvents[index].id;
+
               bool isMerged = false, hasMerged = false;
               if (index > 0) {
                 hasMerged = _checkMessageMergeable(
