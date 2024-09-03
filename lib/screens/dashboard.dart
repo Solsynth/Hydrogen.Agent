@@ -144,10 +144,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ).paddingSymmetric(horizontal: 9),
             ).paddingOnly(left: 4),
             title: _signRecord == null
-                ? const Text('签到')
+                ? Text('dailySign'.tr)
                 : Text(_signRecord!.overviewSuggestion),
             subtitle: _signRecord == null
-                ? const Text('今日未拜访佛祖')
+                ? Text('dailySignNone'.tr)
                 : Text('+${_signRecord!.resultExperience} EXP'),
             trailing: AnimatedSwitcher(
               switchInCurve: Curves.fastOutSlowIn,
@@ -414,7 +414,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(color: _unFocusColor, fontSize: 12),
             ),
             Text(
-              '占卜多少都是玩，人生还得靠自己',
+              'dashboardFooter'.tr,
               style: GoogleFonts.notoSerifHk(
                 color: _unFocusColor,
                 fontSize: 12,

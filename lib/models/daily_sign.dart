@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 
 part 'daily_sign.g.dart';
@@ -39,10 +40,10 @@ class DailySignRecord {
       };
 
   String get overviewSuggestion => switch (resultTier) {
-        0 => '诸事不宜',
-        1 => '有些不宜',
-        2 => '平平淡淡',
-        3 => '有些事宜',
-        _ => '诸事皆宜',
+        0 => 'dailySignTier0'.tr,
+        1 => 'dailySignTier1'.tr,
+        2 => 'dailySignTier2'.tr,
+        3 => 'dailySignTier3'.tr,
+        _ => 'dailySignTier4'.tr,
       };
 }
