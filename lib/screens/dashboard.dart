@@ -258,8 +258,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (x.subtitle != null) Text(x.subtitle!),
-                                  Text(x.body),
+                                  if (x.subtitle != null)
+                                    Text(
+                                      x.subtitle!,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  else
+                                    Text(
+                                      x.body,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                 ],
                               ),
                             ),
@@ -326,17 +336,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       return SizedBox(
                         width: min(480, width),
                         child: Card(
-                          child: PostListEntryWidget(
-                            item: item,
-                            isClickable: true,
-                            isShowEmbed: true,
-                            isNestedClickable: true,
-                            onUpdate: (_) {
-                              _pullPosts();
-                            },
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerLow,
+                          child: SingleChildScrollView(
+                            child: PostListEntryWidget(
+                              item: item,
+                              isClickable: true,
+                              isShowEmbed: true,
+                              isNestedClickable: true,
+                              onUpdate: (_) {
+                                _pullPosts();
+                              },
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerLow,
+                            ),
                           ),
                         ).paddingSymmetric(horizontal: 8),
                       );
