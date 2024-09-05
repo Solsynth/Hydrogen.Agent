@@ -51,6 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int? _currentPostsCount;
 
   Future<void> _pullPosts() async {
+    print(_lastRead.feedLastReadAt);
     if (_lastRead.feedLastReadAt == null) return;
     log('[Dashboard] Pulling posts with pivot: ${_lastRead.feedLastReadAt}');
     final resp = await _posts.seeWhatsNew(_lastRead.feedLastReadAt!);
@@ -195,7 +196,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ).paddingSymmetric(horizontal: 8),
           const Divider(thickness: 0.3).paddingSymmetric(vertical: 8),
-          // Unread notifications
+
+          /// Unread notifications
           Obx(
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,7 +358,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 )
               ],
-            ),
+            ).paddingOnly(bottom: 12),
 
           /// Unread messages part
           if (_currentMessages?.isNotEmpty ?? false)
@@ -463,7 +465,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 )
               ],
-            ),
+            ).paddingOnly(bottom: 12),
+
+          /// Footer
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
