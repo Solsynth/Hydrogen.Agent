@@ -26,7 +26,7 @@ class AppNavigationDrawer extends StatefulWidget {
 
 class _AppNavigationDrawerState extends State<AppNavigationDrawer>
     with TickerProviderStateMixin {
-  bool _isCollapsed = false;
+  bool _isCollapsed = true;
 
   late final AnimationController _drawerAnimationController =
       AnimationController(

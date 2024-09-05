@@ -12,14 +12,20 @@ class LastReadProvider extends GetxController {
 
   set feedLastReadAt(int? value) {
     if (value == _feedLastReadAt) return;
-    _feedLastReadAt = max(_feedLastReadAt ?? 0, value ?? 0);
-    if (value != _feedLastReadAt) _saveToStorage();
+    final newValue = max(_feedLastReadAt ?? 0, value ?? 0);
+    if (newValue != _feedLastReadAt) {
+      _feedLastReadAt = newValue;
+      _saveToStorage();
+    }
   }
 
   set messagesLastReadAt(int? value) {
     if (value == _messagesLastReadAt) return;
-    _messagesLastReadAt = max(_messagesLastReadAt ?? 0, value ?? 0);
-    if (value != _messagesLastReadAt) _saveToStorage();
+    final newValue = max(_messagesLastReadAt ?? 0, value ?? 0);
+    if (newValue != _messagesLastReadAt) {
+      _messagesLastReadAt = newValue;
+      _saveToStorage();
+    }
   }
 
   LastReadProvider() {

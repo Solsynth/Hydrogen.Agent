@@ -72,6 +72,15 @@ class Channel {
         'realm_id': realmId,
         'is_encrypted': isEncrypted,
       };
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Channel) return false;
+    return id == other.id;
+  }
+
+  @override
+  int get hashCode => id;
 }
 
 class ChannelMember {
