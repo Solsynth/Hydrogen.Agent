@@ -59,7 +59,8 @@ class ChatEventList extends StatelessWidget {
 
               final item = chatController.currentEvents[index].data;
 
-              return InkWell(
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 child: ChatEvent(
                   key: Key('m${item.uuid}'),
                   item: item,
