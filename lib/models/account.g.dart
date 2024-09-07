@@ -24,6 +24,9 @@ Account _$AccountFromJson(Map<String, dynamic> json) => Account(
       avatar: json['avatar'],
       banner: json['banner'],
       description: json['description'] as String,
+      profile: json['profile'] == null
+          ? null
+          : AccountProfile.fromJson(json['profile'] as Map<String, dynamic>),
       badges: (json['badges'] as List<dynamic>?)
           ?.map((e) => AccountBadge.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -43,6 +46,7 @@ Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
       'avatar': instance.avatar,
       'banner': instance.banner,
       'description': instance.description,
+      'profile': instance.profile?.toJson(),
       'badges': instance.badges?.map((e) => e.toJson()).toList(),
       'email_address': instance.emailAddress,
       'external_id': instance.externalId,
@@ -68,5 +72,39 @@ Map<String, dynamic> _$AccountBadgeToJson(AccountBadge instance) =>
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'metadata': instance.metadata,
       'type': instance.type,
+      'account_id': instance.accountId,
+    };
+
+AccountProfile _$AccountProfileFromJson(Map<String, dynamic> json) =>
+    AccountProfile(
+      id: (json['id'] as num).toInt(),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      deletedAt: json['deleted_at'] == null
+          ? null
+          : DateTime.parse(json['deleted_at'] as String),
+      firstName: json['first_name'] as String?,
+      lastName: json['last_name'] as String?,
+      experience: (json['experience'] as num?)?.toInt(),
+      lastSeenAt: json['last_seen_at'] == null
+          ? null
+          : DateTime.parse(json['last_seen_at'] as String),
+      birthday: json['birthday'] == null
+          ? null
+          : DateTime.parse(json['birthday'] as String),
+      accountId: (json['account_id'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$AccountProfileToJson(AccountProfile instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+      'deleted_at': instance.deletedAt?.toIso8601String(),
+      'first_name': instance.firstName,
+      'last_name': instance.lastName,
+      'experience': instance.experience,
+      'last_seen_at': instance.lastSeenAt?.toIso8601String(),
+      'birthday': instance.birthday?.toIso8601String(),
       'account_id': instance.accountId,
     };

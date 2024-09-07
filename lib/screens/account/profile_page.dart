@@ -84,10 +84,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   }
 
   int get _userSocialCreditPoints {
-    int birthPart =
-        DateTime.now().difference(_userinfo!.createdAt.toLocal()).inSeconds;
-    birthPart = birthPart >> 16;
-    return _totalUpvote * 2 - _totalDownvote + birthPart;
+    return _totalUpvote * 2 - _totalDownvote + _postController.postTotal.value;
   }
 
   @override
@@ -97,8 +94,9 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     _postController = PostListController(author: widget.name);
     _albumPagingController.addPageRequestListener((pageKey) async {
       final client = ServiceFinder.configureClient('files');
-      final resp = await client
-          .get('/attachments?take=10&offset=$pageKey&author=${widget.name}');
+      final resp = await client.get(
+        '/attachments?take=10&offset=$pageKey&author=${widget.name}&original=true',
+      );
       if (resp.statusCode == 200) {
         final result = PaginationResult.fromJson(resp.body);
         final out = result.data

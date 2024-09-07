@@ -199,7 +199,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                               radius: 19,
                             ),
                           ),
-                          const IgnorePointer(child: Gap(8)),
+                          const Gap(8),
                           Expanded(
                             child: IgnorePointer(
                               child: Column(
@@ -241,7 +241,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                           ),
                         ],
                       ),
-                    const IgnorePointer(child: Gap(4)),
+                    const Gap(4),
                     IgnorePointer(
                       child: Text(
                         widget.item.alt,
@@ -253,7 +253,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                         ),
                       ),
                     ),
-                    const IgnorePointer(child: Gap(2)),
+                    const Gap(2),
                     IgnorePointer(
                       child: Wrap(
                         spacing: 6,

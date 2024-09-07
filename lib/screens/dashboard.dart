@@ -23,6 +23,7 @@ import 'package:solian/providers/message/adaptor.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:solian/widgets/daily_sign/history_chart.dart';
 import 'package:solian/widgets/posts/post_list.dart';
@@ -491,7 +492,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           /// Footer
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: SolianTheme.isLargeScreen(context)
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             children: [
               Text(
                 'Powered by Solar Network',

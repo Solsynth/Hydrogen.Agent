@@ -15,6 +15,7 @@ class Account {
   dynamic avatar;
   dynamic banner;
   String description;
+  AccountProfile? profile;
   List<AccountBadge>? badges;
   String? emailAddress;
   int? externalId;
@@ -31,6 +32,7 @@ class Account {
     required this.avatar,
     required this.banner,
     required this.description,
+    required this.profile,
     required this.badges,
     required this.emailAddress,
     this.externalId,
@@ -66,4 +68,36 @@ class AccountBadge {
       _$AccountBadgeFromJson(json);
 
   Map<String, dynamic> toJson() => _$AccountBadgeToJson(this);
+}
+
+@JsonSerializable()
+class AccountProfile {
+  int id;
+  DateTime createdAt;
+  DateTime updatedAt;
+  DateTime? deletedAt;
+  String? firstName;
+  String? lastName;
+  int? experience;
+  DateTime? lastSeenAt;
+  DateTime? birthday;
+  int accountId;
+
+  AccountProfile({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.deletedAt,
+    required this.firstName,
+    required this.lastName,
+    required this.experience,
+    required this.lastSeenAt,
+    required this.birthday,
+    required this.accountId,
+  });
+
+  factory AccountProfile.fromJson(Map<String, dynamic> json) =>
+      _$AccountProfileFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AccountProfileToJson(this);
 }
