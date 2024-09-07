@@ -45,7 +45,7 @@ class _AccountBadgeWidgetState extends State<AccountBadgeWidget> {
   Widget build(BuildContext context) {
     final spec = badges[widget.item.type];
 
-    if (spec == null) return const SizedBox();
+    if (spec == null) return const SizedBox.shrink();
 
     return Tooltip(
       richMessage: TextSpan(

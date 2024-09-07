@@ -155,7 +155,7 @@ class PostCreatePopup extends StatelessWidget {
     final AuthProvider auth = Get.find();
 
     if (auth.isAuthorized.isFalse) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
 
     final List<dynamic> actionList = [

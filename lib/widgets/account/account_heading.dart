@@ -71,7 +71,7 @@ class AccountHeadingWidget extends StatelessWidget {
                             content: banner,
                             fit: BoxFit.cover,
                           )
-                        : const SizedBox(),
+                        : const SizedBox.shrink(),
                   ),
                 ),
               ).paddingSymmetric(horizontal: 16),

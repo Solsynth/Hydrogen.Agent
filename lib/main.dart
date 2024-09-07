@@ -109,7 +109,7 @@ class SolianApp extends StatelessWidget {
             return SystemShell(
               child: ScaffoldMessenger(
                 child: BootstrapperShell(
-                  child: child ?? const SizedBox(),
+                  child: child ?? const SizedBox.shrink(),
                 ),
               ),
             );

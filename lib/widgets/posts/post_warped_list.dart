@@ -29,7 +29,7 @@ class PostWarpedListWidget extends StatelessWidget {
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
           if (item.pinnedAt != null && !isPinned) {
-            return const SizedBox();
+            return const SizedBox.shrink();
           }
           return PostListEntryWidget(
             renderOrder: index,

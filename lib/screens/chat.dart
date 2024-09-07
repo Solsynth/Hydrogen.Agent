@@ -112,7 +112,7 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Obx(() {
                 if (_channels.isLoading.isFalse) {
-                  return const SizedBox();
+                  return const SizedBox.shrink();
                 } else {
                   return const LinearProgressIndicator();
                 }

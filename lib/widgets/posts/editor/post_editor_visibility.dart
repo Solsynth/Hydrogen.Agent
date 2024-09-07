@@ -59,7 +59,7 @@ class PostEditorVisibilityDialog extends StatelessWidget {
                 controller.visibility.value == 3) {
               return const Gap(8);
             }
-            return const SizedBox();
+            return const SizedBox.shrink();
           }),
           Obx(() {
             if (controller.visibility.value == 2) {
@@ -86,7 +86,7 @@ class PostEditorVisibilityDialog extends StatelessWidget {
                 },
               );
             }
-            return const SizedBox();
+            return const SizedBox.shrink();
           }),
           Obx(() {
             if (controller.visibility.value == 3) {
@@ -113,7 +113,7 @@ class PostEditorVisibilityDialog extends StatelessWidget {
                 },
               );
             }
-            return const SizedBox();
+            return const SizedBox.shrink();
           }),
         ],
       ),

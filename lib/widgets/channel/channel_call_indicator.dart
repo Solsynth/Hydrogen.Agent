@@ -64,7 +64,7 @@ class ChannelCallIndicator extends StatelessWidget {
           const Gap(6),
           Obx(() {
             if (call.isInitialized.value) {
-              return const SizedBox();
+              return const SizedBox.shrink();
             }
             if (ongoingCall.participants.isNotEmpty) {
               return Container(
@@ -84,7 +84,7 @@ class ChannelCallIndicator extends StatelessWidget {
                 ),
               );
             }
-            return const SizedBox();
+            return const SizedBox.shrink();
           })
         ],
       ),
@@ -113,7 +113,7 @@ class ChannelCallIndicator extends StatelessWidget {
               child: Text('callJoin'.tr),
             );
           }
-          return const SizedBox();
+          return const SizedBox.shrink();
         })
       ],
     );

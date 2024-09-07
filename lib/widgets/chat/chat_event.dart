@@ -40,7 +40,7 @@ class ChatEvent extends StatelessWidget {
   }
 
   Widget _buildLinkExpansion() {
-    if (item.body['text'] == null) return const SizedBox();
+    if (item.body['text'] == null) return const SizedBox.shrink();
     return LinkExpansion(content: item.body['text']);
   }
 
@@ -49,7 +49,7 @@ class ChatEvent extends StatelessWidget {
         ? List<String>.from(item.body['attachments']?.whereType<String>())
         : List<String>.empty();
 
-    if (attachments.isEmpty) return const SizedBox();
+    if (attachments.isEmpty) return const SizedBox.shrink();
 
     if (isMinimal) {
       final unFocusColor =
@@ -94,7 +94,7 @@ class ChatEvent extends StatelessWidget {
       ),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
-          return const SizedBox();
+          return const SizedBox.shrink();
         }
 
         return Container(

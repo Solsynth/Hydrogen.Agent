@@ -36,7 +36,7 @@ class AboutScreen extends StatelessWidget {
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return const SizedBox();
+                  return const SizedBox.shrink();
                 }
 
                 return Text(

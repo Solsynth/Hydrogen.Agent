@@ -84,7 +84,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     participant: call.focusTrack.value!,
                     onTap: () {},
                   )
-                : const SizedBox(),
+                : const SizedBox.shrink(),
           ),
           Positioned(
             left: 0,

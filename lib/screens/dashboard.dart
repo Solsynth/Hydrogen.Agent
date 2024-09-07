@@ -190,7 +190,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         icon: const Icon(Icons.local_fire_department),
                         onPressed: _signingDaily ? null : _signDaily,
                       )
-                    : const SizedBox(),
+                    : const SizedBox.shrink(),
               ),
             ),
           ).paddingSymmetric(horizontal: 8),

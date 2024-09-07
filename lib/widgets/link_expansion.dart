@@ -57,7 +57,7 @@ class LinkExpansion extends StatelessWidget {
     );
     final matches = linkRegex.allMatches(content);
     if (matches.isEmpty) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
 
     final LinkExpandProvider expandController = Get.find();
@@ -72,7 +72,7 @@ class LinkExpansion extends StatelessWidget {
             future: expandController.expandLink(x.group(0)!),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const SizedBox();
+                return const SizedBox.shrink();
               }
 
               final isRichDescription = [

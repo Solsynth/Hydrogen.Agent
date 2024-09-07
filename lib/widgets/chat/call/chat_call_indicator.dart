@@ -11,7 +11,7 @@ class ChatCallCurrentIndicator extends StatelessWidget {
 
     return Obx(() {
       if (call.current.value == null || call.channel.value == null) {
-        return const SizedBox();
+        return const SizedBox.shrink();
       }
 
       return ListTile(

@@ -347,7 +347,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                             FutureBuilder(
                               future: element.file.length(),
                               builder: (context, snapshot) {
-                                if (!snapshot.hasData) return const SizedBox();
+                                if (!snapshot.hasData)
+                                  return const SizedBox.shrink();
                                 return Text(
                                   _formatBytes(snapshot.data!),
                                   style: Theme.of(context).textTheme.bodySmall,
@@ -628,7 +629,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                                   ),
                                 );
                               }
-                              return const SizedBox();
+                              return const SizedBox.shrink();
                             }),
                           ],
                         ),
@@ -667,7 +668,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                               ),
                               Obx(() {
                                 if (_uploadController.isUploading.value) {
-                                  return const SizedBox();
+                                  return const SizedBox.shrink();
                                 }
                                 return TextButton(
                                   child: Text('attachmentUploadQueueStart'.tr),
@@ -681,7 +682,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         ),
                       );
                     }
-                    return const SliverToBoxAdapter(child: SizedBox());
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
                   }),
                   Obx(() {
                     if (_uploadController.queueOfUpload.isNotEmpty) {
@@ -697,7 +698,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         ),
                       );
                     }
-                    return const SliverToBoxAdapter(child: SizedBox());
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
                   }),
                   if (_attachments.isNotEmpty)
                     SliverPadding(

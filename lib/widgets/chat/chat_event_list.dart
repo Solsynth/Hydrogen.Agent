@@ -96,7 +96,7 @@ class ChatEventList extends StatelessWidget {
               chatController.totalEvents - chatController.currentEvents.length;
 
           if (amount.value <= 0 || chatController.isLoading.isTrue) {
-            return const SliverToBoxAdapter(child: SizedBox());
+            return const SliverToBoxAdapter(child: SizedBox.shrink());
           }
 
           return SliverToBoxAdapter(

@@ -79,7 +79,7 @@ class _PostItemState extends State<PostItem> {
   }
 
   Widget _buildThumbnail() {
-    if (widget.item.body['thumbnail'] == null) return const SizedBox();
+    if (widget.item.body['thumbnail'] == null) return const SizedBox.shrink();
     final border = BorderSide(
       color: Theme.of(context).dividerColor,
       width: 0.3,
@@ -148,7 +148,7 @@ class _PostItemState extends State<PostItem> {
         vertical: 8,
       );
     }
-    return const SizedBox();
+    return const SizedBox.shrink();
   }
 
   Widget _buildFooter() {
@@ -187,7 +187,7 @@ class _PostItemState extends State<PostItem> {
     }
 
     if (widgets.isEmpty) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     } else {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,

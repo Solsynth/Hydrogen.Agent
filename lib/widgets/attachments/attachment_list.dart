@@ -139,7 +139,7 @@ class _AttachmentListState extends State<AttachmentList> {
   @override
   Widget build(BuildContext context) {
     if (widget.attachmentsId.isEmpty) {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
 
     if (_isLoading) {
@@ -172,7 +172,7 @@ class _AttachmentListState extends State<AttachmentList> {
         children: widget.attachmentsId.map((x) {
           final element = _attachmentsMeta[idx];
           idx++;
-          if (element == null) return const SizedBox();
+          if (element == null) return const SizedBox.shrink();
           double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
             decoration: BoxDecoration(

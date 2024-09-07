@@ -22,7 +22,7 @@ class AppBarLeadingButton extends StatelessWidget {
         onPressed: () => rootScaffoldKey.currentState!.openDrawer(),
       );
     } else {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
   }
 }

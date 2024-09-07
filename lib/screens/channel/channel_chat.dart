@@ -222,7 +222,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
         actions: [
           const BackgroundStateWidget(),
           Builder(builder: (context) {
-            if (_isBusy || _channel == null) return const SizedBox();
+            if (_isBusy || _channel == null) return const SizedBox.shrink();
 
             return ChatCallButton(
               realm: _channel!.realm,
@@ -299,7 +299,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                     if (_chatController.isLoading.isTrue) {
                       return const LinearProgressIndicator().animate().slideY();
                     } else {
-                      return const SizedBox();
+                      return const SizedBox.shrink();
                     }
                   }),
                   ClipRect(
@@ -350,7 +350,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                   ]),
                 );
               }
-              return const SizedBox();
+              return const SizedBox.shrink();
             }),
           ],
         );
