@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -185,7 +186,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       child: ListView(
         children: [
           if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-          const SizedBox(height: 24),
+          const Gap(24),
           Stack(
             children: [
               AccountAvatar(content: _avatar, radius: 40),
@@ -202,7 +203,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               ),
             ],
           ).paddingSymmetric(horizontal: padding),
-          const SizedBox(height: 16),
+          const Gap(16),
           Stack(
             children: [
               ClipRRect(
@@ -247,7 +248,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               ),
             ],
           ).paddingSymmetric(horizontal: padding),
-          const SizedBox(height: 24),
+          const Gap(24),
           Row(
             children: [
               Flexible(
@@ -262,7 +263,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const Gap(16),
               Flexible(
                 flex: 1,
                 child: TextField(
@@ -275,7 +276,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               ),
             ],
           ).paddingSymmetric(horizontal: padding),
-          const SizedBox(height: 16),
+          const Gap(16),
           Row(
             children: [
               Flexible(
@@ -288,7 +289,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const Gap(16),
               Flexible(
                 flex: 1,
                 child: TextField(
@@ -301,7 +302,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               ),
             ],
           ).paddingSymmetric(horizontal: padding),
-          const SizedBox(height: 16),
+          const Gap(16),
           TextField(
             controller: _descriptionController,
             keyboardType: TextInputType.multiline,
@@ -312,7 +313,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               labelText: 'description'.tr,
             ),
           ).paddingSymmetric(horizontal: padding),
-          const SizedBox(height: 16),
+          const Gap(16),
           TextField(
             controller: _birthdayController,
             readOnly: true,
@@ -322,7 +323,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
             ),
             onTap: () => _selectBirthday(),
           ).paddingSymmetric(horizontal: padding),
-          const SizedBox(height: 16),
+          const Gap(16),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

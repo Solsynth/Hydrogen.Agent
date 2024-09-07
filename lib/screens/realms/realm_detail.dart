@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
@@ -95,7 +96,7 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
                 backgroundColor: Colors.teal,
                 child: Icon(Icons.group, color: Colors.white),
               ),
-              const SizedBox(width: 16),
+              const Gap(16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

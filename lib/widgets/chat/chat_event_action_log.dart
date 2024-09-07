@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
 class ChatEventMessageActionLog extends StatelessWidget {
@@ -25,7 +26,7 @@ class ChatEventMessageActionLog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           icon,
-          const SizedBox(width: 4),
+          const Gap(4),
           Text(text),
         ],
       ).paddingOnly(

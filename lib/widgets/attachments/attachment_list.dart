@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart' hide CarouselController;
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_item.dart';
@@ -359,7 +360,7 @@ class AttachmentListEntry extends StatelessWidget {
                       color: Colors.white,
                       size: 32,
                     ),
-                    if (!isDense) const SizedBox(height: 8),
+                    if (!isDense) const Gap(8),
                     if (!isDense)
                       Text(
                         'matureContent'.tr,

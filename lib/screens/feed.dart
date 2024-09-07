@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/providers/auth.dart';
@@ -224,7 +225,7 @@ class PostCreatePopup extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               x.icon,
-                              const SizedBox(height: 8),
+                              const Gap(8),
                               Expanded(
                                 child: Text(
                                   x.label,

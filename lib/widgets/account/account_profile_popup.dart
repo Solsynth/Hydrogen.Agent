@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/account_status.dart';
@@ -72,7 +73,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.cancel, size: 24),
-            const SizedBox(height: 12),
+            const Gap(12),
             Text(
               _hasError.toString(),
               textAlign: TextAlign.center,

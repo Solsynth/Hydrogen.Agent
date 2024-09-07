@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
@@ -74,7 +75,7 @@ class _AttachmentAttrEditorDialogState
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: const LinearProgressIndicator().animate().scaleX(),
               ),
-            const SizedBox(height: 18),
+            const Gap(18),
             TextField(
               controller: _altController,
               decoration: InputDecoration(
@@ -86,7 +87,7 @@ class _AttachmentAttrEditorDialogState
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             CheckboxListTile(
               contentPadding: const EdgeInsets.only(left: 4, right: 18),
               shape: const RoundedRectangleBorder(

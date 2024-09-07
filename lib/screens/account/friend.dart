@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/relations.dart';
@@ -56,7 +57,7 @@ class _FriendScreenState extends State<FriendScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('accountFriendNewHint'.tr, textAlign: TextAlign.left),
-              const SizedBox(height: 18),
+              const Gap(18),
               TextField(
                 controller: controller,
                 decoration: InputDecoration(

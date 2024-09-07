@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 
@@ -47,7 +48,7 @@ class _ChatTypingIndicatorState extends State<ChatTypingIndicator>
       child: Row(
         children: [
           const Icon(Icons.more_horiz),
-          const SizedBox(width: 6),
+          const Gap(6),
           Text('typingMessage'.trParams({
             'user': widget.users.map((x) => x.account.nick).join(', '),
           })),

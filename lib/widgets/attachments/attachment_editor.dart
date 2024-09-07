@@ -7,6 +7,7 @@ import 'package:dismissible_page/dismissible_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -144,7 +145,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('attachmentAddLinkHint'.tr, textAlign: TextAlign.left),
-              const SizedBox(height: 18),
+              const Gap(18),
               TextField(
                 controller: controller,
                 decoration: InputDecoration(
@@ -353,7 +354,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                                 );
                               },
                             ),
-                            const SizedBox(width: 6),
+                            const Gap(6),
                             if (element.progress != null)
                               Text(
                                 '${(element.progress! * 100).toStringAsFixed(2)}%',
@@ -614,7 +615,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 10),
+                            const Gap(10),
                             Obx(() {
                               if (_uploadController.isUploading.value) {
                                 return SizedBox(
@@ -635,9 +636,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 20),
+                const Gap(20),
                 Text('attachmentAutoUpload'.tr),
-                const SizedBox(width: 8),
+                const Gap(8),
                 Switch(
                   value: _isAutoUpload,
                   onChanged: (bool? value) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
@@ -86,7 +87,7 @@ class _PostEditorDateDialogState extends State<PostEditorDateDialog> {
             ),
             onTap: () => _selectDate(0),
           ),
-          const SizedBox(height: 16),
+          const Gap(16),
           TextField(
             controller: _publishedUntilController,
             readOnly: true,

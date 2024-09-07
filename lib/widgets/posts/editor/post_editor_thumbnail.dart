@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
@@ -68,7 +69,7 @@ class _PostEditorThumbnailDialogState extends State<PostEditorThumbnailDialog> {
               _promptUploadNewAttachment();
             },
           ),
-          const SizedBox(height: 8),
+          const Gap(8),
           TextField(
             controller: _attachmentController,
             decoration: InputDecoration(

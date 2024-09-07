@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/exts.dart';
@@ -214,7 +215,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: const LinearProgressIndicator().animate().scaleX(),
               ),
-            const SizedBox(height: 18),
+            const Gap(18),
             TextField(
               controller: _labelController,
               decoration: InputDecoration(
@@ -226,7 +227,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             TextField(
               controller: _clearAtController,
               readOnly: true,
@@ -238,7 +239,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
               ),
               onTap: () => selectClearAt(),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Wrap(
@@ -281,7 +282,7 @@ class _AccountStatusEditorDialogState extends State<AccountStatusEditorDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Wrap(

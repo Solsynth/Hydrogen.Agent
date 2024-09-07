@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/models/account.dart';
@@ -150,7 +151,7 @@ class AccountHeadingWidget extends StatelessWidget {
                 ),
             ],
           ).paddingOnly(left: 116, top: 6),
-          const SizedBox(height: 4),
+          const Gap(4),
           if (badges?.isNotEmpty ?? false)
             SizedBox(
               width: double.infinity,

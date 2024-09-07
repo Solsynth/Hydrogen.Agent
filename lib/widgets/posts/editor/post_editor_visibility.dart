@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/widgets/account/account_select.dart';
@@ -56,7 +57,7 @@ class PostEditorVisibilityDialog extends StatelessWidget {
           Obx(() {
             if (controller.visibility.value == 2 ||
                 controller.visibility.value == 3) {
-              return const SizedBox(height: 8);
+              return const Gap(8);
             }
             return const SizedBox();
           }),

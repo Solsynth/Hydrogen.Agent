@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/stickers.dart';
@@ -127,7 +128,7 @@ class _StickerUploadDialogState extends State<StickerUploadDialog> {
               _promptUploadNewAttachment();
             },
           ),
-          const SizedBox(height: 8),
+          const Gap(8),
           TextField(
             controller: _attachmentController,
             decoration: InputDecoration(
@@ -138,7 +139,7 @@ class _StickerUploadDialogState extends State<StickerUploadDialog> {
             ),
             onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           ),
-          const SizedBox(height: 8),
+          const Gap(8),
           TextField(
             controller: _packController,
             decoration: InputDecoration(

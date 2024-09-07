@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:livekit_client/livekit_client.dart';
 
@@ -35,7 +36,7 @@ class ParticipantInfoWidget extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
-            const SizedBox(width: 5),
+            const Gap(5),
             isScreenShare
                 ? const Icon(
                     Icons.monitor,
@@ -47,7 +48,7 @@ class ParticipantInfoWidget extends StatelessWidget {
                     color: audioAvailable ? Colors.white : Colors.red,
                     size: 16,
                   ),
-            const SizedBox(width: 3),
+            const Gap(3),
             if (connectionQuality != ConnectionQuality.unknown)
               Icon(
                 {

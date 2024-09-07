@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/screens/auth/signin.dart';
 
@@ -20,7 +21,7 @@ class SigninRequiredOverlay extends StatelessWidget {
                 Icons.login,
                 size: 48,
               ),
-              const SizedBox(height: 8),
+              const Gap(8),
               Text(
                 'signinRequired'.tr,
                 style: Theme.of(context).textTheme.titleLarge,

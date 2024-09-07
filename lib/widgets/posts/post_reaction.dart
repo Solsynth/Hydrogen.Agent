@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/reaction.dart';
 
@@ -33,9 +34,11 @@ class PostReactionPopup extends StatelessWidget {
                     label: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(e.key,
-                            style: const TextStyle(fontFamily: 'monospace')),
-                        const SizedBox(width: 6),
+                        Text(
+                          e.key,
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
+                        const Gap(6),
                         Text('x${reactionList[e.key]?.toString() ?? '0'}',
                             style:
                                 const TextStyle(fontWeight: FontWeight.bold)),

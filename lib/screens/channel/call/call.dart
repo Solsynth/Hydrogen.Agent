@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/call.dart';
 import 'package:solian/theme.dart';
@@ -257,7 +258,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      const SizedBox(width: 6),
+                                      const Gap(6),
                                       Text(call.lastDuration.value)
                                     ],
                                   );
@@ -276,7 +277,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                                             'callStatusReconnecting'.tr,
                                       }[call.room.connectionState]!,
                                     ),
-                                    const SizedBox(width: 6),
+                                    const Gap(6),
                                     if (connectionQuality !=
                                         livekit.ConnectionQuality.unknown)
                                       Icon(

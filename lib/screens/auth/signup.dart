@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/services.dart';
@@ -94,7 +95,7 @@ class _SignUpPopupState extends State<SignUpPopup> {
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               TextField(
                 autocorrect: false,
                 enableSuggestions: false,
@@ -108,7 +109,7 @@ class _SignUpPopupState extends State<SignUpPopup> {
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               TextField(
                 autocorrect: false,
                 enableSuggestions: false,
@@ -122,7 +123,7 @@ class _SignUpPopupState extends State<SignUpPopup> {
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               TextField(
                 obscureText: true,
                 autocorrect: false,
@@ -138,7 +139,7 @@ class _SignUpPopupState extends State<SignUpPopup> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 onSubmitted: (_) => performAction(context),
               ),
-              const SizedBox(height: 16),
+              const Gap(16),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
@@ -163,7 +164,7 @@ class _StickerScreenState extends State<StickerScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(item.name),
-                        const SizedBox(width: 6),
+                        const Gap(6),
                         Badge(
                           label: Text('#${item.id}'),
                         )

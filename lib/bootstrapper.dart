@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -197,7 +198,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                       height: 24,
                       child: CircularProgressIndicator(strokeWidth: 3),
                     ),
-                  const SizedBox(height: 12),
+                  const Gap(12),
                   CenteredContainer(
                     maxWidth: 280,
                     child: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
 
@@ -25,7 +26,7 @@ class PostEditorOverviewDialog extends StatelessWidget {
             ),
             onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           ),
-          const SizedBox(height: 16),
+          const Gap(16),
           TextField(
             autofocus: true,
             autocorrect: true,
@@ -37,7 +38,7 @@ class PostEditorOverviewDialog extends StatelessWidget {
             ),
             onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           ),
-          const SizedBox(height: 16),
+          const Gap(16),
           TextField(
             enabled: controller.mode.value == 1,
             maxLines: null,

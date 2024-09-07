@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:solian/exts.dart';
@@ -160,7 +161,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               TextField(
                 obscureText: true,
                 autocorrect: false,
@@ -176,7 +177,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 onSubmitted: (_) => performAction(),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

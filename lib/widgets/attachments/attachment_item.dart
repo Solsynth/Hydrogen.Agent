@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -65,7 +66,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.file_present, size: 32),
-                const SizedBox(height: 6),
+                const Gap(6),
                 Text(
                   widget.item.mimetype,
                   style: TextStyle(
@@ -74,13 +75,13 @@ class _AttachmentItemState extends State<AttachmentItem> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 2),
+                const Gap(2),
                 Text(
                   widget.item.alt,
                   style: const TextStyle(fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12),
+                const Gap(12),
                 TextButton.icon(
                   icon: const Icon(Icons.launch),
                   label: Text('openInBrowser'.tr),
@@ -282,7 +283,7 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
                   color: Colors.white,
                   size: 32,
                 ),
-                const SizedBox(height: 8),
+                const Gap(8),
                 Text(
                   'attachmentUnload'.tr,
                   style: const TextStyle(

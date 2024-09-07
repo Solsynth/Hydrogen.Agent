@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:markdown_toolbar/markdown_toolbar.dart';
@@ -183,7 +184,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 6),
+                  const Gap(6),
                   if (_editorController.aliasController.text.isNotEmpty)
                     Badge(
                       label: Text('#${_editorController.aliasController.text}'),
@@ -296,7 +297,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                                       ?.unfocus(),
                                 ),
                               ),
-                              const SizedBox(height: 120)
+                              const Gap(120)
                             ],
                           ),
                         ),

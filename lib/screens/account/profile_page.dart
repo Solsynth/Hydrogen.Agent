@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/controllers/post_list_controller.dart';
@@ -156,12 +157,11 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                 automaticallyImplyLeading: false,
                 flexibleSpace: Row(
                   children: [
-                    AppBarLeadingButton.adaptive(context) ??
-                        const SizedBox(width: 8),
-                    const SizedBox(width: 8),
+                    AppBarLeadingButton.adaptive(context) ?? const Gap(8),
+                    const Gap(8),
                     if (_userinfo != null)
                       AccountAvatar(content: _userinfo!.avatar, radius: 16),
-                    const SizedBox(width: 12),
+                    const Gap(12),
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -243,7 +243,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [

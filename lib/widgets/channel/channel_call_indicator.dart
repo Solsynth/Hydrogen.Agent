@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:avatar_stack/avatar_stack.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/call.dart';
@@ -60,7 +61,7 @@ class ChannelCallIndicator extends StatelessWidget {
               }));
             }
           }),
-          const SizedBox(width: 6),
+          const Gap(6),
           Obx(() {
             if (call.isInitialized.value) {
               return const SizedBox();

@@ -6,6 +6,7 @@ import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gal/gal.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
@@ -198,7 +199,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                               radius: 19,
                             ),
                           ),
-                          const IgnorePointer(child: SizedBox(width: 8)),
+                          const IgnorePointer(child: Gap(8)),
                           Expanded(
                             child: IgnorePointer(
                               child: Column(
@@ -240,7 +241,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                           ),
                         ],
                       ),
-                    const IgnorePointer(child: SizedBox(height: 4)),
+                    const IgnorePointer(child: Gap(4)),
                     IgnorePointer(
                       child: Text(
                         widget.item.alt,
@@ -252,7 +253,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                         ),
                       ),
                     ),
-                    const IgnorePointer(child: SizedBox(height: 2)),
+                    const IgnorePointer(child: Gap(2)),
                     IgnorePointer(
                       child: Wrap(
                         spacing: 6,

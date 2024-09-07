@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/services.dart';
 
@@ -111,7 +112,7 @@ class _TagsFieldState extends State<TagsField> {
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               ),
-                              const SizedBox(width: 4.0),
+                              const Gap(4),
                               InkWell(
                                 child: const Icon(
                                   Icons.cancel,

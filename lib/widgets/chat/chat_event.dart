@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/event.dart';
@@ -214,7 +215,7 @@ class ChatEvent extends StatelessWidget {
               opacity: 0.75,
               child: FaIcon(FontAwesomeIcons.quoteLeft, size: 14),
             ).paddingOnly(bottom: 2.75),
-            const SizedBox(width: 4),
+            const Gap(4),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -226,12 +227,12 @@ class ChatEvent extends StatelessWidget {
                         content: item.sender.account.avatar,
                         radius: 9,
                       ),
-                      const SizedBox(width: 5),
+                      const Gap(5),
                       Text(
                         item.sender.account.nick,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 4),
+                      const Gap(4),
                       Text(format(item.createdAt, locale: 'en_short')),
                     ],
                   ),
@@ -275,7 +276,7 @@ class ChatEvent extends StatelessWidget {
                           item.sender.account.nick,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(width: 4),
+                        const Gap(4),
                         Text(format(item.createdAt, locale: 'en_short'))
                       ],
                     ).paddingSymmetric(horizontal: 12),
