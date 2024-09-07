@@ -1,6 +1,10 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/realm.dart';
 
+part 'channel.g.dart';
+
+@JsonSerializable()
 class Channel {
   int id;
   DateTime createdAt;
@@ -17,6 +21,7 @@ class Channel {
   int? realmId;
   bool isEncrypted;
 
+  @JsonKey(includeFromJson: false, includeToJson: true)
   bool isAvailable = false;
 
   Channel({
@@ -36,42 +41,10 @@ class Channel {
     required this.realmId,
   });
 
-  factory Channel.fromJson(Map<String, dynamic> json) => Channel(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'],
-        alias: json['alias'],
-        name: json['name'],
-        description: json['description'],
-        type: json['type'],
-        members: json['members']
-            ?.map((e) => ChannelMember.fromJson(e))
-            .toList()
-            .cast<ChannelMember>(),
-        account: Account.fromJson(json['account']),
-        accountId: json['account_id'],
-        realm: json['realm'] != null ? Realm.fromJson(json['realm']) : null,
-        realmId: json['realm_id'],
-        isEncrypted: json['is_encrypted'],
-      );
+  factory Channel.fromJson(Map<String, dynamic> json) =>
+      _$ChannelFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'alias': alias,
-        'name': name,
-        'description': description,
-        'type': type,
-        'members': members?.map((e) => e.toJson()).toList(),
-        'account': account.toJson(),
-        'account_id': accountId,
-        'realm': realm?.toJson(),
-        'realm_id': realmId,
-        'is_encrypted': isEncrypted,
-      };
+  Map<String, dynamic> toJson() => _$ChannelToJson(this);
 
   @override
   bool operator ==(Object other) {
@@ -83,6 +56,7 @@ class Channel {
   int get hashCode => id;
 }
 
+@JsonSerializable()
 class ChannelMember {
   int id;
   DateTime createdAt;
@@ -104,25 +78,8 @@ class ChannelMember {
     required this.notify,
   });
 
-  factory ChannelMember.fromJson(Map<String, dynamic> json) => ChannelMember(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'],
-        channelId: json['channel_id'],
-        accountId: json['account_id'],
-        account: Account.fromJson(json['account']),
-        notify: json['notify'],
-      );
+  factory ChannelMember.fromJson(Map<String, dynamic> json) =>
+      _$ChannelMemberFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'channel_id': channelId,
-        'account_id': accountId,
-        'account': account.toJson(),
-        'notify': notify,
-      };
+  Map<String, dynamic> toJson() => _$ChannelMemberToJson(this);
 }

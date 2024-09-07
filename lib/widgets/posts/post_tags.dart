@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:solian/models/feed.dart';
+import 'package:solian/models/post_categories.dart';
 import 'package:solian/router.dart';
 
 class PostTagsList extends StatelessWidget {

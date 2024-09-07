@@ -51,7 +51,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int? _currentPostsCount;
 
   Future<void> _pullPosts() async {
-    print(_lastRead.feedLastReadAt);
     if (_lastRead.feedLastReadAt == null) return;
     log('[Dashboard] Pulling posts with pivot: ${_lastRead.feedLastReadAt}');
     final resp = await _posts.seeWhatsNew(_lastRead.feedLastReadAt!);

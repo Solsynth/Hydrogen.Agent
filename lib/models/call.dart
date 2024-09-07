@@ -1,6 +1,10 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:solian/models/channel.dart';
 
+part 'call.g.dart';
+
+@JsonSerializable()
 class Call {
   int id;
   DateTime createdAt;
@@ -26,32 +30,9 @@ class Call {
     required this.channel,
   });
 
-  factory Call.fromJson(Map<String, dynamic> json) => Call(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'],
-        endedAt:
-            json['ended_at'] != null ? DateTime.parse(json['ended_at']) : null,
-        externalId: json['external_id'],
-        founderId: json['founder_id'],
-        channelId: json['channel_id'],
-        participants: json['participants'] ?? List.empty(),
-        channel: Channel.fromJson(json['channel']),
-      );
+  factory Call.fromJson(Map<String, dynamic> json) => _$CallFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'ended_at': endedAt?.toIso8601String(),
-        'external_id': externalId,
-        'founder_id': founderId,
-        'channel_id': channelId,
-        'participants': participants,
-        'channel': channel.toJson(),
-      };
+  Map<String, dynamic> toJson() => _$CallToJson(this);
 }
 
 enum ParticipantStatsType {

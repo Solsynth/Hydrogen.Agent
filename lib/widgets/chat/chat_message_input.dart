@@ -156,7 +156,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     };
 
     // The local mock data
-    final sender = Sender(
+    final sender = ChannelMember(
       id: 0,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),

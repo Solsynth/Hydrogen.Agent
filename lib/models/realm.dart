@@ -1,5 +1,9 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:solian/models/account.dart';
 
+part 'realm.g.dart';
+
+@JsonSerializable()
 class Realm {
   int id;
   DateTime createdAt;
@@ -25,33 +29,9 @@ class Realm {
     this.accountId,
   });
 
-  factory Realm.fromJson(Map<String, dynamic> json) => Realm(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'] != null
-            ? DateTime.parse(json['deleted_at'])
-            : null,
-        alias: json['alias'],
-        name: json['name'],
-        description: json['description'],
-        isPublic: json['is_public'],
-        isCommunity: json['is_community'],
-        accountId: json['account_id'],
-      );
+  factory Realm.fromJson(Map<String, dynamic> json) => _$RealmFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'alias': alias,
-        'name': name,
-        'description': description,
-        'is_public': isPublic,
-        'is_community': isCommunity,
-        'account_id': accountId,
-      };
+  Map<String, dynamic> toJson() => _$RealmToJson(this);
 
   @override
   bool operator ==(Object other) {
@@ -65,6 +45,7 @@ class Realm {
   int get hashCode => id;
 }
 
+@JsonSerializable()
 class RealmMember {
   int id;
   DateTime createdAt;
@@ -86,27 +67,8 @@ class RealmMember {
     required this.powerLevel,
   });
 
-  factory RealmMember.fromJson(Map<String, dynamic> json) => RealmMember(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'] != null
-            ? DateTime.parse(json['deleted_at'])
-            : null,
-        realmId: json['realm_id'],
-        accountId: json['account_id'],
-        account: Account.fromJson(json['account']),
-        powerLevel: json['power_level'],
-      );
+  factory RealmMember.fromJson(Map<String, dynamic> json) =>
+      _$RealmMemberFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'realm_id': realmId,
-        'account_id': accountId,
-        'account': account.toJson(),
-        'power_level': powerLevel,
-      };
+  Map<String, dynamic> toJson() => _$RealmMemberToJson(this);
 }

@@ -1,7 +1,16 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'packet.g.dart';
+
+@JsonSerializable()
 class NetworkPackage {
+  @JsonKey(name: 'w')
   String method;
+  @JsonKey(name: 'e')
   String? endpoint;
+  @JsonKey(name: 'm')
   String? message;
+  @JsonKey(name: 'p')
   Map<String, dynamic>? payload;
 
   NetworkPackage({
@@ -11,17 +20,8 @@ class NetworkPackage {
     this.payload,
   });
 
-  factory NetworkPackage.fromJson(Map<String, dynamic> json) => NetworkPackage(
-        method: json['w'],
-        endpoint: json['e'],
-        message: json['m'],
-        payload: json['p'],
-      );
+  factory NetworkPackage.fromJson(Map<String, dynamic> json) =>
+      _$NetworkPackageFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'w': method,
-        'e': endpoint,
-        'm': message,
-        'p': payload,
-      };
+  Map<String, dynamic> toJson() => _$NetworkPackageToJson(this);
 }

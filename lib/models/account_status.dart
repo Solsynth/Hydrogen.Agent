@@ -1,3 +1,8 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'account_status.g.dart';
+
+@JsonSerializable()
 class AccountStatus {
   bool isDisturbable;
   bool isOnline;
@@ -11,21 +16,13 @@ class AccountStatus {
     required this.status,
   });
 
-  factory AccountStatus.fromJson(Map<String, dynamic> json) => AccountStatus(
-    isDisturbable: json['is_disturbable'],
-    isOnline: json['is_online'],
-    lastSeenAt: json['last_seen_at'] != null ? DateTime.parse(json['last_seen_at']) : null,
-    status: json['status'] != null ? Status.fromJson(json['status']) : null,
-  );
+  factory AccountStatus.fromJson(Map<String, dynamic> json) =>
+      _$AccountStatusFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-    'is_disturbable': isDisturbable,
-    'is_online': isOnline,
-    'last_seen_at': lastSeenAt?.toIso8601String(),
-    'status': status?.toJson(),
-  };
+  Map<String, dynamic> toJson() => _$AccountStatusToJson(this);
 }
 
+@JsonSerializable()
 class Status {
   int id;
   DateTime createdAt;
@@ -53,31 +50,7 @@ class Status {
     required this.accountId,
   });
 
-  factory Status.fromJson(Map<String, dynamic> json) => Status(
-    id: json['id'],
-    createdAt: DateTime.parse(json['created_at']),
-    updatedAt: DateTime.parse(json['updated_at']),
-    deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
-    type: json['type'],
-    label: json['label'],
-    attitude: json['attitude'],
-    isNoDisturb: json['is_no_disturb'],
-    isInvisible: json['is_invisible'],
-    clearAt: json['clear_at'] != null ? DateTime.parse(json['clear_at']) : null,
-    accountId: json['account_id'],
-  );
+  factory Status.fromJson(Map<String, dynamic> json) => _$StatusFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'created_at': createdAt.toIso8601String(),
-    'updated_at': updatedAt.toIso8601String(),
-    'deleted_at': deletedAt?.toIso8601String(),
-    'type': type,
-    'label': label,
-    'attitude': attitude,
-    'is_no_disturb': isNoDisturb,
-    'is_invisible': isInvisible,
-    'clear_at': clearAt?.toIso8601String(),
-    'account_id': accountId,
-  };
+  Map<String, dynamic> toJson() => _$StatusToJson(this);
 }

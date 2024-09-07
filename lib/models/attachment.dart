@@ -1,5 +1,9 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:solian/models/account.dart';
 
+part 'attachment.g.dart';
+
+@JsonSerializable()
 class AttachmentPlaceholder {
   int chunkCount;
   int chunkSize;
@@ -12,19 +16,12 @@ class AttachmentPlaceholder {
   });
 
   factory AttachmentPlaceholder.fromJson(Map<String, dynamic> json) =>
-      AttachmentPlaceholder(
-        chunkCount: json['chunk_count'],
-        chunkSize: json['chunk_size'],
-        meta: Attachment.fromJson(json['meta']),
-      );
+      _$AttachmentPlaceholderFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'chunk_count': chunkCount,
-        'chunk_size': chunkSize,
-        'meta': meta.toJson(),
-      };
+  Map<String, dynamic> toJson() => _$AttachmentPlaceholderToJson(this);
 }
 
+@JsonSerializable()
 class Attachment {
   int id;
   DateTime createdAt;
@@ -68,50 +65,8 @@ class Attachment {
     required this.accountId,
   });
 
-  factory Attachment.fromJson(Map<String, dynamic> json) => Attachment(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'] != null
-            ? DateTime.parse(json['deleted_at'])
-            : null,
-        rid: json['rid'],
-        uuid: json['uuid'],
-        size: json['size'],
-        name: json['name'],
-        alt: json['alt'],
-        mimetype: json['mimetype'],
-        hash: json['hash'],
-        destination: json['destination'],
-        isAnalyzed: json['is_analyzed'],
-        isUploaded: json['is_uploaded'],
-        metadata: json['metadata'],
-        fileChunks: json['file_chunks'],
-        isMature: json['is_mature'],
-        account:
-            json['account'] != null ? Account.fromJson(json['account']) : null,
-        accountId: json['account_id'],
-      );
+  factory Attachment.fromJson(Map<String, dynamic> json) =>
+      _$AttachmentFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt?.toIso8601String(),
-        'rid': rid,
-        'uuid': uuid,
-        'size': size,
-        'name': name,
-        'alt': alt,
-        'mimetype': mimetype,
-        'hash': hash,
-        'destination': destination,
-        'is_analyzed': isAnalyzed,
-        'is_uploaded': isUploaded,
-        'metadata': metadata,
-        'file_chunks': fileChunks,
-        'is_mature': isMature,
-        'account': account?.toJson(),
-        'account_id': accountId,
-      };
+  Map<String, dynamic> toJson() => _$AttachmentToJson(this);
 }

@@ -1,3 +1,8 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'notification.g.dart';
+
+@JsonSerializable()
 class Notification {
   int id;
   DateTime createdAt;
@@ -25,35 +30,8 @@ class Notification {
     required this.accountId,
   });
 
-  factory Notification.fromJson(Map<String, dynamic> json) => Notification(
-        id: json['id'] ?? 0,
-        createdAt: json['created_at'] == null
-            ? DateTime.now()
-            : DateTime.parse(json['created_at']),
-        updatedAt: json['updated_at'] == null
-            ? DateTime.now()
-            : DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'],
-        title: json['title'],
-        subtitle: json['subtitle'],
-        body: json['body'],
-        avatar: json['avatar'],
-        picture: json['picture'],
-        senderId: json['sender_id'],
-        accountId: json['account_id'],
-      );
+  factory Notification.fromJson(Map<String, dynamic> json) =>
+      _$NotificationFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'title': title,
-        'subtitle': subtitle,
-        'body': body,
-        'avatar': avatar,
-        'picture': picture,
-        'sender_id': senderId,
-        'account_id': accountId,
-      };
+  Map<String, dynamic> toJson() => _$NotificationToJson(this);
 }

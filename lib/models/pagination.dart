@@ -1,3 +1,8 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'pagination.g.dart';
+
+@JsonSerializable()
 class PaginationResult {
   int count;
   List<dynamic>? data;
@@ -8,10 +13,7 @@ class PaginationResult {
   });
 
   factory PaginationResult.fromJson(Map<String, dynamic> json) =>
-      PaginationResult(count: json['count'], data: json['data']);
+      _$PaginationResultFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'count': count,
-        'data': data,
-      };
+  Map<String, dynamic> toJson() => _$PaginationResultToJson(this);
 }

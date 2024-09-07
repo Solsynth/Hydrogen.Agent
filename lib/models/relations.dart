@@ -1,5 +1,9 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:solian/models/account.dart';
 
+part 'relations.g.dart';
+
+@JsonSerializable()
 class Relationship {
   int id;
   DateTime createdAt;
@@ -23,27 +27,8 @@ class Relationship {
     required this.status,
   });
 
-  factory Relationship.fromJson(Map<String, dynamic> json) => Relationship(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'],
-        accountId: json['account_id'],
-        relatedId: json['related_id'],
-        account: Account.fromJson(json['account']),
-        related: Account.fromJson(json['related']),
-        status: json['status'],
-      );
+  factory Relationship.fromJson(Map<String, dynamic> json) =>
+      _$RelationshipFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt,
-        'account_id': accountId,
-        'related_id': relatedId,
-        'account': account.toJson(),
-        'related': related.toJson(),
-        'status': status,
-      };
+  Map<String, dynamic> toJson() => _$RelationshipToJson(this);
 }

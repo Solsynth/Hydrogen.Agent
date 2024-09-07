@@ -1,3 +1,8 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'link.g.dart';
+
+@JsonSerializable()
 class LinkMeta {
   int id;
   DateTime createdAt;
@@ -29,37 +34,8 @@ class LinkMeta {
     required this.siteName,
   });
 
-  factory LinkMeta.fromJson(Map<String, dynamic> json) => LinkMeta(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-        deletedAt: json['deleted_at'] != null
-            ? DateTime.parse(json['deleted_at'])
-            : null,
-        entryId: json['entry_id'],
-        icon: json['icon'],
-        url: json['url'],
-        title: json['title'],
-        image: json['image'],
-        video: json['video'],
-        audio: json['audio'],
-        description: json['description'],
-        siteName: json['site_name'],
-      );
+  factory LinkMeta.fromJson(Map<String, dynamic> json) =>
+      _$LinkMetaFromJson(json);
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-        'deleted_at': deletedAt?.toIso8601String(),
-        'entry_id': entryId,
-        'icon': icon,
-        'url': url,
-        'title': title,
-        'image': image,
-        'video': video,
-        'audio': audio,
-        'description': description,
-        'site_name': siteName,
-      };
+  Map<String, dynamic> toJson() => _$LinkMetaToJson(this);
 }
