@@ -24,6 +24,7 @@ import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
+import 'package:solian/widgets/daily_sign/history_chart.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -80,10 +81,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   bool _signingDaily = true;
   DailySignRecord? _signRecord;
+  List<DailySignRecord>? _signRecordHistory;
 
   Future<void> _pullDaily() async {
     try {
       _signRecord = await _dailySign.getToday();
+      _dailySign.listLastRecord(30).then((value) {
+        setState(() => _signRecordHistory = value);
+      });
     } catch (e) {
       context.showErrorDialog(e);
     }
@@ -137,61 +142,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ).paddingOnly(top: 8, left: 18, right: 18, bottom: 12),
           Card(
-            child: ListTile(
-              leading: AnimatedSwitcher(
-                switchInCurve: Curves.fastOutSlowIn,
-                switchOutCurve: Curves.fastOutSlowIn,
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: child,
-                  );
-                },
-                child: _signRecord == null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            DateFormat('dd').format(DateTime.now()),
-                            style: GoogleFonts.robotoMono(
-                                fontSize: 22, height: 1.2),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: AnimatedSwitcher(
+                    switchInCurve: Curves.fastOutSlowIn,
+                    switchOutCurve: Curves.fastOutSlowIn,
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: child,
+                      );
+                    },
+                    child: _signRecord == null
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                DateFormat('dd').format(DateTime.now()),
+                                style: GoogleFonts.robotoMono(
+                                    fontSize: 22, height: 1.2),
+                              ),
+                              Text(
+                                DateFormat('yy/MM').format(DateTime.now()),
+                                style: GoogleFonts.robotoMono(fontSize: 12),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            _signRecord!.symbol,
+                            style: GoogleFonts.notoSerifHk(
+                                fontSize: 20, height: 1),
+                          ).paddingSymmetric(horizontal: 9),
+                  ).paddingOnly(left: 4),
+                  title: _signRecord == null
+                      ? Text('dailySign'.tr)
+                      : Text(_signRecord!.overviewSuggestion),
+                  subtitle: _signRecord == null
+                      ? Text('dailySignNone'.tr)
+                      : Text('+${_signRecord!.resultExperience} EXP'),
+                  trailing: AnimatedSwitcher(
+                    switchInCurve: Curves.fastOutSlowIn,
+                    switchOutCurve: Curves.fastOutSlowIn,
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: child,
+                      );
+                    },
+                    child: _signRecord == null
+                        ? IconButton(
+                            tooltip: '上香求签',
+                            icon: const Icon(Icons.local_fire_department),
+                            onPressed: _signingDaily ? null : _signDaily,
+                          )
+                        : IconButton(
+                            tooltip: '查看运势历史',
+                            icon: const Icon(Icons.history),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                useRootNavigator: true,
+                                builder: (context) =>
+                                    DailySignHistoryChartDialog(
+                                  data: _signRecordHistory,
+                                ),
+                              );
+                            },
                           ),
-                          Text(
-                            DateFormat('yy/MM').format(DateTime.now()),
-                            style: GoogleFonts.robotoMono(fontSize: 12),
-                          ),
-                        ],
-                      )
-                    : Text(
-                        _signRecord!.symbol,
-                        style: GoogleFonts.notoSerifHk(fontSize: 20, height: 1),
-                      ).paddingSymmetric(horizontal: 9),
-              ).paddingOnly(left: 4),
-              title: _signRecord == null
-                  ? Text('dailySign'.tr)
-                  : Text(_signRecord!.overviewSuggestion),
-              subtitle: _signRecord == null
-                  ? Text('dailySignNone'.tr)
-                  : Text('+${_signRecord!.resultExperience} EXP'),
-              trailing: AnimatedSwitcher(
-                switchInCurve: Curves.fastOutSlowIn,
-                switchOutCurve: Curves.fastOutSlowIn,
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: child,
-                  );
-                },
-                child: _signRecord == null
-                    ? IconButton(
-                        tooltip: '上香求签',
-                        icon: const Icon(Icons.local_fire_department),
-                        onPressed: _signingDaily ? null : _signDaily,
-                      )
-                    : const SizedBox.shrink(),
-              ),
+                  ),
+                ),
+              ],
             ),
           ).paddingSymmetric(horizontal: 8),
           const Divider(thickness: 0.3).paddingSymmetric(vertical: 8),
