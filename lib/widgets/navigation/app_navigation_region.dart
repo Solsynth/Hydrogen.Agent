@@ -16,7 +16,7 @@ class AppNavigationRegion extends StatelessWidget {
   });
 
   void _gotoChannel(Channel item) {
-    AppRouter.instance.pushReplacementNamed(
+    AppRouter.instance.goNamed(
       'channelChat',
       pathParameters: {'alias': item.alias},
       queryParameters: {

@@ -14,7 +14,8 @@ class Call {
   String externalId;
   int founderId;
   int channelId;
-  List<dynamic> participants;
+  @JsonKey(defaultValue: [])
+  List<dynamic>? participants;
   Channel channel;
 
   Call({

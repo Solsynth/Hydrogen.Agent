@@ -19,7 +19,7 @@ Call _$CallFromJson(Map<String, dynamic> json) => Call(
       externalId: json['external_id'] as String,
       founderId: (json['founder_id'] as num).toInt(),
       channelId: (json['channel_id'] as num).toInt(),
-      participants: json['participants'] as List<dynamic>,
+      participants: json['participants'] as List<dynamic>? ?? [],
       channel: Channel.fromJson(json['channel'] as Map<String, dynamic>),
     );
 

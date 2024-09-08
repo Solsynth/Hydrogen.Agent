@@ -53,11 +53,11 @@ class ChannelCallIndicator extends StatelessWidget {
               return Text('callOngoingJoined'.trParams({
                 'duration': call.lastDuration.value,
               }));
-            } else if (ongoingCall.participants.isEmpty) {
+            } else if (ongoingCall.participants!.isEmpty) {
               return Text('callOngoingEmpty'.tr);
             } else {
               return Text('callOngoingParticipants'.trParams({
-                'count': ongoingCall.participants.length.toString(),
+                'count': ongoingCall.participants!.length.toString(),
               }));
             }
           }),
@@ -66,14 +66,14 @@ class ChannelCallIndicator extends StatelessWidget {
             if (call.isInitialized.value) {
               return const SizedBox.shrink();
             }
-            if (ongoingCall.participants.isNotEmpty) {
+            if (ongoingCall.participants!.isNotEmpty) {
               return Container(
                 height: 28,
                 constraints: const BoxConstraints(maxWidth: 120),
                 child: AvatarStack(
                   height: 28,
                   borderWidth: 0,
-                  avatars: ongoingCall.participants.map((x) {
+                  avatars: ongoingCall.participants!.map((x) {
                     final userinfo =
                         Account.fromJson(jsonDecode(x['metadata']));
                     return PlatformInfo.canCacheImage

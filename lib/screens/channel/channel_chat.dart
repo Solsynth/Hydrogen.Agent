@@ -98,6 +98,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
         setState(() => _ongoingCall = Call.fromJson(resp.body));
       }
     } catch (e) {
+      print((e as dynamic).stackTrace);
       context.showErrorDialog(e);
     }
 
