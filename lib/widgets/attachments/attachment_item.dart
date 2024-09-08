@@ -1,15 +1,20 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/providers/durations.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
   final String parentId;
@@ -53,6 +58,11 @@ class _AttachmentItemState extends State<AttachmentItem> {
         );
       case 'video':
         return _AttachmentItemVideo(
+          item: widget.item,
+          autoload: widget.autoload,
+        );
+      case 'audio':
+        return _AttachmentItemAudio(
           item: widget.item,
           autoload: widget.autoload,
         );
@@ -240,22 +250,21 @@ class _AttachmentItemVideo extends StatefulWidget {
 }
 
 class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
-  late final _player = Player(
-    configuration: const PlayerConfiguration(
-      logLevel: MPVLogLevel.error,
-    ),
-  );
-
-  late final _controller = VideoController(_player);
-
   bool _showContent = false;
 
+  VideoPlayerController? _videoController;
+  ChewieController? _chewieController;
+
   Future<void> _startLoad() async {
-    await _player.open(
-      Media(ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}')),
-      play: false,
-    );
     setState(() => _showContent = true);
+    final url =
+        ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}');
+    _videoController = VideoPlayerController.networkUrl(Uri.parse(url));
+    await _videoController!.initialize();
+    _chewieController = ChewieController(
+      videoPlayerController: _videoController!,
+      aspectRatio: widget.item.metadata?['ratio'],
+    );
   }
 
   @override
@@ -305,17 +314,237 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
           _startLoad();
         },
       );
+    } else if (_chewieController == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
-    return Video(
+    return Chewie(controller: _chewieController!);
+  }
+
+  @override
+  void dispose() {
+    _chewieController?.dispose();
+    _videoController?.dispose();
+    super.dispose();
+  }
+}
+
+class _AttachmentItemAudio extends StatefulWidget {
+  final Attachment item;
+  final bool autoload;
+
+  const _AttachmentItemAudio({
+    required this.item,
+    this.autoload = false,
+  });
+
+  @override
+  State<_AttachmentItemAudio> createState() => _AttachmentItemAudioState();
+}
+
+class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
+  bool _showContent = false;
+
+  double? _draggingValue;
+
+  AudioPlayer? _audioController;
+
+  Future<void> _startLoad() async {
+    setState(() => _showContent = true);
+    final url =
+        ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}');
+    _audioController = AudioPlayer();
+    // Platform that can cache image also capable to cache audio
+    // https://pub.dev/packages/just_audio#experimental-features
+    if (PlatformInfo.canCacheImage) {
+      final source = LockCachingAudioSource(Uri.parse(url));
+      await _audioController!.setAudioSource(source);
+    } else {
+      await _audioController!.setUrl(url);
+    }
+    _audioController!.playingStream.listen((_) => setState(() {}));
+    _audioController!.positionStream.listen((_) => setState(() {}));
+    _audioController!.durationStream.listen((_) => setState(() {}));
+    _audioController!.bufferedPositionStream.listen((_) => setState(() {}));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoload) {
+      _startLoad();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const ratio = 16 / 9;
+    if (!_showContent) {
+      return GestureDetector(
+        child: AspectRatio(
+          aspectRatio: ratio,
+          child: CenteredContainer(
+            maxWidth: 280,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.not_started,
+                  color: Colors.white,
+                  size: 32,
+                ),
+                const Gap(8),
+                Text(
+                  'attachmentUnload'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  'attachmentUnloadCaption'.tr,
+                  style: const TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          _startLoad();
+        },
+      );
+    } else if (_audioController == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return AspectRatio(
       aspectRatio: ratio,
-      controller: _controller,
+      child: CenteredContainer(
+        maxWidth: 320,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.audio_file, size: 32),
+            const Gap(8),
+            Text(
+              widget.item.alt,
+              style: const TextStyle(fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+            const Gap(12),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      SliderTheme(
+                        data: SliderThemeData(
+                          trackHeight: 2,
+                          trackShape: _PlayerProgressTrackShape(),
+                          thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 8,
+                          ),
+                          overlayShape: SliderComponentShape.noOverlay,
+                        ),
+                        child: Slider(
+                          secondaryTrackValue: _audioController!
+                              .bufferedPosition.inMilliseconds
+                              .abs()
+                              .toDouble(),
+                          value: _draggingValue?.abs() ??
+                              _audioController!.position.inMilliseconds
+                                  .toDouble()
+                                  .abs(),
+                          min: 0,
+                          max: max(
+                            _audioController!.bufferedPosition.inMilliseconds
+                                .abs(),
+                            max(
+                              _audioController!.position.inMilliseconds.abs(),
+                              _audioController!.duration?.inMilliseconds
+                                      .abs() ??
+                                  1,
+                            ),
+                          ).toDouble(),
+                          onChanged: (value) {
+                            setState(() => _draggingValue = value);
+                          },
+                          onChangeEnd: (value) {
+                            _audioController!
+                                .seek(Duration(milliseconds: value.toInt()));
+                            setState(() => _draggingValue = null);
+                          },
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _audioController!.position.toHumanReadableString(),
+                            style: GoogleFonts.robotoMono(fontSize: 12),
+                          ),
+                          Text(
+                            _audioController!.duration
+                                    ?.toHumanReadableString() ??
+                                '00:00',
+                            style: GoogleFonts.robotoMono(fontSize: 12),
+                          ),
+                        ],
+                      ).paddingSymmetric(horizontal: 8, vertical: 4),
+                    ],
+                  ),
+                ),
+                const Gap(16),
+                IconButton.filled(
+                  icon: _audioController!.playing
+                      ? const Icon(Icons.pause)
+                      : const Icon(Icons.play_arrow),
+                  onPressed: () {
+                    if (_audioController!.playing) {
+                      _audioController!.pause();
+                    } else {
+                      _audioController!.play();
+                    }
+                  },
+                  visualDensity: const VisualDensity(
+                    horizontal: -4,
+                    vertical: 0,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   @override
   void dispose() {
-    _player.dispose();
+    _audioController?.dispose();
     super.dispose();
+  }
+}
+
+class _PlayerProgressTrackShape extends RoundedRectSliderTrackShape {
+  @override
+  Rect getPreferredRect({
+    required RenderBox parentBox,
+    Offset offset = Offset.zero,
+    required SliderThemeData sliderTheme,
+    bool isEnabled = false,
+    bool isDiscrete = false,
+  }) {
+    final trackHeight = sliderTheme.trackHeight;
+    final trackLeft = offset.dx;
+    final trackTop = offset.dy + (parentBox.size.height - trackHeight!) / 2;
+    final trackWidth = parentBox.size.width;
+    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }

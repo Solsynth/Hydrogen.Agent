@@ -94,6 +94,8 @@ class _AttachmentListState extends State<AttachmentList> {
         } else {
           portrait++;
         }
+      } else if (entry.mimetype.split('/').firstOrNull == 'audio') {
+        landscape++;
       }
     }
     if (isConsistent && consistentValue != null) {

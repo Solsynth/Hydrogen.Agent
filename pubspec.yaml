@@ -2,7 +2,7 @@ name: solian
 description: "The Solar Network App"
 publish_to: "none"
 
-version: 1.2.1+28
+version: 1.2.1+29
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -68,9 +68,6 @@ dependencies:
   firebase_crashlytics: ^4.0.4
   firebase_analytics: ^11.2.1
   firebase_performance: ^0.10.0+4
-  media_kit: ^1.1.10+1
-  media_kit_video: ^1.2.4
-  media_kit_libs_video: ^1.0.4
   flutter_svg: ^2.0.10+1
   cross_file: ^0.3.4+2
   google_fonts: ^6.2.1
@@ -78,6 +75,12 @@ dependencies:
   json_annotation: ^4.9.0
   gap: ^3.0.1
   fl_chart: ^0.69.0
+  video_player: ^2.9.1
+  video_player_win: ^2.3.11
+  chewie: ^1.8.4
+  just_audio: ^0.9.40
+  just_audio_windows: ^0.2.1
+  just_audio_mpv: ^0.1.7
 
 dev_dependencies:
   flutter_test:
