@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
+import 'package:solian/widgets/current_state_action.dart';
 
 class TitleShell extends StatelessWidget {
   final bool showAppBar;
@@ -32,6 +33,12 @@ class TitleShell extends StatelessWidget {
               ),
               centerTitle: isCenteredTitle,
               toolbarHeight: SolianTheme.toolbarHeight(context),
+              actions: [
+                const BackgroundStateWidget(),
+                SizedBox(
+                  width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                ),
+              ],
             )
           : null,
       body: child,

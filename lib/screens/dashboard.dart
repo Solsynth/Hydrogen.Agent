@@ -136,10 +136,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'today'.tr,
+                DateTime.now().day == DateTime.now().toUtc().day
+                    ? 'today'.tr
+                    : 'yesterday'.tr,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              Text(DateFormat('yyyy/MM/dd').format(DateTime.now())),
+              Text(DateFormat('yyyy/MM/dd').format(DateTime.now().toUtc())),
             ],
           ).paddingOnly(top: 8, left: 18, right: 18, bottom: 12),
           Card(
@@ -502,16 +504,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               Text(
                 'dashboardFooter'.tr,
-                style: [const Locale('zh', 'CN'), const Locale('zh', 'HK')]
-                        .contains(Get.deviceLocale)
-                    ? GoogleFonts.notoSerifHk(
-                        color: _unFocusColor,
-                        fontSize: 12,
-                      )
-                    : TextStyle(
-                        color: _unFocusColor,
-                        fontSize: 12,
-                      ),
+                style: TextStyle(color: _unFocusColor, fontSize: 12),
               )
             ],
           ).paddingAll(8),

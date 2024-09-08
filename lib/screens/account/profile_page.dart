@@ -8,10 +8,12 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/account/account_heading.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
@@ -143,7 +145,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
@@ -211,6 +213,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                 ),
                 bottom: TabBar(
                   tabs: [
+                    Tab(text: 'profilePage'.tr),
                     Tab(text: 'profilePosts'.tr),
                     Tab(text: 'profileAlbum'.tr),
                   ],
@@ -221,6 +224,24 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
           body: TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             children: [
+              Column(
+                children: [
+                  const Gap(16),
+                  AccountHeadingWidget(
+                    name: _userinfo!.name,
+                    nick: _userinfo!.nick,
+                    desc: _userinfo!.description,
+                    badges: _userinfo!.badges,
+                    banner: _userinfo!.banner,
+                    avatar: _userinfo!.avatar,
+                    status: Get.find<StatusProvider>()
+                        .getSomeoneStatus(_userinfo!.name),
+                    detail: _userinfo,
+                    profile: _userinfo!.profile,
+                    extraWidgets: const [],
+                  ),
+                ],
+              ),
               RefreshIndicator(
                 onRefresh: () => Future.wait([
                   _postController.reloadAllOver(),

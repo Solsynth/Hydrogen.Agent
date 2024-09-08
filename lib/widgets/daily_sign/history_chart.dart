@@ -131,7 +131,7 @@ class DailySignHistoryChartDialog extends StatelessWidget {
                             reservedSize: 28,
                             interval: 86400000,
                             getTitlesWidget: (value, _) => Text(
-                              DateFormat('MM/dd').format(
+                              DateFormat('dd').format(
                                 DateTime.fromMillisecondsSinceEpoch(
                                   value.toInt(),
                                 ),
@@ -231,7 +231,7 @@ class DailySignHistoryChartDialog extends StatelessWidget {
                             reservedSize: 28,
                             interval: 86400000,
                             getTitlesWidget: (value, _) => Text(
-                              DateFormat('MM/dd').format(
+                              DateFormat('dd').format(
                                 DateTime.fromMillisecondsSinceEpoch(
                                   value.toInt(),
                                 ),

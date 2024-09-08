@@ -347,8 +347,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                             FutureBuilder(
                               future: element.file.length(),
                               builder: (context, snapshot) {
-                                if (!snapshot.hasData)
+                                if (!snapshot.hasData) {
                                   return const SizedBox.shrink();
+                                }
                                 return Text(
                                   _formatBytes(snapshot.data!),
                                   style: Theme.of(context).textTheme.bodySmall,
