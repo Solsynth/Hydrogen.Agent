@@ -1,20 +1,19 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/durations.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:video_player/video_player.dart';
 
 class AttachmentItem extends StatefulWidget {
   final String parentId;
@@ -252,19 +251,19 @@ class _AttachmentItemVideo extends StatefulWidget {
 class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
   bool _showContent = false;
 
-  VideoPlayerController? _videoController;
-  ChewieController? _chewieController;
+  Player? _videoPlayer;
+  VideoController? _videoController;
 
   Future<void> _startLoad() async {
     setState(() => _showContent = true);
-    final url =
-        ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}');
-    _videoController = VideoPlayerController.networkUrl(Uri.parse(url));
-    await _videoController!.initialize();
-    _chewieController = ChewieController(
-      videoPlayerController: _videoController!,
-      aspectRatio: widget.item.metadata?['ratio'],
+    MediaKit.ensureInitialized();
+    final url = ServiceFinder.buildUrl(
+      'files',
+      '/attachments/${widget.item.rid}',
     );
+    _videoPlayer = Player();
+    _videoController = VideoController(_videoPlayer!);
+    _videoPlayer!.open(Media(url), play: !widget.autoload);
   }
 
   @override
@@ -314,19 +313,21 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
           _startLoad();
         },
       );
-    } else if (_chewieController == null) {
+    } else if (_videoController == null) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    return Chewie(controller: _chewieController!);
+    return Video(
+      controller: _videoController!,
+      aspectRatio: ratio,
+    );
   }
 
   @override
   void dispose() {
-    _chewieController?.dispose();
-    _videoController?.dispose();
+    _videoPlayer?.dispose();
     super.dispose();
   }
 }
@@ -348,26 +349,28 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
   bool _showContent = false;
 
   double? _draggingValue;
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  Duration _bufferedPosition = Duration.zero;
 
-  AudioPlayer? _audioController;
+  Player? _audioPlayer;
 
   Future<void> _startLoad() async {
     setState(() => _showContent = true);
-    final url =
-        ServiceFinder.buildUrl('files', '/attachments/${widget.item.rid}');
-    _audioController = AudioPlayer();
-    // Platform that can cache image also capable to cache audio
-    // https://pub.dev/packages/just_audio#experimental-features
-    if (PlatformInfo.canCacheImage) {
-      final source = LockCachingAudioSource(Uri.parse(url));
-      await _audioController!.setAudioSource(source);
-    } else {
-      await _audioController!.setUrl(url);
-    }
-    _audioController!.playingStream.listen((_) => setState(() {}));
-    _audioController!.positionStream.listen((_) => setState(() {}));
-    _audioController!.durationStream.listen((_) => setState(() {}));
-    _audioController!.bufferedPositionStream.listen((_) => setState(() {}));
+    MediaKit.ensureInitialized();
+    final url = ServiceFinder.buildUrl(
+      'files',
+      '/attachments/${widget.item.rid}',
+    );
+    _audioPlayer = Player();
+    await _audioPlayer!.open(Media(url), play: !widget.autoload);
+    _audioPlayer!.stream.playing.listen((v) => setState(() => _isPlaying = v));
+    _audioPlayer!.stream.position.listen((v) => setState(() => _position = v));
+    _audioPlayer!.stream.duration.listen((v) => setState(() => _duration = v));
+    _audioPlayer!.stream.buffer.listen(
+      (v) => setState(() => _bufferedPosition = v),
+    );
   }
 
   @override
@@ -417,7 +420,7 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
           _startLoad();
         },
       );
-    } else if (_audioController == null) {
+    } else if (_audioPlayer == null) {
       return const Center(
         child: CircularProgressIndicator(),
       );
@@ -453,30 +456,23 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
                           overlayShape: SliderComponentShape.noOverlay,
                         ),
                         child: Slider(
-                          secondaryTrackValue: _audioController!
-                              .bufferedPosition.inMilliseconds
-                              .abs()
-                              .toDouble(),
+                          secondaryTrackValue:
+                              _bufferedPosition.inMilliseconds.abs().toDouble(),
                           value: _draggingValue?.abs() ??
-                              _audioController!.position.inMilliseconds
-                                  .toDouble()
-                                  .abs(),
+                              _position.inMilliseconds.toDouble().abs(),
                           min: 0,
                           max: max(
-                            _audioController!.bufferedPosition.inMilliseconds
-                                .abs(),
+                            _bufferedPosition.inMilliseconds.abs(),
                             max(
-                              _audioController!.position.inMilliseconds.abs(),
-                              _audioController!.duration?.inMilliseconds
-                                      .abs() ??
-                                  1,
+                              _position.inMilliseconds.abs(),
+                              _duration.inMilliseconds.abs(),
                             ),
                           ).toDouble(),
                           onChanged: (value) {
                             setState(() => _draggingValue = value);
                           },
                           onChangeEnd: (value) {
-                            _audioController!
+                            _audioPlayer!
                                 .seek(Duration(milliseconds: value.toInt()));
                             setState(() => _draggingValue = null);
                           },
@@ -486,13 +482,11 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            _audioController!.position.toHumanReadableString(),
+                            _position.toHumanReadableString(),
                             style: GoogleFonts.robotoMono(fontSize: 12),
                           ),
                           Text(
-                            _audioController!.duration
-                                    ?.toHumanReadableString() ??
-                                '00:00',
+                            _duration.toHumanReadableString(),
                             style: GoogleFonts.robotoMono(fontSize: 12),
                           ),
                         ],
@@ -502,15 +496,11 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
                 ),
                 const Gap(16),
                 IconButton.filled(
-                  icon: _audioController!.playing
+                  icon: _isPlaying
                       ? const Icon(Icons.pause)
                       : const Icon(Icons.play_arrow),
                   onPressed: () {
-                    if (_audioController!.playing) {
-                      _audioController!.pause();
-                    } else {
-                      _audioController!.play();
-                    }
+                    _audioPlayer!.playOrPause();
                   },
                   visualDensity: const VisualDensity(
                     horizontal: -4,
@@ -527,7 +517,7 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
 
   @override
   void dispose() {
-    _audioController?.dispose();
+    _audioPlayer?.dispose();
     super.dispose();
   }
 }
