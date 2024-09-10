@@ -368,10 +368,7 @@ class _PostItemState extends State<PostItem> {
                           end: Alignment.topCenter,
                           colors: [
                             Theme.of(context).colorScheme.surfaceContainerLow,
-                            Theme.of(context)
-                                .colorScheme
-                                .surface
-                                .withOpacity(0),
+                            Colors.transparent,
                           ],
                         ),
                       ),
@@ -464,10 +461,7 @@ class _PostItemState extends State<PostItem> {
                                     end: Alignment.topCenter,
                                     colors: [
                                       Theme.of(context).colorScheme.surface,
-                                      Theme.of(context)
-                                          .colorScheme
-                                          .surface
-                                          .withOpacity(0),
+                                      Colors.transparent,
                                     ],
                                   ),
                                 ),

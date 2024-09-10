@@ -172,7 +172,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                       end: Alignment.topCenter,
                       colors: [
                         Theme.of(context).colorScheme.surface,
-                        Theme.of(context).colorScheme.surface.withOpacity(0),
+                        Colors.transparent,
                       ],
                     ),
                   ),

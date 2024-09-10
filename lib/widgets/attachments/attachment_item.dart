@@ -1,6 +1,7 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -221,21 +222,87 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
 
   @override
   Widget build(BuildContext context) {
+    const labelShadows = <Shadow>[
+      Shadow(
+        offset: Offset(1, 1),
+        blurRadius: 5.0,
+        color: Color.fromARGB(255, 0, 0, 0),
+      ),
+    ];
     final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
     if (!_showContent) {
       return GestureDetector(
-        child: Column(
+        child: Stack(
           children: [
             if (widget.item.metadata?['thumbnail'] != null)
               AspectRatio(
                 aspectRatio: 16 / 9,
-                child: Image.network(
+                child: AutoCacheImage(
                   ServiceFinder.buildUrl(
                     'uc',
                     '/attachments/${widget.item.metadata?['thumbnail']}',
                   ),
+                  fit: BoxFit.cover,
+                ),
+              )
+            else
+              const Center(
+                child: Icon(Icons.movie, size: 64),
+              ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: IgnorePointer(
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Theme.of(context).colorScheme.surface,
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
                 ),
               ),
+            ),
+            Positioned(
+              bottom: 4,
+              left: 16,
+              right: 16,
+              child: SizedBox(
+                height: 45,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.item.alt,
+                            style: const TextStyle(shadows: labelShadows),
+                          ),
+                          Text(
+                            Duration(
+                              milliseconds:
+                                  (widget.item.metadata?['duration'] ?? 0) *
+                                      1000,
+                            ).toHumanReadableString(),
+                            style: GoogleFonts.robotoMono(
+                              fontSize: 12,
+                              shadows: labelShadows,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.play_arrow, shadows: labelShadows)
+                        .paddingOnly(bottom: 4, right: 8),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
         onTap: () {
@@ -302,6 +369,25 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
     );
   }
 
+  String _formatBytes(int bytes, {int decimals = 2}) {
+    if (bytes == 0) return '0 Bytes';
+    const k = 1024;
+    final dm = decimals < 0 ? 0 : decimals;
+    final sizes = [
+      'Bytes',
+      'KiB',
+      'MiB',
+      'GiB',
+      'TiB',
+      'PiB',
+      'EiB',
+      'ZiB',
+      'YiB'
+    ];
+    final i = (math.log(bytes) / math.log(k)).floor().toInt();
+    return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -312,38 +398,84 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
 
   @override
   Widget build(BuildContext context) {
+    const labelShadows = <Shadow>[
+      Shadow(
+        offset: Offset(1, 1),
+        blurRadius: 5.0,
+        color: Color.fromARGB(255, 0, 0, 0),
+      ),
+    ];
     const ratio = 16 / 9;
     if (!_showContent) {
       return GestureDetector(
-        child: AspectRatio(
-          aspectRatio: ratio,
-          child: CenteredContainer(
-            maxWidth: 280,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.not_started,
-                  color: Colors.white,
-                  size: 32,
+        child: Stack(
+          children: [
+            if (widget.item.metadata?['thumbnail'] != null)
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: AutoCacheImage(
+                  ServiceFinder.buildUrl(
+                    'uc',
+                    '/attachments/${widget.item.metadata?['thumbnail']}',
+                  ),
+                  fit: BoxFit.cover,
                 ),
-                const Gap(8),
-                Text(
-                  'attachmentUnload'.tr,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+              )
+            else
+              const Center(
+                child: Icon(Icons.radio, size: 64),
+              ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: IgnorePointer(
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Theme.of(context).colorScheme.surface,
+                        Colors.transparent,
+                      ],
+                    ),
                   ),
                 ),
-                Text(
-                  'attachmentUnloadCaption'.tr,
-                  style: const TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
             ),
-          ),
+            Positioned(
+              bottom: 4,
+              left: 16,
+              right: 16,
+              child: SizedBox(
+                height: 45,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.item.alt,
+                            style: const TextStyle(shadows: labelShadows),
+                          ),
+                          Text(
+                            _formatBytes(widget.item.size),
+                            style: GoogleFonts.robotoMono(
+                              fontSize: 12,
+                              shadows: labelShadows,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.play_arrow, shadows: labelShadows)
+                        .paddingOnly(bottom: 4, right: 8),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         onTap: () {
           _startLoad();
@@ -355,92 +487,116 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
       );
     }
 
-    return AspectRatio(
-      aspectRatio: ratio,
-      child: CenteredContainer(
-        maxWidth: 320,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.audio_file, size: 32),
-            const Gap(8),
-            Text(
-              widget.item.alt,
-              style: const TextStyle(fontSize: 13),
-              textAlign: TextAlign.center,
+    return Stack(
+      children: [
+        if (widget.item.metadata?['thumbnail'] != null)
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: AutoCacheImage(
+              ServiceFinder.buildUrl(
+                'uc',
+                '/attachments/${widget.item.metadata?['thumbnail']}',
+              ),
+              fit: BoxFit.cover,
             ),
-            const Gap(12),
-            Row(
+          ).animate().blur(
+                duration: 300.ms,
+                end: const Offset(10, 10),
+                curve: Curves.easeInOut,
+              ),
+        AspectRatio(
+          aspectRatio: ratio,
+          child: CenteredContainer(
+            maxWidth: 320,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      SliderTheme(
-                        data: SliderThemeData(
-                          trackHeight: 2,
-                          trackShape: _PlayerProgressTrackShape(),
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 8,
-                          ),
-                          overlayShape: SliderComponentShape.noOverlay,
-                        ),
-                        child: Slider(
-                          secondaryTrackValue:
-                              _bufferedPosition.inMilliseconds.abs().toDouble(),
-                          value: _draggingValue?.abs() ??
-                              _position.inMilliseconds.toDouble().abs(),
-                          min: 0,
-                          max: max(
-                            _bufferedPosition.inMilliseconds.abs(),
-                            max(
-                              _position.inMilliseconds.abs(),
-                              _duration.inMilliseconds.abs(),
-                            ),
-                          ).toDouble(),
-                          onChanged: (value) {
-                            setState(() => _draggingValue = value);
-                          },
-                          onChangeEnd: (value) {
-                            _audioPlayer!
-                                .seek(Duration(milliseconds: value.toInt()));
-                            setState(() => _draggingValue = null);
-                          },
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _position.toHumanReadableString(),
-                            style: GoogleFonts.robotoMono(fontSize: 12),
-                          ),
-                          Text(
-                            _duration.toHumanReadableString(),
-                            style: GoogleFonts.robotoMono(fontSize: 12),
-                          ),
-                        ],
-                      ).paddingSymmetric(horizontal: 8, vertical: 4),
-                    ],
-                  ),
+                const Icon(Icons.audio_file, size: 32),
+                const Gap(8),
+                Text(
+                  widget.item.alt,
+                  style: const TextStyle(fontSize: 13),
+                  textAlign: TextAlign.center,
                 ),
-                const Gap(16),
-                IconButton.filled(
-                  icon: _isPlaying
-                      ? const Icon(Icons.pause)
-                      : const Icon(Icons.play_arrow),
-                  onPressed: () {
-                    _audioPlayer!.playOrPause();
-                  },
-                  visualDensity: const VisualDensity(
-                    horizontal: -4,
-                    vertical: 0,
-                  ),
+                const Gap(12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          SliderTheme(
+                            data: SliderThemeData(
+                              trackHeight: 2,
+                              trackShape: _PlayerProgressTrackShape(),
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 8,
+                              ),
+                              overlayShape: SliderComponentShape.noOverlay,
+                            ),
+                            child: Slider(
+                              secondaryTrackValue: _bufferedPosition
+                                  .inMilliseconds
+                                  .abs()
+                                  .toDouble(),
+                              value: _draggingValue?.abs() ??
+                                  _position.inMilliseconds.toDouble().abs(),
+                              min: 0,
+                              max: math
+                                  .max(
+                                    _bufferedPosition.inMilliseconds.abs(),
+                                    math.max(
+                                      _position.inMilliseconds.abs(),
+                                      _duration.inMilliseconds.abs(),
+                                    ),
+                                  )
+                                  .toDouble(),
+                              onChanged: (value) {
+                                setState(() => _draggingValue = value);
+                              },
+                              onChangeEnd: (value) {
+                                _audioPlayer!.seek(
+                                  Duration(milliseconds: value.toInt()),
+                                );
+                                setState(() => _draggingValue = null);
+                              },
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _position.toHumanReadableString(),
+                                style: GoogleFonts.robotoMono(fontSize: 12),
+                              ),
+                              Text(
+                                _duration.toHumanReadableString(),
+                                style: GoogleFonts.robotoMono(fontSize: 12),
+                              ),
+                            ],
+                          ).paddingSymmetric(horizontal: 8, vertical: 4),
+                        ],
+                      ),
+                    ),
+                    const Gap(16),
+                    IconButton.filled(
+                      icon: _isPlaying
+                          ? const Icon(Icons.pause)
+                          : const Icon(Icons.play_arrow),
+                      onPressed: () {
+                        _audioPlayer!.playOrPause();
+                      },
+                      visualDensity: const VisualDensity(
+                        horizontal: -4,
+                        vertical: 0,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
