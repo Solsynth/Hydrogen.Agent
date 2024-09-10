@@ -54,7 +54,11 @@ class _AttachmentEditorThumbnailDialogState
     final AttachmentProvider attach = Get.find();
 
     widget.item.metadata ??= {};
-    widget.item.metadata!['thumbnail'] = _attachmentController.text;
+    if (_attachmentController.text.isNotEmpty) {
+      widget.item.metadata!['thumbnail'] = _attachmentController.text;
+    } else {
+      widget.item.metadata!['thumbnail'] = null;
+    }
 
     try {
       await attach.updateAttachment(

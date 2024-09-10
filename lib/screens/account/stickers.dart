@@ -1,14 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/stickers.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/stickers/sticker_uploader.dart';
 
 class StickerScreen extends StatefulWidget {
@@ -94,17 +93,12 @@ class _StickerScreenState extends State<StickerScreen> {
           ),
         ],
       ),
-      leading: PlatformInfo.canCacheImage
-          ? CachedNetworkImage(
-              imageUrl: imageUrl,
-              width: 28,
-              height: 28,
-            )
-          : Image.network(
-              imageUrl,
-              width: 28,
-              height: 28,
-            ),
+      leading: AutoCacheImage(
+        imageUrl,
+        width: 28,
+        height: 28,
+        noErrorWidget: true,
+      ),
     );
   }
 

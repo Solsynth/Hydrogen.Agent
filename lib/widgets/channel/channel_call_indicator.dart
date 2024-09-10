@@ -1,16 +1,15 @@
 import 'dart:convert';
 
 import 'package:avatar_stack/avatar_stack.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/call.dart';
 import 'package:solian/models/channel.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/call.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/chat/call/call_prejoin.dart';
 
 class ChannelCallIndicator extends StatelessWidget {
@@ -76,10 +75,7 @@ class ChannelCallIndicator extends StatelessWidget {
                   avatars: ongoingCall.participants!.map((x) {
                     final userinfo =
                         Account.fromJson(jsonDecode(x['metadata']));
-                    return PlatformInfo.canCacheImage
-                        ? CachedNetworkImageProvider(userinfo.avatar)
-                            as ImageProvider
-                        : NetworkImage(userinfo.avatar) as ImageProvider;
+                    return AutoCacheImage.provider(userinfo.avatar);
                   }).toList(),
                 ),
               );

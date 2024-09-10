@@ -1,7 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 
 class AccountAvatar extends StatelessWidget {
   final dynamic content;
@@ -34,11 +33,7 @@ class AccountAvatar extends StatelessWidget {
       key: Key('a$content'),
       radius: radius,
       backgroundColor: bgColor,
-      backgroundImage: !isEmpty
-          ? (PlatformInfo.canCacheImage
-              ? CachedNetworkImageProvider(url)
-              : NetworkImage(url)) as ImageProvider<Object>?
-          : null,
+      backgroundImage: !isEmpty ? AutoCacheImage.provider(url) : null,
       child: isEmpty
           ? Icon(
               Icons.account_circle,
@@ -74,33 +69,6 @@ class AccountProfileImage extends StatelessWidget {
         ? content
         : ServiceFinder.buildUrl('files', '/attachments/$content');
 
-    if (PlatformInfo.canCacheImage) {
-      return CachedNetworkImage(
-        imageUrl: url,
-        fit: fit,
-        progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-          child: CircularProgressIndicator(
-            value: downloadProgress.progress,
-          ),
-        ),
-      );
-    } else {
-      return Image.network(
-        url,
-        fit: fit,
-        loadingBuilder: (BuildContext context, Widget child,
-            ImageChunkEvent? loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-            ),
-          );
-        },
-      );
-    }
+    return AutoCacheImage(url, fit: fit, noErrorWidget: true);
   }
 }

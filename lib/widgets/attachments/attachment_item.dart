@@ -1,17 +1,15 @@
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:solian/models/attachment.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/durations.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -140,66 +138,13 @@ class _AttachmentItemImage extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (PlatformInfo.canCacheImage)
-            CachedNetworkImage(
-              fit: fit,
-              imageUrl: ServiceFinder.buildUrl(
-                'files',
-                '/attachments/${item.rid}',
-              ),
-              progressIndicatorBuilder: (context, url, downloadProgress) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: downloadProgress.progress,
-                  ),
-                );
-              },
-              errorWidget: (context, url, error) {
-                return Material(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.close, size: 32)
-                          .animate(onPlay: (e) => e.repeat(reverse: true))
-                          .fade(duration: 500.ms),
-                      Text(error.toString()),
-                    ],
-                  ),
-                );
-              },
-            )
-          else
-            Image.network(
-              ServiceFinder.buildUrl('files', '/attachments/${item.rid}'),
-              fit: fit,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return Material(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.close, size: 32)
-                          .animate(onPlay: (e) => e.repeat(reverse: true))
-                          .fade(duration: 500.ms),
-                      Text(error.toString()),
-                    ],
-                  ),
-                );
-              },
+          AutoCacheImage(
+            ServiceFinder.buildUrl(
+              'files',
+              '/attachments/${item.rid}',
             ),
+            fit: fit,
+          ),
           if (showBadge && badge != null)
             Positioned(
               right: 12,
@@ -279,35 +224,19 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
     final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
     if (!_showContent) {
       return GestureDetector(
-        child: AspectRatio(
-          aspectRatio: ratio,
-          child: CenteredContainer(
-            maxWidth: 280,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.not_started,
-                  color: Colors.white,
-                  size: 32,
-                ),
-                const Gap(8),
-                Text(
-                  'attachmentUnload'.tr,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+        child: Column(
+          children: [
+            if (widget.item.metadata?['thumbnail'] != null)
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Image.network(
+                  ServiceFinder.buildUrl(
+                    'uc',
+                    '/attachments/${widget.item.metadata?['thumbnail']}',
                   ),
                 ),
-                Text(
-                  'attachmentUnloadCaption'.tr,
-                  style: const TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+              ),
+          ],
         ),
         onTap: () {
           _startLoad();

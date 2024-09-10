@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,13 +10,13 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
 import 'package:solian/models/packet.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:uuid/uuid.dart';
@@ -414,17 +413,11 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                           .map(
                             (x) => ChatMessageSuggestion(
                               type: 'emotes',
-                              leading: PlatformInfo.canCacheImage
-                                  ? CachedNetworkImage(
-                                      imageUrl: x.imageUrl,
-                                      width: 28,
-                                      height: 28,
-                                    )
-                                  : Image.network(
-                                      x.imageUrl,
-                                      width: 28,
-                                      height: 28,
-                                    ),
+                              leading: AutoCacheImage(
+                                x.imageUrl,
+                                width: 28,
+                                height: 28,
+                              ),
                               display: x.name,
                               content: x.textWarpedPlaceholder,
                             ),

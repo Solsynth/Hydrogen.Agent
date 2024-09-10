@@ -1,12 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown.dart';
 import 'package:get/get.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:markdown/markdown.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'account/account_profile_popup.dart';
@@ -107,19 +106,12 @@ class MarkdownTextContent extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(radius)),
                 child: Container(
                   color: Theme.of(context).colorScheme.surfaceContainer,
-                  child: PlatformInfo.canCacheImage
-                      ? CachedNetworkImage(
-                          imageUrl: url,
-                          width: width,
-                          height: height,
-                          fit: fit,
-                        )
-                      : Image.network(
-                          url,
-                          width: width,
-                          height: height,
-                          fit: fit,
-                        ),
+                  child: AutoCacheImage(
+                    url,
+                    width: width,
+                    height: height,
+                    fit: fit,
+                  ),
                 ),
               ).paddingSymmetric(vertical: 4);
             case 'attachments':
@@ -138,19 +130,12 @@ class MarkdownTextContent extends StatelessWidget {
           }
         }
 
-        return PlatformInfo.canCacheImage
-            ? CachedNetworkImage(
-                imageUrl: url,
-                width: width,
-                height: height,
-                fit: fit,
-              )
-            : Image.network(
-                url,
-                width: width,
-                height: height,
-                fit: fit,
-              );
+        return AutoCacheImage(
+          url,
+          width: width,
+          height: height,
+          fit: fit,
+        );
       },
     );
   }

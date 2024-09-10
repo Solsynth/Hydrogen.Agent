@@ -177,19 +177,23 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           children: [
             ListTile(
               tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-              title: Row(
-                children: [
-                  Text(
-                    _editorController.title ?? 'title'.tr,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Gap(6),
-                  if (_editorController.aliasController.text.isNotEmpty)
-                    Badge(
-                      label: Text('#${_editorController.aliasController.text}'),
+              title: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Text(
+                      _editorController.title ?? 'title'.tr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                ],
+                    const Gap(6),
+                    if (_editorController.aliasController.text.isNotEmpty)
+                      Badge(
+                        label:
+                            Text('#${_editorController.aliasController.text}'),
+                      ),
+                  ],
+                ),
               ),
               subtitle: Text(
                 _editorController.description ?? 'description'.tr,
