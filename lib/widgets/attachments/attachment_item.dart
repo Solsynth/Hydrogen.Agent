@@ -286,7 +286,8 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
                           Text(
                             Duration(
                               milliseconds:
-                                  (widget.item.metadata?['duration'] ?? 0) *
+                                  (widget.item.metadata?['duration'] ?? 0)
+                                          .toInt() *
                                       1000,
                             ).toHumanReadableString(),
                             style: GoogleFonts.robotoMono(
