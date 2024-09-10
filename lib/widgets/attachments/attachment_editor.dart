@@ -20,6 +20,7 @@ import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_attr_editor.dart';
+import 'package:solian/widgets/attachments/attachment_editor_thumbnail.dart';
 import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
 
 class AttachmentEditorPopup extends StatefulWidget {
@@ -264,6 +265,21 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     );
   }
 
+  void _showAttachmentThumbnailEditor(Attachment element, int idx) {
+    showDialog(
+      context: context,
+      builder: (context) => AttachmentEditorThumbnailDialog(
+        item: element,
+        pool: widget.pool,
+        initialItem: element.metadata?['thumbnail'],
+        onUpdate: (value) {
+          _attachments[idx]!.metadata ??= {};
+          _attachments[idx]!.metadata!['thumbnail'] = value;
+        },
+      ),
+    );
+  }
+
   void _showEdit(Attachment element, int index) {
     showDialog(
       context: context,
@@ -455,11 +471,12 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     );
   }
 
-  Widget _buildListEntry(Attachment element, int index) {
+  Widget _buildListEntry(Attachment element, int idx) {
     var fileType = element.mimetype.split('/').firstOrNull;
     fileType ??= 'unknown';
 
     final canBePreview = fileType.toLowerCase() == 'image';
+    final canHasThumbnail = fileType.toLowerCase() != 'image';
 
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 8, bottom: 16),
@@ -491,14 +508,23 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    color: Colors.teal,
-                    icon: const Icon(Icons.preview),
-                    visualDensity: const VisualDensity(horizontal: -4),
-                    onPressed: canBePreview
-                        ? () => _showAttachmentPreview(element)
-                        : null,
-                  ),
+                  if (canBePreview)
+                    IconButton(
+                      color: Colors.teal,
+                      icon: const Icon(Icons.preview),
+                      visualDensity: const VisualDensity(horizontal: -4),
+                      onPressed: () => _showAttachmentPreview(element),
+                    ),
+                  if (canHasThumbnail)
+                    IconButton(
+                      color: Colors.teal,
+                      icon: const Icon(Icons.add_photo_alternate),
+                      visualDensity: const VisualDensity(horizontal: -4),
+                      onPressed: () => _showAttachmentThumbnailEditor(
+                        element,
+                        idx,
+                      ),
+                    ),
                   PopupMenuButton(
                     icon: const Icon(Icons.more_horiz),
                     iconColor: Theme.of(context).colorScheme.primary,
@@ -514,7 +540,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                             horizontal: 8,
                           ),
                         ),
-                        onTap: () => _showEdit(element, index),
+                        onTap: () => _showEdit(element, idx),
                       ),
                       PopupMenuItem(
                         child: ListTile(
@@ -527,7 +553,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         onTap: () {
                           _deleteAttachment(element).then((_) {
                             widget.onRemove(element.rid);
-                            setState(() => _attachments.removeAt(index));
+                            setState(() => _attachments.removeAt(idx));
                           });
                         },
                       ),
@@ -541,7 +567,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                         ),
                         onTap: () {
                           widget.onRemove(element.rid);
-                          setState(() => _attachments.removeAt(index));
+                          setState(() => _attachments.removeAt(idx));
                         },
                       ),
                     ],

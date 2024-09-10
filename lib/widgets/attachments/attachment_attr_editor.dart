@@ -37,6 +37,7 @@ class _AttachmentAttrEditorDialogState
         widget.item.id,
         _altController.value.text,
         isMature: _isMature,
+        metadata: widget.item.metadata ?? {},
       );
 
       Get.find<AttachmentProvider>().clearCache(id: widget.item.rid);

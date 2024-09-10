@@ -192,6 +192,7 @@ class AttachmentProvider extends GetConnect {
   Future<Response> updateAttachment(
     int id,
     String alt, {
+    required Map<String, dynamic> metadata,
     bool isMature = false,
   }) async {
     final AuthProvider auth = Get.find();
@@ -201,6 +202,7 @@ class AttachmentProvider extends GetConnect {
 
     var resp = await client.put('/attachments/$id', {
       'alt': alt,
+      'metadata': metadata,
       'is_mature': isMature,
     });
 

@@ -299,14 +299,14 @@ class _PostItemState extends State<PostItem> {
       return AttachmentList(
         parentId: widget.item.id.toString(),
         attachmentsId: attachments,
-        autoload: true,
+        autoload: false,
         isGrid: true,
       ).paddingOnly(left: 36, top: 4, bottom: 4);
     } else if (attachments.length > 1) {
       return AttachmentList(
         parentId: widget.item.id.toString(),
         attachmentsId: attachments,
-        autoload: true,
+        autoload: false,
         isColumn: true,
       ).paddingOnly(left: 60, right: 24);
     } else {
@@ -314,7 +314,7 @@ class _PostItemState extends State<PostItem> {
         flatMaxHeight: MediaQuery.of(context).size.width,
         parentId: widget.item.id.toString(),
         attachmentsId: attachments,
-        autoload: true,
+        autoload: false,
       );
     }
   }
