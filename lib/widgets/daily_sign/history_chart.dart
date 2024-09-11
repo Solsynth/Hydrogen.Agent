@@ -24,7 +24,7 @@ class DailySignHistoryChartDialog extends StatelessWidget {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('运势历史'),
+          Text('dailySignHistoryTitle'.tr),
           Text(
             '${DateFormat('yyyy/MM/dd').format(_firstRecordDate!)} - ${DateFormat('yyyy/MM/dd').format(DateTime.now())}',
             style: TextStyle(
@@ -46,8 +46,10 @@ class DailySignHistoryChartDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('近期运势', style: Theme.of(context).textTheme.titleMedium)
-                    .paddingOnly(bottom: 18),
+                Text(
+                  'dailySignHistoryRecent'.tr,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ).paddingOnly(bottom: 18),
                 SizedBox(
                   height: 180,
                   width: max(640, MediaQuery.of(context).size.width),
@@ -147,8 +149,10 @@ class DailySignHistoryChartDialog extends StatelessWidget {
                   ),
                 ).marginOnly(right: 24, bottom: 8, top: 8),
                 const Gap(16),
-                Text('功德趋势', style: Theme.of(context).textTheme.titleMedium)
-                    .paddingOnly(bottom: 18),
+                Text(
+                  'dailySignHistoryReward'.tr,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ).paddingOnly(bottom: 18),
                 SizedBox(
                   height: 180,
                   width: max(640, MediaQuery.of(context).size.width),

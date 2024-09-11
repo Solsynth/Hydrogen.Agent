@@ -197,12 +197,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     },
                     child: _signRecord == null
                         ? IconButton(
-                            tooltip: '上香求签',
+                            tooltip: 'dailySignAction'.tr,
                             icon: const Icon(Icons.local_fire_department),
                             onPressed: _signingDaily ? null : _signDaily,
                           )
                         : IconButton(
-                            tooltip: '查看运势历史',
+                            tooltip: 'dailySignHistoryAction'.tr,
                             icon: const Icon(Icons.history),
                             onPressed: () {
                               showDialog(
