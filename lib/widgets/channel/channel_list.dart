@@ -127,9 +127,8 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         : const EdgeInsets.symmetric(horizontal: 16);
 
     if (item.type == 1) {
-      final otherside = item.members!
-          .where((e) => e.account.externalId != widget.selfId)
-          .first;
+      final otherside =
+          item.members!.where((e) => e.account.id != widget.selfId).first;
 
       return ListTile(
         leading: AccountAvatar(

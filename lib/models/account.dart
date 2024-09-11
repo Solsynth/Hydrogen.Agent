@@ -18,7 +18,6 @@ class Account {
   AccountProfile? profile;
   List<AccountBadge>? badges;
   String? emailAddress;
-  int? externalId;
 
   Account({
     required this.id,
@@ -35,7 +34,6 @@ class Account {
     required this.profile,
     required this.badges,
     required this.emailAddress,
-    this.externalId,
   });
 
   factory Account.fromJson(Map<String, dynamic> json) =>

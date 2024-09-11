@@ -35,7 +35,7 @@ class _PostActionState extends State<PostAction> {
 
     setState(() {
       _canModifyContent =
-          auth.userProfile.value!['id'] == widget.item.author.externalId;
+          auth.userProfile.value!['id'] == widget.item.author.id;
       _isBusy = false;
     });
   }

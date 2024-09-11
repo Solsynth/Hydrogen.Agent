@@ -102,6 +102,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     try {
       _signRecord = await _dailySign.signToday();
+      _dailySign.listLastRecord(30).then((value) {
+        setState(() => _signRecordHistory = value);
+      });
     } catch (e) {
       context.showErrorDialog(e);
     }
@@ -201,20 +204,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             icon: const Icon(Icons.local_fire_department),
                             onPressed: _signingDaily ? null : _signDaily,
                           )
-                        : IconButton(
-                            tooltip: 'dailySignHistoryAction'.tr,
-                            icon: const Icon(Icons.history),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                useRootNavigator: true,
-                                builder: (context) =>
-                                    DailySignHistoryChartDialog(
-                                  data: _signRecordHistory,
-                                ),
-                              );
-                            },
-                          ),
+                        : (_signRecordHistory?.isEmpty ?? true)
+                            ? const SizedBox.shrink()
+                            : IconButton(
+                                tooltip: 'dailySignHistoryAction'.tr,
+                                icon: const Icon(Icons.history),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    useRootNavigator: true,
+                                    builder: (context) =>
+                                        DailySignHistoryChartDialog(
+                                      data: _signRecordHistory,
+                                    ),
+                                  );
+                                },
+                              ),
                   ),
                 ),
               ],

@@ -41,8 +41,8 @@ class _ChatEventActionState extends State<ChatEventAction> {
     setState(() => _isBusy = true);
 
     setState(() {
-      _canModifyContent = auth.userProfile.value!['id'] ==
-          widget.item.sender.account.externalId;
+      _canModifyContent =
+          auth.userProfile.value!['id'] == widget.item.sender.account.id;
       _isBusy = false;
     });
   }

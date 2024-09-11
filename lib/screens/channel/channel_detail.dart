@@ -43,8 +43,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
   void checkOwner() async {
     final AuthProvider auth = Get.find();
     setState(() {
-      _isOwned =
-          auth.userProfile.value!['id'] == widget.channel.account.externalId;
+      _isOwned = auth.userProfile.value!['id'] == widget.channel.account.id;
     });
   }
 

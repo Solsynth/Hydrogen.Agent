@@ -31,7 +31,6 @@ Account _$AccountFromJson(Map<String, dynamic> json) => Account(
           ?.map((e) => AccountBadge.fromJson(e as Map<String, dynamic>))
           .toList(),
       emailAddress: json['email_address'] as String?,
-      externalId: (json['external_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
@@ -49,7 +48,6 @@ Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
       'profile': instance.profile?.toJson(),
       'badges': instance.badges?.map((e) => e.toJson()).toList(),
       'email_address': instance.emailAddress,
-      'external_id': instance.externalId,
     };
 
 AccountBadge _$AccountBadgeFromJson(Map<String, dynamic> json) => AccountBadge(

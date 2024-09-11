@@ -18,6 +18,8 @@
   "shareNoUri": "Share text content",
   "alias": "Alias",
   "feed": "Feed",
+  "explore": "Explore",
+  "posts": "Posts",
   "unlink": "Unlink",
   "feedSearch": "Search Feed",
   "feedSearchWithTag": "Searching with tag #@key",

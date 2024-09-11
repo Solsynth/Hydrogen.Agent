@@ -173,7 +173,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
                       IconButton(
                         color: Colors.red,
                         icon: const Icon(Icons.remove_circle),
-                        onPressed: element.account.externalId == _accountId
+                        onPressed: element.account.id == _accountId
                             ? null
                             : () => removeMember(element),
                       ),
