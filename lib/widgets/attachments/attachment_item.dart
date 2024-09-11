@@ -260,7 +260,7 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
                       end: Alignment.topCenter,
                       colors: [
                         Theme.of(context).colorScheme.surface,
-                        Colors.transparent,
+                        Theme.of(context).colorScheme.surface.withOpacity(0),
                       ],
                     ),
                   ),
@@ -281,7 +281,10 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
                         children: [
                           Text(
                             widget.item.alt,
-                            style: const TextStyle(shadows: labelShadows),
+                            style: const TextStyle(
+                              shadows: labelShadows,
+                              color: Colors.white,
+                            ),
                           ),
                           Text(
                             Duration(
@@ -293,13 +296,17 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
                             style: GoogleFonts.robotoMono(
                               fontSize: 12,
                               shadows: labelShadows,
+                              color: Colors.white,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.play_arrow, shadows: labelShadows)
-                        .paddingOnly(bottom: 4, right: 8),
+                    const Icon(
+                      Icons.play_arrow,
+                      shadows: labelShadows,
+                      color: Colors.white,
+                    ).paddingOnly(bottom: 4, right: 8),
                   ],
                 ),
               ),
@@ -437,7 +444,7 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
                       end: Alignment.topCenter,
                       colors: [
                         Theme.of(context).colorScheme.surface,
-                        Colors.transparent,
+                        Theme.of(context).colorScheme.surface.withOpacity(0),
                       ],
                     ),
                   ),
@@ -458,20 +465,27 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
                         children: [
                           Text(
                             widget.item.alt,
-                            style: const TextStyle(shadows: labelShadows),
+                            style: const TextStyle(
+                              shadows: labelShadows,
+                              color: Colors.white,
+                            ),
                           ),
                           Text(
                             _formatBytes(widget.item.size),
                             style: GoogleFonts.robotoMono(
                               fontSize: 12,
                               shadows: labelShadows,
+                              color: Colors.white,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.play_arrow, shadows: labelShadows)
-                        .paddingOnly(bottom: 4, right: 8),
+                    const Icon(
+                      Icons.play_arrow,
+                      shadows: labelShadows,
+                      color: Colors.white,
+                    ).paddingOnly(bottom: 4, right: 8),
                   ],
                 ),
               ),

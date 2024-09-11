@@ -1,11 +1,25 @@
-import 'package:get/get.dart';
-import 'package:solian/translations/en_us.dart';
-import 'package:solian/translations/zh_cn.dart';
+import 'dart:convert';
 
-class SolianMessages extends Translations {
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:get/get.dart';
+
+class AppTranslations extends Translations {
+  static const List<String> supportedLocales = ['zh_cn', 'en_us'];
+
+  final Map<String, Map<String, String>> messages = {};
+
+  static Future<void> init() async {
+    final AppTranslations inst = Get.find();
+    inst.messages.clear();
+    for (final locale in supportedLocales) {
+      inst.messages[locale] = jsonDecode(
+        await rootBundle.loadString('assets/locales/$locale.json'),
+      )
+          .map((key, value) => MapEntry(key, value.toString()))
+          .cast<String, String>();
+    }
+  }
+
   @override
-  Map<String, Map<String, String>> get keys => {
-        'en_US': i18nEnglish,
-        'zh_CN': i18nSimplifiedChinese,
-      };
+  Map<String, Map<String, String>> get keys => messages;
 }

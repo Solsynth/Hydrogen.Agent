@@ -42,6 +42,9 @@ void main() async {
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
+  Get.put(AppTranslations());
+  await AppTranslations.init();
+
   usePathUrlStrategy();
   runApp(const SolianApp());
 }
@@ -99,10 +102,12 @@ class SolianApp extends StatelessWidget {
           routeInformationParser: AppRouter.instance.routeInformationParser,
           routeInformationProvider: AppRouter.instance.routeInformationProvider,
           backButtonDispatcher: AppRouter.instance.backButtonDispatcher,
-          translations: SolianMessages(),
+          translations: Get.find<AppTranslations>(),
           locale: Get.deviceLocale,
           fallbackLocale: const Locale('en', 'US'),
-          onInit: () => _initializeProviders(context),
+          onInit: () {
+            _initializeProviders(context);
+          },
           builder: (context, child) {
             return SystemShell(
               child: ScaffoldMessenger(
