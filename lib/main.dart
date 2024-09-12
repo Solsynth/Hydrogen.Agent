@@ -15,6 +15,7 @@ import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/daily_sign.dart';
 import 'package:solian/providers/last_read.dart';
 import 'package:solian/providers/link_expander.dart';
+import 'package:solian/providers/navigation.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
@@ -123,6 +124,8 @@ class SolianApp extends StatelessWidget {
   }
 
   void _initializeProviders(BuildContext context) async {
+    Get.put(NavigationStateProvider());
+
     Get.lazyPut(() => AuthProvider());
     Get.lazyPut(() => RelationshipProvider());
     Get.lazyPut(() => PostProvider());

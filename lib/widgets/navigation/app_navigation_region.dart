@@ -4,6 +4,7 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
+import 'package:solian/providers/navigation.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 
@@ -21,8 +22,6 @@ class AppNavigationRegion extends StatefulWidget {
 
 class _AppNavigationRegionState extends State<AppNavigationRegion>
     with SingleTickerProviderStateMixin {
-  Realm? _focusedRealm;
-
   bool _isTryingExit = false;
 
   late final AnimationController _animationController = AnimationController(
@@ -39,14 +38,18 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
 
   void _focusRealm(Realm item) {
     _animationController.animateTo(1).then((_) {
-      setState(() => _focusedRealm = item);
+      setState(
+        () => Get.find<NavigationStateProvider>().focusedRealm.value = item,
+      );
       _animationController.animateTo(0);
     });
   }
 
   void _unFocusRealm() {
     _animationController.animateTo(1).then((_) {
-      setState(() => _focusedRealm = null);
+      setState(
+        () => Get.find<NavigationStateProvider>().focusedRealm.value = null,
+      );
       _animationController.animateTo(0);
     });
   }
@@ -58,6 +61,7 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
   }
 
   Widget _buildRealmFocusAvatar() {
+    final focusedRealm = Get.find<NavigationStateProvider>().focusedRealm.value;
     return MouseRegion(
       child: AnimatedSwitcher(
         switchInCurve: Curves.fastOutSlowIn,
@@ -83,7 +87,7 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
                 ),
                 onTap: () => _unFocusRealm(),
               )
-            : _buildEntryAvatar(_focusedRealm!),
+            : _buildEntryAvatar(focusedRealm!),
       ),
       onEnter: (_) => setState(() => _isTryingExit = true),
       onExit: (_) => setState(() => _isTryingExit = false),
@@ -137,88 +141,89 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
     final RealmProvider realms = Get.find();
     final ChannelProvider channels = Get.find();
     final AuthProvider auth = Get.find();
+    final NavigationStateProvider navState = Get.find();
 
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return SlideTransition(
-          position: _animationTween,
-          child: child,
-        );
-      },
-      child: _focusedRealm == null
-          ? Obx(() {
-              if (widget.isCollapsed) {
-                return CustomScrollView(
-                  slivers: [
-                    const SliverPadding(padding: EdgeInsets.only(top: 8)),
-                    SliverList.builder(
-                      itemCount: realms.availableRealms.length,
-                      itemBuilder: (context, index) {
-                        final element = realms.availableRealms[index];
-                        return Tooltip(
-                          message: element.name,
-                          child: _buildEntry(context, element),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              }
-
-              return CustomScrollView(
-                slivers: [
-                  const SliverPadding(padding: EdgeInsets.only(top: 8)),
-                  SliverList.builder(
-                    itemCount: realms.availableRealms.length,
-                    itemBuilder: (context, index) {
-                      final element = realms.availableRealms[index];
-                      return _buildEntry(context, element);
-                    },
-                  ),
-                  const SliverPadding(padding: EdgeInsets.only(bottom: 8)),
-                ],
-              );
-            })
-          : Column(
-              children: [
-                if (widget.isCollapsed)
-                  Tooltip(
-                    message: _focusedRealm!.name,
-                    child: _buildRealmFocusAvatar().paddingSymmetric(
-                      vertical: 8,
-                    ),
+    return Obx(
+      () => AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return SlideTransition(
+            position: _animationTween,
+            child: child,
+          );
+        },
+        child: navState.focusedRealm.value == null
+            ? widget.isCollapsed
+                ? CustomScrollView(
+                    slivers: [
+                      const SliverPadding(padding: EdgeInsets.only(top: 8)),
+                      SliverList.builder(
+                        itemCount: realms.availableRealms.length,
+                        itemBuilder: (context, index) {
+                          final element = realms.availableRealms[index];
+                          return Tooltip(
+                            message: element.name,
+                            child: _buildEntry(context, element),
+                          );
+                        },
+                      ),
+                    ],
                   )
-                else
-                  ListTile(
-                    minTileHeight: 0,
-                    tileColor:
-                        Theme.of(context).colorScheme.surfaceContainerLow,
-                    leading: _buildRealmFocusAvatar(),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    title: Text(_focusedRealm!.name),
-                    subtitle: Text(
-                      _focusedRealm!.description,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                : CustomScrollView(
+                    slivers: [
+                      const SliverPadding(padding: EdgeInsets.only(top: 8)),
+                      SliverList.builder(
+                        itemCount: realms.availableRealms.length,
+                        itemBuilder: (context, index) {
+                          final element = realms.availableRealms[index];
+                          return _buildEntry(context, element);
+                        },
+                      ),
+                      const SliverPadding(padding: EdgeInsets.only(bottom: 8)),
+                    ],
+                  )
+            : Column(
+                children: [
+                  if (widget.isCollapsed)
+                    Tooltip(
+                      message: navState.focusedRealm.value!.name,
+                      child: _buildRealmFocusAvatar().paddingSymmetric(
+                        vertical: 8,
+                      ),
+                    )
+                  else
+                    ListTile(
+                      minTileHeight: 0,
+                      tileColor:
+                          Theme.of(context).colorScheme.surfaceContainerLow,
+                      leading: _buildRealmFocusAvatar(),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 8),
+                      title: Text(navState.focusedRealm.value!.name),
+                      subtitle: Text(
+                        navState.focusedRealm.value!.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  Expanded(
+                    child: Obx(
+                      () => ChannelListWidget(
+                        channels: channels.availableChannels
+                            .where(
+                              (x) =>
+                                  x.realm?.id ==
+                                  navState.focusedRealm.value?.id,
+                            )
+                            .toList(),
+                        selfId: auth.userProfile.value!['id'],
+                        noCategory: true,
+                      ),
                     ),
                   ),
-                Expanded(
-                  child: Obx(
-                    () => ChannelListWidget(
-                      channels: channels.availableChannels
-                          .where(
-                            (x) => x.realm?.externalId == _focusedRealm?.id,
-                          )
-                          .toList(),
-                      selfId: auth.userProfile.value!['id'],
-                      noCategory: true,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 }

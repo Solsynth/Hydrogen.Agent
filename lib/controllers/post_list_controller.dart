@@ -9,6 +9,7 @@ import 'package:solian/providers/last_read.dart';
 
 class PostListController extends GetxController {
   String? author;
+  String? realm;
 
   /// The polling source modifier.
   /// - `0`: default recommendations
@@ -99,8 +100,10 @@ class PostListController extends GetxController {
     final idx = <dynamic>{};
     postList.retainWhere((x) => idx.add(x.id));
 
-    var lastId = postList.map((x) => x.id).reduce(max);
-    Get.find<LastReadProvider>().feedLastReadAt = lastId;
+    if (postList.isNotEmpty) {
+      var lastId = postList.map((x) => x.id).reduce(max);
+      Get.find<LastReadProvider>().feedLastReadAt = lastId;
+    }
 
     return result;
   }
@@ -123,16 +126,21 @@ class PostListController extends GetxController {
             resp = await provider.listRecommendations(
               pageKey,
               channel: 'shuffle',
+              realm: realm,
             );
             break;
           case 1:
             resp = await provider.listRecommendations(
               pageKey,
               channel: 'friends',
+              realm: realm,
             );
             break;
           default:
-            resp = await provider.listRecommendations(pageKey);
+            resp = await provider.listRecommendations(
+              pageKey,
+              realm: realm,
+            );
             break;
         }
       }

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/navigation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
@@ -25,21 +28,34 @@ class _FeedScreenState extends State<FeedScreen>
   late final PostListController _postController;
   late final TabController _tabController;
 
+  List<StreamSubscription>? _subscriptions;
+
   @override
   void initState() {
     super.initState();
+    final navState = Get.find<NavigationStateProvider>();
     _postController = PostListController();
+    _postController.realm = navState.focusedRealm.value?.alias;
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (_postController.mode.value == _tabController.index) return;
       _postController.mode.value = _tabController.index;
       _postController.reloadAllOver();
     });
+    _subscriptions = [
+      Get.find<NavigationStateProvider>().focusedRealm.listen((value) {
+        if (value?.alias != _postController.realm) {
+          _postController.realm = value?.alias;
+          _postController.reloadAllOver();
+        }
+      }),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
+    final NavigationStateProvider navState = Get.find();
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -96,37 +112,51 @@ class _FeedScreenState extends State<FeedScreen>
               );
             }
 
-            return TabBarView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _tabController,
+            return Column(
               children: [
-                RefreshIndicator(
-                  onRefresh: () => _postController.reloadAllOver(),
-                  child: CustomScrollView(slivers: [
-                    PostWarpedListWidget(
-                      controller: _postController.pagingController,
-                      onUpdate: () => _postController.reloadAllOver(),
+                if (navState.focusedRealm.value != null)
+                  MaterialBanner(
+                    leading: const Icon(Icons.layers),
+                    content: Text(
+                      'Browsing in realm #${navState.focusedRealm.value!.alias}',
                     ),
-                  ]),
+                    actions: const [SizedBox.shrink()],
+                  ),
+                Expanded(
+                  child: TabBarView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: _tabController,
+                    children: [
+                      RefreshIndicator(
+                        onRefresh: () => _postController.reloadAllOver(),
+                        child: CustomScrollView(slivers: [
+                          PostWarpedListWidget(
+                            controller: _postController.pagingController,
+                            onUpdate: () => _postController.reloadAllOver(),
+                          ),
+                        ]),
+                      ),
+                      Obx(() {
+                        if (auth.isAuthorized.value) {
+                          return RefreshIndicator(
+                            onRefresh: () => _postController.reloadAllOver(),
+                            child: CustomScrollView(slivers: [
+                              PostWarpedListWidget(
+                                controller: _postController.pagingController,
+                                onUpdate: () => _postController.reloadAllOver(),
+                              ),
+                            ]),
+                          );
+                        } else {
+                          return SigninRequiredOverlay(
+                            onSignedIn: () => _postController.reloadAllOver(),
+                          );
+                        }
+                      }),
+                      PostShuffleSwiper(controller: _postController),
+                    ],
+                  ),
                 ),
-                Obx(() {
-                  if (auth.isAuthorized.value) {
-                    return RefreshIndicator(
-                      onRefresh: () => _postController.reloadAllOver(),
-                      child: CustomScrollView(slivers: [
-                        PostWarpedListWidget(
-                          controller: _postController.pagingController,
-                          onUpdate: () => _postController.reloadAllOver(),
-                        ),
-                      ]),
-                    );
-                  } else {
-                    return SigninRequiredOverlay(
-                      onSignedIn: () => _postController.reloadAllOver(),
-                    );
-                  }
-                }),
-                PostShuffleSwiper(controller: _postController),
               ],
             );
           }),
@@ -138,6 +168,11 @@ class _FeedScreenState extends State<FeedScreen>
   @override
   void dispose() {
     _postController.dispose();
+    if (_subscriptions != null) {
+      for (final subscription in _subscriptions!) {
+        subscription.cancel();
+      }
+    }
     super.dispose();
   }
 }
