@@ -269,6 +269,7 @@
   "messageCallStartDesc": "@user 发起了一次通话",
   "messageCallEndDesc": "通话持续了 @duration",
   "messageTypeUnsupported": "不支持的消息类型 @type",
+  "messageInputPlaceholder": "发消息于 @channel",
   "messageActionList": "消息的操作",
   "messageDeletionConfirm": "确认删除消息",
   "messageDeletionConfirmCaption": "你确定要删除消息 @id 吗？该操作不可撤销。",
