@@ -162,7 +162,13 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         ),
         contentPadding: padding,
         title: Text(item.name),
-        subtitle: !widget.isDense ? Text(item.description) : null,
+        subtitle: !widget.isDense
+            ? Text(
+                item.description,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              )
+            : null,
         onTap: () => _gotoChannel(item),
       );
     }

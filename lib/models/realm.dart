@@ -12,9 +12,12 @@ class Realm {
   String alias;
   String name;
   String description;
+  String? avatar;
+  String? banner;
   bool isPublic;
   bool isCommunity;
   int? accountId;
+  int? externalId;
 
   Realm({
     required this.id,
@@ -24,9 +27,12 @@ class Realm {
     required this.alias,
     required this.name,
     required this.description,
+    required this.avatar,
+    required this.banner,
     required this.isPublic,
     required this.isCommunity,
     this.accountId,
+    this.externalId,
   });
 
   factory Realm.fromJson(Map<String, dynamic> json) => _$RealmFromJson(json);

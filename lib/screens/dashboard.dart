@@ -315,7 +315,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Card(
                     child: ListTile(
                       contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 24),
+                          const EdgeInsets.only(left: 24, right: 32),
                       trailing: const Icon(Icons.inbox_outlined),
                       title: Text('notifyEmpty'.tr),
                       subtitle: Text('notifyEmptyCaption'.tr),
@@ -368,18 +368,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       return SizedBox(
                         width: min(480, width),
                         child: Card(
-                          child: SingleChildScrollView(
-                            child: PostListEntryWidget(
-                              item: item,
-                              isClickable: true,
-                              isShowEmbed: true,
-                              isNestedClickable: true,
-                              onUpdate: (_) {
-                                _pullPosts();
-                              },
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerLow,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(8),
+                            ),
+                            child: SingleChildScrollView(
+                              child: PostListEntryWidget(
+                                item: item,
+                                isClickable: true,
+                                isShowEmbed: true,
+                                isNestedClickable: true,
+                                onUpdate: (_) {
+                                  _pullPosts();
+                                },
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerLow,
+                              ),
                             ),
                           ),
                         ).paddingSymmetric(horizontal: 8),

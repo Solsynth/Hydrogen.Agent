@@ -16,9 +16,12 @@ Realm _$RealmFromJson(Map<String, dynamic> json) => Realm(
       alias: json['alias'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
+      avatar: json['avatar'] as String?,
+      banner: json['banner'] as String?,
       isPublic: json['is_public'] as bool,
       isCommunity: json['is_community'] as bool,
       accountId: (json['account_id'] as num?)?.toInt(),
+      externalId: (json['external_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$RealmToJson(Realm instance) => <String, dynamic>{
@@ -29,9 +32,12 @@ Map<String, dynamic> _$RealmToJson(Realm instance) => <String, dynamic>{
       'alias': instance.alias,
       'name': instance.name,
       'description': instance.description,
+      'avatar': instance.avatar,
+      'banner': instance.banner,
       'is_public': instance.isPublic,
       'is_community': instance.isCommunity,
       'account_id': instance.accountId,
+      'external_id': instance.externalId,
     };
 
 RealmMember _$RealmMemberFromJson(Map<String, dynamic> json) => RealmMember(

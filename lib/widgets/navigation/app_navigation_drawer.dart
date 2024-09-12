@@ -239,45 +239,38 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
           children: [
             _buildUserInfo().paddingSymmetric(vertical: 8),
             const Divider(thickness: 0.3, height: 1),
-            Column(
-              children: AppNavigation.destinations
-                  .map(
-                    (e) => _isCollapsed
-                        ? Tooltip(
-                            message: e.label,
-                            child: InkWell(
-                              child: Icon(e.icon, size: 20).paddingSymmetric(
-                                horizontal: 28,
-                                vertical: 16,
-                              ),
-                              onTap: () {
-                                AppRouter.instance.goNamed(e.page);
-                                _closeDrawer();
-                              },
-                            ),
-                          )
-                        : ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
-                            leading: Icon(e.icon, size: 20).paddingAll(2),
-                            title: !_isCollapsed ? Text(e.label) : null,
-                            enabled: true,
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                runSpacing: 8,
+                spacing: 8,
+                alignment: WrapAlignment.spaceAround,
+                children: AppNavigation.destinations
+                    .map(
+                      (e) => Card(
+                        elevation: 0,
+                        margin: EdgeInsets.zero,
+                        child: Tooltip(
+                          message: e.label,
+                          child: InkWell(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            child: Icon(e.icon, size: 20).paddingAll(20),
                             onTap: () {
                               AppRouter.instance.goNamed(e.page);
                               _closeDrawer();
                             },
                           ),
-                  )
-                  .toList(),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ).paddingSymmetric(vertical: 8, horizontal: 12),
             ),
             const Divider(thickness: 0.3, height: 1),
             Expanded(
               child: AppNavigationRegion(
                 isCollapsed: _isCollapsed,
-                onSelected: (item) {
-                  _closeDrawer();
-                },
               ),
             ),
             const Divider(thickness: 0.3, height: 1),
