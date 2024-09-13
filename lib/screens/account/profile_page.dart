@@ -152,7 +152,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
               SliverAppBar(
                 centerTitle: false,
                 floating: true,
-                toolbarHeight: SolianTheme.toolbarHeight(context),
+                toolbarHeight: AppTheme.toolbarHeight(context),
                 leadingWidth: 24,
                 automaticallyImplyLeading: false,
                 flexibleSpace: Row(
@@ -207,7 +207,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         onPressed: null,
                       ),
                     SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                      width: AppTheme.isLargeScreen(context) ? 8 : 16,
                     ),
                   ],
                 ),

@@ -62,7 +62,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
           leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('realm'.tr),
           centerTitle: true,
-          toolbarHeight: SolianTheme.toolbarHeight(context),
+          toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             const BackgroundStateWidget(),
             const NotificationButton(),
@@ -77,7 +77,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
               },
             ),
             SizedBox(
-              width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+              width: AppTheme.isLargeScreen(context) ? 8 : 16,
             ),
           ],
         ),

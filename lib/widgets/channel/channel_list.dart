@@ -11,6 +11,7 @@ class ChannelListWidget extends StatefulWidget {
   final List<Channel> channels;
   final int selfId;
   final bool isDense;
+  final bool isCollapsed;
   final bool noCategory;
   final bool useReplace;
   final Function(Channel)? onSelected;
@@ -20,6 +21,7 @@ class ChannelListWidget extends StatefulWidget {
     required this.channels,
     required this.selfId,
     this.isDense = false,
+    this.isCollapsed = false,
     this.noCategory = false,
     this.useReplace = false,
     this.onSelected,
@@ -130,13 +132,25 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
       final otherside =
           item.members!.where((e) => e.account.id != widget.selfId).first;
 
+      final avatar = AccountAvatar(
+        content: otherside.account.avatar,
+        radius: widget.isDense ? 12 : 20,
+        bgColor: Theme.of(context).colorScheme.primary,
+        feColor: Theme.of(context).colorScheme.onPrimary,
+      );
+
+      if (widget.isCollapsed) {
+        return Tooltip(
+          message: otherside.account.nick,
+          child: InkWell(
+            child: avatar.paddingSymmetric(vertical: 12),
+            onTap: () => _gotoChannel(item),
+          ),
+        );
+      }
+
       return ListTile(
-        leading: AccountAvatar(
-          content: otherside.account.avatar,
-          radius: widget.isDense ? 12 : 20,
-          bgColor: Theme.of(context).colorScheme.primary,
-          feColor: Theme.of(context).colorScheme.onPrimary,
-        ),
+        leading: avatar,
         contentPadding: padding,
         title: Text(otherside.account.nick),
         subtitle: !widget.isDense
@@ -145,21 +159,33 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         onTap: () => _gotoChannel(item),
       );
     } else {
+      final avatar = CircleAvatar(
+        backgroundColor: item.realmId == null
+            ? Theme.of(context).colorScheme.primary
+            : Colors.transparent,
+        radius: widget.isDense ? 12 : 20,
+        child: FaIcon(
+          FontAwesomeIcons.hashtag,
+          color: item.realmId == null
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.primary,
+          size: widget.isDense ? 12 : 16,
+        ),
+      );
+
+      if (widget.isCollapsed) {
+        return Tooltip(
+          message: item.name,
+          child: InkWell(
+            child: avatar.paddingSymmetric(vertical: 12),
+            onTap: () => _gotoChannel(item),
+          ),
+        );
+      }
+
       return ListTile(
         minTileHeight: widget.isDense ? 48 : null,
-        leading: CircleAvatar(
-          backgroundColor: item.realmId == null
-              ? Theme.of(context).colorScheme.primary
-              : Colors.transparent,
-          radius: widget.isDense ? 12 : 20,
-          child: FaIcon(
-            FontAwesomeIcons.hashtag,
-            color: item.realmId == null
-                ? Theme.of(context).colorScheme.onPrimary
-                : Theme.of(context).colorScheme.primary,
-            size: widget.isDense ? 12 : 16,
-          ),
-        ),
+        leading: avatar,
         contentPadding: padding,
         title: Text(item.name),
         subtitle: !widget.isDense

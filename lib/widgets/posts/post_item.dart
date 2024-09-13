@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/shells/title_shell.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
@@ -302,7 +303,7 @@ class _PostItemState extends State<PostItem> {
         autoload: false,
         isGrid: true,
       ).paddingOnly(left: 36, top: 4, bottom: 4);
-    } else if (attachments.length > 1) {
+    } else if (attachments.length > 1 || AppTheme.isLargeScreen(context)) {
       return AttachmentList(
         parentId: widget.item.id.toString(),
         attachmentsId: attachments,
@@ -497,7 +498,10 @@ class _PostItemState extends State<PostItem> {
             ],
           ).paddingOnly(
             top: 10,
-            bottom: attachments.length == 1 ? 10 : 0,
+            bottom:
+                (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+                    ? 10
+                    : 0,
             right: 16,
             left: 16,
           ),
@@ -514,8 +518,13 @@ class _PostItemState extends State<PostItem> {
                 });
               },
             ).paddingOnly(
-              top: attachments.length == 1 ? 10 : 6,
-              left: attachments.length == 1 ? 24 : 60,
+              top: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+                  ? 10
+                  : 6,
+              left:
+                  (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+                      ? 24
+                      : 60,
               right: 16,
               bottom: 10,
             )

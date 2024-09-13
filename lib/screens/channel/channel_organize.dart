@@ -110,7 +110,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
         appBar: AppBar(
           title: AppBarTitle('channelOrganizing'.tr),
           centerTitle: false,
-          toolbarHeight: SolianTheme.toolbarHeight(context),
+          toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyChannel(),

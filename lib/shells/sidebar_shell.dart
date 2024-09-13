@@ -29,9 +29,9 @@ class SidebarShell extends StatelessWidget {
         flex: 2,
         child: child,
       ),
-      if (SolianTheme.isExtraLargeScreen(context))
+      if (AppTheme.isExtraLargeScreen(context))
         const VerticalDivider(thickness: 0.3, width: 1),
-      if (SolianTheme.isExtraLargeScreen(context))
+      if (AppTheme.isExtraLargeScreen(context))
         Flexible(
           flex: 1,
           child: sidebar ?? const SidebarPlaceholder(),
@@ -47,10 +47,10 @@ class SidebarShell extends StatelessWidget {
               leading: AppBarLeadingButton.adaptive(context),
               title: AppBarTitle(state.topRoute?.name?.tr ?? 'page'.tr),
               centerTitle: false,
-              toolbarHeight: SolianTheme.toolbarHeight(context),
+              toolbarHeight: AppTheme.toolbarHeight(context),
             )
           : null,
-      body: SolianTheme.isLargeScreen(context)
+      body: AppTheme.isLargeScreen(context)
           ? Row(
               children: sidebarFirst
                   ? buildContent(context).reversed.toList()

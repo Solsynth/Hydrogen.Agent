@@ -133,7 +133,7 @@ class _FriendScreenState extends State<FriendScreen>
                 ).paddingAll(14),
               ),
             SizedBox(
-              width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+              width: AppTheme.isLargeScreen(context) ? 8 : 16,
             ),
           ],
           bottom: TabBar(

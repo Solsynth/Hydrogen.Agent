@@ -217,8 +217,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
         leading: AppBarLeadingButton.adaptive(context),
         title: AppBarTitle(title),
         centerTitle: false,
-        titleSpacing: SolianTheme.titleSpacing(context),
-        toolbarHeight: SolianTheme.toolbarHeight(context),
+        titleSpacing: AppTheme.titleSpacing(context),
+        toolbarHeight: AppTheme.toolbarHeight(context),
         actions: [
           const BackgroundStateWidget(),
           Builder(builder: (context) {
@@ -255,7 +255,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
             },
           ),
           SizedBox(
-            width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+            width: AppTheme.isLargeScreen(context) ? 8 : 16,
           ),
         ],
       ),
@@ -276,7 +276,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                       channel: _channel!,
                       ongoingCall: _ongoingCall!,
                       onJoin: () {
-                        if (!SolianTheme.isLargeScreen(context)) {
+                        if (!AppTheme.isLargeScreen(context)) {
                           final ChatCallProvider call = Get.find();
                           call.gotoScreen(context);
                         }
@@ -337,7 +337,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
             ),
             Obx(() {
               final ChatCallProvider call = Get.find();
-              if (call.isMounted.value && SolianTheme.isLargeScreen(context)) {
+              if (call.isMounted.value && AppTheme.isLargeScreen(context)) {
                 return const Expanded(
                   child: Row(children: [
                     VerticalDivider(width: 0.3, thickness: 0.3),

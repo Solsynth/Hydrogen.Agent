@@ -114,7 +114,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
                       },
                     ),
                     SizedBox(
-                      width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                      width: AppTheme.isLargeScreen(context) ? 8 : 16,
                     ),
                   ],
                   bottom: const TabBar(

@@ -8,7 +8,7 @@ class AppBarTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (SolianTheme.isSpecializedMacOS(context)) {
+    if (AppTheme.isSpecializedMacOS(context)) {
       return Text(title);
     } else {
       return Text(title);

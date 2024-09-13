@@ -61,10 +61,10 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
           leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('draftBox'.tr),
           centerTitle: false,
-          toolbarHeight: SolianTheme.toolbarHeight(context),
+          toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             SizedBox(
-              width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+              width: AppTheme.isLargeScreen(context) ? 8 : 16,
             ),
           ],
         ),

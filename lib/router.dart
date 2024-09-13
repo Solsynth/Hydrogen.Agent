@@ -154,6 +154,7 @@ abstract class AppRouter {
         name: 'channelChat',
         builder: (context, state) {
           return ChannelChatScreen(
+            key: UniqueKey(),
             alias: state.pathParameters['alias']!,
             realm: state.uri.queryParameters['realm'] ?? 'global',
           );

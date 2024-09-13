@@ -11,6 +11,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/navigation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
@@ -124,7 +125,12 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
   void initState() {
     super.initState();
     if (widget.edit == null && widget.reply == null && widget.repost == null) {
-      _editorController.localRead();
+      _editorController.localRead().then((res) {
+        if (!res) {
+          final navState = Get.find<NavigationStateProvider>();
+          _editorController.realmZone.value = navState.focusedRealm.value;
+        }
+      });
     }
     if (widget.reply != null) {
       _editorController.replyTo.value = widget.reply;
@@ -158,7 +164,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
             ),
           ),
           centerTitle: false,
-          toolbarHeight: SolianTheme.toolbarHeight(context),
+          toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => _applyPost(),
@@ -177,23 +183,19 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           children: [
             ListTile(
               tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-              title: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    Text(
-                      _editorController.title ?? 'title'.tr,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              title: Row(
+                children: [
+                  Text(
+                    _editorController.title ?? 'title'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Gap(6),
+                  if (_editorController.aliasController.text.isNotEmpty)
+                    Badge(
+                      label: Text('#${_editorController.aliasController.text}'),
                     ),
-                    const Gap(6),
-                    if (_editorController.aliasController.text.isNotEmpty)
-                      Badge(
-                        label:
-                            Text('#${_editorController.aliasController.text}'),
-                      ),
-                  ],
-                ),
+                ],
               ),
               subtitle: Text(
                 _editorController.description ?? 'description'.tr,
@@ -365,12 +367,12 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                       ],
                     ),
                   ),
-                  if (SolianTheme.isLargeScreen(context))
+                  if (AppTheme.isLargeScreen(context))
                     const VerticalDivider(width: 0.3, thickness: 0.3)
                         .paddingSymmetric(
                       horizontal: 16,
                     ),
-                  if (SolianTheme.isLargeScreen(context))
+                  if (AppTheme.isLargeScreen(context))
                     Expanded(
                       child: SingleChildScrollView(
                         child: MarkdownTextContent(

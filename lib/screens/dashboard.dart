@@ -504,7 +504,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           /// Footer
           Column(
-            mainAxisAlignment: SolianTheme.isLargeScreen(context)
+            mainAxisAlignment: AppTheme.isLargeScreen(context)
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: [

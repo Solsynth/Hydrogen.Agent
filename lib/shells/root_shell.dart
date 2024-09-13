@@ -41,10 +41,10 @@ class RootShell extends StatelessWidget {
 
     return Scaffold(
       key: rootScaffoldKey,
-      drawer: SolianTheme.isLargeScreen(context)
+      drawer: AppTheme.isLargeScreen(context)
           ? null
           : AppNavigationDrawer(routeName: routeName),
-      body: SolianTheme.isLargeScreen(context)
+      body: AppTheme.isLargeScreen(context)
           ? Row(
               children: [
                 if (showNavigation) AppNavigationDrawer(routeName: routeName),

@@ -25,7 +25,7 @@ class CenteredShell extends StatelessWidget {
               leading: AppBarLeadingButton.adaptive(context),
               title: AppBarTitle(state.topRoute?.name?.tr ?? 'page'.tr),
               centerTitle: false,
-              toolbarHeight: SolianTheme.toolbarHeight(context),
+              toolbarHeight: AppTheme.toolbarHeight(context),
             )
           : null,
       body: Center(

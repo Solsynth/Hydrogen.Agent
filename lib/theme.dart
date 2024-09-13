@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:solian/platform.dart';
 
-abstract class SolianTheme {
+abstract class AppTheme {
   static bool isLargeScreen(BuildContext context) =>
       MediaQuery.of(context).size.width > 640;
 
@@ -9,13 +9,13 @@ abstract class SolianTheme {
       MediaQuery.of(context).size.width > 720;
 
   static bool isSpecializedMacOS(BuildContext context) =>
-      PlatformInfo.isMacOS && !SolianTheme.isLargeScreen(context);
+      PlatformInfo.isMacOS && !AppTheme.isLargeScreen(context);
 
   static double? titleSpacing(BuildContext context) {
-    if (SolianTheme.isSpecializedMacOS(context)) {
+    if (AppTheme.isSpecializedMacOS(context)) {
       return 24;
     } else {
-      return SolianTheme.isLargeScreen(context) ? null : 24;
+      return AppTheme.isLargeScreen(context) ? null : 24;
     }
   }
 

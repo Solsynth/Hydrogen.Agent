@@ -32,11 +32,11 @@ class TitleShell extends StatelessWidget {
                 title ?? (state!.topRoute?.name?.tr ?? 'page'.tr),
               ),
               centerTitle: isCenteredTitle,
-              toolbarHeight: SolianTheme.toolbarHeight(context),
+              toolbarHeight: AppTheme.toolbarHeight(context),
               actions: [
                 const BackgroundStateWidget(),
                 SizedBox(
-                  width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                  width: AppTheme.isLargeScreen(context) ? 8 : 16,
                 ),
               ],
             )

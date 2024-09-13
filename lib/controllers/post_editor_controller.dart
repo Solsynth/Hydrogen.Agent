@@ -155,13 +155,14 @@ class PostEditorController extends GetxController {
     );
   }
 
-  void localRead() {
-    SharedPreferences.getInstance().then((inst) {
-      if (inst.containsKey('post_editor_local_save')) {
-        isRestoreFromLocal.value = true;
-        payload = jsonDecode(inst.getString('post_editor_local_save')!);
-      }
-    });
+  Future<bool> localRead() async {
+    final inst = await SharedPreferences.getInstance();
+    if (inst.containsKey('post_editor_local_save')) {
+      isRestoreFromLocal.value = true;
+      payload = jsonDecode(inst.getString('post_editor_local_save')!);
+      return true;
+    }
+    return false;
   }
 
   void localClear() {

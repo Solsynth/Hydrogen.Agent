@@ -391,5 +391,6 @@
   "userLevel10": "Grandmaster",
   "userLevel11": "Legend",
   "userLevel12": "Mythic",
-  "userLevel13": "Immortal"
+  "userLevel13": "Immortal",
+  "postBrowsingIn": "Browsing in @region"
 }

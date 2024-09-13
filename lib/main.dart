@@ -80,8 +80,8 @@ Future<void> _initializePlatformComponents() async {
 }
 
 final themeSwitcher = ThemeSwitcher(
-  lightThemeData: SolianTheme.build(Brightness.light),
-  darkThemeData: SolianTheme.build(Brightness.dark),
+  lightThemeData: AppTheme.build(Brightness.light),
+  darkThemeData: AppTheme.build(Brightness.dark),
 );
 
 class SolianApp extends StatelessWidget {

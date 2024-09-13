@@ -33,11 +33,11 @@ class _SettingScreenState extends State<SettingScreen> {
       tooltip: label,
       onPressed: () {
         context.read<ThemeSwitcher>().setTheme(
-              SolianTheme.build(
+              AppTheme.build(
                 Brightness.light,
                 seedColor: color,
               ),
-              SolianTheme.build(
+              AppTheme.build(
                 Brightness.dark,
                 seedColor: color,
               ),

@@ -98,12 +98,12 @@ class ChannelCallIndicator extends StatelessWidget {
               child: Text('callJoin'.tr),
             );
           } else if (call.channel.value?.id == channel.id &&
-              !SolianTheme.isLargeScreen(context)) {
+              !AppTheme.isLargeScreen(context)) {
             return TextButton(
               onPressed: () => onJoin(),
               child: Text('callResume'.tr),
             );
-          } else if (!SolianTheme.isLargeScreen(context)) {
+          } else if (!AppTheme.isLargeScreen(context)) {
             return TextButton(
               onPressed: null,
               child: Text('callJoin'.tr),

@@ -20,62 +20,42 @@ class AppNavigationRegion extends StatefulWidget {
   State<AppNavigationRegion> createState() => _AppNavigationRegionState();
 }
 
-class _AppNavigationRegionState extends State<AppNavigationRegion>
-    with SingleTickerProviderStateMixin {
+class _AppNavigationRegionState extends State<AppNavigationRegion> {
   bool _isTryingExit = false;
 
-  late final AnimationController _animationController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 250),
-  );
-  late final Animation<Offset> _animationTween = Tween<Offset>(
-    begin: Offset.zero,
-    end: const Offset(1.0, 0.0),
-  ).animate(CurvedAnimation(
-    parent: _animationController,
-    curve: Curves.fastOutSlowIn,
-  ));
-
   void _focusRealm(Realm item) {
-    _animationController.animateTo(1).then((_) {
-      setState(
-        () => Get.find<NavigationStateProvider>().focusedRealm.value = item,
-      );
-      _animationController.animateTo(0);
-    });
+    setState(
+      () => Get.find<NavigationStateProvider>().focusedRealm.value = item,
+    );
   }
 
   void _unFocusRealm() {
-    _animationController.animateTo(1).then((_) {
-      setState(
-        () => Get.find<NavigationStateProvider>().focusedRealm.value = null,
-      );
-      _animationController.animateTo(0);
-    });
+    setState(
+      () => Get.find<NavigationStateProvider>().focusedRealm.value = null,
+    );
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
   }
 
   Widget _buildRealmFocusAvatar() {
     final focusedRealm = Get.find<NavigationStateProvider>().focusedRealm.value;
-    return MouseRegion(
-      child: AnimatedSwitcher(
-        switchInCurve: Curves.fastOutSlowIn,
-        switchOutCurve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, animation) {
-          return ScaleTransition(
-            scale: animation,
-            child: child,
-          );
-        },
-        child: _isTryingExit
-            ? GestureDetector(
-                child: CircleAvatar(
+    return GestureDetector(
+      child: MouseRegion(
+        child: AnimatedSwitcher(
+          switchInCurve: Curves.fastOutSlowIn,
+          switchOutCurve: Curves.fastOutSlowIn,
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: child,
+            );
+          },
+          child: _isTryingExit
+              ? CircleAvatar(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   child: const Icon(
                     Icons.arrow_back,
@@ -84,13 +64,13 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
                   ),
                 ).paddingSymmetric(
                   vertical: 8,
-                ),
-                onTap: () => _unFocusRealm(),
-              )
-            : _buildEntryAvatar(focusedRealm!),
+                )
+              : _buildEntryAvatar(focusedRealm!),
+        ),
+        onEnter: (_) => setState(() => _isTryingExit = true),
+        onExit: (_) => setState(() => _isTryingExit = false),
       ),
-      onEnter: (_) => setState(() => _isTryingExit = true),
-      onExit: (_) => setState(() => _isTryingExit = false),
+      onTap: () => _unFocusRealm(),
     );
   }
 
@@ -113,11 +93,11 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
   }
 
   Widget _buildEntry(BuildContext context, Realm item) {
-    const padding = EdgeInsets.symmetric(horizontal: 20);
+    const padding = EdgeInsets.symmetric(horizontal: 20, vertical: 8);
 
     if (widget.isCollapsed) {
       return InkWell(
-        child: _buildEntryAvatar(item),
+        child: _buildEntryAvatar(item).paddingSymmetric(vertical: 8),
         onTap: () => _focusRealm(item),
       );
     }
@@ -144,19 +124,27 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
     final NavigationStateProvider navState = Get.find();
 
     return Obx(
-      () => AnimatedBuilder(
-        animation: _animationController,
-        builder: (context, child) {
+      () => AnimatedSwitcher(
+        switchInCurve: Curves.fastOutSlowIn,
+        switchOutCurve: Curves.fastOutSlowIn,
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (child, animation) {
           return SlideTransition(
-            position: _animationTween,
-            child: child,
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(animation),
+            child: Material(
+              color: Theme.of(context).colorScheme.surface,
+              child: child,
+            ),
           );
         },
         child: navState.focusedRealm.value == null
             ? widget.isCollapsed
                 ? CustomScrollView(
                     slivers: [
-                      const SliverPadding(padding: EdgeInsets.only(top: 8)),
+                      const SliverPadding(padding: EdgeInsets.only(top: 16)),
                       SliverList.builder(
                         itemCount: realms.availableRealms.length,
                         itemBuilder: (context, index) {
@@ -171,7 +159,6 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
                   )
                 : CustomScrollView(
                     slivers: [
-                      const SliverPadding(padding: EdgeInsets.only(top: 8)),
                       SliverList.builder(
                         itemCount: realms.availableRealms.length,
                         itemBuilder: (context, index) {
@@ -179,7 +166,6 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
                           return _buildEntry(context, element);
                         },
                       ),
-                      const SliverPadding(padding: EdgeInsets.only(bottom: 8)),
                     ],
                   )
             : Column(
@@ -187,8 +173,9 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
                   if (widget.isCollapsed)
                     Tooltip(
                       message: navState.focusedRealm.value!.name,
-                      child: _buildRealmFocusAvatar().paddingSymmetric(
-                        vertical: 8,
+                      child: _buildRealmFocusAvatar().paddingOnly(
+                        top: 24,
+                        bottom: 8,
                       ),
                     )
                   else
@@ -209,13 +196,12 @@ class _AppNavigationRegionState extends State<AppNavigationRegion>
                   Expanded(
                     child: Obx(
                       () => ChannelListWidget(
+                        useReplace: true,
                         channels: channels.availableChannels
-                            .where(
-                              (x) =>
-                                  x.realm?.id ==
-                                  navState.focusedRealm.value?.id,
-                            )
+                            .where((x) =>
+                                x.realm?.id == navState.focusedRealm.value?.id)
                             .toList(),
+                        isCollapsed: widget.isCollapsed,
                         selfId: auth.userProfile.value!['id'],
                         noCategory: true,
                       ),

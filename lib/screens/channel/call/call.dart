@@ -205,7 +205,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             : AppBar(
                 leading: AppBarLeadingButton.adaptive(context),
                 centerTitle: true,
-                toolbarHeight: SolianTheme.toolbarHeight(context),
+                toolbarHeight: AppTheme.toolbarHeight(context),
                 title: Obx(
                   () => RichText(
                     textAlign: TextAlign.center,

@@ -192,9 +192,9 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
   }
 
   void _autoResize() {
-    if (SolianTheme.isExtraLargeScreen(context)) {
+    if (AppTheme.isExtraLargeScreen(context)) {
       _expandDrawer();
-    } else if (SolianTheme.isLargeScreen(context)) {
+    } else if (AppTheme.isLargeScreen(context)) {
       _collapseDrawer();
     } else {
       _drawerAnimationController.value = 1;
@@ -229,7 +229,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
         return Drawer(
           width: _drawerAnimation.value,
           backgroundColor:
-              SolianTheme.isLargeScreen(context) ? Colors.transparent : null,
+              AppTheme.isLargeScreen(context) ? Colors.transparent : null,
           child: child,
         );
       },
@@ -247,20 +247,20 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
                 alignment: WrapAlignment.spaceAround,
                 children: AppNavigation.destinations
                     .map(
-                      (e) => Card(
-                        elevation: 0,
-                        margin: EdgeInsets.zero,
-                        child: Tooltip(
-                          message: e.label,
-                          child: InkWell(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                            child: Icon(e.icon, size: 20).paddingAll(20),
-                            onTap: () {
-                              AppRouter.instance.goNamed(e.page);
-                              _closeDrawer();
-                            },
-                          ),
+                      (e) => Tooltip(
+                        message: e.label,
+                        child: InkWell(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
+                          child: Icon(
+                            e.icon,
+                            size: 22,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ).paddingAll(16),
+                          onTap: () {
+                            AppRouter.instance.goNamed(e.page);
+                            _closeDrawer();
+                          },
                         ),
                       ),
                     )

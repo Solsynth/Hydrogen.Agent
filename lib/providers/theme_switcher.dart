@@ -16,8 +16,8 @@ class ThemeSwitcher extends ChangeNotifier {
     if (prefs.containsKey('global_theme_color')) {
       final value = prefs.getInt('global_theme_color')!;
       final color = Color(value);
-      lightThemeData = SolianTheme.build(Brightness.light, seedColor: color);
-      darkThemeData = SolianTheme.build(Brightness.dark, seedColor: color);
+      lightThemeData = AppTheme.build(Brightness.light, seedColor: color);
+      darkThemeData = AppTheme.build(Brightness.dark, seedColor: color);
       notifyListeners();
     }
   }

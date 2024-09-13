@@ -85,13 +85,13 @@ class _FeedScreenState extends State<FeedScreen>
                 title: AppBarTitle('feed'.tr),
                 centerTitle: false,
                 floating: true,
-                toolbarHeight: SolianTheme.toolbarHeight(context),
+                toolbarHeight: AppTheme.toolbarHeight(context),
                 leading: AppBarLeadingButton.adaptive(context),
                 actions: [
                   const BackgroundStateWidget(),
                   const NotificationButton(),
                   SizedBox(
-                    width: SolianTheme.isLargeScreen(context) ? 8 : 16,
+                    width: AppTheme.isLargeScreen(context) ? 8 : 16,
                   ),
                 ],
                 bottom: TabBar(
@@ -118,7 +118,9 @@ class _FeedScreenState extends State<FeedScreen>
                   MaterialBanner(
                     leading: const Icon(Icons.layers),
                     content: Text(
-                      'Browsing in realm #${navState.focusedRealm.value!.alias}',
+                      'postBrowsingIn'.trParams({
+                        'region': '#${navState.focusedRealm.value!.alias}',
+                      }),
                     ),
                     actions: const [SizedBox.shrink()],
                   ),

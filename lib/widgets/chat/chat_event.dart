@@ -75,9 +75,6 @@ class ChatEvent extends StatelessWidget {
       key: Key('m${item.uuid}attachments-box'),
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.only(top: isMerged ? 0 : 4, bottom: 4),
-      constraints: const BoxConstraints(
-        maxHeight: 720,
-      ),
       child: AttachmentList(
         key: Key('m${item.uuid}attachments'),
         parentId: item.uuid,
@@ -301,7 +298,10 @@ class ChatEvent extends StatelessWidget {
             ],
           ).paddingSymmetric(horizontal: 12),
           _buildLinkExpansion().paddingOnly(left: 52, right: 8),
-          _buildAttachment(context).paddingOnly(left: 56, right: 8),
+          _buildAttachment(
+            context,
+            isMinimal: ['messages.edit'].contains(item.type),
+          ).paddingOnly(left: 56, right: 8),
         ],
       );
     }

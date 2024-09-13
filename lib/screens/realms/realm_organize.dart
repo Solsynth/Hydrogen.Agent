@@ -102,7 +102,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
           leading: AppBarLeadingButton.adaptive(context),
           title: AppBarTitle('realmOrganizing'.tr),
           centerTitle: false,
-          toolbarHeight: SolianTheme.toolbarHeight(context),
+          toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             TextButton(
               onPressed: _isBusy ? null : () => applyRealm(),
