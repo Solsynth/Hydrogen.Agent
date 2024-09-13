@@ -155,7 +155,8 @@ class MessagesFetchingProvider extends GetxController {
     final database = Get.find<DatabaseProvider>().database;
     final lastOne = await (database.select(database.localMessageEventTable)
           ..where((x) => x.channelId.equals(channel.id))
-          ..orderBy([(t) => OrderingTerm.desc(t.id)]))
+          ..orderBy([(t) => OrderingTerm.desc(t.id)])
+          ..limit(1))
         .getSingleOrNull();
 
     final data = await fetchRemoteEvents(
@@ -169,7 +170,7 @@ class MessagesFetchingProvider extends GetxController {
     );
     if (data != null) {
       await database.batch((batch) {
-        batch.insertAll(
+        batch.insertAllOnConflictUpdate(
           database.localMessageEventTable,
           data.$1.map((x) => LocalMessageEventTableCompanion(
                 id: Value(x.id),
