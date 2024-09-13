@@ -134,7 +134,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     );
     if (resp.statusCode == 200) {
       _syncWidget();
-      context.showSnackbar('accountPersonalizeApplied'.tr);
+      context.showSnackbar('accountProfileApplied'.tr);
     } else {
       context.showErrorDialog(resp.bodyString);
     }
@@ -163,7 +163,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     );
     if (resp.statusCode == 200) {
       _syncWidget();
-      context.showSnackbar('accountPersonalizeApplied'.tr);
+      context.showSnackbar('accountProfileApplied'.tr);
     } else {
       context.showErrorDialog(resp.bodyString);
     }

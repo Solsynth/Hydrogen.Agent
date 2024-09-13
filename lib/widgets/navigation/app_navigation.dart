@@ -20,7 +20,7 @@ abstract class AppNavigation {
     ),
     AppNavigationDestination(
       icon: Icons.forum,
-      label: 'channelTypeDirect'.tr,
+      label: 'chat'.tr,
       page: 'chat',
     ),
   ];

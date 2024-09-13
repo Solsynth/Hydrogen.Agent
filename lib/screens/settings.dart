@@ -82,32 +82,27 @@ class _SettingScreenState extends State<SettingScreen> {
             ).paddingSymmetric(horizontal: 12, vertical: 8),
           ),
           _buildCaptionHeader('more'.tr),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              TextButton(
-                style: const ButtonStyle(
-                  visualDensity: VisualDensity(horizontal: -4, vertical: -4),
-                ),
-                child: Text('about'.tr),
-                onPressed: () {
-                  AppRouter.instance.pushNamed('about');
-                },
-              ),
-              TextButton(
-                style: const ButtonStyle(
-                  visualDensity: VisualDensity(horizontal: -4, vertical: -4),
-                ),
-                child: Text('messageHistoryWipe'.tr),
-                onPressed: () {
-                  final chatHistory = ChatEventController();
-                  chatHistory.initialize().then((_) async {
-                    await chatHistory.database.localEvents.wipeLocalEvents();
-                  });
-                },
-              ),
-            ],
-          ).paddingSymmetric(horizontal: 12, vertical: 8),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            trailing: const Icon(Icons.chevron_right),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            title: Text('about'.tr),
+            onTap: () {
+              AppRouter.instance.pushNamed('about');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_sweep),
+            trailing: const Icon(Icons.chevron_right),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            title: Text('messageHistoryWipe'.tr),
+            onTap: () {
+              final chatHistory = ChatEventController();
+              chatHistory.initialize().then((_) async {
+                await chatHistory.database.localEvents.wipeLocalEvents();
+              });
+            },
+          ),
         ],
       ),
     );

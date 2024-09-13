@@ -269,43 +269,16 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
             ),
             const Divider(thickness: 0.3, height: 1),
             Expanded(
-              child: AppNavigationRegion(
-                isCollapsed: _isCollapsed,
+              child: Material(
+                color: Theme.of(context).colorScheme.surface,
+                child: AppNavigationRegion(
+                  isCollapsed: _isCollapsed,
+                ),
               ),
             ),
             const Divider(thickness: 0.3, height: 1),
             Column(
               children: [
-                if (_isCollapsed)
-                  Tooltip(
-                    message: 'settings'.tr,
-                    child: InkWell(
-                      child: const Icon(
-                        Icons.settings,
-                        size: 20,
-                      ).paddingSymmetric(
-                        horizontal: 28,
-                        vertical: 10,
-                      ),
-                      onTap: () {
-                        AppRouter.instance.pushNamed('settings');
-                        _closeDrawer();
-                      },
-                    ),
-                  )
-                else
-                  ListTile(
-                    minTileHeight: 0,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                    ),
-                    leading: const Icon(Icons.settings, size: 20).paddingAll(2),
-                    title: Text('settings'.tr),
-                    onTap: () {
-                      AppRouter.instance.pushNamed('settings');
-                      _closeDrawer();
-                    },
-                  ),
                 if (_isCollapsed)
                   Tooltip(
                     message: 'expand'.tr,

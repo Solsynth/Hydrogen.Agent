@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/providers/auth.dart';
@@ -23,9 +24,9 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     final actionItems = [
       (
-        const Icon(Icons.color_lens),
-        'accountPersonalize'.tr,
-        'accountPersonalize',
+        const Icon(Icons.face),
+        'accountProfile'.tr,
+        'accountProfile',
       ),
       (
         Obx(() {
@@ -47,9 +48,9 @@ class _AccountScreenState extends State<AccountScreen> {
         'accountFriend',
       ),
       (
-      const Icon(Icons.emoji_symbols),
-      'accountStickers'.tr,
-      'accountStickers',
+        const Icon(Icons.emoji_symbols),
+        'accountStickers'.tr,
+        'accountStickers',
       ),
     ];
 
@@ -64,7 +65,7 @@ class _AccountScreenState extends State<AccountScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ActionCard(
+                  _ActionCard(
                     icon: Icon(
                       Icons.login,
                       color: Theme.of(context).colorScheme.onPrimary,
@@ -85,7 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       });
                     },
                   ),
-                  ActionCard(
+                  _ActionCard(
                     icon: Icon(
                       Icons.add,
                       color: Theme.of(context).colorScheme.onPrimary,
@@ -103,6 +104,19 @@ class _AccountScreenState extends State<AccountScreen> {
                         setState(() {});
                       });
                     },
+                  ),
+                  const Gap(4),
+                  TextButton(
+                    style: const ButtonStyle(
+                      visualDensity: VisualDensity(
+                        horizontal: -4,
+                        vertical: -2,
+                      ),
+                    ),
+                    onPressed: () {
+                      AppRouter.instance.pushNamed('settings');
+                    },
+                    child: Text('settings'.tr),
                   ),
                 ],
               ),
@@ -126,6 +140,18 @@ class _AccountScreenState extends State<AccountScreen> {
                     },
                   ),
                 )),
+                const Divider(thickness: 0.3, height: 1)
+                    .paddingSymmetric(vertical: 4),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  leading: const Icon(Icons.settings),
+                  title: Text('settings'.tr),
+                  onTap: () {
+                    AppRouter.instance.pushNamed('settings');
+                  },
+                ),
+                const Divider(thickness: 0.3, height: 1)
+                    .paddingSymmetric(vertical: 4),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 34),
                   leading: const Icon(Icons.logout),
@@ -186,13 +212,13 @@ class _AccountHeadingState extends State<AccountHeading> {
   }
 }
 
-class ActionCard extends StatelessWidget {
+class _ActionCard extends StatelessWidget {
   final Widget icon;
   final String title;
   final String caption;
   final Function onTap;
 
-  const ActionCard({
+  const _ActionCard({
     super.key,
     required this.onTap,
     required this.title,

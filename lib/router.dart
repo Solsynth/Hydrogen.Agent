@@ -246,7 +246,7 @@ abstract class AppRouter {
       ),
       GoRoute(
         path: '/account/personalize',
-        name: 'accountPersonalize',
+        name: 'accountProfile',
         builder: (context, state) => TitleShell(
           state: state,
           child: const PersonalizeScreen(),
