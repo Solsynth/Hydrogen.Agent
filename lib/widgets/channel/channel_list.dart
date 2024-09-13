@@ -105,7 +105,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     return FutureBuilder(
       future: Future.delayed(
         const Duration(milliseconds: 500),
-        () => _eventController.database.localEvents.findLastByChannel(item.id),
+        () => _eventController.src.getLastInChannel(item),
       ),
       builder: (context, snapshot) {
         if (!snapshot.hasData && snapshot.data == null) {
@@ -114,8 +114,9 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
           ));
         }
 
+        final data = snapshot.data!.data!;
         return Text(
-          '${snapshot.data!.data.sender.account.nick}: ${snapshot.data!.data.body['text'] ?? 'Unsupported message to preview'}',
+          '${data.sender.account.nick}: ${data.body['text'] ?? 'Unsupported message to preview'}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         );

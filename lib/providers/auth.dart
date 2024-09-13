@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
-import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/providers/websocket.dart';
@@ -198,11 +197,6 @@ class AuthProvider extends GetConnect {
     Get.find<WebSocketProvider>().disconnect();
     Get.find<WebSocketProvider>().notifications.clear();
     Get.find<WebSocketProvider>().notificationUnread.value = 0;
-
-    final chatHistory = ChatEventController();
-    chatHistory.initialize().then((_) async {
-      await chatHistory.database.localEvents.wipeLocalEvents();
-    });
 
     storage.deleteAll();
   }

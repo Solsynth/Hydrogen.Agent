@@ -13,6 +13,8 @@ import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
 import 'package:solian/providers/daily_sign.dart';
+import 'package:solian/providers/database/database.dart';
+import 'package:solian/providers/database/services/messages.dart';
 import 'package:solian/providers/last_read.dart';
 import 'package:solian/providers/link_expander.dart';
 import 'package:solian/providers/navigation.dart';
@@ -43,6 +45,7 @@ void main() async {
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
 
+  Get.put(DatabaseProvider());
   Get.put(AppTranslations());
   await AppTranslations.init();
 
@@ -135,6 +138,7 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => StatusProvider());
     Get.lazyPut(() => ChannelProvider());
     Get.lazyPut(() => RealmProvider());
+    Get.lazyPut(() => MessagesFetchingProvider());
     Get.lazyPut(() => ChatCallProvider());
     Get.lazyPut(() => AttachmentUploaderController());
     Get.lazyPut(() => LinkExpandProvider());

@@ -62,7 +62,7 @@ class ChatEventList extends StatelessWidget {
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 child: ChatEvent(
-                  key: Key('m${item.uuid}'),
+                  key: Key('m${item!.uuid}'),
                   item: item,
                   isMerged: isMerged,
                   chatController: chatController,

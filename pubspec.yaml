@@ -40,8 +40,6 @@ dependencies:
   package_info_plus: ^8.0.0
   device_info_plus: ^10.1.0
   flutter_acrylic: ^1.1.4
-  floor: ^1.5.0
-  sqflite: ^2.3.3+1
   protocol_handler: ^0.2.0
   markdown: ^7.2.2
   pasteboard: ^0.3.0
@@ -77,6 +75,9 @@ dependencies:
   media_kit: ^1.1.11
   media_kit_video: ^1.2.5
   media_kit_libs_video: ^1.0.5
+  drift: ^2.20.2
+  drift_flutter: ^0.2.0
+  very_good_infinite_list: ^0.8.0
 
 dev_dependencies:
   flutter_test:
@@ -85,13 +86,10 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.13.1
 
-  floor_generator: ^1.4.0
   build_runner: ^2.4.12
-  sqflite_common_ffi: ^2.3.3
-  sqflite_common_ffi_web: ^0.4.3+1
   flutter_native_splash: ^2.4.1
-  freezed: ^2.5.7
   json_serializable: ^6.8.0
+  drift_dev: ^2.20.3
 
 flutter:
   uses-material-design: true
