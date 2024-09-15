@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:protocol_handler/protocol_handler.dart';
+import 'package:solian/background.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
@@ -22,7 +23,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void requestResetPassword() async {
+  void _requestResetPassword() async {
     final username = _usernameController.value.text;
     if (username.isEmpty) {
       context.showErrorDialog('signinResetPasswordHint'.tr);
@@ -52,7 +53,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
     context.showModalDialog('done'.tr, 'signinResetPasswordSent'.tr);
   }
 
-  void performAction() async {
+  void _performAction() async {
     final AuthProvider auth = Get.find();
 
     final username = _usernameController.value.text;
@@ -100,6 +101,8 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
     }
 
     Get.find<WebSocketProvider>().registerPushNotifications();
+    autoConfigureBackgroundNotificationService();
+    autoStartBackgroundNotificationService();
 
     Navigator.pop(context, true);
   }
@@ -121,7 +124,7 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
     final uri = url.replaceFirst('solink://', '');
     if (uri == 'auth?status=done') {
       closeInAppWebView();
-      performAction();
+      _performAction();
     }
   }
 
@@ -175,19 +178,19 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
                 ),
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
-                onSubmitted: (_) => performAction(),
+                onSubmitted: (_) => _performAction(),
               ),
               const Gap(12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: _isBusy ? null : () => requestResetPassword(),
+                    onPressed: _isBusy ? null : () => _requestResetPassword(),
                     style: TextButton.styleFrom(foregroundColor: Colors.grey),
                     child: Text('forgotPassword'.tr),
                   ),
                   TextButton(
-                    onPressed: _isBusy ? null : () => performAction(),
+                    onPressed: _isBusy ? null : () => _performAction(),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

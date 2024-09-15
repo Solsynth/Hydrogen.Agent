@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:solian/background.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/providers/database/database.dart';
@@ -200,6 +201,7 @@ class AuthProvider extends GetConnect {
     Get.find<WebSocketProvider>().notificationUnread.value = 0;
 
     AppDatabase.removeDatabase();
+    autoStopBackgroundNotificationService();
 
     storage.deleteAll();
   }
