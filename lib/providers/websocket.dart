@@ -118,6 +118,10 @@ class WebSocketProvider extends GetxController {
         final packet = NetworkPackage.fromJson(jsonDecode(event));
         log('Websocket incoming message: ${packet.method} ${packet.message}');
         stream.sink.add(packet);
+        if (packet.method == 'notifications.new') {
+          notifications.add(Notification.fromJson(packet.payload!));
+          notificationUnread.value++;
+        }
       },
       onDone: () {
         isConnected.value = false;

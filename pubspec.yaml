@@ -2,7 +2,7 @@ name: solian
 description: "The Solar Network App"
 publish_to: "none"
 
-version: 1.2.1+36
+version: 1.2.1+37
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -127,9 +127,7 @@ flutter:
           weight: 700
 
 flutter_launcher_icons:
-  android:
-    generate: "launcher_icon"
-    image_path: "assets/icon.png"
+  android: false
   ios: true
   image_path: "assets/icon.png"
   min_sdk_android: 21

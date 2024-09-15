@@ -68,6 +68,7 @@ Future<void> _initializeFirebase() async {
 
 Future<void> _initializeBackgroundNotificationService() async {
   autoConfigureBackgroundNotificationService();
+  autoStartBackgroundNotificationService();
 }
 
 Future<void> _initializePlatformComponents() async {
