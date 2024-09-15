@@ -204,7 +204,8 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
   @override
   void initState() {
     super.initState();
-    _getStatus();
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.value) _getStatus();
     Future.delayed(Duration.zero, () => _autoResize());
     _drawerAnimationController.addListener(() {
       if (_drawerAnimation.value > 180 && _isCollapsed) {
