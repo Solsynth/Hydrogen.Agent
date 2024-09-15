@@ -274,6 +274,9 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
                 color: Theme.of(context).colorScheme.surface,
                 child: AppNavigationRegion(
                   isCollapsed: _isCollapsed,
+                  onSelected: () {
+                    _closeDrawer();
+                  },
                 ),
               ),
             ),

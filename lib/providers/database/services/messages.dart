@@ -51,15 +51,9 @@ class MessagesFetchingProvider extends GetxController {
   Future<(List<Event>, int)?> fetchRemoteEvents(
     Channel channel,
     String scope, {
-    required int depth,
-    bool Function(List<Event> items)? onBrake,
     take = 10,
     offset = 0,
   }) async {
-    if (depth <= 0) {
-      return null;
-    }
-
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return null;
 
@@ -77,21 +71,7 @@ class MessagesFetchingProvider extends GetxController {
     final result =
         response.data?.map((e) => Event.fromJson(e)).toList() ?? List.empty();
 
-    if (onBrake != null && onBrake(result)) {
-      return (result, response.count);
-    }
-
-    final expandResult = (await fetchRemoteEvents(
-          channel,
-          scope,
-          depth: depth - 1,
-          take: take,
-          offset: offset + result.length,
-        ))
-            ?.$1 ??
-        List.empty();
-
-    return ([...result, ...expandResult], response.count);
+    return (result, response.count);
   }
 
   Future<LocalMessageEventTableData> receiveEvent(Event remote) async {
@@ -151,22 +131,14 @@ class MessagesFetchingProvider extends GetxController {
 
   /// Pull the remote events to local database
   Future<(List<Event>, int)?> pullRemoteEvents(Channel channel,
-      {String scope = 'global', depth = 10, offset = 0}) async {
+      {String scope = 'global', take = 10, offset = 0}) async {
     final database = Get.find<DatabaseProvider>().database;
-    final lastOne = await (database.select(database.localMessageEventTable)
-          ..where((x) => x.channelId.equals(channel.id))
-          ..orderBy([(t) => OrderingTerm.desc(t.id)])
-          ..limit(1))
-        .getSingleOrNull();
 
     final data = await fetchRemoteEvents(
       channel,
       scope,
-      depth: depth,
       offset: offset,
-      onBrake: (items) {
-        return items.any((x) => x.id == lastOne?.id);
-      },
+      take: take,
     );
     if (data != null) {
       await database.batch((batch) {
@@ -185,11 +157,13 @@ class MessagesFetchingProvider extends GetxController {
     return data;
   }
 
-  Future<List<LocalMessageEventTableData>> listEvents(Channel channel) async {
+  Future<List<LocalMessageEventTableData>> listEvents(Channel channel,
+      {required int take, int offset = 0}) async {
     final database = Get.find<DatabaseProvider>().database;
     return await (database.select(database.localMessageEventTable)
           ..where((x) => x.channelId.equals(channel.id))
-          ..orderBy([(t) => OrderingTerm.desc(t.id)]))
+          ..orderBy([(t) => OrderingTerm.desc(t.id)])
+          ..limit(take, offset: offset))
         .get();
   }
 

@@ -10,10 +10,12 @@ import 'package:solian/widgets/channel/channel_list.dart';
 
 class AppNavigationRegion extends StatefulWidget {
   final bool isCollapsed;
+  final Function onSelected;
 
   const AppNavigationRegion({
     super.key,
     this.isCollapsed = false,
+    required this.onSelected,
   });
 
   @override
@@ -204,6 +206,7 @@ class _AppNavigationRegionState extends State<AppNavigationRegion> {
                         isCollapsed: widget.isCollapsed,
                         selfId: auth.userProfile.value!['id'],
                         noCategory: true,
+                        onSelected: (_) => widget.onSelected(),
                       ),
                     ),
                   ),

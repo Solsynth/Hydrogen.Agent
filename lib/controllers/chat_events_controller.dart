@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
-import 'package:solian/platform.dart';
 import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/database/services/messages.dart';
 
@@ -31,79 +30,32 @@ class ChatEventController {
     this.channel = channel;
     this.scope = scope;
 
-    syncLocal(channel);
-
     isLoading.value = true;
-    if (PlatformInfo.isWeb) {
-      final result = await src.fetchRemoteEvents(
-        channel,
-        scope,
-        depth: 1,
-        offset: 0,
-      );
+    await syncLocal(channel, take: 10);
+
+    src.pullRemoteEvents(channel, scope: scope, take: 10).then((result) {
       totalEvents.value = result?.$2 ?? 0;
-      if (result != null) {
-        for (final x in result.$1.reversed) {
-          final entry = LocalMessageEventTableData(
-            id: x.id,
-            channelId: x.channelId,
-            createdAt: x.createdAt,
-            data: x,
-          );
-          insertEvent(entry);
-          applyEvent(entry);
-        }
-      }
-    } else {
-      final result = await src.pullRemoteEvents(
-        channel,
-        scope: scope,
-        depth: 1,
-      );
-      totalEvents.value = result?.$2 ?? 0;
-      await syncLocal(channel);
-    }
+      syncLocal(channel, take: 10);
+    });
     isLoading.value = false;
   }
 
   Future<void> loadEvents(Channel channel, String scope) async {
+    const take = 20;
+    final offset = currentEvents.length;
+
     isLoading.value = true;
-    if (PlatformInfo.isWeb) {
-      final result = await src.fetchRemoteEvents(
-        channel,
-        scope,
-        depth: 3,
-        offset: currentEvents.length,
-      );
-      if (result != null) {
-        totalEvents.value = result.$2;
-        for (final x in result.$1.reversed) {
-          final entry = LocalMessageEventTableData(
-            id: x.id,
-            channelId: x.channelId,
-            createdAt: x.createdAt,
-            data: x,
-          );
-          currentEvents.add(entry);
-          applyEvent(entry);
-        }
-      }
-    } else {
-      final result = await src.pullRemoteEvents(
-        channel,
-        depth: 3,
-        scope: scope,
-        offset: currentEvents.length,
-      );
+    await syncLocal(channel, take: take, offset: offset);
+    src.pullRemoteEvents(channel, scope: scope, offset: offset).then((result) {
       totalEvents.value = result?.$2 ?? 0;
-      await syncLocal(channel);
-    }
+      syncLocal(channel, take: take, offset: offset);
+    });
     isLoading.value = false;
   }
 
-  Future<bool> syncLocal(Channel channel) async {
-    if (PlatformInfo.isWeb) return false;
-    final data = await src.listEvents(channel);
+  Future<bool> syncLocal(Channel channel,
+      {required int take, int offset = 0}) async {
+    final data = await src.listEvents(channel, take: take, offset: offset);
     currentEvents.replaceRange(0, currentEvents.length, data);
     for (final x in data.reversed) {
       applyEvent(x);
@@ -113,16 +65,7 @@ class ChatEventController {
 
   receiveEvent(Event remote) async {
     LocalMessageEventTableData entry;
-    if (PlatformInfo.isWeb) {
-      entry = LocalMessageEventTableData(
-        id: remote.id,
-        channelId: remote.channelId,
-        createdAt: remote.createdAt,
-        data: remote,
-      );
-    } else {
-      entry = await src.receiveEvent(remote);
-    }
+    entry = await src.receiveEvent(remote);
 
     totalEvents.value++;
     insertEvent(entry);
