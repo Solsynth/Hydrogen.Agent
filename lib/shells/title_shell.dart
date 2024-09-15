@@ -24,6 +24,8 @@ class TitleShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    assert(state != null || title != null);
+
     return Scaffold(
       appBar: showAppBar
           ? AppBar(

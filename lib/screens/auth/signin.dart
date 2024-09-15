@@ -7,17 +7,18 @@ import 'package:solian/exts.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class SignInPopup extends StatefulWidget {
-  const SignInPopup({super.key});
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
 
   @override
-  State<SignInPopup> createState() => _SignInPopupState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
+class _SignInScreenState extends State<SignInScreen> with ProtocolListener {
   bool _isBusy = false;
 
   final _usernameController = TextEditingController();
@@ -130,79 +131,76 @@ class _SignInPopupState extends State<SignInPopup> with ProtocolListener {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.9,
-      child: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.6,
-          constraints: const BoxConstraints(maxWidth: 360),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: Image.asset('assets/logo.png', width: 64, height: 64),
-              ).paddingOnly(bottom: 4),
-              Text(
-                'signinGreeting'.tr,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                ),
-              ).paddingOnly(left: 4, bottom: 16),
-              TextField(
-                autocorrect: false,
-                enableSuggestions: false,
-                controller: _usernameController,
-                autofillHints: const [AutofillHints.username],
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: 'username'.tr,
-                ),
-                onTapOutside: (_) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
+    return Material(
+      color: Theme.of(context).colorScheme.surface,
+      child: CenteredContainer(
+        maxWidth: 360,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              child: Image.asset('assets/logo.png', width: 64, height: 64),
+            ).paddingOnly(bottom: 4),
+            Text(
+              'signinGreeting'.tr,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
               ),
-              const Gap(12),
-              TextField(
-                obscureText: true,
-                autocorrect: false,
-                enableSuggestions: false,
-                autofillHints: const [AutofillHints.password],
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: 'password'.tr,
-                ),
-                onTapOutside: (_) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                onSubmitted: (_) => _performAction(),
+            ).paddingOnly(left: 4, bottom: 16),
+            TextField(
+              autocorrect: false,
+              enableSuggestions: false,
+              controller: _usernameController,
+              autofillHints: const [AutofillHints.username],
+              decoration: InputDecoration(
+                isDense: true,
+                border: const OutlineInputBorder(),
+                labelText: 'username'.tr,
               ),
-              const Gap(12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: _isBusy ? null : () => _requestResetPassword(),
-                    style: TextButton.styleFrom(foregroundColor: Colors.grey),
-                    child: Text('forgotPassword'.tr),
+              onTapOutside: (_) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
+            ),
+            const Gap(12),
+            TextField(
+              obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              autofillHints: const [AutofillHints.password],
+              controller: _passwordController,
+              decoration: InputDecoration(
+                isDense: true,
+                border: const OutlineInputBorder(),
+                labelText: 'password'.tr,
+              ),
+              onTapOutside: (_) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
+              onSubmitted: (_) => _performAction(),
+            ),
+            const Gap(12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: _isBusy ? null : () => _requestResetPassword(),
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                  child: Text('forgotPassword'.tr),
+                ),
+                TextButton(
+                  onPressed: _isBusy ? null : () => _performAction(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('next'.tr),
+                      const Icon(Icons.chevron_right),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: _isBusy ? null : () => _performAction(),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('next'.tr),
-                        const Icon(Icons.chevron_right),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

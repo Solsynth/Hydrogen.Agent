@@ -151,7 +151,7 @@ class _FeedScreenState extends State<FeedScreen>
                           );
                         } else {
                           return SigninRequiredOverlay(
-                            onSignedIn: () => _postController.reloadAllOver(),
+                            onDone: () => _postController.reloadAllOver(),
                           );
                         }
                       }),

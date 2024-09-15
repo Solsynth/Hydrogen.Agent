@@ -8,6 +8,8 @@ import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/personalize.dart';
 import 'package:solian/screens/account/profile_page.dart';
 import 'package:solian/screens/account/stickers.dart';
+import 'package:solian/screens/auth/signin.dart';
+import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/screens/channel/channel_chat.dart';
 import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
@@ -257,6 +259,24 @@ abstract class AppRouter {
         name: 'accountProfilePage',
         builder: (context, state) => AccountProfilePage(
           name: state.pathParameters['name']!,
+        ),
+      ),
+      GoRoute(
+        path: '/auth/sign-in',
+        name: 'signin',
+        builder: (context, state) => TitleShell(
+          state: state,
+          isCenteredTitle: true,
+          child: const SignInScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/auth/sign-up',
+        name: 'signup',
+        builder: (context, state) => TitleShell(
+          state: state,
+          isCenteredTitle: true,
+          child: const SignUpScreen(),
         ),
       ),
     ],

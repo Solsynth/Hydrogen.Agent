@@ -102,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Obx(() {
           if (auth.isAuthorized.isFalse) {
             return SigninRequiredOverlay(
-              onSignedIn: () => _channels.refreshAvailableChannel(),
+              onDone: () => _channels.refreshAvailableChannel(),
             );
           }
 

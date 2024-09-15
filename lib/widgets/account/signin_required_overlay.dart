@@ -1,49 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:solian/screens/auth/signin.dart';
+import 'package:solian/router.dart';
+import 'package:solian/widgets/sized_container.dart';
 
 class SigninRequiredOverlay extends StatelessWidget {
-  final Function onSignedIn;
+  final Function onDone;
 
-  const SigninRequiredOverlay({super.key, required this.onSignedIn});
+  const SigninRequiredOverlay({super.key, required this.onDone});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 280),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.login,
-                size: 48,
-              ),
-              const Gap(8),
-              Text(
-                'signinRequired'.tr,
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'signinRequiredHint'.tr,
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+      child: CenteredContainer(
+        maxWidth: 280,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.login,
+              size: 48,
+            ),
+            const Gap(8),
+            Text(
+              'signinRequired'.tr,
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'signinRequiredHint'.tr,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
       onTap: () {
-        showModalBottomSheet(
-          useRootNavigator: true,
-          isScrollControlled: true,
-          context: context,
-          builder: (context) => const SignInPopup(),
-        ).then((value) {
-          if (value != null) onSignedIn();
+        AppRouter.instance.pushNamed('signin').then((value) {
+          if (value != null) onDone();
         });
       },
     );

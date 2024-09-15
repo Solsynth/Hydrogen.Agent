@@ -6,8 +6,6 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/router.dart';
-import 'package:solian/screens/auth/signin.dart';
-import 'package:solian/screens/auth/signup.dart';
 import 'package:solian/widgets/account/account_heading.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:badges/badges.dart' as badges;
@@ -73,13 +71,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: 'signin'.tr,
                     caption: 'signinCaption'.tr,
                     onTap: () {
-                      showModalBottomSheet(
-                        useRootNavigator: true,
-                        isDismissible: false,
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => const SignInPopup(),
-                      ).then((val) async {
+                      AppRouter.instance.pushNamed('signin').then((val) async {
                         if (val == true) {
                           await auth.refreshUserProfile();
                         }
@@ -94,13 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: 'signup'.tr,
                     caption: 'signupCaption'.tr,
                     onTap: () {
-                      showModalBottomSheet(
-                        useRootNavigator: true,
-                        isDismissible: false,
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => const SignUpPopup(),
-                      ).then((_) {
+                      AppRouter.instance.pushNamed('signup').then((_) {
                         setState(() {});
                       });
                     },

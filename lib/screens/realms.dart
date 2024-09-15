@@ -84,7 +84,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
         body: Obx(() {
           if (auth.isAuthorized.isFalse) {
             return SigninRequiredOverlay(
-              onSignedIn: () => _getRealms(),
+              onDone: () => _getRealms(),
             );
           }
 
