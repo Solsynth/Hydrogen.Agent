@@ -18,8 +18,8 @@ import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/daily_sign.dart';
+import 'package:solian/providers/database/services/messages.dart';
 import 'package:solian/providers/last_read.dart';
-import 'package:solian/providers/message/adaptor.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
@@ -72,7 +72,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _pullMessages() async {
     if (_lastRead.messagesLastReadAt == null) return;
     log('[Dashboard] Pulling messages with pivot: ${_lastRead.messagesLastReadAt}');
-    final out = await getWhatsNewEvents(_lastRead.messagesLastReadAt!);
+    final src = Get.find<MessagesFetchingProvider>();
+    final out = await src.getWhatsNewEvents(_lastRead.messagesLastReadAt!);
     if (out == null) return;
     setState(() {
       _currentMessages = out.$1;

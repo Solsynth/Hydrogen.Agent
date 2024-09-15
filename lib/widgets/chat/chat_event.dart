@@ -97,7 +97,7 @@ class ChatEvent extends StatelessWidget {
         return Container(
           constraints: const BoxConstraints(maxWidth: 480),
           child: ChatEvent(
-            item: snapshot.data!.data,
+            item: snapshot.data!.data!,
             isMerged: false,
             isQuote: true,
           ),

@@ -6,6 +6,7 @@ import 'package:solian/models/event.dart';
 import 'package:solian/providers/last_read.dart';
 import 'package:solian/widgets/chat/chat_event.dart';
 import 'package:solian/widgets/chat/chat_event_action.dart';
+import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 
 class ChatEventList extends StatelessWidget {
   final String scope;
@@ -36,8 +37,9 @@ class ChatEventList extends StatelessWidget {
       reverse: true,
       slivers: [
         Obx(() {
-          return SliverList.builder(
+          return SliverInfiniteList(
             key: Key('chat-history#${channel.id}'),
+            isLoading: chatController.isLoading.value,
             itemCount: chatController.currentEvents.length,
             itemBuilder: (context, index) {
               Get.find<LastReadProvider>().messagesLastReadAt =
@@ -62,7 +64,7 @@ class ChatEventList extends StatelessWidget {
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 child: ChatEvent(
-                  key: Key('m${item.uuid}'),
+                  key: Key('m${item!.uuid}'),
                   item: item,
                   isMerged: isMerged,
                   chatController: chatController,
@@ -89,28 +91,12 @@ class ChatEventList extends StatelessWidget {
                 },
               );
             },
-          );
-        }),
-        Obx(() {
-          final amount =
-              chatController.totalEvents - chatController.currentEvents.length;
-
-          if (amount.value <= 0 || chatController.isLoading.isTrue) {
-            return const SliverToBoxAdapter(child: SizedBox.shrink());
-          }
-
-          return SliverToBoxAdapter(
-            child: ListTile(
-              tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
-              leading: const Icon(Icons.sync_disabled),
-              title: Text('messageUnSync'.tr),
-              subtitle: Text('messageUnSyncCaption'.trParams({
-                'count': amount.string,
-              })),
-              onTap: () {
-                chatController.loadEvents(channel, scope);
-              },
-            ),
+            onFetchData: () {
+              chatController.loadEvents(
+                chatController.channel!,
+                chatController.scope!,
+              );
+            },
           );
         }),
       ],

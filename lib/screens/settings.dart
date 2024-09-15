@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
@@ -97,10 +96,7 @@ class _SettingScreenState extends State<SettingScreen> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 22),
             title: Text('messageHistoryWipe'.tr),
             onTap: () {
-              final chatHistory = ChatEventController();
-              chatHistory.initialize().then((_) async {
-                await chatHistory.database.localEvents.wipeLocalEvents();
-              });
+              // TODO Wipe message history
             },
           ),
         ],
