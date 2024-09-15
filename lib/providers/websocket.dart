@@ -5,7 +5,9 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/models/notification.dart';
 import 'package:solian/models/packet.dart';
@@ -29,18 +31,44 @@ class WebSocketProvider extends GetxController {
 
   @override
   onInit() {
-    FirebaseMessaging.instance
-        .requestPermission(
-            alert: true,
-            announcement: true,
-            carPlay: true,
-            badge: true,
-            sound: true)
-        .then((status) {
-      notifyPrefetch();
-    });
+    notifyPrefetch();
 
     super.onInit();
+  }
+
+  void requestPermissions() {
+    try {
+      FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          announcement: true,
+          carPlay: true,
+          badge: true,
+          sound: true);
+    } catch (_) {
+      // When firebase isn't initialized (background service)
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
   }
 
   Future<void> connect({noRetry = false}) async {
@@ -120,6 +148,12 @@ class WebSocketProvider extends GetxController {
   }
 
   Future<void> registerPushNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('service_background_notification') == true) {
+      log('Background notification service has been enabled, skip register push notifications');
+      return;
+    }
+
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 

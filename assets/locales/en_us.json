@@ -54,6 +54,8 @@
   "edit": "Edit",
   "delete": "Delete",
   "settings": "Settings",
+  "settingsNotificationBgService": "Background Notification Service",
+  "settingsNotificationBgServiceDesc": "A notification service is always installed on the device, so that some devices that do not support push notifications can receive notifications in the background. When this feature is enabled, push notifications will not be registered with the server, and you will always appear to be online in the eyes of others (except for invisible). You may need to turn off power and traffic optimization in the settings.",
   "search": "Search",
   "post": "Post",
   "article": "Article",
@@ -393,5 +395,7 @@
   "userLevel11": "Legend",
   "userLevel12": "Mythic",
   "userLevel13": "Immortal",
-  "postBrowsingIn": "Browsing in @region"
+  "postBrowsingIn": "Browsing in @region",
+  "needRestartToApply": "Restart the application to take effect",
+  "holdToSeeDetail": "Long press / Mouse hover to see detail"
 }

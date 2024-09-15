@@ -14,6 +14,8 @@
   "edit": "编辑",
   "delete": "删除",
   "settings": "设置",
+  "settingsNotificationBgService": "常驻通知服务",
+  "settingsNotificationBgServiceDesc": "在设备常驻一个通知服务，使得部分不支持推送通知的设备可以在后台收到通知；启用该功能的情况下不会向服务器注册推送通知，并且你会始终在他人眼中成为在线（隐身除外）；可能需要在设置中关闭电量与流量优化。",
   "page": "页面",
   "draft": "草稿",
   "draftSave": "存为草稿",
@@ -394,5 +396,7 @@
   "userLevel11": "名垂千古",
   "userLevel12": "独占鳌头",
   "userLevel13": "万古流芳",
-  "postBrowsingIn": "浏览 @region 内的帖子中"
+  "postBrowsingIn": "浏览 @region 内的帖子中",
+  "needRestartToApply": "需要重启应用来生效",
+  "holdToSeeDetail": "长按 / 鼠标悬浮来查看详情"
 }

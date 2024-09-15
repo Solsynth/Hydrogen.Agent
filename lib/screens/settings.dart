@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
@@ -16,7 +17,7 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  late final SharedPreferences _prefs;
+  SharedPreferences? _prefs;
 
   Widget _buildCaptionHeader(String title) {
     return Container(
@@ -42,7 +43,7 @@ class _SettingScreenState extends State<SettingScreen> {
                 seedColor: color,
               ),
             );
-        _prefs.setInt('global_theme_color', color.value);
+        _prefs?.setInt('global_theme_color', color.value);
         context.clearSnackbar();
         context.showSnackbar('themeColorApplied'.tr);
       },
@@ -62,6 +63,9 @@ class _SettingScreenState extends State<SettingScreen> {
     super.initState();
     SharedPreferences.getInstance().then((inst) {
       _prefs = inst;
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -80,6 +84,35 @@ class _SettingScreenState extends State<SettingScreen> {
                   .map((x) => _buildThemeColorButton(x.$1, x.$2))
                   .toList(),
             ).paddingSymmetric(horizontal: 12, vertical: 8),
+          ),
+          _buildCaptionHeader('notification'.tr),
+          Tooltip(
+            message: 'settingsNotificationBgServiceDesc'.tr,
+            child: CheckboxListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+              secondary: const Icon(Icons.system_security_update_warning),
+              enabled: PlatformInfo.isAndroid,
+              title: Text('settingsNotificationBgService'.tr),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('holdToSeeDetail'.tr),
+                  Text(
+                    'needRestartToApply'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+              value:
+                  _prefs?.getBool('service_background_notification') ?? false,
+              onChanged: (value) {
+                _prefs
+                    ?.setBool('service_background_notification', value ?? false)
+                    .then((_) {
+                  setState(() {});
+                });
+              },
+            ),
           ),
           _buildCaptionHeader('more'.tr),
           ListTile(

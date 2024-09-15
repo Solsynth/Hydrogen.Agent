@@ -79,6 +79,8 @@ dependencies:
   drift_flutter: ^0.2.0
   very_good_infinite_list: ^0.8.0
   path_provider: ^2.1.4
+  flutter_background_service: ^5.0.10
+  flutter_local_notifications: ^17.2.2
 
 dev_dependencies:
   flutter_test:
