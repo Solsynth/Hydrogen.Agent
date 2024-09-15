@@ -152,6 +152,8 @@ class WebSocketProvider extends GetxController {
   }
 
   Future<void> registerPushNotifications() async {
+    if (PlatformInfo.isWeb) return;
+
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('service_background_notification') == true) {
       log('Background notification service has been enabled, skip register push notifications');

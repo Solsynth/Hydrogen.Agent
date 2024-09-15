@@ -312,7 +312,9 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
   }
 
   Widget _buildQueueEntry(AttachmentUploadTask element, int index) {
-    final extName = extension(element.file.path).substring(1);
+    final extName = element.file.name.contains('.')
+        ? extension(element.file.name).substring(1)
+        : '';
     final canBeCrop = ['png', 'jpg', 'jpeg', 'gif'].contains(extName);
 
     return Container(
