@@ -138,7 +138,14 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer>
                         Builder(
                           builder: (context) {
                             if (_accountStatus == null) {
-                              return Text('loading'.tr).paddingOnly(left: 16);
+                              return Text(
+                                'loading'.tr,
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
+                                style: TextStyle(
+                                  color: _unFocusColor,
+                                ),
+                              ).paddingOnly(left: 16);
                             }
                             final info = StatusProvider.determineStatus(
                               _accountStatus!,
