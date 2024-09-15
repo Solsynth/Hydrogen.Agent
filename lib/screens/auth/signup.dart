@@ -73,7 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(8)),
               child: Image.asset('assets/logo.png', width: 64, height: 64),
-            ).paddingOnly(bottom: 4),
+            ).paddingOnly(bottom: 8, left: 4),
             Text(
               'signupGreeting'.tr,
               style: const TextStyle(

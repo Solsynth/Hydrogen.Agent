@@ -9,6 +9,7 @@ import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:solian/background.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
+import 'package:solian/models/auth.dart';
 import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
@@ -148,27 +149,13 @@ class AuthProvider extends GetConnect {
 
   Future<TokenSet> signin(
     BuildContext context,
-    String username,
-    String password,
+    AuthTicket ticket,
   ) async {
     userProfile.value = null;
 
-    final client = ServiceFinder.configureClient('auth');
-
-    // Create ticket
-    final resp = await client.post('/auth', {
-      'username': username,
-      'password': password,
-    });
-    if (resp.statusCode != 200) {
-      throw RequestException(resp);
-    } else if (resp.body['is_finished'] == false) {
-      throw RiskyAuthenticateException(resp.body['ticket']['id']);
-    }
-
     // Assign token
     final tokenResp = await post('/auth/token', {
-      'code': resp.body['ticket']['grant_token'],
+      'code': ticket.grantToken!,
       'grant_type': 'grant_token',
     });
     if (tokenResp.statusCode != 200) {

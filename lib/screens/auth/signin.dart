@@ -1,15 +1,15 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:protocol_handler/protocol_handler.dart';
 import 'package:solian/background.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
-import 'package:solian/providers/websocket.dart';
+import 'package:solian/models/auth.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -18,11 +18,27 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> with ProtocolListener {
+class _SignInScreenState extends State<SignInScreen> {
   bool _isBusy = false;
+
+  AuthTicket? _currentTicket;
+
+  List<AuthFactor>? _factors;
+  int? _factorPicked;
+  int? _factorPickedType;
+
+  int _period = 0;
 
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  final Map<int, (String label, IconData icon, bool isOtp)> _factorLabelMap = {
+    0: ('authFactorPassword'.tr, Icons.password, false),
+    1: ('authFactorEmail'.tr, Icons.email, true),
+  };
+
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   void _requestResetPassword() async {
     final username = _usernameController.value.text;
@@ -54,78 +70,141 @@ class _SignInScreenState extends State<SignInScreen> with ProtocolListener {
     context.showModalDialog('done'.tr, 'signinResetPasswordSent'.tr);
   }
 
-  void _performAction() async {
-    final AuthProvider auth = Get.find();
-
+  void _performNewTicket() async {
     final username = _usernameController.value.text;
-    final password = _passwordController.value.text;
-    if (username.isEmpty || password.isEmpty) return;
+    if (username.isEmpty) return;
+
+    final client = ServiceFinder.configureClient('auth');
 
     setState(() => _isBusy = true);
 
     try {
-      await auth.signin(context, username, password);
-      await Future.delayed(const Duration(milliseconds: 250), () async {
-        await auth.refreshAuthorizeStatus();
-        await auth.refreshUserProfile();
+      // Create ticket
+      final resp = await client.post('/auth', {
+        'username': username,
       });
-    } on RiskyAuthenticateException catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('riskDetection'.tr),
-            content: Text('signinRiskDetected'.tr),
-            actions: [
-              TextButton(
-                child: Text('next'.tr),
-                onPressed: () {
-                  const redirect = 'solink://auth?status=done';
-                  launchUrlString(
-                    ServiceFinder.buildUrl('capital',
-                        '/auth/mfa?redirect_uri=$redirect&ticketId=${e.ticketId}'),
-                    mode: LaunchMode.inAppWebView,
-                  );
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          );
-        },
-      );
-      return;
+      if (resp.statusCode != 200) {
+        throw RequestException(resp);
+      } else {
+        final result = AuthResult.fromJson(resp.body);
+        _currentTicket = result.ticket;
+      }
+
+      // Pull factors
+      final factorResp = await client.get('/auth/factors',
+          query: {'ticketId': _currentTicket!.id.toString()});
+      if (factorResp.statusCode != 200) {
+        throw RequestException(factorResp);
+      } else {
+        final result = List<AuthFactor>.from(
+          factorResp.body.map((x) => AuthFactor.fromJson(x)),
+        );
+        _factors = result;
+      }
+
+      setState(() => _period++);
     } catch (e) {
       context.showErrorDialog(e);
       return;
     } finally {
       setState(() => _isBusy = false);
     }
-
-    Get.find<WebSocketProvider>().registerPushNotifications();
-    autoConfigureBackgroundNotificationService();
-    autoStartBackgroundNotificationService();
-
-    Navigator.pop(context, true);
   }
 
-  @override
-  void initState() {
-    protocolHandler.addListener(this);
-    super.initState();
+  void _performGetFactorCode() async {
+    if (_factorPicked == null) return;
+
+    final client = ServiceFinder.configureClient('auth');
+
+    setState(() => _isBusy = true);
+
+    try {
+      // Request one-time-password code
+      final resp = await client.post('/auth/factors/$_factorPicked', {});
+      if (resp.statusCode != 200 && resp.statusCode != 204) {
+        throw RequestException(resp);
+      } else {
+        _factorPickedType = _factors!
+            .where(
+              (x) => x.id == _factorPicked,
+            )
+            .first
+            .type;
+      }
+
+      setState(() => _period++);
+    } catch (e) {
+      context.showErrorDialog(e);
+      return;
+    } finally {
+      setState(() => _isBusy = false);
+    }
   }
 
-  @override
-  void dispose() {
-    protocolHandler.removeListener(this);
-    super.dispose();
+  void _performCheckTicket() async {
+    final AuthProvider auth = Get.find();
+
+    final password = _passwordController.value.text;
+    if (password.isEmpty) return;
+
+    final client = ServiceFinder.configureClient('auth');
+
+    setState(() => _isBusy = true);
+
+    try {
+      // Check ticket
+      final resp = await client.patch('/auth', {
+        'ticket_id': _currentTicket!.id,
+        'factor_id': _factorPicked!,
+        'code': password,
+      });
+      if (resp.statusCode != 200) {
+        throw RequestException(resp);
+      }
+
+      final result = AuthResult.fromJson(resp.body);
+      _currentTicket = result.ticket;
+
+      // Finish sign in if possible
+      if (result.isFinished) {
+        await auth.signin(context, _currentTicket!);
+
+        await Future.delayed(const Duration(milliseconds: 250), () async {
+          await auth.refreshAuthorizeStatus();
+          await auth.refreshUserProfile();
+
+          Get.find<WebSocketProvider>().registerPushNotifications();
+          autoConfigureBackgroundNotificationService();
+          autoStartBackgroundNotificationService();
+
+          Navigator.pop(context, true);
+        });
+      } else {
+        // Skip the first step
+        _factorPicked = null;
+        _factorPickedType = null;
+        setState(() => _period += 2);
+      }
+    } catch (e) {
+      context.showErrorDialog(e);
+      return;
+    } finally {
+      setState(() => _isBusy = false);
+    }
   }
 
-  @override
-  void onProtocolUrlReceived(String url) {
-    final uri = url.replaceFirst('solink://', '');
-    if (uri == 'auth?status=done') {
-      closeInAppWebView();
-      _performAction();
+  void _previousStep() {
+    assert(_period > 0);
+    switch (_period % 3) {
+      case 1:
+        _currentTicket = null;
+        _factors = null;
+        _factorPicked = null;
+      case 2:
+        _passwordController.clear();
+        _factorPickedType = null;
+      default:
+        setState(() => _period--);
     }
   }
 
@@ -135,72 +214,237 @@ class _SignInScreenState extends State<SignInScreen> with ProtocolListener {
       color: Theme.of(context).colorScheme.surface,
       child: CenteredContainer(
         maxWidth: 360,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              child: Image.asset('assets/logo.png', width: 64, height: 64),
-            ).paddingOnly(bottom: 4),
-            Text(
-              'signinGreeting'.tr,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-              ),
-            ).paddingOnly(left: 4, bottom: 16),
-            TextField(
-              autocorrect: false,
-              enableSuggestions: false,
-              controller: _usernameController,
-              autofillHints: const [AutofillHints.username],
-              decoration: InputDecoration(
-                isDense: true,
-                border: const OutlineInputBorder(),
-                labelText: 'username'.tr,
-              ),
-              onTapOutside: (_) =>
-                  FocusManager.instance.primaryFocus?.unfocus(),
-            ),
-            const Gap(12),
-            TextField(
-              obscureText: true,
-              autocorrect: false,
-              enableSuggestions: false,
-              autofillHints: const [AutofillHints.password],
-              controller: _passwordController,
-              decoration: InputDecoration(
-                isDense: true,
-                border: const OutlineInputBorder(),
-                labelText: 'password'.tr,
-              ),
-              onTapOutside: (_) =>
-                  FocusManager.instance.primaryFocus?.unfocus(),
-              onSubmitted: (_) => _performAction(),
-            ),
-            const Gap(12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: _isBusy ? null : () => _requestResetPassword(),
-                  style: TextButton.styleFrom(foregroundColor: Colors.grey),
-                  child: Text('forgotPassword'.tr),
-                ),
-                TextButton(
-                  onPressed: _isBusy ? null : () => _performAction(),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+        child: PageTransitionSwitcher(
+          transitionBuilder: (
+            Widget child,
+            Animation<double> primaryAnimation,
+            Animation<double> secondaryAnimation,
+          ) {
+            return SharedAxisTransition(
+              animation: primaryAnimation,
+              secondaryAnimation: secondaryAnimation,
+              transitionType: SharedAxisTransitionType.horizontal,
+              child: child,
+            );
+          },
+          child: switch (_period % 3) {
+            1 => Column(
+                key: const ValueKey<int>(1),
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child:
+                        Image.asset('assets/logo.png', width: 64, height: 64),
+                  ).paddingOnly(bottom: 8, left: 4),
+                  Text(
+                    'signinPickFactor'.tr,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ).paddingOnly(left: 4, bottom: 16),
+                  Card(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Column(
+                      children: _factors
+                              ?.map(
+                                (x) => CheckboxListTile(
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(8),
+                                    ),
+                                  ),
+                                  secondary: Icon(
+                                    _factorLabelMap[x.type]?.$2 ??
+                                        Icons.question_mark,
+                                  ),
+                                  title: Text(
+                                    _factorLabelMap[x.type]?.$1 ?? 'unknown'.tr,
+                                  ),
+                                  enabled: !_currentTicket!.factorTrail
+                                      .contains(x.id),
+                                  value: _factorPicked == x.id,
+                                  onChanged: (value) {
+                                    if (value == true) {
+                                      setState(() => _factorPicked = x.id);
+                                    }
+                                  },
+                                ),
+                              )
+                              .toList() ??
+                          List.empty(),
+                    ),
+                  ),
+                  Text(
+                    'signinMultiFactor'.trParams(
+                      {'n': _currentTicket!.stepRemain.toString()},
+                    ),
+                    style: TextStyle(color: _unFocusColor, fontSize: 12),
+                  ).paddingOnly(left: 16, right: 16),
+                  const Gap(12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('next'.tr),
-                      const Icon(Icons.chevron_right),
+                      TextButton(
+                        onPressed: _isBusy ? null : () => _previousStep(),
+                        style:
+                            TextButton.styleFrom(foregroundColor: Colors.grey),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.chevron_left),
+                            Text('prev'.tr),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed:
+                            _isBusy ? null : () => _performGetFactorCode(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('next'.tr),
+                            const Icon(Icons.chevron_right),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            2 => Column(
+                key: const ValueKey<int>(2),
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child:
+                        Image.asset('assets/logo.png', width: 64, height: 64),
+                  ).paddingOnly(bottom: 8, left: 4),
+                  Text(
+                    'signinEnterPassword'.tr,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ).paddingOnly(left: 4, bottom: 16),
+                  TextField(
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    controller: _passwordController,
+                    obscureText: true,
+                    autofillHints: [
+                      (_factorLabelMap[_factorPickedType]?.$3 ?? true)
+                          ? AutofillHints.password
+                          : AutofillHints.oneTimeCode
+                    ],
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: const OutlineInputBorder(),
+                      labelText:
+                          (_factorLabelMap[_factorPickedType]?.$3 ?? true)
+                              ? 'passwordOneTime'.tr
+                              : 'password'.tr,
+                      helperText:
+                          (_factorLabelMap[_factorPickedType]?.$3 ?? true)
+                              ? 'passwordOneTimeInputHint'.tr
+                              : 'passwordInputHint'.tr,
+                    ),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                    onSubmitted: _isBusy ? null : (_) => _performCheckTicket(),
+                  ),
+                  const Gap(12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: _isBusy ? null : () => _previousStep(),
+                        style:
+                            TextButton.styleFrom(foregroundColor: Colors.grey),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.chevron_left),
+                            Text('prev'.tr),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _isBusy ? null : () => _performCheckTicket(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('next'.tr),
+                            const Icon(Icons.chevron_right),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            _ => Column(
+                key: const ValueKey<int>(0),
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child:
+                        Image.asset('assets/logo.png', width: 64, height: 64),
+                  ).paddingOnly(bottom: 8, left: 4),
+                  Text(
+                    'signinGreeting'.tr,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ).paddingOnly(left: 4, bottom: 16),
+                  TextField(
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    controller: _usernameController,
+                    autofillHints: const [AutofillHints.username],
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: const OutlineInputBorder(),
+                      labelText: 'username'.tr,
+                      helperText: 'usernameInputHint'.tr,
+                    ),
+                    onTapOutside: (_) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                    onSubmitted: _isBusy ? null : (_) => _performNewTicket(),
+                  ),
+                  const Gap(12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed:
+                            _isBusy ? null : () => _requestResetPassword(),
+                        style:
+                            TextButton.styleFrom(foregroundColor: Colors.grey),
+                        child: Text('forgotPassword'.tr),
+                      ),
+                      TextButton(
+                        onPressed: _isBusy ? null : () => _performNewTicket(),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('next'.tr),
+                            const Icon(Icons.chevron_right),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+          },
         ),
       ),
     );
