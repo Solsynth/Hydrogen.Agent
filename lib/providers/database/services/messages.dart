@@ -51,12 +51,12 @@ class MessagesFetchingProvider extends GetxController {
   Future<(List<Event>, int)?> fetchRemoteEvents(
     Channel channel,
     String scope, {
-    required int remainDepth,
+    required int depth,
     bool Function(List<Event> items)? onBrake,
     take = 10,
     offset = 0,
   }) async {
-    if (remainDepth <= 0) {
+    if (depth <= 0) {
       return null;
     }
 
@@ -84,7 +84,7 @@ class MessagesFetchingProvider extends GetxController {
     final expandResult = (await fetchRemoteEvents(
           channel,
           scope,
-          remainDepth: remainDepth - 1,
+          depth: depth - 1,
           take: take,
           offset: offset + result.length,
         ))
@@ -162,7 +162,7 @@ class MessagesFetchingProvider extends GetxController {
     final data = await fetchRemoteEvents(
       channel,
       scope,
-      remainDepth: depth,
+      depth: depth,
       offset: offset,
       onBrake: (items) {
         return items.any((x) => x.id == lastOne?.id);

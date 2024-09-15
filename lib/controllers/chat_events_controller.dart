@@ -12,7 +12,7 @@ class ChatEventController {
       RxList.empty(growable: true);
   final RxInt totalEvents = 0.obs;
 
-  final RxBool isLoading = false.obs;
+  final RxBool isLoading = true.obs;
 
   Channel? channel;
   String? scope;
@@ -27,7 +27,7 @@ class ChatEventController {
     return await src.getEvent(id, channel!, scope: scope!);
   }
 
-  Future<void> getEvents(Channel channel, String scope) async {
+  Future<void> getInitialEvents(Channel channel, String scope) async {
     this.channel = channel;
     this.scope = scope;
 
@@ -38,7 +38,7 @@ class ChatEventController {
       final result = await src.fetchRemoteEvents(
         channel,
         scope,
-        remainDepth: 3,
+        depth: 1,
         offset: 0,
       );
       totalEvents.value = result?.$2 ?? 0;
@@ -58,6 +58,7 @@ class ChatEventController {
       final result = await src.pullRemoteEvents(
         channel,
         scope: scope,
+        depth: 1,
       );
       totalEvents.value = result?.$2 ?? 0;
       await syncLocal(channel);
@@ -71,7 +72,7 @@ class ChatEventController {
       final result = await src.fetchRemoteEvents(
         channel,
         scope,
-        remainDepth: 3,
+        depth: 3,
         offset: currentEvents.length,
       );
       if (result != null) {
@@ -123,6 +124,7 @@ class ChatEventController {
       entry = await src.receiveEvent(remote);
     }
 
+    totalEvents.value++;
     insertEvent(entry);
     applyEvent(entry);
   }

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exts.dart';
@@ -156,7 +155,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
 
   void _keepUpdateWithServer() {
     _getOngoingCall();
-    _chatController.getEvents(_channel!, widget.realm);
+    _chatController.getInitialEvents(_channel!, widget.realm);
     setState(() => _isOutOfSyncSince = null);
   }
 
@@ -193,7 +192,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
 
     _getOngoingCall();
     _getChannel().then((_) {
-      _chatController.getEvents(_channel!, widget.realm);
+      _chatController.getInitialEvents(_channel!, widget.realm);
       _listenMessages();
     });
   }
@@ -295,13 +294,6 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                       },
                     ),
                   ),
-                  Obx(() {
-                    if (_chatController.isLoading.isTrue) {
-                      return const LinearProgressIndicator().animate().slideY();
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  }),
                   ClipRect(
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
