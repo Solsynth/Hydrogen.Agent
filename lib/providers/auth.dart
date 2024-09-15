@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
+import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 
@@ -197,6 +198,8 @@ class AuthProvider extends GetConnect {
     Get.find<WebSocketProvider>().disconnect();
     Get.find<WebSocketProvider>().notifications.clear();
     Get.find<WebSocketProvider>().notificationUnread.value = 0;
+
+    AppDatabase.removeDatabase();
 
     storage.deleteAll();
   }

@@ -1,9 +1,11 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 
-extension SolianExtenions on BuildContext {
+extension AppExtensions on BuildContext {
   void showSnackbar(String content, {SnackBarAction? action}) {
     ScaffoldMessenger.of(this).showSnackBar(SnackBar(
       content: Text(content),
@@ -100,5 +102,26 @@ extension SolianExtenions on BuildContext {
         ],
       ),
     );
+  }
+}
+
+extension ByteFormatter on int {
+  String formatBytes({int decimals = 2}) {
+    if (this == 0) return '0 Bytes';
+    const k = 1024;
+    final dm = decimals < 0 ? 0 : decimals;
+    final sizes = [
+      'Bytes',
+      'KiB',
+      'MiB',
+      'GiB',
+      'TiB',
+      'PiB',
+      'EiB',
+      'ZiB',
+      'YiB'
+    ];
+    final i = (math.log(this) / math.log(k)).floor().toInt();
+    return '${(this / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
   }
 }

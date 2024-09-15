@@ -38,25 +38,6 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
   Color get _unFocusColor =>
       Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
-  String _formatBytes(int bytes, {int decimals = 2}) {
-    if (bytes == 0) return '0 Bytes';
-    const k = 1024;
-    final dm = decimals < 0 ? 0 : decimals;
-    final sizes = [
-      'Bytes',
-      'KiB',
-      'MiB',
-      'GiB',
-      'TiB',
-      'PiB',
-      'EiB',
-      'ZiB',
-      'YiB'
-    ];
-    final i = (math.log(bytes) / math.log(k)).floor().toInt();
-    return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
-  }
-
   double _getRatio() {
     final value = widget.item.metadata?['ratio'];
     if (value == null) return 1;
@@ -274,7 +255,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                               style: metaTextStyle,
                             ),
                           Text(
-                            _formatBytes(widget.item.size),
+                            widget.item.size.formatBytes(),
                             style: metaTextStyle,
                           ),
                           Text(

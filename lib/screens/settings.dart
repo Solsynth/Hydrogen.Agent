@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
@@ -82,21 +83,36 @@ class _SettingScreenState extends State<SettingScreen> {
           ),
           _buildCaptionHeader('more'.tr),
           ListTile(
+            leading: const Icon(Icons.delete_sweep),
+            trailing: const Icon(Icons.chevron_right),
+            subtitle: FutureBuilder(
+              future: AppDatabase.getDatabaseSize(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Text('localDatabaseSize'.trParams(
+                    {'size': 'unknown'.tr},
+                  ));
+                }
+                return Text('localDatabaseSize'.trParams(
+                  {'size': snapshot.data!.formatBytes()},
+                ));
+              },
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            title: Text('localDatabaseWipe'.tr),
+            onTap: () {
+              AppDatabase.removeDatabase().then((_) {
+                setState(() {});
+              });
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.info_outline),
             trailing: const Icon(Icons.chevron_right),
             contentPadding: const EdgeInsets.symmetric(horizontal: 22),
             title: Text('about'.tr),
             onTap: () {
               AppRouter.instance.pushNamed('about');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_sweep),
-            trailing: const Icon(Icons.chevron_right),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
-            title: Text('messageHistoryWipe'.tr),
-            onTap: () {
-              // TODO Wipe message history
             },
           ),
         ],

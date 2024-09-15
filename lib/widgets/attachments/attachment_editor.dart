@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:dismissible_page/dismissible_page.dart';
@@ -209,25 +208,6 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
     });
   }
 
-  String _formatBytes(int bytes, {int decimals = 2}) {
-    if (bytes == 0) return '0 Bytes';
-    const k = 1024;
-    final dm = decimals < 0 ? 0 : decimals;
-    final sizes = [
-      'Bytes',
-      'KiB',
-      'MiB',
-      'GiB',
-      'TiB',
-      'PiB',
-      'EiB',
-      'ZiB',
-      'YiB'
-    ];
-    final i = (math.log(bytes) / math.log(k)).floor().toInt();
-    return '${(bytes / math.pow(k, i)).toStringAsFixed(dm)} ${sizes[i]}';
-  }
-
   void _revertMetadataList() {
     final AttachmentProvider attach = Get.find();
 
@@ -367,7 +347,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                                   return const SizedBox.shrink();
                                 }
                                 return Text(
-                                  _formatBytes(snapshot.data!),
+                                  snapshot.data!.formatBytes(),
                                   style: Theme.of(context).textTheme.bodySmall,
                                 );
                               },
@@ -502,7 +482,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           ),
                         ),
                         Text(
-                          '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${_formatBytes(element.size)}',
+                          '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${element.size.formatBytes()}',
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
