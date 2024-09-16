@@ -153,7 +153,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     try {
       // Check ticket
-      final resp = await client.patch('/auth', {
+      final resp = await client.request('/auth', 'PATCH', body: {
         'ticket_id': _currentTicket!.id,
         'factor_id': _factorPicked!,
         'code': password,
