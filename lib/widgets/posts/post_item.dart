@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -362,7 +363,7 @@ class _PostItemState extends State<PostItem> {
                           locale: 'en_short',
                         ),
                       ).paddingOnly(top: 0.5),
-                      const Gap(16),
+                      const Gap(8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,15 +400,22 @@ class _PostItemState extends State<PostItem> {
                 )
                 .toList(),
           ),
-        ).paddingOnly(
-          top: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-              ? 10
-              : 6,
-          left: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-              ? 24
-              : 60,
-          right: 16,
-        );
+        )
+            .animate()
+            .fadeIn(
+              duration: 300.ms,
+              curve: Curves.easeIn,
+            )
+            .paddingOnly(
+              top: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+                  ? 10
+                  : 6,
+              left:
+                  (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+                      ? 24
+                      : 60,
+              right: 16,
+            );
       },
     );
   }
