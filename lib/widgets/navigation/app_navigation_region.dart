@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/realm.dart';
@@ -126,16 +127,12 @@ class _AppNavigationRegionState extends State<AppNavigationRegion> {
     final NavigationStateProvider navState = Get.find();
 
     return Obx(
-      () => AnimatedSwitcher(
-        switchInCurve: Curves.fastOutSlowIn,
-        switchOutCurve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, animation) {
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(animation),
+      () => PageTransitionSwitcher(
+        transitionBuilder: (child, animation, secondaryAnimation) {
+          return SharedAxisTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
             child: Material(
               color: Theme.of(context).colorScheme.surface,
               child: child,
