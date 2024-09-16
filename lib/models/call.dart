@@ -1,4 +1,4 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:solian/models/channel.dart';
 

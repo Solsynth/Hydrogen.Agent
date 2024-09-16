@@ -1,4 +1,4 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/post_categories.dart';
 import 'package:solian/models/realm.dart';

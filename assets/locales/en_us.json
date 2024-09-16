@@ -410,5 +410,8 @@
   "userLevel13": "Immortal",
   "postBrowsingIn": "Browsing in @region",
   "needRestartToApply": "Restart the application to take effect",
-  "holdToSeeDetail": "Long press / Mouse hover to see detail"
+  "holdToSeeDetail": "Long press / Mouse hover to see detail",
+  "subscribe": "Subscribe",
+  "subscribed": "Subscribed",
+  "unsubscribe": "Unsubscribe"
 }

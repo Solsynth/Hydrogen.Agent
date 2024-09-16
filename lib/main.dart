@@ -20,6 +20,7 @@ import 'package:solian/providers/last_read.dart';
 import 'package:solian/providers/link_expander.dart';
 import 'package:solian/providers/navigation.dart';
 import 'package:solian/providers/stickers.dart';
+import 'package:solian/providers/subscription.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/providers/auth.dart';
@@ -151,6 +152,7 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => LinkExpandProvider());
     Get.lazyPut(() => DailySignProvider());
     Get.lazyPut(() => LastReadProvider());
+    Get.lazyPut(() => SubscriptionProvider());
 
     Get.find<WebSocketProvider>().requestPermissions();
   }

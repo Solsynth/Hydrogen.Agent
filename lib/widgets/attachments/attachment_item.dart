@@ -282,6 +282,8 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
                         children: [
                           Text(
                             widget.item.alt,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               shadows: labelShadows,
                               color: Colors.white,
@@ -447,6 +449,8 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
                         children: [
                           Text(
                             widget.item.alt,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               shadows: labelShadows,
                               color: Colors.white,

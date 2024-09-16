@@ -411,5 +411,8 @@
   "userLevel13": "万古流芳",
   "postBrowsingIn": "浏览 @region 内的帖子中",
   "needRestartToApply": "需要重启应用来生效",
-  "holdToSeeDetail": "长按 / 鼠标悬浮来查看详情"
+  "holdToSeeDetail": "长按 / 鼠标悬浮来查看详情",
+  "subscribe": "订阅",
+  "subscribed": "已订阅",
+  "unsubscribe": "取消订阅"
 }

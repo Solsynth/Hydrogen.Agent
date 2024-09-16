@@ -97,8 +97,8 @@ class PostProvider extends GetConnect {
     return resp;
   }
 
-  Future<List<Post>> listPostFeaturedReply(String alias) async {
-    final resp = await get('/posts/$alias/replies/featured');
+  Future<List<Post>> listPostFeaturedReply(String alias, {int take = 1}) async {
+    final resp = await get('/posts/$alias/replies/featured?take=$take');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }

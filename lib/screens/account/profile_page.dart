@@ -8,8 +8,10 @@ import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/models/subscription.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/relation.dart';
+import 'package:solian/providers/subscription.dart';
 import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
@@ -37,11 +39,20 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
 
   bool _isBusy = true;
   bool _isMakingFriend = false;
+  bool _isSubscribing = false;
   bool _showMature = false;
 
   Account? _userinfo;
+  Subscription? _subscription;
   List<Post> _pinnedPosts = List.empty();
   int _totalUpvote = 0, _totalDownvote = 0;
+
+  Future<void> _getSubscription() async {
+    setState(() => _isSubscribing = true);
+    _subscription = await Get.find<SubscriptionProvider>()
+        .getSubscriptionOnUser(_userinfo!.id);
+    setState(() => _isSubscribing = false);
+  }
 
   Future<void> _getUserinfo() async {
     setState(() => _isBusy = true);
@@ -70,7 +81,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     setState(() => _isBusy = false);
   }
 
-  Future<void> getPinnedPosts() async {
+  Future<void> _getPinnedPosts() async {
     final client = await ServiceFinder.configureClient('interactive');
     final resp = await client.get('/users/${widget.name}/pin');
     if (resp.statusCode != 200) {
@@ -115,8 +126,10 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       }
     });
 
-    _getUserinfo();
-    getPinnedPosts();
+    _getUserinfo().then((_) {
+      _getSubscription();
+      _getPinnedPosts();
+    });
   }
 
   Widget _buildStatisticsEntry(String label, String content) {
@@ -180,6 +193,40 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         ],
                       ),
                     ),
+                    if (_userinfo != null && _subscription == null)
+                      OutlinedButton(
+                        style: const ButtonStyle(
+                          visualDensity:
+                              VisualDensity(horizontal: -4, vertical: -2),
+                        ),
+                        onPressed: _isSubscribing
+                            ? null
+                            : () async {
+                                setState(() => _isSubscribing = true);
+                                _subscription =
+                                    await Get.find<SubscriptionProvider>()
+                                        .subscribeToUser(_userinfo!.id);
+                                setState(() => _isSubscribing = false);
+                              },
+                        child: Text('subscribe'.tr),
+                      )
+                    else if (_userinfo != null)
+                      OutlinedButton(
+                        style: const ButtonStyle(
+                          visualDensity:
+                              VisualDensity(horizontal: -4, vertical: -2),
+                        ),
+                        onPressed: _isSubscribing
+                            ? null
+                            : () async {
+                                setState(() => _isSubscribing = true);
+                                await Get.find<SubscriptionProvider>()
+                                    .unsubscribeFromUser(_userinfo!.id);
+                                _subscription = null;
+                                setState(() => _isSubscribing = false);
+                              },
+                        child: Text('unsubscribe'.tr),
+                      ),
                     if (_userinfo != null &&
                         !_relationshipProvider.hasFriend(_userinfo!))
                       IconButton(
@@ -245,7 +292,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
               RefreshIndicator(
                 onRefresh: () => Future.wait([
                   _postController.reloadAllOver(),
-                  getPinnedPosts(),
+                  _getPinnedPosts(),
                 ]),
                 child: CustomScrollView(slivers: [
                   SliverToBoxAdapter(
