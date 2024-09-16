@@ -405,12 +405,9 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                     if (emojiMatch != null) {
                       final StickerProvider stickers = Get.find();
                       final emoteSearch = emojiMatch[2]!;
-                      return stickers.availableStickers
-                          .where(
-                            (x) => x.textWarpedPlaceholder
-                                .toUpperCase()
-                                .contains(emoteSearch.toUpperCase()),
-                          )
+                      final result = await stickers
+                          .searchStickerByAlias(emoteSearch.substring(1));
+                      return result
                           .map(
                             (x) => ChatMessageSuggestion(
                               type: 'emotes',

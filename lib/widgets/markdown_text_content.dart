@@ -89,7 +89,6 @@ class MarkdownTextContent extends StatelessWidget {
             case 'stickers':
               double radius = 8;
               final StickerProvider sticker = Get.find();
-              url = sticker.aliasImageMapping[segments[1].toUpperCase()]!;
               if (emojiMatch.length <= 1 && isOnlyEmoji) {
                 width = 128;
                 height = 128;
@@ -106,11 +105,20 @@ class MarkdownTextContent extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(radius)),
                 child: Container(
                   color: Theme.of(context).colorScheme.surfaceContainer,
-                  child: AutoCacheImage(
-                    url,
-                    width: width,
-                    height: height,
-                    fit: fit,
+                  child: FutureBuilder(
+                    future: sticker.getStickerByAlias(segments[1]),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return AutoCacheImage(
+                        snapshot.data!.imageUrl,
+                        width: width,
+                        height: height,
+                        fit: fit,
+                        noErrorWidget: true,
+                      );
+                    },
                   ),
                 ),
               ).paddingSymmetric(vertical: 4);
@@ -172,7 +180,8 @@ class _CustomEmoteInlineSyntax extends InlineSyntax {
   bool onMatch(markdown.InlineParser parser, Match match) {
     final StickerProvider sticker = Get.find();
     final alias = match[1]!.toUpperCase();
-    if (sticker.aliasImageMapping[alias] == null) {
+    if (sticker.stickerCache.containsKey(alias) &&
+        sticker.stickerCache[alias] == null) {
       parser.advanceBy(1);
       return false;
     }

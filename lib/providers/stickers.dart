@@ -1,47 +1,48 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:solian/exceptions/request.dart';
-import 'package:solian/models/pagination.dart';
 import 'package:solian/models/stickers.dart';
 import 'package:solian/services.dart';
 
 class StickerProvider extends GetxController {
-  final RxMap<String, String> aliasImageMapping = RxMap();
-  final RxList<Sticker> availableStickers = RxList.empty(growable: true);
+  final RxMap<String, FutureOr<Sticker?>> stickerCache = RxMap();
 
-  Future<void> refreshAvailableStickers() async {
-    availableStickers.clear();
-    aliasImageMapping.clear();
-
-    final client = await ServiceFinder.configureClient('files');
-    final resp = await client.get(
-      '/stickers/manifest?take=100',
-    );
-    if (resp.statusCode == 200) {
-      final result = PaginationResult.fromJson(resp.body);
-      final out = result.data?.map((e) => StickerPack.fromJson(e)).toList();
-      if (out == null) return;
-
-      for (final pack in out) {
-        for (final sticker in (pack.stickers ?? List<Sticker>.empty())) {
-          sticker.pack = pack;
-          aliasImageMapping[sticker.textPlaceholder.toUpperCase()] =
-              sticker.imageUrl;
-          availableStickers.add(sticker);
-        }
-      }
+  Future<Sticker?> getStickerByAlias(String alias) {
+    if (stickerCache.containsKey(alias)) {
+      return Future.value(stickerCache[alias]);
     }
-    availableStickers.refresh();
+
+    stickerCache[alias] = Future(() async {
+      final client = await ServiceFinder.configureClient('files');
+      final resp = await client.get(
+        '/stickers/lookup/$alias',
+      );
+      if (resp.statusCode != 200) {
+        if (resp.statusCode == 404) {
+          stickerCache[alias] = null;
+        }
+        throw RequestException(resp);
+      }
+
+      return Sticker.fromJson(resp.body);
+    }).then((result) {
+      stickerCache[alias] = result;
+      return result;
+    });
+
+    return Future.value(stickerCache[alias]);
   }
 
-  Future<Sticker?> getStickerByAlias(String alias) async {
+  Future<List<Sticker>> searchStickerByAlias(String alias) async {
     final client = await ServiceFinder.configureClient('files');
     final resp = await client.get(
-      '/stickers/lookup/$alias',
+      '/stickers/lookup?probe=$alias',
     );
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
 
-    return Sticker.fromJson(resp.body);
+    return List<Sticker>.from(resp.body.map((x) => Sticker.fromJson(x)));
   }
 }
