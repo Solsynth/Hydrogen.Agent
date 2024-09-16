@@ -8,7 +8,7 @@ part of 'packet.dart';
 
 NetworkPackage _$NetworkPackageFromJson(Map<String, dynamic> json) =>
     NetworkPackage(
-      method: json['w'] as String,
+      method: json['w'] as String? ?? 'unknown',
       endpoint: json['e'] as String?,
       message: json['m'] as String?,
       payload: json['p'] as Map<String, dynamic>?,

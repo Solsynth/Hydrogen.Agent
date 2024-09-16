@@ -4,7 +4,7 @@ part 'packet.g.dart';
 
 @JsonSerializable()
 class NetworkPackage {
-  @JsonKey(name: 'w')
+  @JsonKey(name: 'w', defaultValue: 'unknown')
   String method;
   @JsonKey(name: 'e')
   String? endpoint;

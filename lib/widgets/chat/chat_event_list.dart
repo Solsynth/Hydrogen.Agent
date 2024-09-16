@@ -92,10 +92,13 @@ class ChatEventList extends StatelessWidget {
               );
             },
             onFetchData: () {
-              chatController.loadEvents(
-                chatController.channel!,
-                chatController.scope!,
-              );
+              if (chatController.currentEvents.length <
+                  chatController.totalEvents.value) {
+                chatController.loadEvents(
+                  chatController.channel!,
+                  chatController.scope!,
+                );
+              }
             },
           );
         }),

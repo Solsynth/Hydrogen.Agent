@@ -129,6 +129,14 @@ class MessagesFetchingProvider extends GetxController {
     return await receiveEvent(remoteRecord);
   }
 
+  Future<LocalMessageEventTableData?> getEventFromLocal(int id) async {
+    final database = Get.find<DatabaseProvider>().database;
+    final localRecord = await (database.select(database.localMessageEventTable)
+          ..where((x) => x.id.equals(id)))
+        .getSingleOrNull();
+    return localRecord;
+  }
+
   /// Pull the remote events to local database
   Future<(List<Event>, int)?> pullRemoteEvents(Channel channel,
       {String scope = 'global', take = 10, offset = 0}) async {

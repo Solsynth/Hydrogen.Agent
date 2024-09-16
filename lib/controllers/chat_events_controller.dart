@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/models/event.dart';
@@ -30,14 +32,31 @@ class ChatEventController {
     this.channel = channel;
     this.scope = scope;
 
-    isLoading.value = true;
-    await syncLocal(channel, take: 10);
+    const firstTake = 20;
+    const furtherTake = 100;
 
-    src.pullRemoteEvents(channel, scope: scope, take: 10).then((result) {
-      totalEvents.value = result?.$2 ?? 0;
-      syncLocal(channel, take: 10);
-    });
+    isLoading.value = true;
+    await syncLocal(channel, take: firstTake);
     isLoading.value = false;
+
+    // Take a small range of messages to check is local database up to date
+    var isUpToDate = true;
+    final result =
+        await src.pullRemoteEvents(channel, scope: scope, take: firstTake);
+    totalEvents.value = result?.$2 ?? 0;
+    if ((result?.$1.length ?? 0) > 0) {
+      final minId = result!.$1.map((x) => x.id).reduce(math.min);
+      isUpToDate = await src.getEventFromLocal(minId) != null;
+    }
+    syncLocal(channel, take: firstTake);
+
+    if (!isUpToDate) {
+      // Loading more content due to isn't up to date
+      final result =
+          await src.pullRemoteEvents(channel, scope: scope, take: furtherTake);
+      totalEvents.value = result?.$2 ?? 0;
+      syncLocal(channel, take: furtherTake);
+    }
   }
 
   Future<void> loadEvents(Channel channel, String scope) async {
@@ -46,7 +65,9 @@ class ChatEventController {
 
     isLoading.value = true;
     await syncLocal(channel, take: take, offset: offset);
-    src.pullRemoteEvents(channel, scope: scope, offset: offset).then((result) {
+    src
+        .pullRemoteEvents(channel, scope: scope, take: take, offset: offset)
+        .then((result) {
       totalEvents.value = result?.$2 ?? 0;
       syncLocal(channel, take: take, offset: offset);
     });
@@ -56,7 +77,11 @@ class ChatEventController {
   Future<bool> syncLocal(Channel channel,
       {required int take, int offset = 0}) async {
     final data = await src.listEvents(channel, take: take, offset: offset);
-    currentEvents.replaceRange(0, currentEvents.length, data);
+    if (currentEvents.length >= offset + take) {
+      currentEvents.replaceRange(offset, offset + take, data);
+    } else {
+      currentEvents.insertAll(currentEvents.length, data);
+    }
     for (final x in data.reversed) {
       applyEvent(x);
     }
