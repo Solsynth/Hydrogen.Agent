@@ -9,7 +9,6 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/relation.dart';
-import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
@@ -115,7 +114,6 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
         final AuthProvider auth = Get.find();
         try {
           await Future.wait([
-            Get.find<StickerProvider>().refreshAvailableStickers(),
             if (auth.isAuthorized.isTrue)
               Get.find<ChannelProvider>().refreshAvailableChannel(),
             if (auth.isAuthorized.isTrue)

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/stickers.dart';
 import 'package:solian/services.dart';
@@ -30,5 +31,17 @@ class StickerProvider extends GetxController {
       }
     }
     availableStickers.refresh();
+  }
+
+  Future<Sticker?> getStickerByAlias(String alias) async {
+    final client = await ServiceFinder.configureClient('files');
+    final resp = await client.get(
+      '/stickers/lookup/$alias',
+    );
+    if (resp.statusCode != 200) {
+      throw RequestException(resp);
+    }
+
+    return Sticker.fromJson(resp.body);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/post_editor_controller.dart';
 import 'package:solian/widgets/attachments/attachment_editor.dart';
@@ -58,18 +57,25 @@ class _PostEditorThumbnailDialogState extends State<PostEditorThumbnailDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListTile(
-            title: Text('postThumbnailAttachmentNew'.tr),
-            contentPadding: const EdgeInsets.only(left: 16, right: 13),
-            trailing: const Icon(Icons.chevron_right),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+          Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              title: Text('postThumbnailAttachmentNew'.tr),
+              contentPadding: const EdgeInsets.only(left: 12, right: 9),
+              trailing: const Icon(Icons.chevron_right),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              onTap: () {
+                _promptUploadNewAttachment();
+              },
             ),
-            onTap: () {
-              _promptUploadNewAttachment();
-            },
           ),
-          const Gap(8),
+          const Row(children: <Widget>[
+            Expanded(child: Divider()),
+            Text('OR'),
+            Expanded(child: Divider()),
+          ]).paddingOnly(top: 12, bottom: 16, left: 16, right: 16),
           TextField(
             controller: _attachmentController,
             decoration: InputDecoration(

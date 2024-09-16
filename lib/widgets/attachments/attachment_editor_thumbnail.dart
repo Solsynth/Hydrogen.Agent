@@ -93,14 +93,14 @@ class _AttachmentEditorThumbnailDialogState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('postThumbnail'.tr),
+      title: Text('attachmentThumbnail'.tr),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Card(
             margin: EdgeInsets.zero,
             child: ListTile(
-              title: Text('postThumbnailAttachmentNew'.tr),
+              title: Text('attachmentThumbnailAttachmentNew'.tr),
               contentPadding: const EdgeInsets.only(left: 12, right: 9),
               trailing: const Icon(Icons.chevron_right),
               shape: const RoundedRectangleBorder(
@@ -122,7 +122,7 @@ class _AttachmentEditorThumbnailDialogState
               isDense: true,
               border: const OutlineInputBorder(),
               prefixText: '#',
-              labelText: 'postThumbnailAttachment'.tr,
+              labelText: 'attachmentThumbnailAttachment'.tr,
             ),
             onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           ),
