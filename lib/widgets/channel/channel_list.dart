@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
@@ -213,6 +216,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
               return _buildEntry(element);
             },
           ),
+          SliverGap(max(16, MediaQuery.of(context).padding.bottom)),
         ],
       );
     }

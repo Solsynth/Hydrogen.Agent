@@ -125,7 +125,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Obx(
                       () => ChannelListWidget(
                         noCategory: true,
-                        channels: _channels.directChannels,
+                        channels: List.from([
+                          ..._channels.groupChannels
+                              .where((x) => x.realmId == null),
+                          ..._channels.directChannels
+                        ]),
                         selfId: selfId,
                         useReplace: true,
                       ),
