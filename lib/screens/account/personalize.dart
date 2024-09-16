@@ -126,7 +126,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       return;
     }
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.put(
       '/users/me/$position',
@@ -148,7 +148,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     _birthday?.toIso8601String();
     final resp = await client.put(

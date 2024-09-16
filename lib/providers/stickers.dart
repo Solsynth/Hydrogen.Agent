@@ -11,7 +11,7 @@ class StickerProvider extends GetxController {
     availableStickers.clear();
     aliasImageMapping.clear();
 
-    final client = ServiceFinder.configureClient('files');
+    final client = await ServiceFinder.configureClient('files');
     final resp = await client.get(
       '/stickers/manifest?take=100',
     );

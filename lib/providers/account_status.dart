@@ -37,7 +37,7 @@ class StatusProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     return await client.get('/users/me/status');
   }
@@ -56,7 +56,7 @@ class StatusProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final payload = {
       'type': type,
@@ -85,7 +85,7 @@ class StatusProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.delete('/users/me/status');
     if (resp.statusCode != 200) {

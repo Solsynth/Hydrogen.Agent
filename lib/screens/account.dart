@@ -205,7 +205,6 @@ class _ActionCard extends StatelessWidget {
   final Function onTap;
 
   const _ActionCard({
-    super.key,
     required this.onTap,
     required this.title,
     required this.caption,

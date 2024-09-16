@@ -35,7 +35,7 @@ class _TagsFieldState extends State<TagsField> {
   Future<List<String>?> _searchTags(String probe) async {
     _currentSearchProbe = probe;
 
-    final client = ServiceFinder.configureClient('interactive');
+    final client = await ServiceFinder.configureClient('interactive');
     final resp = await client.get(
       '/tags?take=10&probe=$_currentSearchProbe',
     );

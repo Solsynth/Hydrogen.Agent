@@ -71,7 +71,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
     (
       label: 'bsCheckingServer',
       action: () async {
-        final client = ServiceFinder.configureClient('dealer');
+        final client = await ServiceFinder.configureClient('dealer');
         final resp = await client.get('/.well-known');
         if (resp.statusCode != null && resp.statusCode != 200) {
           setState(() {

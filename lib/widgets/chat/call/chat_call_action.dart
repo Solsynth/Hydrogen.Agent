@@ -33,7 +33,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     setState(() => _isBusy = true);
 
@@ -57,7 +57,7 @@ class _ChatCallButtonState extends State<ChatCallButton> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     setState(() => _isBusy = true);
 

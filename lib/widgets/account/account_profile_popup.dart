@@ -26,7 +26,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
     setState(() => _isBusy = true);
 
     try {
-      final client = ServiceFinder.configureClient('auth');
+      final client = await ServiceFinder.configureClient('auth');
       final resp = await client.get('/users/${widget.name}');
       if (resp.statusCode == 200) {
         setState(() {

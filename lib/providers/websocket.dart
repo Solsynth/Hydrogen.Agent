@@ -138,7 +138,7 @@ class WebSocketProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.get('/notifications?skip=0&take=100');
     if (resp.statusCode == 200) {
@@ -182,7 +182,7 @@ class WebSocketProvider extends GetxController {
     }
     log('Device Push Token is $token');
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.post('/notifications/subscribe', {
       'provider': provider,

@@ -28,7 +28,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         nickname.isEmpty ||
         password.isEmpty) return;
 
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
 
     final resp = await client.post('/users', {
       'name': username,

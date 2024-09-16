@@ -10,7 +10,7 @@ class DailySignProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('id');
+    final client = await auth.configureClient('id');
 
     final resp = await client.get('/daily?take=$take');
     if (resp.statusCode != 200 && resp.statusCode != 404) {
@@ -30,7 +30,7 @@ class DailySignProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('id');
+    final client = await auth.configureClient('id');
 
     final resp = await client.get('/daily/today');
     if (resp.statusCode != 200 && resp.statusCode != 404) {
@@ -46,7 +46,7 @@ class DailySignProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('id');
+    final client = await auth.configureClient('id');
 
     final resp = await client.post('/daily', {});
     if (resp.statusCode != 200) {

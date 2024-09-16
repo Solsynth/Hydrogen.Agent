@@ -29,10 +29,10 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
-    final resp = await client
-        .delete('/channels/${widget.realm}/${widget.channel.id}');
+    final resp =
+        await client.delete('/channels/${widget.realm}/${widget.channel.id}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString);
     } else if (Navigator.canPop(context)) {
@@ -48,7 +48,7 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     final resp = await client.delete(
       '/channels/${widget.realm}/${widget.channel.alias}/members/me',
@@ -69,11 +69,11 @@ class _ChannelDeletionDialogState extends State<ChannelDeletionDialog> {
           ? 'channelDeletionConfirm'.tr
           : 'channelLeaveConfirm'.tr),
       content: Text(
-        widget.isOwned ?
-        'channelDeletionConfirmCaption'
-            .trParams({'channel': '#${widget.channel.alias}'}) :
-        'channelLeaveConfirmCaption'
-            .trParams({'channel': '#${widget.channel.alias}'}),
+        widget.isOwned
+            ? 'channelDeletionConfirmCaption'
+                .trParams({'channel': '#${widget.channel.alias}'})
+            : 'channelLeaveConfirmCaption'
+                .trParams({'channel': '#${widget.channel.alias}'}),
       ),
       actions: <Widget>[
         TextButton(

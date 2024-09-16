@@ -63,7 +63,7 @@ class _StickerUploadDialogState extends State<StickerUploadDialog> {
     setState(() => _isBusy = true);
 
     Response resp;
-    final client = auth.configureClient('files');
+    final client = await auth.configureClient('files');
     if (widget.edit == null) {
       resp = await client.post('/stickers', {
         'name': _nameController.text,

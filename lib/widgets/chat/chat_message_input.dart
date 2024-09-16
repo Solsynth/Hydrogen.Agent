@@ -118,7 +118,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
     final mentionedUserNames = _findMentionedUsers(_textController.text);
     final mentionedUserIds = List<int>.empty(growable: true);
 
-    var client = auth.configureClient('auth');
+    var client = await auth.configureClient('auth');
     if (mentionedUserNames.isNotEmpty) {
       resp = await client.get('/users?name=${mentionedUserNames.join(',')}');
       if (resp.statusCode != 200) {
@@ -131,7 +131,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
       }
     }
 
-    client = auth.configureClient('messaging');
+    client = await auth.configureClient('messaging');
 
     if (_textController.text.trim().isEmpty && _attachments.isEmpty) return;
 
@@ -432,7 +432,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                       final userSearch = userMatch[1]!.toLowerCase();
                       final AuthProvider auth = Get.find();
 
-                      final client = auth.configureClient('auth');
+                      final client = await auth.configureClient('auth');
                       final resp = await client.get(
                         '/users/search?probe=$userSearch',
                       );

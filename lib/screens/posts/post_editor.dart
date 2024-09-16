@@ -75,7 +75,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('interactive');
+    final client = await auth.configureClient('interactive');
 
     Response resp;
     if (widget.edit != null) {

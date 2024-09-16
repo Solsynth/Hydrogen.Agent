@@ -49,7 +49,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
     final lookupResp = await client.get('/users/lookup?probe=$username');
     if (lookupResp.statusCode != 200) {
       context.showErrorDialog(lookupResp.bodyString);
@@ -74,7 +74,7 @@ class _SignInScreenState extends State<SignInScreen> {
     final username = _usernameController.value.text;
     if (username.isEmpty) return;
 
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
 
     setState(() => _isBusy = true);
 
@@ -114,7 +114,7 @@ class _SignInScreenState extends State<SignInScreen> {
   void _performGetFactorCode() async {
     if (_factorPicked == null) return;
 
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
 
     setState(() => _isBusy = true);
 
@@ -147,7 +147,7 @@ class _SignInScreenState extends State<SignInScreen> {
     final password = _passwordController.value.text;
     if (password.isEmpty) return;
 
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
 
     setState(() => _isBusy = true);
 
@@ -288,7 +288,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton(
-                        onPressed: _isBusy ? null : () => _previousStep(),
+                        onPressed: (_isBusy || _period > 1)
+                            ? null
+                            : () => _previousStep(),
                         style:
                             TextButton.styleFrom(foregroundColor: Colors.grey),
                         child: Row(

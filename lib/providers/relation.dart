@@ -26,21 +26,21 @@ class RelationshipProvider extends GetxController {
     return _friends.any((x) => x.relatedId == account.id);
   }
 
-  Future<Response> listRelation() {
+  Future<Response> listRelation() async {
     final AuthProvider auth = Get.find();
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
     return client.get('/users/me/relations');
   }
 
-  Future<Response> listRelationWithStatus(int status) {
+  Future<Response> listRelationWithStatus(int status) async {
     final AuthProvider auth = Get.find();
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
     return client.get('/users/me/relations?status=$status');
   }
 
   Future<Response> makeFriend(String username) async {
     final AuthProvider auth = Get.find();
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
     final resp = await client.post('/users/me/relations?related=$username', {});
     if (resp.statusCode != 200) {
       throw RequestException(resp);
@@ -52,7 +52,7 @@ class RelationshipProvider extends GetxController {
   Future<Response> handleRelation(
       Relationship relationship, bool doAccept) async {
     final AuthProvider auth = Get.find();
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
     final resp = await client.post(
       '/users/me/relations/${relationship.relatedId}/${doAccept ? 'accept' : 'decline'}',
       {},
@@ -66,7 +66,7 @@ class RelationshipProvider extends GetxController {
 
   Future<Response> editRelation(Relationship relationship, int status) async {
     final AuthProvider auth = Get.find();
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
     final resp = await client.patch(
       '/users/me/relations/${relationship.relatedId}',
       {'status': status},

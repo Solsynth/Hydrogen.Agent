@@ -115,14 +115,14 @@ class AuthProvider extends GetConnect {
     return request;
   }
 
-  GetConnect configureClient(
+  Future<GetConnect> configureClient(
     String service, {
     timeout = const Duration(seconds: 5),
-  }) {
+  }) async {
     final client = GetConnect(
       maxAuthRetries: 3,
       timeout: timeout,
-      userAgent: 'Solian/1.1',
+      userAgent: await ServiceFinder.getUserAgent(),
       sendUserAgent: true,
     );
     client.httpClient.addAuthenticator(requestAuthenticator);
@@ -204,7 +204,7 @@ class AuthProvider extends GetConnect {
 
   Future<void> refreshUserProfile() async {
     if (!isAuthorized.value) return;
-    final client = configureClient('auth');
+    final client = await configureClient('auth');
     final resp = await client.get('/users/me');
     if (resp.statusCode != 200) {
       throw RequestException(resp);

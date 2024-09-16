@@ -46,7 +46,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   Future<void> _getUserinfo() async {
     setState(() => _isBusy = true);
 
-    var client = ServiceFinder.configureClient('auth');
+    var client = await ServiceFinder.configureClient('auth');
     var resp = await client.get('/users/${widget.name}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
@@ -56,7 +56,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       _userinfo = Account.fromJson(resp.body);
     }
 
-    client = ServiceFinder.configureClient('interactive');
+    client = await ServiceFinder.configureClient('interactive');
     resp = await client.get('/users/${widget.name}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
@@ -71,7 +71,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   }
 
   Future<void> getPinnedPosts() async {
-    final client = ServiceFinder.configureClient('interactive');
+    final client = await ServiceFinder.configureClient('interactive');
     final resp = await client.get('/users/${widget.name}/pin');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
@@ -95,7 +95,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     _relationshipProvider = Get.find();
     _postController = PostListController(author: widget.name);
     _albumPagingController.addPageRequestListener((pageKey) async {
-      final client = ServiceFinder.configureClient('files');
+      final client = await ServiceFinder.configureClient('files');
       final resp = await client.get(
         '/attachments?take=10&offset=$pageKey&author=${widget.name}&original=true',
       );

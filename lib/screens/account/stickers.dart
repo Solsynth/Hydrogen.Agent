@@ -48,7 +48,7 @@ class _StickerScreenState extends State<StickerScreen> {
     );
     if (confirm != true) return false;
 
-    final client = auth.configureClient('files');
+    final client = await auth.configureClient('files');
     final resp = await client.delete('/stickers/${item.id}');
 
     return resp.statusCode == 200;
@@ -107,7 +107,7 @@ class _StickerScreenState extends State<StickerScreen> {
     final AuthProvider auth = Get.find();
     final name = auth.userProfile.value!['name'];
     _pagingController.addPageRequestListener((pageKey) async {
-      final client = ServiceFinder.configureClient('files');
+      final client = await ServiceFinder.configureClient('files');
       final resp = await client.get(
         '/stickers/manifest?take=10&offset=$pageKey&author=$name',
       );

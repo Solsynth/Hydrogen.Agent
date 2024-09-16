@@ -31,7 +31,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
     if (markList.isNotEmpty) {
-      final client = auth.configureClient('auth');
+      final client = await auth.configureClient('auth');
       await client.put('/notifications/read', {'messages': markList});
     }
 
@@ -53,7 +53,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     await client.put('/notifications/read/${element.id}', {});
 

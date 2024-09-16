@@ -93,7 +93,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient(
+    final client = await auth.configureClient(
       'uc',
       timeout: const Duration(minutes: 3),
     );
@@ -135,7 +135,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('uc');
+    final client = await auth.configureClient('uc');
 
     final fileAlt = basename(path).contains('.')
         ? basename(path).substring(0, basename(path).lastIndexOf('.'))
@@ -173,7 +173,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient(
+    final client = await auth.configureClient(
       'uc',
       timeout: const Duration(minutes: 3),
     );
@@ -198,7 +198,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('files');
+    final client = await auth.configureClient('files');
 
     var resp = await client.put('/attachments/$id', {
       'alt': alt,
@@ -217,7 +217,7 @@ class AttachmentProvider extends GetConnect {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('files');
+    final client = await auth.configureClient('files');
 
     var resp = await client.delete('/attachments/$id');
     if (resp.statusCode != 200) {

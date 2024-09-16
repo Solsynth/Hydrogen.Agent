@@ -37,7 +37,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
   void getMembers() async {
     setState(() => _isBusy = true);
 
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
 
     final resp = await client.get('/realms/${widget.realm.alias}/members');
     if (resp.statusCode == 200) {
@@ -72,7 +72,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.post(
       '/realms/${widget.realm.alias}/members',
@@ -93,7 +93,7 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.request(
       '/realms/${widget.realm.alias}/members',

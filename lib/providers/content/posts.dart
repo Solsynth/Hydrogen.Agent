@@ -14,9 +14,9 @@ class PostProvider extends GetConnect {
     GetConnect client;
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.value) {
-      client = auth.configureClient('co');
+      client = await auth.configureClient('co');
     } else {
-      client = ServiceFinder.configureClient('co');
+      client = await ServiceFinder.configureClient('co');
     }
     final resp = await client.get('/whats-new?pivot=$pivot');
     if (resp.statusCode != 200) {
@@ -36,9 +36,9 @@ class PostProvider extends GetConnect {
       if (realm != null) 'realm=$realm',
     ];
     if (auth.isAuthorized.value) {
-      client = auth.configureClient('co');
+      client = await auth.configureClient('co');
     } else {
-      client = ServiceFinder.configureClient('co');
+      client = await ServiceFinder.configureClient('co');
     }
     final resp = await client.get(
       channel == null
@@ -60,7 +60,7 @@ class PostProvider extends GetConnect {
       'take=${10}',
       'offset=$page',
     ];
-    final client = auth.configureClient('interactive');
+    final client = await auth.configureClient('interactive');
     final resp = await client.get('/posts/drafts?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw RequestException(resp);

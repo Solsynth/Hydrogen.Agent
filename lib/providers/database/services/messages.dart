@@ -12,7 +12,7 @@ class MessagesFetchingProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return null;
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     final resp = await client.get(
       '/whats-new?pivot=$pivot&take=$take',
@@ -33,7 +33,7 @@ class MessagesFetchingProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return null;
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     final resp = await client.get(
       '/channels/$scope/${channel.alias}/events/$id',
@@ -57,7 +57,7 @@ class MessagesFetchingProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return null;
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     final resp = await client.get(
       '/channels/$scope/${channel.alias}/events?take=$take&offset=$offset',

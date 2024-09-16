@@ -79,7 +79,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
 
     setState(() => _isBusy = true);
 
-    final client = auth.configureClient('messaging');
+    final client = await auth.configureClient('messaging');
 
     final resp = await client
         .put('/channels/${widget.realm}/${widget.channel.alias}/members/me', {

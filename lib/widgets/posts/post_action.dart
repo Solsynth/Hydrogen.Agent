@@ -192,7 +192,7 @@ class _PostActionState extends State<PostAction> {
                           : 'unpinPost'.tr,
                     ),
                     onTap: () async {
-                      final client = Get.find<AuthProvider>()
+                      final client = await Get.find<AuthProvider>()
                           .configureClient('interactive');
                       await client.post('/posts/${widget.item.id}/pin', {});
                       Navigator.pop(context, true);
@@ -254,7 +254,7 @@ class _PostDeletionDialogState extends State<PostDeletionDialog> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    final client = auth.configureClient('interactive');
+    final client = await auth.configureClient('interactive');
 
     setState(() => _isBusy = true);
     final resp = await client.delete('/posts/${widget.item.id}');

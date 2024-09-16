@@ -25,7 +25,7 @@ class RealmProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.get('/realms/$alias');
     if (resp.statusCode != 200) {
@@ -39,7 +39,7 @@ class RealmProvider extends GetxController {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
 
     final resp = await client.get('/realms/me/available');
     if (resp.statusCode != 200) {

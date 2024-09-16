@@ -36,16 +36,13 @@ class _AccountSelectorState extends State<AccountSelector> {
 
   _revertSelectedUsers() async {
     if (widget.initialSelection?.isEmpty ?? true) return;
-    final client = ServiceFinder.configureClient('auth');
+    final client = await ServiceFinder.configureClient('auth');
     final idQuery = widget.initialSelection!.join(',');
     final resp = await client.get('/users?id=$idQuery');
 
     setState(() {
       _selectedUsers.addAll(
-        resp.body
-            .map((e) => Account.fromJson(e))
-            .toList()
-            .cast<Account>(),
+        resp.body.map((e) => Account.fromJson(e)).toList().cast<Account>(),
       );
     });
   }
@@ -73,7 +70,7 @@ class _AccountSelectorState extends State<AccountSelector> {
 
     if (_probeController.text.isEmpty) return;
 
-    final client = auth.configureClient('auth');
+    final client = await auth.configureClient('auth');
     final resp = await client.get(
       '/users/search?probe=${_probeController.text}',
     );
@@ -156,7 +153,8 @@ class _AccountSelectorState extends State<AccountSelector> {
                           }
 
                           setState(() {
-                            final idx = _selectedUsers.indexWhere((x) => x.id == element.id);
+                            final idx = _selectedUsers
+                                .indexWhere((x) => x.id == element.id);
                             if (idx != -1) {
                               _selectedUsers.removeAt(idx);
                             } else {
