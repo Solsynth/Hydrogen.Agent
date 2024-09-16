@@ -379,6 +379,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 isClickable: true,
                                 isShowEmbed: true,
                                 isNestedClickable: true,
+                                showFeaturedReply: true,
                                 onUpdate: (_) {
                                   _pullPosts();
                                 },

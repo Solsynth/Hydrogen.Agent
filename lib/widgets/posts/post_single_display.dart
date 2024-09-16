@@ -23,6 +23,7 @@ class PostSingleDisplay extends StatelessWidget {
             isClickable: true,
             isShowEmbed: true,
             isNestedClickable: true,
+            showFeaturedReply: true,
             onUpdate: onUpdate,
             backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
           ),

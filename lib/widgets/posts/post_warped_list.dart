@@ -36,6 +36,7 @@ class PostWarpedListWidget extends StatelessWidget {
             isShowEmbed: isShowEmbed,
             isNestedClickable: isNestedClickable,
             isClickable: isClickable,
+            showFeaturedReply: true,
             item: item,
             onUpdate: onUpdate ?? () {},
           );

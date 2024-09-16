@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/services.dart';
 
@@ -94,6 +95,15 @@ class PostProvider extends GetConnect {
     }
 
     return resp;
+  }
+
+  Future<List<Post>> listPostFeaturedReply(String alias) async {
+    final resp = await get('/posts/$alias/replies/featured');
+    if (resp.statusCode != 200) {
+      throw RequestException(resp);
+    }
+
+    return List<Post>.from(resp.body.map((x) => Post.fromJson(x)));
   }
 
   Future<Response> getPost(String alias) async {

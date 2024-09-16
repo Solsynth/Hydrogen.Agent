@@ -33,6 +33,7 @@ class PostListWidget extends StatelessWidget {
             isShowEmbed: isShowEmbed,
             isNestedClickable: isNestedClickable,
             isClickable: isClickable,
+            showFeaturedReply: true,
             item: item,
             backgroundColor: backgroundColor,
             onUpdate: () {
@@ -51,6 +52,7 @@ class PostListEntryWidget extends StatelessWidget {
   final bool isShowEmbed;
   final bool isNestedClickable;
   final bool isClickable;
+  final bool showFeaturedReply;
   final Post item;
   final Function onUpdate;
   final Color? backgroundColor;
@@ -61,6 +63,7 @@ class PostListEntryWidget extends StatelessWidget {
     required this.isShowEmbed,
     required this.isNestedClickable,
     required this.isClickable,
+    required this.showFeaturedReply,
     required this.item,
     required this.onUpdate,
     this.backgroundColor,
@@ -74,6 +77,7 @@ class PostListEntryWidget extends StatelessWidget {
         item: item,
         isShowEmbed: isShowEmbed,
         isClickable: isNestedClickable,
+        showFeaturedReply: showFeaturedReply,
         backgroundColor: backgroundColor,
       ).paddingSymmetric(vertical: 8),
       onLongPress: () {

@@ -302,6 +302,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                           isClickable: true,
                           isNestedClickable: true,
                           isShowEmbed: true,
+                          showFeaturedReply: true,
                           onUpdate: () {
                             _postController.reloadAllOver();
                           },

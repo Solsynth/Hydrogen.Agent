@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get_utils/get_utils.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/shells/title_shell.dart';
 import 'package:solian/theme.dart';
@@ -30,6 +31,7 @@ class PostItem extends StatefulWidget {
   final bool isFullDate;
   final bool isFullContent;
   final bool isContentSelectable;
+  final bool showFeaturedReply;
   final String? attachmentParent;
   final Color? backgroundColor;
 
@@ -45,6 +47,7 @@ class PostItem extends StatefulWidget {
     this.isFullDate = false,
     this.isFullContent = false,
     this.isContentSelectable = false,
+    this.showFeaturedReply = false,
     this.attachmentParent,
     this.backgroundColor,
   });
@@ -103,7 +106,7 @@ class _PostItemState extends State<PostItem> {
       children: [
         if (widget.isCompact)
           AccountAvatar(
-            content: item.author.avatar.toString(),
+            content: item.author.avatar,
             radius: 10,
           ).paddingOnly(left: 2, top: 1),
         Expanded(
@@ -320,6 +323,95 @@ class _PostItemState extends State<PostItem> {
     }
   }
 
+  Widget _buildFeaturedReply() {
+    if ((widget.item.metric?.replyCount ?? 0) == 0) {
+      return const SizedBox.shrink();
+    }
+    final List<String> attachments = item.body['attachments'] is List
+        ? List.from(item.body['attachments']?.whereType<String>())
+        : List.empty();
+    final unFocusColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+    return FutureBuilder(
+      future: Get.find<PostProvider>().listPostFeaturedReply(
+        widget.item.id.toString(),
+      ),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Card(
+          margin: EdgeInsets.zero,
+          child: Column(
+            children: snapshot.data!
+                .map(
+                  (x) => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AccountAvatar(content: x.author.avatar, radius: 10),
+                      const Gap(6),
+                      Text(
+                        x.author.nick,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const Gap(6),
+                      Text(
+                        format(
+                          x.publishedAt?.toLocal() ?? DateTime.now(),
+                          locale: 'en_short',
+                        ),
+                      ).paddingOnly(top: 0.5),
+                      const Gap(16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MarkdownTextContent(
+                              content: x.body['content'],
+                              parentId: 'p${item.id}-featured-reply${x.id}',
+                            ),
+                            if (x.body['attachments'] is List &&
+                                x.body['attachments'].length > 0)
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.file_copy,
+                                    size: 15,
+                                    color: unFocusColor,
+                                  ).paddingOnly(right: 5),
+                                  Text(
+                                    'attachmentHint'.trParams(
+                                      {
+                                        'count': x.body['attachments'].length
+                                            .toString()
+                                      },
+                                    ),
+                                    style: TextStyle(color: unFocusColor),
+                                  )
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ).paddingSymmetric(horizontal: 12, vertical: 8),
+                )
+                .toList(),
+          ),
+        ).paddingOnly(
+          top: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+              ? 10
+              : 6,
+          left: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
+              ? 24
+              : 60,
+          right: 16,
+        );
+      },
+    );
+  }
+
   double _contentHeight = 0;
 
   @override
@@ -417,7 +509,7 @@ class _PostItemState extends State<PostItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                child: AccountAvatar(content: item.author.avatar.toString()),
+                child: AccountAvatar(content: item.author.avatar),
                 onTap: () {
                   showModalBottomSheet(
                     useRootNavigator: true,
@@ -506,6 +598,7 @@ class _PostItemState extends State<PostItem> {
             left: 16,
           ),
           _buildAttachments(),
+          if (widget.showFeaturedReply) _buildFeaturedReply(),
           if (widget.isShowReply || widget.isReactable)
             PostQuickAction(
               isShowReply: widget.isShowReply,
