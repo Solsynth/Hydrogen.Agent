@@ -484,7 +484,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           ),
                         ),
                         Text(
-                          '${fileType[0].toUpperCase()}${fileType.substring(1)} · ${element.size.formatBytes()}',
+                          '${fileType.isNotEmpty ? fileType.capitalize : 'unknown'.tr} · ${element.size.formatBytes()}',
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
