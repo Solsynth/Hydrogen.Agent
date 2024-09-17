@@ -14,12 +14,14 @@ class MarkdownTextContent extends StatelessWidget {
   final String content;
   final String parentId;
   final bool isSelectable;
+  final bool isLargeText;
 
   const MarkdownTextContent({
     super.key,
     required this.content,
     required this.parentId,
     this.isSelectable = false,
+    this.isLargeText = false,
   });
 
   Widget _buildContent(BuildContext context) {
@@ -35,6 +37,14 @@ class MarkdownTextContent extends StatelessWidget {
       styleSheet: MarkdownStyleSheet.fromTheme(
         Theme.of(context),
       ).copyWith(
+        textScaleFactor: isLargeText ? 1.1 : 1,
+        blockquote: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+        blockquoteDecoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
+        ),
         horizontalRuleDecoration: BoxDecoration(
           border: Border(
             top: BorderSide(

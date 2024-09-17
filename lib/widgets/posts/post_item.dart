@@ -550,6 +550,8 @@ class _PostItemState extends State<PostItem> {
                               parentId: 'p${item.id}-embed',
                               content: item.body['content'],
                               isSelectable: widget.isContentSelectable,
+                              isLargeText: item.type == 'article' &&
+                                  widget.isFullContent,
                             ).paddingOnly(left: 12, right: 8),
                           ),
                         ),
