@@ -228,6 +228,8 @@
   "realmDescription": "Description",
   "realmPublic": "Public Realm",
   "realmCommunity": "Community Realm",
+  "realmAvatar": "Realm avatar",
+  "realmBanner": "Realm banner",
   "realmDetail": "Realm detail",
   "realmMember": "Realm member",
   "realmMembers": "Realm members",

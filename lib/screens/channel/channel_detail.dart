@@ -114,7 +114,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
       ListTile(
         leading: const Icon(Icons.settings),
         trailing: const Icon(Icons.chevron_right),
-        title: Text('channelSettings'.tr.capitalize!),
+        title: Text('channelSettings'.tr),
         onTap: () async {
           AppRouter.instance
               .pushNamed(
@@ -173,7 +173,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.notifications_active),
-                title: Text('channelNotifyLevel'.tr.capitalize!),
+                title: Text('channelNotifyLevel'.tr),
                 trailing: DropdownButtonHideUnderline(
                   child: DropdownButton2<int>(
                     isExpanded: true,
@@ -208,7 +208,7 @@ class _ChannelDetailScreenState extends State<ChannelDetailScreen> {
               ListTile(
                 leading: const Icon(Icons.supervisor_account),
                 trailing: const Icon(Icons.chevron_right),
-                title: Text('channelMembers'.tr.capitalize!),
+                title: Text('channelMembers'.tr),
                 onTap: () => showMemberList(),
               ),
               ...(_isOwned ? ownerActions : List.empty()),

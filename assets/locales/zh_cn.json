@@ -229,6 +229,8 @@
   "realmDescription": "领域简介",
   "realmPublic": "公开领域",
   "realmCommunity": "社区领域",
+  "realmAvatar": "领域头像",
+  "realmBanner": "领域横幅",
   "realmDetail": "领域详情",
   "realmMember": "领域成员",
   "realmMembers": "领域成员",

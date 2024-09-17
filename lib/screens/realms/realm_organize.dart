@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/attachment.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
@@ -29,17 +35,19 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
   bool _isBusy = false;
 
   final _aliasController = TextEditingController();
+  final _avatarController = TextEditingController();
+  final _bannerController = TextEditingController();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
 
   bool _isCommunity = false;
   bool _isPublic = false;
 
-  void applyRealm() async {
+  void _applyRealm() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    if (_aliasController.value.text.isEmpty) randomizeAlias();
+    if (_aliasController.value.text.isEmpty) _randomizeAlias();
 
     setState(() => _isBusy = true);
 
@@ -49,6 +57,8 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
       'alias': _aliasController.value.text.toLowerCase(),
       'name': _nameController.value.text,
       'description': _descriptionController.value.text,
+      'avatar': _avatarController.value.text,
+      'banner': _bannerController.value.text,
       'is_public': _isPublic,
       'is_community': _isCommunity,
     };
@@ -68,29 +78,108 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
     setState(() => _isBusy = false);
   }
 
-  void randomizeAlias() {
+  final _imagePicker = ImagePicker();
+
+  Future<void> _editImage(String position) async {
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) return;
+
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: image.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'cropImage'.tr,
+          toolbarColor: Theme.of(context).colorScheme.primary,
+          toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
+          aspectRatioPresets: [
+            if (position == 'avatar') CropAspectRatioPreset.square,
+            if (position == 'banner') _BannerCropAspectRatioPreset(),
+          ],
+        ),
+        IOSUiSettings(
+          title: 'cropImage'.tr,
+          aspectRatioPresets: [
+            if (position == 'avatar') CropAspectRatioPreset.square,
+            if (position == 'banner') _BannerCropAspectRatioPreset(),
+          ],
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedFile == null) return;
+    final file = File(croppedFile.path);
+
+    setState(() => _isBusy = true);
+
+    final AttachmentProvider attach = Get.find();
+
+    Attachment? attachResult;
+    try {
+      attachResult = await attach.createAttachmentDirectly(
+        await file.readAsBytes(),
+        file.path,
+        'avatar',
+        null,
+      );
+    } catch (e) {
+      setState(() => _isBusy = false);
+      context.showErrorDialog(e);
+      return;
+    }
+
+    switch (position) {
+      case 'avatar':
+        _avatarController.text = attachResult.rid;
+        break;
+      case 'banner':
+        _bannerController.text = attachResult.rid;
+        break;
+    }
+
+    setState(() => _isBusy = false);
+  }
+
+  void _randomizeAlias() {
     _aliasController.text =
         const Uuid().v4().replaceAll('-', '').substring(0, 12);
   }
 
-  void syncWidget() {
+  void _syncWidget() {
     if (widget.edit != null) {
       _aliasController.text = widget.edit!.alias;
       _nameController.text = widget.edit!.name;
       _descriptionController.text = widget.edit!.description;
+      _avatarController.text = widget.edit!.avatar ?? '';
+      _bannerController.text = widget.edit!.banner ?? '';
       _isPublic = widget.edit!.isPublic;
       _isCommunity = widget.edit!.isCommunity;
     }
   }
 
-  void cancelAction() {
+  void _cancelAction() {
     AppRouter.instance.pop();
   }
 
   @override
   void initState() {
-    syncWidget();
+    _syncWidget();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _aliasController.dispose();
+    _avatarController.dispose();
+    _bannerController.dispose();
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -105,7 +194,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
           toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             TextButton(
-              onPressed: _isBusy ? null : () => applyRealm(),
+              onPressed: _isBusy ? null : () => _applyRealm(),
               child: Text('apply'.tr.toUpperCase()),
             )
           ],
@@ -126,7 +215,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
                   ),
                   actions: [
                     TextButton(
-                      onPressed: cancelAction,
+                      onPressed: _cancelAction,
                       child: Text('cancel'.tr),
                     ),
                   ],
@@ -150,7 +239,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
                       visualDensity:
                           const VisualDensity(horizontal: -2, vertical: -2),
                     ),
-                    onPressed: () => randomizeAlias(),
+                    onPressed: () => _randomizeAlias(),
                     child: const Icon(Icons.refresh),
                   )
                 ],
@@ -165,6 +254,55 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
                 onTapOutside: (_) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
               ).paddingSymmetric(horizontal: 16, vertical: 8),
+              const Divider(thickness: 0.3),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      autofocus: true,
+                      controller: _avatarController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'realmAvatar'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    ),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      shape: const CircleBorder(),
+                      visualDensity:
+                          const VisualDensity(horizontal: -2, vertical: -2),
+                    ),
+                    onPressed: _isBusy ? null : () => _editImage('avatar'),
+                    child: const Icon(Icons.upload),
+                  )
+                ],
+              ).paddingSymmetric(horizontal: 16, vertical: 2),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      autofocus: true,
+                      controller: _bannerController,
+                      decoration: InputDecoration.collapsed(
+                        hintText: 'realmBanner'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                    ),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      shape: const CircleBorder(),
+                      visualDensity:
+                          const VisualDensity(horizontal: -2, vertical: -2),
+                    ),
+                    onPressed: _isBusy ? null : () => _editImage('banner'),
+                    child: const Icon(Icons.upload),
+                  )
+                ],
+              ).paddingSymmetric(horizontal: 16, vertical: 2),
               const Divider(thickness: 0.3),
               Expanded(
                 child: TextField(
@@ -201,4 +339,12 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
       ),
     );
   }
+}
+
+class _BannerCropAspectRatioPreset extends CropAspectRatioPresetData {
+  @override
+  (int, int)? get data => (16, 7);
+
+  @override
+  String get name => '16x7';
 }

@@ -98,6 +98,14 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
   }
 
   @override
+  void dispose() {
+    _aliasController.dispose();
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final notifyBannerActions = [
       TextButton(

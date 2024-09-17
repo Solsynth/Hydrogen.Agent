@@ -6,7 +6,9 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/navigation.dart';
+import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 
 class AppNavigationRegion extends StatefulWidget {
@@ -169,6 +171,19 @@ class _AppNavigationRegionState extends State<AppNavigationRegion> {
                   )
             : Column(
                 children: [
+                  if (!widget.isCollapsed &&
+                      (navState.focusedRealm.value!.banner?.isNotEmpty ??
+                          false))
+                    AspectRatio(
+                      aspectRatio: 16 / 7,
+                      child: AutoCacheImage(
+                        ServiceFinder.buildUrl(
+                          'uc',
+                          '/attachments/${navState.focusedRealm.value!.banner}',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   if (widget.isCollapsed)
                     Tooltip(
                       message: navState.focusedRealm.value!.name,

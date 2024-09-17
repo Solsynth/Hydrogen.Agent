@@ -69,7 +69,8 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
       ListTile(
         leading: const Icon(Icons.settings),
         trailing: const Icon(Icons.chevron_right),
-        title: Text('realmSettings'.tr.capitalize!),
+        title: Text('realmSettings'.tr),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
         onTap: () async {
           AppRouter.instance
               .pushNamed(
@@ -120,14 +121,16 @@ class _RealmDetailScreenState extends State<RealmDetailScreen> {
           child: ListView(
             children: [
               ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                 leading: const Icon(Icons.supervisor_account),
                 trailing: const Icon(Icons.chevron_right),
-                title: Text('realmMembers'.tr.capitalize!),
+                title: Text('realmMembers'.tr),
                 onTap: () => showMemberList(),
               ),
               ...(_isOwned ? ownerActions : List.empty()),
               const Divider(thickness: 0.3),
               ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                 leading: _isOwned
                     ? const Icon(Icons.delete)
                     : const Icon(Icons.exit_to_app),

@@ -7,10 +7,13 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
+import 'package:solian/services.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/sized_container.dart';
 
@@ -128,19 +131,34 @@ class _RealmListScreenState extends State<RealmListScreen> {
                   children: [
                     Container(
                       color: Theme.of(context).colorScheme.surfaceContainer,
+                      child: (element.banner?.isEmpty ?? true)
+                          ? const SizedBox.shrink()
+                          : AutoCacheImage(
+                              ServiceFinder.buildUrl(
+                                'uc',
+                                '/attachments/${element.banner}',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                     ),
-                    const Positioned(
+                    Positioned(
                       bottom: -30,
                       left: 18,
-                      child: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.indigo,
-                        child: FaIcon(
-                          FontAwesomeIcons.globe,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
+                      child: (element.avatar?.isEmpty ?? true)
+                          ? CircleAvatar(
+                              radius: 24,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              child: const FaIcon(
+                                FontAwesomeIcons.globe,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            )
+                          : AccountAvatar(
+                              content: element.avatar!,
+                              bgColor: Theme.of(context).colorScheme.primary,
+                            ),
                     ),
                   ],
                 ),
