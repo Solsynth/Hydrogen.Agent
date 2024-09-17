@@ -417,5 +417,11 @@
   "holdToSeeDetail": "长按 / 鼠标悬浮来查看详情",
   "subscribe": "订阅",
   "subscribed": "已订阅",
-  "unsubscribe": "取消订阅"
+  "unsubscribe": "取消订阅",
+  "preferences": "偏好设置",
+  "notificationPreferences": "通知偏好设置",
+  "notificationTopicPostFeedback": "帖子反馈",
+  "notificationTopicPostSubscription": "订阅源",
+  "preferencesApplied": "偏好设置已应用",
+  "save": "保存"
 }

@@ -416,5 +416,11 @@
   "holdToSeeDetail": "Long press / Mouse hover to see detail",
   "subscribe": "Subscribe",
   "subscribed": "Subscribed",
-  "unsubscribe": "Unsubscribe"
+  "unsubscribe": "Unsubscribe",
+  "preferences": "Preferences",
+  "notificationPreferences": "Notification preferences",
+  "notificationTopicPostFeedback": "Post feedbacks",
+  "notificationTopicPostSubscription": "Post subscriptions",
+  "preferencesApplied": "Preferences has been applied.",
+  "save": "Save"
 }

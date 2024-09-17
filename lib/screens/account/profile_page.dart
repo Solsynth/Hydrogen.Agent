@@ -400,7 +400,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                             child: AttachmentListEntry(
                               item: item,
                               isDense: true,
-                              parentId: 'album',
+                              parentId: 'album-$index',
                               showMature: _showMature,
                               onReveal: (value) {
                                 setState(() => _showMature = value);

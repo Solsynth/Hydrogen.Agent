@@ -5,6 +5,7 @@ import 'package:solian/models/realm.dart';
 import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
+import 'package:solian/screens/account/preferences/notifications.dart';
 import 'package:solian/screens/account/profile_edit.dart';
 import 'package:solian/screens/account/profile_page.dart';
 import 'package:solian/screens/auth/signin.dart';
@@ -243,6 +244,14 @@ abstract class AppRouter {
         builder: (context, state) => TitleShell(
           state: state,
           child: const PersonalizeScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/account/preferences/notifications',
+        name: 'notificationPreferences',
+        builder: (context, state) => TitleShell(
+          state: state,
+          child: const NotificationPreferencesScreen(),
         ),
       ),
       GoRoute(

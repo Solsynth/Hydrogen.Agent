@@ -131,6 +131,15 @@ class _AccountScreenState extends State<AccountScreen> {
                     AppRouter.instance.pushNamed('settings');
                   },
                 ),
+                if (auth.isAuthorized.value)
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                    leading: const Icon(Icons.edit_notifications),
+                    title: Text('notificationPreferences'.tr),
+                    onTap: () {
+                      AppRouter.instance.pushNamed('notificationPreferences');
+                    },
+                  ),
                 const Divider(thickness: 0.3, height: 1)
                     .paddingSymmetric(vertical: 4),
                 ListTile(
