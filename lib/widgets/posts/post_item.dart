@@ -341,64 +341,67 @@ class _PostItemState extends State<PostItem> {
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const SizedBox.shrink();
         }
-        return Card(
-          margin: EdgeInsets.zero,
-          child: Column(
-            children: snapshot.data!
-                .map(
-                  (x) => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AccountAvatar(content: x.author.avatar, radius: 10),
-                      const Gap(6),
-                      Text(
-                        x.author.nick,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const Gap(6),
-                      Text(
-                        format(
-                          x.publishedAt?.toLocal() ?? DateTime.now(),
-                          locale: 'en_short',
+        return Container(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Card(
+            margin: EdgeInsets.zero,
+            child: Column(
+              children: snapshot.data!
+                  .map(
+                    (x) => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AccountAvatar(content: x.author.avatar, radius: 10),
+                        const Gap(6),
+                        Text(
+                          x.author.nick,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      ).paddingOnly(top: 0.5),
-                      const Gap(8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            MarkdownTextContent(
-                              content: x.body['content'],
-                              parentId: 'p${item.id}-featured-reply${x.id}',
-                            ),
-                            if (x.body['attachments'] is List &&
-                                x.body['attachments'].length > 0)
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.file_copy,
-                                    size: 15,
-                                    color: unFocusColor,
-                                  ).paddingOnly(right: 5),
-                                  Text(
-                                    'attachmentHint'.trParams(
-                                      {
-                                        'count': x.body['attachments'].length
-                                            .toString()
-                                      },
-                                    ),
-                                    style: TextStyle(color: unFocusColor),
-                                  )
-                                ],
+                        const Gap(6),
+                        Text(
+                          format(
+                            x.publishedAt?.toLocal() ?? DateTime.now(),
+                            locale: 'en_short',
+                          ),
+                        ).paddingOnly(top: 0.5),
+                        const Gap(8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              MarkdownTextContent(
+                                content: x.body['content'],
+                                parentId: 'p${item.id}-featured-reply${x.id}',
                               ),
-                          ],
+                              if (x.body['attachments'] is List &&
+                                  x.body['attachments'].length > 0)
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.file_copy,
+                                      size: 15,
+                                      color: unFocusColor,
+                                    ).paddingOnly(right: 5),
+                                    Text(
+                                      'attachmentHint'.trParams(
+                                        {
+                                          'count': x.body['attachments'].length
+                                              .toString()
+                                        },
+                                      ),
+                                      style: TextStyle(color: unFocusColor),
+                                    )
+                                  ],
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ).paddingSymmetric(horizontal: 12, vertical: 8),
-                )
-                .toList(),
+                      ],
+                    ).paddingSymmetric(horizontal: 12, vertical: 8),
+                  )
+                  .toList(),
+            ),
           ),
         )
             .animate()
