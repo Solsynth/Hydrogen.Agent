@@ -35,13 +35,14 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  bool _isEncrypted = false;
+  bool _isPublic = false;
+  bool _isCommunity = false;
 
-  void applyChannel() async {
+  void _applyChannel() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    if (_aliasController.value.text.isEmpty) randomizeAlias();
+    if (_aliasController.value.text.isEmpty) _randomizeAlias();
 
     setState(() => _isBusy = true);
 
@@ -52,7 +53,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
       'alias': _aliasController.value.text.toLowerCase(),
       'name': _nameController.value.text,
       'description': _descriptionController.value.text,
-      'is_encrypted': _isEncrypted,
+      'is_encrypted': _isPublic,
     };
 
     Response? resp;
@@ -71,27 +72,28 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
     setState(() => _isBusy = false);
   }
 
-  void randomizeAlias() {
+  void _randomizeAlias() {
     _aliasController.text =
         const Uuid().v4().replaceAll('-', '').substring(0, 12);
   }
 
-  void syncWidget() {
+  void _syncWidget() {
     if (widget.edit != null) {
       _aliasController.text = widget.edit!.alias;
       _nameController.text = widget.edit!.name;
       _descriptionController.text = widget.edit!.description;
-      _isEncrypted = widget.edit!.isEncrypted;
+      _isPublic = widget.edit!.isPublic;
+      _isCommunity = widget.edit!.isCommunity;
     }
   }
 
-  void cancelAction() {
+  void _cancelAction() {
     AppRouter.instance.pop();
   }
 
   @override
   void initState() {
-    syncWidget();
+    _syncWidget();
     super.initState();
   }
 
@@ -99,7 +101,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
   Widget build(BuildContext context) {
     final notifyBannerActions = [
       TextButton(
-        onPressed: cancelAction,
+        onPressed: _cancelAction,
         child: Text('cancel'.tr),
       ),
     ];
@@ -113,7 +115,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
           toolbarHeight: AppTheme.toolbarHeight(context),
           actions: [
             TextButton(
-              onPressed: _isBusy ? null : () => applyChannel(),
+              onPressed: _isBusy ? null : () => _applyChannel(),
               child: Text('apply'.tr.toUpperCase()),
             )
           ],
@@ -164,7 +166,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
                       visualDensity:
                           const VisualDensity(horizontal: -2, vertical: -2),
                     ),
-                    onPressed: () => randomizeAlias(),
+                    onPressed: () => _randomizeAlias(),
                     child: const Icon(Icons.refresh),
                   )
                 ],
@@ -196,12 +198,17 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
               ),
               const Divider(thickness: 0.3),
               CheckboxListTile(
-                title: Text('channelEncrypted'.tr),
-                value: _isEncrypted,
-                onChanged: (widget.edit?.isEncrypted ?? false)
-                    ? null
-                    : (newValue) =>
-                        setState(() => _isEncrypted = newValue ?? false),
+                title: Text('channelPublic'.tr),
+                value: _isPublic,
+                onChanged: (value) =>
+                    setState(() => _isPublic = value ?? false),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+              CheckboxListTile(
+                title: Text('channelCommunity'.tr),
+                value: _isCommunity,
+                onChanged: (value) =>
+                    setState(() => _isCommunity = value ?? false),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
             ],

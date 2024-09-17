@@ -22,7 +22,8 @@ Channel _$ChannelFromJson(Map<String, dynamic> json) => Channel(
           .toList(),
       account: Account.fromJson(json['account'] as Map<String, dynamic>),
       accountId: (json['account_id'] as num).toInt(),
-      isEncrypted: json['is_encrypted'] as bool,
+      isPublic: json['is_public'] as bool,
+      isCommunity: json['is_community'] as bool,
       realm: json['realm'] == null
           ? null
           : Realm.fromJson(json['realm'] as Map<String, dynamic>),
@@ -43,7 +44,8 @@ Map<String, dynamic> _$ChannelToJson(Channel instance) => <String, dynamic>{
       'account_id': instance.accountId,
       'realm': instance.realm?.toJson(),
       'realm_id': instance.realmId,
-      'is_encrypted': instance.isEncrypted,
+      'is_public': instance.isPublic,
+      'is_community': instance.isCommunity,
       'is_available': instance.isAvailable,
     };
 

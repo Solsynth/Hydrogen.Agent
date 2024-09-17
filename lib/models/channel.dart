@@ -19,7 +19,8 @@ class Channel {
   int accountId;
   Realm? realm;
   int? realmId;
-  bool isEncrypted;
+  bool isPublic;
+  bool isCommunity;
 
   @JsonKey(includeFromJson: false, includeToJson: true)
   bool isAvailable = false;
@@ -36,7 +37,8 @@ class Channel {
     required this.members,
     required this.account,
     required this.accountId,
-    required this.isEncrypted,
+    required this.isPublic,
+    required this.isCommunity,
     required this.realm,
     required this.realmId,
   });
