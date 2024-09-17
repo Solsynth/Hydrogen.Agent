@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
@@ -14,6 +17,7 @@ import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
+import 'package:version/version.dart';
 
 class BootstrapperShell extends StatefulWidget {
   final Widget child;
@@ -35,6 +39,8 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
 
   int _periodCursor = 0;
 
+  final Completer _bootCompleter = Completer();
+
   late final List<({String label, Future<void> Function() action})> _periods = [
     (
       label: 'bsLoadingTheme',
@@ -47,12 +53,20 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       action: () async {
         if (PlatformInfo.isWeb) return;
         try {
+          final prefs = await SharedPreferences.getInstance();
           final info = await PackageInfo.fromPlatform();
           final localVersionString = '${info.version}+${info.buildNumber}';
           final resp = await GetConnect().get(
             'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?page=1&limit=1',
           );
-          if (resp.body[0]['name'] != localVersionString) {
+          final remoteVersionString =
+              (resp.body as List).firstOrNull?['name'] ?? '0.0.0';
+          final remoteVersion = Version.parse(remoteVersionString ?? '0.0.0');
+          final localVersion =
+              Version.parse(localVersionString.split('+').first);
+          final strictUpdate = prefs.getBool('check_update_strictly') ?? false;
+          if (remoteVersion > localVersion ||
+              (remoteVersionString != localVersionString && strictUpdate)) {
             setState(() {
               _isErrored = true;
               _subtitle = 'bsCheckForUpdateDesc'.tr;
@@ -63,7 +77,8 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                   .showConfirmDialog(
                 'updateAvailable'.tr,
                 'updateAvailableDesc'.trParams({
-                  'version': resp.body[0]['name'],
+                  'from': localVersionString,
+                  'to': remoteVersionString,
                 }),
               )
                   .then((result) {
@@ -75,21 +90,23 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
                     'https://testflight.apple.com/join/YJ0lmN6O',
                   );
                   AzhonAppUpdate.update(model);
-                  if (mounted) {
-                    setState(() {
-                      _isErrored = false;
-                      _subtitle = null;
-                    });
-                  }
                 }
               });
+            } else {
+              setState(() {
+                _isErrored = true;
+                _subtitle = 'bsCheckForUpdateDesc'.tr;
+              });
             }
+          } else if (remoteVersionString != localVersionString) {
+            _bootCompleter.future.then((_) {
+              context.showSnackbar('updateMayAvailable'.trParams({
+                'version': remoteVersionString,
+              }));
+            });
           }
         } catch (e) {
-          setState(() {
-            _isErrored = true;
-            _subtitle = 'bsCheckForUpdateFailed'.tr;
-          });
+          context.showErrorDialog('Unable to check update: $e');
         }
       },
     ),
@@ -180,6 +197,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       }
     } finally {
       setState(() => _isBusy = false);
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _bootCompleter.complete();
+      });
     }
   }
 
@@ -276,6 +296,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
             setState(() {
               _isBusy = false;
               _isErrored = false;
+            });
+            Future.delayed(const Duration(milliseconds: 100), () {
+              _bootCompleter.complete();
             });
           } else {
             setState(() {

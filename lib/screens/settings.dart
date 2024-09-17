@@ -114,6 +114,21 @@ class _SettingScreenState extends State<SettingScreen> {
               },
             ),
           ),
+          _buildCaptionHeader('update'.tr),
+          CheckboxListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            secondary: const Icon(Icons.sync_alt),
+            title: Text('updateCheckStrictly'.tr),
+            subtitle: Text('updateCheckStrictlyDesc'.tr),
+            value: _prefs?.getBool('check_update_strictly') ?? false,
+            onChanged: (value) {
+              _prefs
+                  ?.setBool('check_update_strictly', value ?? false)
+                  .then((_) {
+                setState(() {});
+              });
+            },
+          ),
           _buildCaptionHeader('more'.tr),
           ListTile(
             leading: const Icon(Icons.delete_sweep),

@@ -154,6 +154,8 @@ PODS:
     - PromisesSwift (~> 2.1)
   - FirebaseSharedSwift (11.2.0)
   - Flutter (1.0.0)
+  - flutter_app_update (0.0.1):
+    - Flutter
   - flutter_background_service_ios (0.0.3):
     - Flutter
   - flutter_keyboard_visibility (0.0.1):
@@ -306,6 +308,7 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - firebase_performance (from `.symlinks/plugins/firebase_performance/ios`)
   - Flutter (from `Flutter`)
+  - flutter_app_update (from `.symlinks/plugins/flutter_app_update/ios`)
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
@@ -383,6 +386,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_performance/ios"
   Flutter:
     :path: Flutter
+  flutter_app_update:
+    :path: ".symlinks/plugins/flutter_app_update/ios"
   flutter_background_service_ios:
     :path: ".symlinks/plugins/flutter_background_service_ios/ios"
   flutter_keyboard_visibility:
@@ -464,6 +469,7 @@ SPEC CHECKSUMS:
   FirebaseSessions: adcec8b72d0066a385e3affcd1bcb1ebb3908ce6
   FirebaseSharedSwift: 7a0d78d155ede78407f0fdc89fbc914014c7c540
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_app_update: 65f61da626cb111d1b24674abc4b01728d7723bc
   flutter_background_service_ios: e30e0d3ee69e4cee66272d0c78eacd48c2e94aac
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086

@@ -55,7 +55,7 @@
   "edit": "Edit",
   "delete": "Delete",
   "settings": "Settings",
-  "settingsNotificationBgService": "Background Notification Service",
+  "settingsNotificationBgService": "Background notification service",
   "settingsNotificationBgServiceDesc": "A notification service is always installed on the device, so that some devices that do not support push notifications can receive notifications in the background. When this feature is enabled, push notifications will not be registered with the server, and you will always appear to be online in the eyes of others (except for invisible). You may need to turn off power and traffic optimization in the settings.",
   "search": "Search",
   "post": "Post",
@@ -428,5 +428,9 @@
   "preferencesApplied": "Preferences has been applied.",
   "save": "Save",
   "updateAvailable": "Update available",
-  "updateAvailableDesc": "There is an update available (@version). Do you want to download and install it now? You can still use the app normally while waiting for the download to complete."
+  "updateAvailableDesc": "There is an update available (@version). Do you want to download and install it now? You can still use the app normally while waiting for the download to complete.",
+  "update": "Update",
+  "updateCheckStrictly": "Strict mode",
+  "updateCheckStrictlyDesc": "If enabled, the app will ask for updating once the local version is different from remote one.",
+  "updateMayAvailable": "App version @version is available, you can update from app store or our website."
 }
