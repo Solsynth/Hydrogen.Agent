@@ -233,6 +233,7 @@ class _AttachmentItemVideoState extends State<_AttachmentItemVideo> {
     final ratio = widget.item.metadata?['ratio'] ?? 16 / 9;
     if (!_showContent) {
       return GestureDetector(
+        behavior: HitTestBehavior.opaque,
         child: Stack(
           children: [
             if (widget.item.metadata?['thumbnail'] != null)
@@ -400,6 +401,7 @@ class _AttachmentItemAudioState extends State<_AttachmentItemAudio> {
     const ratio = 16 / 9;
     if (!_showContent) {
       return GestureDetector(
+        behavior: HitTestBehavior.opaque,
         child: Stack(
           children: [
             if (widget.item.metadata?['thumbnail'] != null)

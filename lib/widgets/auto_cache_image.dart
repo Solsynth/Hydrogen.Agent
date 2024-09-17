@@ -10,6 +10,7 @@ class AutoCacheImage extends StatelessWidget {
   final BoxFit? fit;
   final bool noProgressIndicator;
   final bool noErrorWidget;
+  final bool isDense;
 
   const AutoCacheImage(
     this.url, {
@@ -19,6 +20,7 @@ class AutoCacheImage extends StatelessWidget {
     this.fit,
     this.noProgressIndicator = false,
     this.noErrorWidget = false,
+    this.isDense = false,
   });
 
   @override
@@ -46,13 +48,14 @@ class AutoCacheImage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.close, size: 32)
+                        Icon(Icons.close, size: isDense ? 24 : 32)
                             .animate(onPlay: (e) => e.repeat(reverse: true))
                             .fade(duration: 500.ms),
-                        Text(
-                          error.toString(),
-                          textAlign: TextAlign.center,
-                        ),
+                        if (!isDense)
+                          Text(
+                            error.toString(),
+                            textAlign: TextAlign.center,
+                          ),
                       ],
                     ),
                   ),
@@ -89,13 +92,14 @@ class AutoCacheImage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.close, size: 32)
+                      Icon(Icons.close, size: isDense ? 24 : 32)
                           .animate(onPlay: (e) => e.repeat(reverse: true))
                           .fade(duration: 500.ms),
-                      Text(
-                        error.toString(),
-                        textAlign: TextAlign.center,
-                      ),
+                      if (!isDense)
+                        Text(
+                          error.toString(),
+                          textAlign: TextAlign.center,
+                        ),
                     ],
                   ),
                 ),

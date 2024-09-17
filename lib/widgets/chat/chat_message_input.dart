@@ -415,6 +415,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                                 x.imageUrl,
                                 width: 28,
                                 height: 28,
+                                isDense: true,
                               ),
                               display: x.name,
                               content: x.textWarpedPlaceholder,
