@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:solian/bootstrapper.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
@@ -32,9 +33,12 @@ abstract class AppRouter {
   static GoRouter instance = GoRouter(
     routes: [
       ShellRoute(
-        builder: (context, state, child) => RootShell(
-          state: state,
-          child: child,
+        builder: (context, state, child) => BootstrapperShell(
+          key: const Key('global-bootstrapper'),
+          child: RootShell(
+            state: state,
+            child: child,
+          ),
         ),
         routes: [
           GoRoute(

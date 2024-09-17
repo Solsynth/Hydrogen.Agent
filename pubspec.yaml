@@ -2,7 +2,7 @@ name: solian
 description: "The Solar Network App"
 publish_to: "none"
 
-version: 1.2.1+40
+version: 1.2.1+41
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -80,6 +80,7 @@ dependencies:
   path_provider: ^2.1.4
   flutter_background_service: ^5.0.10
   flutter_local_notifications: ^17.2.2
+  flutter_app_update: ^3.1.0
 
 dev_dependencies:
   flutter_test:

@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:solian/background.dart';
-import 'package:solian/bootstrapper.dart';
 import 'package:solian/firebase_options.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/attachment_uploader.dart';
@@ -123,9 +122,7 @@ class SolianApp extends StatelessWidget {
           builder: (context, child) {
             return SystemShell(
               child: ScaffoldMessenger(
-                child: BootstrapperShell(
-                  child: child ?? const SizedBox.shrink(),
-                ),
+                child: child ?? const SizedBox.shrink(),
               ),
             );
           },

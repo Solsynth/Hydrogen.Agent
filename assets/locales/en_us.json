@@ -68,6 +68,11 @@
   "notificationUnreadCount": "@count unread notifications",
   "errorHappened": "An error occurred",
   "errorHappenedUnauthorized": "Unauthorized request, please sign in or try resign in.",
+  "errorHappenedRequestBad": "Request error, the server refused to process the request. Please check your request data.",
+  "errorHappenedRequestForbidden": "Request error, insufficient permissions.",
+  "errorHappenedRequestNotFound": "Request error, the requested data does not exist.",
+  "errorHappenedRequestConnection": "Network request failed. Please check the connection status and service status, then try again.",
+  "errorHappenedRequestUnknown": "Request error, unknown type. Please take a full screenshot of this message and submit feedback.",
   "forgotPassword": "Forgot password",
   "email": "Email",
   "username": "Username",
@@ -350,8 +355,7 @@
   "bsCheckForUpdate": "Checking For Updates",
   "bsCheckForUpdateFailed": "Unable to Check Updates",
   "bsCheckForUpdateNew": "Found New Version",
-  "bsCheckForUpdateDescApple": "Please head to TestFlight and update your app to latest version to prevent error happens and get latest functions.",
-  "bsCheckForUpdateDescCommon": "Please head to our website download and install latest version of application to prevent error happens and get latest functions.",
+  "bsCheckForUpdateDesc": "Please head to app store and update your app to latest version to prevent error happens and get latest functions.",
   "bsCheckingServer": "Checking Server Status",
   "bsCheckingServerFail": "Unable connect to server, check your network connection",
   "bsCheckingServerDown": "Server currently unavailable, please retry later",
@@ -422,5 +426,7 @@
   "notificationTopicPostFeedback": "Post feedbacks",
   "notificationTopicPostSubscription": "Post subscriptions",
   "preferencesApplied": "Preferences has been applied.",
-  "save": "Save"
+  "save": "Save",
+  "updateAvailable": "Update available",
+  "updateAvailableDesc": "There is an update available (@version). Do you want to download and install it now? You can still use the app normally while waiting for the download to complete."
 }

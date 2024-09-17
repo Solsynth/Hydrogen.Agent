@@ -351,8 +351,7 @@
   "bsCheckForUpdate": "正在检查更新",
   "bsCheckForUpdateFailed": "无法检查更新",
   "bsCheckForUpdateNew": "发现新版本",
-  "bsCheckForUpdateDescApple": "请前往 TestFlight 并将您的应用程序更新到最新版本，以防止出现错误并获取最新功能。",
-  "bsCheckForUpdateDescCommon": "请前往我们的网站下载并安装最新版本的应用程序，以防止出现错误并获取最新功能。",
+  "bsCheckForUpdateDesc": "请前往应用商店并将您的应用程序更新到最新版本，以防止出现错误并获取最新功能。",
   "bsCheckingServer": "检查服务器状态中",
   "bsCheckingServerFail": "无法连接至服务器，请检查你的网络连接状态",
   "bsCheckingServerDown": "当前服务器不可用，请稍后重试",
@@ -423,5 +422,7 @@
   "notificationTopicPostFeedback": "帖子反馈",
   "notificationTopicPostSubscription": "订阅源",
   "preferencesApplied": "偏好设置已应用",
-  "save": "保存"
+  "save": "保存",
+  "updateAvailable": "有可用更新",
+  "updateAvailableDesc": "有可用更新 (@version) 你想现在下载安装吗？在等待下载期间你仍可以正常使用。"
 }

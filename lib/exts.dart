@@ -51,6 +51,28 @@ extension AppExtensions on BuildContext {
     );
   }
 
+  Future<bool> showConfirmDialog(String title, body) async {
+    return await showDialog<bool>(
+          useRootNavigator: true,
+          context: this,
+          builder: (ctx) => AlertDialog(
+            title: Text(title),
+            content: Text(body),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('cancel'.tr),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('okay'.tr),
+              )
+            ],
+          ),
+        ) ??
+        false;
+  }
+
   Future<void> showErrorDialog(dynamic exception) {
     Widget content = Text(exception.toString().capitalize!);
     if (exception is UnauthorizedException) {

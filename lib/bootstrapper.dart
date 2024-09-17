@@ -13,6 +13,7 @@ import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
+import 'package:flutter_app_update/flutter_app_update.dart';
 
 class BootstrapperShell extends StatefulWidget {
   final Widget child;
@@ -49,15 +50,40 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
           final info = await PackageInfo.fromPlatform();
           final localVersionString = '${info.version}+${info.buildNumber}';
           final resp = await GetConnect().get(
-            'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?limit=1',
+            'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?page=1&limit=1',
           );
           if (resp.body[0]['name'] != localVersionString) {
             setState(() {
               _isErrored = true;
-              _subtitle = PlatformInfo.isIOS || PlatformInfo.isMacOS
-                  ? 'bsCheckForUpdateDescApple'.tr
-                  : 'bsCheckForUpdateDescCommon'.tr;
+              _subtitle = 'bsCheckForUpdateDesc'.tr;
             });
+
+            if (PlatformInfo.isAndroid) {
+              context
+                  .showConfirmDialog(
+                'updateAvailable'.tr,
+                'updateAvailableDesc'.trParams({
+                  'version': resp.body[0]['name'],
+                }),
+              )
+                  .then((result) {
+                if (result) {
+                  final model = UpdateModel(
+                    'https://files.solsynth.dev/d/production01/solian/app-arm64-v8a-release.apk',
+                    'solian-app-arm64-v8a-release.apk',
+                    'ic_launcher',
+                    'https://testflight.apple.com/join/YJ0lmN6O',
+                  );
+                  AzhonAppUpdate.update(model);
+                  if (mounted) {
+                    setState(() {
+                      _isErrored = false;
+                      _subtitle = null;
+                    });
+                  }
+                }
+              });
+            }
           }
         } catch (e) {
           setState(() {
