@@ -428,7 +428,7 @@
   "preferencesApplied": "Preferences has been applied.",
   "save": "Save",
   "updateAvailable": "Update available",
-  "updateAvailableDesc": "There is an update available (@version). Do you want to download and install it now? You can still use the app normally while waiting for the download to complete.",
+  "updateAvailableDesc": "There is an update available (@from to @to). Do you want to download and install it now? You can still use the app normally while waiting for the download to complete.",
   "update": "Update",
   "updateCheckStrictly": "Strict mode",
   "updateCheckStrictlyDesc": "If enabled, the app will ask for updating once the local version is different from remote one.",
