@@ -34,7 +34,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
   final List<Channel> _channels = List.empty(growable: true);
 
   getRealm({String? overrideAlias}) async {
-    final RealmProvider provider = Get.find();
+    final RealmProvider realm = Get.find();
 
     setState(() => _isBusy = true);
 
@@ -43,7 +43,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
     }
 
     try {
-      final resp = await provider.getRealm(_overrideAlias ?? widget.alias);
+      final resp = await realm.getRealm(_overrideAlias ?? widget.alias);
       setState(() => _realm = Realm.fromJson(resp.body));
     } catch (e) {
       context.showErrorDialog(e);
@@ -55,14 +55,26 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
   getChannels() async {
     setState(() => _isBusy = true);
 
-    final ChannelProvider provider = Get.find();
-    final resp = await provider.listChannel(scope: _realm!.alias);
+    final ChannelProvider channel = Get.find();
+    final resp = await channel.listChannel(scope: _realm!.alias);
+    final availableResp = await channel.listAvailableChannel(
+      scope: _realm!.alias,
+    );
+
+    final Set<int> channelIdx = {};
 
     setState(() {
       _channels.clear();
       _channels.addAll(
         resp.body.map((e) => Channel.fromJson(e)).toList().cast<Channel>(),
       );
+      _channels.addAll(
+        availableResp.body
+            .map((e) => Channel.fromJson(e))
+            .toList()
+            .cast<Channel>(),
+      );
+      _channels.retainWhere((x) => channelIdx.add(x.id));
     });
 
     setState(() => _isBusy = false);

@@ -89,13 +89,13 @@ class ChannelProvider extends GetxController {
     return resp;
   }
 
-  Future<Response> listAvailableChannel({String realm = 'global'}) async {
+  Future<Response> listAvailableChannel({String scope = 'global'}) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = await auth.configureClient('messaging');
 
-    final resp = await client.get('/channels/$realm/me/available');
+    final resp = await client.get('/channels/$scope/me/available');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
