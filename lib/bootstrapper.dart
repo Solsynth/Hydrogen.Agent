@@ -60,12 +60,19 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
             'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?page=1&limit=1',
           );
           final remoteVersionString =
-              (resp.body as List).firstOrNull?['name'] ?? '0.0.0';
-          final remoteVersion = Version.parse(remoteVersionString ?? '0.0.0');
+              (resp.body as List).firstOrNull?['name'] ?? '0.0.0+0';
+          final remoteVersion =
+              Version.parse(remoteVersionString.split('+').first);
           final localVersion =
               Version.parse(localVersionString.split('+').first);
+          final remoteBuildNumber =
+              int.tryParse(remoteVersionString.split('+').last) ?? 0;
+          final localBuildNumber =
+              int.tryParse(localVersionString.split('+').last) ?? 0;
           final strictUpdate = prefs.getBool('check_update_strictly') ?? false;
           if (remoteVersion > localVersion ||
+              (remoteVersion == localVersion &&
+                  remoteBuildNumber > localBuildNumber) ||
               (remoteVersionString != localVersionString && strictUpdate)) {
             setState(() {
               _isErrored = true;
