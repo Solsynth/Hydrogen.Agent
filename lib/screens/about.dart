@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -48,38 +49,50 @@ class AboutScreen extends StatelessWidget {
             ),
             Text('Copyright © ${DateTime.now().year} Solsynth LLC'),
             const Gap(16),
-            TextButton(
-              style: denseButtonStyle,
-              child: Text('appDetails'.tr),
-              onPressed: () async {
-                final info = await PackageInfo.fromPlatform();
+            CenteredContainer(
+              maxWidth: 280,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  TextButton(
+                    style: denseButtonStyle,
+                    child: Text('appDetails'.tr),
+                    onPressed: () async {
+                      final info = await PackageInfo.fromPlatform();
 
-                showAboutDialog(
-                  context: context,
-                  applicationVersion: '${info.version} (${info.buildNumber})',
-                  applicationLegalese:
-                      'The Solar Network App is an intuitive and self-hostable social network and computing platform. Experience the freedom of a user-friendly design that empowers you to create and connect with communities on your own terms. Embrace the future of social networking with a platform that prioritizes your independence and privacy.',
-                  applicationIcon: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
-                    child:
-                        Image.asset('assets/logo.png', width: 60, height: 60),
+                      showAboutDialog(
+                        context: context,
+                        applicationVersion:
+                            '${info.version} (${info.buildNumber})',
+                        applicationLegalese:
+                            'The Solar Network App is an intuitive and open-source social network and computing platform. Experience the freedom of a user-friendly design that empowers you to create and connect with communities on your own terms. Embrace the future of social networking with a platform that prioritizes your independence and privacy.',
+                        applicationIcon: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(16)),
+                          child: Image.asset('assets/logo.png',
+                              width: 60, height: 60),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            TextButton(
-              style: denseButtonStyle,
-              child: Text('projectWebsite'.tr),
-              onPressed: () {
-                launchUrlString('https://solsynth.dev/products/solar-network');
-              },
-            ),
-            TextButton(
-              style: denseButtonStyle,
-              child: Text('termRelated'.tr),
-              onPressed: () {
-                launchUrlString('https://solsynth.dev/terms');
-              },
+                  TextButton(
+                    style: denseButtonStyle,
+                    child: Text('projectWebsite'.tr),
+                    onPressed: () {
+                      launchUrlString(
+                          'https://solsynth.dev/products/solar-network');
+                    },
+                  ),
+                  TextButton(
+                    style: denseButtonStyle,
+                    child: Text('termRelated'.tr),
+                    onPressed: () {
+                      launchUrlString('https://solsynth.dev/terms');
+                    },
+                  ),
+                ],
+              ),
             ),
             const Gap(16),
             const Text(
