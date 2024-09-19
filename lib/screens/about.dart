@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -49,7 +50,7 @@ class AboutScreen extends StatelessWidget {
             const Gap(16),
             TextButton(
               style: denseButtonStyle,
-              child: const Text('App Details'),
+              child: Text('appDetails'.tr),
               onPressed: () async {
                 final info = await PackageInfo.fromPlatform();
 
@@ -68,9 +69,16 @@ class AboutScreen extends StatelessWidget {
             ),
             TextButton(
               style: denseButtonStyle,
-              child: const Text('Project Website'),
+              child: Text('projectWebsite'.tr),
               onPressed: () {
                 launchUrlString('https://solsynth.dev/products/solar-network');
+              },
+            ),
+            TextButton(
+              style: denseButtonStyle,
+              child: Text('termRelated'.tr),
+              onPressed: () {
+                launchUrlString('https://solsynth.dev/terms');
               },
             ),
             const Gap(16),

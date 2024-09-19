@@ -13,6 +13,7 @@ import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -167,7 +168,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
       final result = AuthResult.fromJson(resp.body);
       _currentTicket = result.ticket;
-      _passwordController.clear();
 
       // Finish sign in if possible
       if (result.isFinished) {
@@ -185,11 +185,13 @@ class _SignInScreenState extends State<SignInScreen> {
           autoStartBackgroundNotificationService();
 
           Navigator.pop(context, true);
+          _passwordController.clear();
         });
       } else {
         // Skip the first step
         _factorPicked = null;
         _factorPickedType = null;
+        _passwordController.clear();
         setState(() => _period += 2);
       }
     } catch (e) {
@@ -210,9 +212,8 @@ class _SignInScreenState extends State<SignInScreen> {
       case 2:
         _passwordController.clear();
         _factorPickedType = null;
-      default:
-        setState(() => _period--);
     }
+    setState(() => _period--);
   }
 
   @override
@@ -235,16 +236,18 @@ class _SignInScreenState extends State<SignInScreen> {
             );
           },
           child: switch (_period % 3) {
-            1 => Column(
+            1 => ListView(
+                shrinkWrap: true,
                 key: const ValueKey<int>(1),
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child:
-                        Image.asset('assets/logo.png', width: 64, height: 64),
-                  ).paddingOnly(bottom: 8, left: 4),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child:
+                          Image.asset('assets/logo.png', width: 64, height: 64),
+                    ).paddingOnly(bottom: 8, left: 4),
+                  ),
                   Text(
                     'signinPickFactor'.tr,
                     style: const TextStyle(
@@ -323,16 +326,18 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ],
               ),
-            2 => Column(
+            2 => ListView(
                 key: const ValueKey<int>(2),
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                shrinkWrap: true,
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child:
-                        Image.asset('assets/logo.png', width: 64, height: 64),
-                  ).paddingOnly(bottom: 8, left: 4),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child:
+                          Image.asset('assets/logo.png', width: 64, height: 64),
+                    ).paddingOnly(bottom: 8, left: 4),
+                  ),
                   Text(
                     'signinEnterPassword'.tr,
                     style: const TextStyle(
@@ -396,16 +401,18 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ],
               ),
-            _ => Column(
+            _ => ListView(
                 key: const ValueKey<int>(0),
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                shrinkWrap: true,
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    child:
-                        Image.asset('assets/logo.png', width: 64, height: 64),
-                  ).paddingOnly(bottom: 8, left: 4),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child:
+                          Image.asset('assets/logo.png', width: 64, height: 64),
+                    ).paddingOnly(bottom: 8, left: 4),
+                  ),
                   Text(
                     'signinGreeting'.tr,
                     style: const TextStyle(
@@ -451,11 +458,50 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ],
                   ),
+                  const Gap(12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 290),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'termAcceptNextWithAgree'.tr,
+                            textAlign: TextAlign.end,
+                            style:
+                                Theme.of(context).textTheme.bodySmall!.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withOpacity(0.75),
+                                    ),
+                          ),
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('termAcceptLink'.tr),
+                                  const Gap(4),
+                                  const Icon(Icons.launch, size: 14),
+                                ],
+                              ),
+                              onTap: () {
+                                launchUrlString('https://solsynth.dev/terms');
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).paddingSymmetric(horizontal: 16),
+                  ),
                 ],
               ),
           },
         ),
-      ),
+      ).paddingAll(24),
     );
   }
 }

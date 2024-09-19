@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/sized_container.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -18,7 +19,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nicknameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void performAction(BuildContext context) async {
+  void _performAction(BuildContext context) async {
     final email = _emailController.value.text;
     final username = _usernameController.value.text;
     final nickname = _nicknameController.value.text;
@@ -60,20 +61,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  bool _isTermAccepted = false;
+
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: CenteredContainer(
         maxWidth: 360,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+          shrinkWrap: true,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              child: Image.asset('assets/logo.png', width: 64, height: 64),
-            ).paddingOnly(bottom: 8, left: 4),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: Image.asset('assets/logo.png', width: 64, height: 64),
+              ).paddingOnly(bottom: 8, left: 4),
+            ),
             Text(
               'signupGreeting'.tr,
               style: const TextStyle(
@@ -136,12 +141,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
-              onSubmitted: (_) => performAction(context),
+              onSubmitted: (_) => _performAction(context),
+            ),
+            const Gap(8),
+            CheckboxListTile(
+              value: _isTermAccepted,
+              title: Text('termAccept'.tr),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8),
+                ),
+              ),
+              subtitle: RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.75),
+                      ),
+                  children: [
+                    TextSpan(text: 'termAcceptDesc'.tr),
+                    WidgetSpan(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('termAcceptLink'.tr),
+                              const Gap(4),
+                              const Icon(Icons.launch, size: 14),
+                            ],
+                          ),
+                          onTap: () {
+                            launchUrlString('https://solsynth.dev/terms');
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              onChanged: (value) {
+                setState(() => _isTermAccepted = value ?? false);
+              },
             ),
             const Gap(16),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
+                onPressed:
+                    !_isTermAccepted ? null : () => _performAction(context),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -149,12 +200,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const Icon(Icons.chevron_right),
                   ],
                 ),
-                onPressed: () => performAction(context),
               ),
             )
           ],
         ),
-      ),
+      ).paddingAll(24),
     );
   }
 }

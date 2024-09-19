@@ -432,5 +432,13 @@
   "update": "Update",
   "updateCheckStrictly": "Strict mode",
   "updateCheckStrictlyDesc": "If enabled, the app will ask for updating once the local version is different from remote one.",
-  "updateMayAvailable": "App version @version is available, you can update from app store or our website."
+  "updateMayAvailable": "App version @version is available, you can update from app store or our website.",
+  "termAccept": "I've read and agree to Solar Network's Terms",
+  "termAcceptDesc": "Including but not limited to \"User Agreement\" and \"Privacy Policy\"",
+  "termAcceptLink": "View terms",
+  "termAcceptNextWithAgree": "By clicking the \"Next\", it means you agree to our terms and its updates. You should already agreed with them while you sign up.",
+  "termRelated": "Related Terms",
+  "appDetails": "App Details",
+  "projectWebsite": "Project Website",
+  "iAmNotRobot": "I'm not a Robot"
 }

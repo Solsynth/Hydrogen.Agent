@@ -35,6 +35,9 @@ abstract class AppTheme {
         brightness: brightness,
         seedColor: seedColor ?? const Color.fromRGBO(154, 98, 91, 1),
       ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+      ),
       fontFamily: 'Comfortaa',
       fontFamilyFallback: [
         'NotoSansSC',
