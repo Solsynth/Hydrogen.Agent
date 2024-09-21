@@ -1,11 +1,16 @@
+import 'dart:math';
+
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:intl/intl.dart';
 import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/account.dart';
 import 'package:solian/models/attachment.dart';
+import 'package:solian/models/daily_sign.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/models/subscription.dart';
@@ -18,6 +23,7 @@ import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_heading.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
+import 'package:solian/widgets/daily_sign/history_chart.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
 import 'package:solian/widgets/sized_container.dart';
@@ -45,6 +51,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   Account? _userinfo;
   Subscription? _subscription;
   List<Post> _pinnedPosts = List.empty();
+  List<DailySignRecord> _dailySignRecords = List.empty();
   int _totalUpvote = 0, _totalDownvote = 0;
 
   Future<void> _getSubscription() async {
@@ -57,7 +64,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   Future<void> _getUserinfo() async {
     setState(() => _isBusy = true);
 
-    var client = await ServiceFinder.configureClient('auth');
+    var client = await ServiceFinder.configureClient('id');
     var resp = await client.get('/users/${widget.name}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
@@ -67,7 +74,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       _userinfo = Account.fromJson(resp.body);
     }
 
-    client = await ServiceFinder.configureClient('interactive');
+    client = await ServiceFinder.configureClient('co');
     resp = await client.get('/users/${widget.name}');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
@@ -82,7 +89,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   }
 
   Future<void> _getPinnedPosts() async {
-    final client = await ServiceFinder.configureClient('interactive');
+    final client = await ServiceFinder.configureClient('co');
     final resp = await client.get('/users/${widget.name}/pin');
     if (resp.statusCode != 200) {
       context.showErrorDialog(resp.bodyString).then((_) {
@@ -92,6 +99,23 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       setState(() {
         _pinnedPosts =
             resp.body.map((x) => Post.fromJson(x)).toList().cast<Post>();
+      });
+    }
+  }
+
+  Future<void> _getDailySignRecords() async {
+    final client = await ServiceFinder.configureClient('id');
+    final resp = await client.get('/users/${widget.name}/daily?take=14');
+    if (resp.statusCode != 200) {
+      context.showErrorDialog(resp.bodyString).then((_) {
+        Navigator.pop(context);
+      });
+    } else {
+      final result = PaginationResult.fromJson(resp.body);
+      setState(() {
+        _dailySignRecords = List.from(
+          result.data?.map((x) => DailySignRecord.fromJson(x)) ?? [],
+        );
       });
     }
   }
@@ -129,6 +153,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     _getUserinfo().then((_) {
       _getSubscription();
       _getPinnedPosts();
+      _getDailySignRecords();
     });
   }
 
@@ -285,7 +310,114 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         .getSomeoneStatus(_userinfo!.name),
                     detail: _userinfo,
                     profile: _userinfo!.profile,
-                    extraWidgets: const [],
+                    extraWidgets: [
+                      if (_dailySignRecords.isNotEmpty)
+                        Card(
+                          child: SizedBox(
+                            height: 180,
+                            width: max(640, MediaQuery.of(context).size.width),
+                            child: LineChart(
+                              LineChartData(
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    isCurved: true,
+                                    isStrokeCapRound: true,
+                                    isStrokeJoinRound: true,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    belowBarData: BarAreaData(
+                                      show: true,
+                                      gradient: LinearGradient(
+                                        colors: List.filled(
+                                          _dailySignRecords.length,
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withOpacity(0.3),
+                                        ).toList(),
+                                      ),
+                                    ),
+                                    spots: _dailySignRecords
+                                        .map(
+                                          (x) => FlSpot(
+                                            x.createdAt
+                                                .copyWith(
+                                                  hour: 0,
+                                                  minute: 0,
+                                                  second: 0,
+                                                  millisecond: 0,
+                                                  microsecond: 0,
+                                                )
+                                                .millisecondsSinceEpoch
+                                                .toDouble(),
+                                            x.resultTier.toDouble(),
+                                          ),
+                                        )
+                                        .toList(),
+                                  )
+                                ],
+                                lineTouchData: LineTouchData(
+                                  touchTooltipData: LineTouchTooltipData(
+                                    getTooltipItems: (spots) => spots
+                                        .map((spot) => LineTooltipItem(
+                                              '${DailySignHistoryChartDialog.signSymbols[spot.y.toInt()]}\n${DateFormat('MM/dd').format(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}',
+                                              TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                              ),
+                                            ))
+                                        .toList(),
+                                    getTooltipColor: (_) => Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainerHigh,
+                                  ),
+                                ),
+                                titlesData: FlTitlesData(
+                                  topTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: const AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 40,
+                                      interval: 1,
+                                      getTitlesWidget: (value, _) => Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          DailySignHistoryChartDialog
+                                              .signSymbols[value.toInt()],
+                                          textAlign: TextAlign.right,
+                                        ).paddingOnly(right: 8),
+                                      ),
+                                    ),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 28,
+                                      interval: 86400000,
+                                      getTitlesWidget: (value, _) => Text(
+                                        DateFormat('dd').format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                            value.toInt(),
+                                          ),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ).paddingOnly(top: 8),
+                                    ),
+                                  ),
+                                ),
+                                gridData: const FlGridData(show: false),
+                                borderData: FlBorderData(show: false),
+                              ),
+                            ),
+                          ).marginOnly(right: 24, left: 12, bottom: 8, top: 24),
+                        )
+                    ],
                   ),
                 ],
               ),
@@ -373,8 +505,9 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
               ),
               CenteredContainer(
                 child: RefreshIndicator(
-                  onRefresh: () =>
-                      Future.sync(() => _albumPagingController.refresh()),
+                  onRefresh: () => Future.sync(
+                    () => _albumPagingController.refresh(),
+                  ),
                   child: PagedGridView<int, Attachment>(
                     padding: EdgeInsets.zero,
                     pagingController: _albumPagingController,

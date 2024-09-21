@@ -12,7 +12,7 @@ class DailySignHistoryChartDialog extends StatelessWidget {
 
   const DailySignHistoryChartDialog({super.key, required this.data});
 
-  static List<String> signSymbols = ['大凶', '凶', '中平', '吉', '大吉'];
+  static final List<String> signSymbols = ['大凶', '凶', '中平', '吉', '大吉'];
 
   DateTime? get _firstRecordDate => data?.map((x) => x.createdAt).reduce(
       (a, b) => DateTime.fromMillisecondsSinceEpoch(
@@ -93,19 +93,22 @@ class DailySignHistoryChartDialog extends StatelessWidget {
                         )
                       ],
                       lineTouchData: LineTouchData(
-                          touchTooltipData: LineTouchTooltipData(
-                        getTooltipItems: (spots) => spots
-                            .map((spot) => LineTooltipItem(
-                                  '${signSymbols[spot.y.toInt()]}\n${DateFormat('MM/dd').format(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}',
-                                  TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                ))
-                            .toList(),
-                        getTooltipColor: (_) =>
-                            Theme.of(context).colorScheme.surfaceContainerHigh,
-                      )),
+                        touchTooltipData: LineTouchTooltipData(
+                          getTooltipItems: (spots) => spots
+                              .map((spot) => LineTooltipItem(
+                                    '${signSymbols[spot.y.toInt()]}\n${DateFormat('MM/dd').format(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}',
+                                    TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                                  ))
+                              .toList(),
+                          getTooltipColor: (_) => Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHigh,
+                        ),
+                      ),
                       titlesData: FlTitlesData(
                         topTitles: const AxisTitles(
                           sideTitles: SideTitles(showTitles: false),
