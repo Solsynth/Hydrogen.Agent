@@ -146,7 +146,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             const Gap(8),
             CheckboxListTile(
               value: _isTermAccepted,
-              title: Text('termAccept'.tr),
+              title: Text(
+                'termAccept'.tr,
+                style: const TextStyle(height: 1.2),
+              ).paddingOnly(bottom: 4),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(8),

@@ -74,9 +74,13 @@ class LinkExpansion extends StatelessWidget {
                                 ),
                               ).paddingOnly(right: 8),
                             if (snapshot.data!.siteName != null)
-                              Text(
-                                snapshot.data!.siteName!,
-                                style: Theme.of(context).textTheme.labelLarge,
+                              Expanded(
+                                child: Text(
+                                  snapshot.data!.siteName!,
+                                  style: Theme.of(context).textTheme.labelLarge,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                           ],
                         ).paddingOnly(

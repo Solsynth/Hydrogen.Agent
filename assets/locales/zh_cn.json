@@ -436,5 +436,10 @@
   "termRelated": "相关条款",
   "projectWebsite": "项目网站",
   "appDetails": "应用详情",
-  "iAmNotRobot": "我不是机器人"
+  "iAmNotRobot": "我不是机器人",
+  "report": "举报",
+  "reportAbuse": "举报滥用",
+  "reportAbuseResource": "举报的资源",
+  "reportAbuseReason": "举报的原因",
+  "reportSubmitted": "举报已提交，感谢你的贡献。我们将通过通知在 24 小时内通知该举报的处理结果。"
 }

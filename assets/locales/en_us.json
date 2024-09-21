@@ -440,5 +440,10 @@
   "termRelated": "Related Terms",
   "appDetails": "App Details",
   "projectWebsite": "Project Website",
-  "iAmNotRobot": "I'm not a Robot"
+  "iAmNotRobot": "I'm not a Robot",
+  "report": "Report",
+  "reportAbuse": "Report abuse",
+  "reportAbuseResource": "Resource identifier",
+  "reportAbuseReason": "Report reason",
+  "reportSubmitted": "Report submitted, thank you for your contribution. We will send a notification about the result of the report within 24 hours for you."
 }

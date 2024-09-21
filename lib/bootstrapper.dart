@@ -41,80 +41,73 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
 
   final Completer _bootCompleter = Completer();
 
+  Future<void> _checkForUpdate() async {
+    if (PlatformInfo.isWeb) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final info = await PackageInfo.fromPlatform();
+      final localVersionString = '${info.version}+${info.buildNumber}';
+      final resp = await GetConnect(
+        timeout: const Duration(seconds: 60),
+      ).get(
+        'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?page=1&limit=1',
+      );
+      final remoteVersionString =
+          (resp.body as List).firstOrNull?['name'] ?? '0.0.0+0';
+      final remoteVersion = Version.parse(remoteVersionString.split('+').first);
+      final localVersion = Version.parse(localVersionString.split('+').first);
+      final remoteBuildNumber =
+          int.tryParse(remoteVersionString.split('+').last) ?? 0;
+      final localBuildNumber =
+          int.tryParse(localVersionString.split('+').last) ?? 0;
+      final strictUpdate = prefs.getBool('check_update_strictly') ?? false;
+      if (remoteVersion > localVersion ||
+          (remoteVersion == localVersion &&
+              remoteBuildNumber > localBuildNumber) ||
+          (remoteVersionString != localVersionString && strictUpdate)) {
+        if (PlatformInfo.isAndroid) {
+          context
+              .showConfirmDialog(
+            'updateAvailable'.tr,
+            'updateAvailableDesc'.trParams({
+              'from': localVersionString,
+              'to': remoteVersionString,
+            }),
+          )
+              .then((result) {
+            if (result) {
+              final model = UpdateModel(
+                'https://files.solsynth.dev/d/production01/solian/app-arm64-v8a-release.apk',
+                'solian-app-arm64-v8a-release.apk',
+                'ic_launcher',
+                'https://testflight.apple.com/join/YJ0lmN6O',
+              );
+              AzhonAppUpdate.update(model);
+            }
+          });
+        } else {
+          context.showInfoDialog(
+            'updateAvailable'.tr,
+            'bsCheckForUpdateDesc'.tr,
+          );
+        }
+      } else if (remoteVersionString != localVersionString) {
+        _bootCompleter.future.then((_) {
+          context.showSnackbar('updateMayAvailable'.trParams({
+            'version': remoteVersionString,
+          }));
+        });
+      }
+    } catch (e) {
+      context.showErrorDialog('Unable to check update: $e');
+    }
+  }
+
   late final List<({String label, Future<void> Function() action})> _periods = [
     (
       label: 'bsLoadingTheme',
       action: () async {
         await context.read<ThemeSwitcher>().restoreTheme();
-      },
-    ),
-    (
-      label: 'bsCheckForUpdate',
-      action: () async {
-        if (PlatformInfo.isWeb) return;
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          final info = await PackageInfo.fromPlatform();
-          final localVersionString = '${info.version}+${info.buildNumber}';
-          final resp = await GetConnect().get(
-            'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?page=1&limit=1',
-          );
-          final remoteVersionString =
-              (resp.body as List).firstOrNull?['name'] ?? '0.0.0+0';
-          final remoteVersion =
-              Version.parse(remoteVersionString.split('+').first);
-          final localVersion =
-              Version.parse(localVersionString.split('+').first);
-          final remoteBuildNumber =
-              int.tryParse(remoteVersionString.split('+').last) ?? 0;
-          final localBuildNumber =
-              int.tryParse(localVersionString.split('+').last) ?? 0;
-          final strictUpdate = prefs.getBool('check_update_strictly') ?? false;
-          if (remoteVersion > localVersion ||
-              (remoteVersion == localVersion &&
-                  remoteBuildNumber > localBuildNumber) ||
-              (remoteVersionString != localVersionString && strictUpdate)) {
-            setState(() {
-              _isErrored = true;
-              _subtitle = 'bsCheckForUpdateDesc'.tr;
-            });
-
-            if (PlatformInfo.isAndroid) {
-              context
-                  .showConfirmDialog(
-                'updateAvailable'.tr,
-                'updateAvailableDesc'.trParams({
-                  'from': localVersionString,
-                  'to': remoteVersionString,
-                }),
-              )
-                  .then((result) {
-                if (result) {
-                  final model = UpdateModel(
-                    'https://files.solsynth.dev/d/production01/solian/app-arm64-v8a-release.apk',
-                    'solian-app-arm64-v8a-release.apk',
-                    'ic_launcher',
-                    'https://testflight.apple.com/join/YJ0lmN6O',
-                  );
-                  AzhonAppUpdate.update(model);
-                }
-              });
-            } else {
-              setState(() {
-                _isErrored = true;
-                _subtitle = 'bsCheckForUpdateDesc'.tr;
-              });
-            }
-          } else if (remoteVersionString != localVersionString) {
-            _bootCompleter.future.then((_) {
-              context.showSnackbar('updateMayAvailable'.trParams({
-                'version': remoteVersionString,
-              }));
-            });
-          }
-        } catch (e) {
-          context.showErrorDialog('Unable to check update: $e');
-        }
       },
     ),
     (
@@ -214,6 +207,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
   void initState() {
     super.initState();
     _runPeriods();
+    _checkForUpdate();
   }
 
   @override

@@ -12,6 +12,7 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_editor.dart';
+import 'package:solian/widgets/reports/abuse_report.dart';
 
 class PostAction extends StatefulWidget {
   final Post item;
@@ -147,6 +148,23 @@ class _PostActionState extends State<PostAction> {
                   onTap: () async {
                     await _doShare();
                     Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                  leading: const Icon(Icons.report),
+                  title: Text('report'.tr),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AbuseReportDialog(
+                        resourceId: 'post:${widget.item.id}',
+                      ),
+                    ).then((status) {
+                      if (status == true) {
+                        Navigator.pop(context);
+                      }
+                    });
                   },
                 ),
                 if (!widget.noReact)
