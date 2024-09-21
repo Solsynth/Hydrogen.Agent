@@ -88,7 +88,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _pullDaily() async {
     try {
       _signRecord = await _dailySign.getToday();
-      _dailySign.listLastRecord(30).then((value) {
+      _dailySign.listLastRecord(14).then((value) {
         setState(() => _signRecordHistory = value);
       });
     } catch (e) {

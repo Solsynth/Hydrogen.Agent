@@ -313,7 +313,7 @@ class _PostItemState extends State<PostItem> {
         attachmentsId: attachments,
         autoload: false,
         isColumn: true,
-      ).paddingOnly(left: 60, right: 24);
+      ).paddingOnly(left: 60, right: 24, top: 4, bottom: 4);
     } else {
       return AttachmentList(
         flatMaxHeight: MediaQuery.of(context).size.width,
