@@ -439,7 +439,14 @@
   "iAmNotRobot": "我不是机器人",
   "report": "举报",
   "reportAbuse": "举报滥用",
+  "reportAbuseDesc": "举报任何违反服务条款的行为",
   "reportAbuseResource": "举报的资源",
   "reportAbuseReason": "举报的原因",
-  "reportSubmitted": "举报已提交，感谢你的贡献。我们将通过通知在 24 小时内通知该举报的处理结果。"
+  "reportSubmitted": "举报已提交，感谢你的贡献。我们将通过通知在 24 小时内通知该举报的处理结果。",
+  "accountDeletion": "请求删除账号",
+  "accountDeletionDesc": "删除目前登陆的账号，及其所有的数据。注意，该操作不可撤销！",
+  "accountDeletionConfirm": "确认账号删除请求",
+  "accountDeletionConfirmDesc": "你确定要删除账号 @account 吗？你将会在其绑定的主要邮件地址收到一封包含着确认删除账号连接的邮件，在二十四小时内使用该连接即可完成删除账号。注意，本操作不可撤销，并且账号创建或关联的所有数据都将被删除，请三思而后行。",
+  "accountDeletionRequested": "已请求删除账号，检查你的收件箱来确认请求。",
+  "slideToConfirm": "滑动来确认"
 }

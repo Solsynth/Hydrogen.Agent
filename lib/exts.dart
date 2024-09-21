@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:action_slider/action_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
@@ -66,6 +68,47 @@ extension AppExtensions on BuildContext {
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
                 child: Text('okay'.tr),
+              )
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<bool> showSlideToConfirmDialog(String title, body) async {
+    return await showDialog<bool>(
+          useRootNavigator: true,
+          context: this,
+          builder: (ctx) => AlertDialog(
+            title: Text(title, textAlign: TextAlign.center),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Text(body, textAlign: TextAlign.center),
+                  const Gap(28),
+                  ActionSlider.standard(
+                    icon: const Icon(Icons.send),
+                    iconAlignment: Alignment.center,
+                    sliderBehavior: SliderBehavior.move,
+                    actionThresholdType: ThresholdType.release,
+                    toggleColor: Colors.red,
+                    action: (controller) async {
+                      controller.success();
+                      await Future.delayed(const Duration(milliseconds: 500));
+                      Navigator.pop(ctx, true);
+                    },
+                    child: Text('slideToConfirm'.tr),
+                  ),
+                ],
+              ),
+            ),
+            actionsAlignment: MainAxisAlignment.center,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('cancel'.tr),
               )
             ],
           ),

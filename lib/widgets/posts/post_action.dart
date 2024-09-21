@@ -152,7 +152,7 @@ class _PostActionState extends State<PostAction> {
                 ),
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  leading: const Icon(Icons.report),
+                  leading: const Icon(Icons.flag),
                   title: Text('report'.tr),
                   onTap: () {
                     showDialog(

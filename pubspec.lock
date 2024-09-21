@@ -22,6 +22,14 @@ packages:
     description: dart
     source: sdk
     version: "0.3.2"
+  action_slider:
+    dependency: "direct main"
+    description:
+      name: action_slider
+      sha256: fad0720cde9bf06c12594c15da17dba087556a3285875a91aee3d3a64a3072e2
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
   analyzer:
     dependency: transitive
     description:
@@ -330,10 +338,10 @@ packages:
     dependency: "direct main"
     description:
       name: desktop_drop
-      sha256: d55a010fe46c8e8fcff4ea4b451a9ff84a162217bdb3b2a0aa1479776205e15d
+      sha256: "03abf1c0443afdd1d65cf8fa589a2f01c67a11da56bbb06f6ea1de79d5628e94"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.4"
+    version: "0.5.0"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -639,10 +647,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_app_update
-      sha256: "2b83278d5cc807f543e623d5b466216316104335a4918d9cc4556f39985fe84a"
+      sha256: "3650f57571e9f05d51f008f3fc9d556351910348f8011de7734b56fa74ccfee6"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
   flutter_background_service:
     dependency: "direct main"
     description:
@@ -759,10 +767,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_local_notifications
-      sha256: c500d5d9e7e553f06b61877ca6b9c8b92c570a4c8db371038702e8ce57f8a50f
+      sha256: "49eeef364fddb71515bc78d5a8c51435a68bccd6e4d68e25a942c5e47761ae71"
       url: "https://pub.dev"
     source: hosted
-    version: "17.2.2"
+    version: "17.2.3"
   flutter_local_notifications_linux:
     dependency: transitive
     description:
@@ -1201,10 +1209,10 @@ packages:
     dependency: "direct main"
     description:
       name: livekit_client
-      sha256: "5df9b6f153b5f2c59fbf116b41e54597dfe8b2340b6630f7d8869887a9e58f44"
+      sha256: "449f1f4f7688cc0d27a466d5b78c8973ec4bf2bbe93f79441f4fd118ecea61d7"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "2.2.6"
   logging:
     dependency: transitive
     description:

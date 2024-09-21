@@ -443,7 +443,14 @@
   "iAmNotRobot": "I'm not a Robot",
   "report": "Report",
   "reportAbuse": "Report abuse",
+  "reportAbuseDesc": "Report any violation of service terms",
   "reportAbuseResource": "Resource identifier",
   "reportAbuseReason": "Report reason",
-  "reportSubmitted": "Report submitted, thank you for your contribution. We will send a notification about the result of the report within 24 hours for you."
+  "reportSubmitted": "Report submitted, thank you for your contribution. We will send a notification about the result of the report within 24 hours for you.",
+  "accountDeletion": "Request account deletion",
+  "accountDeletionDesc": "Delete the current account and all its data. Note that this action is irreversible!",
+  "accountDeletionConfirm": "Confirm request account deletion",
+  "accountDeletionConfirmDesc": "Are you sure to delete account @account? You will receive a confirmation email with a link to confirm the deletion of the account within 24 hours. Note that this action is irreversible, and all data associated with the account will be deleted, and you should be careful about it.",
+  "accountDeletionRequested": "Account deletion requested, check your inbox to confirm the request.",
+  "slideToConfirm": "Slide to confirm"
 }

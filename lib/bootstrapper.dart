@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
@@ -52,6 +53,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       ).get(
         'https://git.solsynth.dev/api/v1/repos/hydrogen/solian/tags?page=1&limit=1',
       );
+      if (resp.statusCode != 200) {
+        throw RequestException(resp);
+      }
       final remoteVersionString =
           (resp.body as List).firstOrNull?['name'] ?? '0.0.0+0';
       final remoteVersion = Version.parse(remoteVersionString.split('+').first);

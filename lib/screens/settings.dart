@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/reports/abuse_report.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -129,6 +132,54 @@ class _SettingScreenState extends State<SettingScreen> {
               });
             },
           ),
+          Obx(() {
+            final AuthProvider auth = Get.find<AuthProvider>();
+            if (!auth.isAuthorized.value) return const SizedBox.shrink();
+            return Column(
+              children: [
+                _buildCaptionHeader('account'.tr),
+                ListTile(
+                  leading: const Icon(Icons.flag),
+                  trailing: const Icon(Icons.chevron_right),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+                  title: Text('reportAbuse'.tr),
+                  subtitle: Text('reportAbuseDesc'.tr),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const AbuseReportDialog(),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.person_remove),
+                  trailing: const Icon(Icons.chevron_right),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+                  title: Text('accountDeletion'.tr),
+                  subtitle: Text('accountDeletionDesc'.tr),
+                  onTap: () {
+                    context
+                        .showSlideToConfirmDialog(
+                      'accountDeletionConfirm'.tr,
+                      'accountDeletionConfirmDesc'.trParams({
+                        'account': '@${auth.userProfile.value!['name']}',
+                      }),
+                    )
+                        .then((value) async {
+                      if (value != true) return;
+                      final client = await auth.configureClient('id');
+                      final resp = await client.post('/users/me/deletion', {});
+                      if (resp.statusCode != 200) {
+                        context.showErrorDialog(RequestException(resp));
+                      } else {
+                        context.showSnackbar('accountDeletionRequested'.tr);
+                      }
+                    });
+                  },
+                ),
+              ],
+            );
+          }),
           _buildCaptionHeader('more'.tr),
           ListTile(
             leading: const Icon(Icons.delete_sweep),
