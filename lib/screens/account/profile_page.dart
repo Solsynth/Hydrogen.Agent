@@ -193,96 +193,99 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                 toolbarHeight: AppTheme.toolbarHeight(context),
                 leadingWidth: 24,
                 automaticallyImplyLeading: false,
-                flexibleSpace: Row(
-                  children: [
-                    AppBarLeadingButton.adaptive(context) ?? const Gap(8),
-                    const Gap(8),
-                    if (_userinfo != null)
-                      AccountAvatar(content: _userinfo!.avatar, radius: 16),
-                    const Gap(12),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_userinfo != null)
-                            Text(
-                              _userinfo!.nick,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          if (_userinfo != null)
-                            Text(
-                              '@${_userinfo!.name}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                        ],
-                      ),
-                    ),
-                    if (_userinfo != null && _subscription == null)
-                      OutlinedButton(
-                        style: const ButtonStyle(
-                          visualDensity:
-                              VisualDensity(horizontal: -4, vertical: -2),
+                flexibleSpace: SizedBox(
+                  height: 56,
+                  child: Row(
+                    children: [
+                      AppBarLeadingButton.adaptive(context) ?? const Gap(8),
+                      const Gap(8),
+                      if (_userinfo != null)
+                        AccountAvatar(content: _userinfo!.avatar, radius: 16),
+                      const Gap(12),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (_userinfo != null)
+                              Text(
+                                _userinfo!.nick,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            if (_userinfo != null)
+                              Text(
+                                '@${_userinfo!.name}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                          ],
                         ),
-                        onPressed: _isSubscribing
-                            ? null
-                            : () async {
-                                setState(() => _isSubscribing = true);
-                                _subscription =
-                                    await Get.find<SubscriptionProvider>()
-                                        .subscribeToUser(_userinfo!.id);
-                                setState(() => _isSubscribing = false);
-                              },
-                        child: Text('subscribe'.tr),
-                      )
-                    else if (_userinfo != null)
-                      OutlinedButton(
-                        style: const ButtonStyle(
-                          visualDensity:
-                              VisualDensity(horizontal: -4, vertical: -2),
+                      ),
+                      if (_userinfo != null && _subscription == null)
+                        OutlinedButton(
+                          style: const ButtonStyle(
+                            visualDensity:
+                                VisualDensity(horizontal: -4, vertical: -2),
+                          ),
+                          onPressed: _isSubscribing
+                              ? null
+                              : () async {
+                                  setState(() => _isSubscribing = true);
+                                  _subscription =
+                                      await Get.find<SubscriptionProvider>()
+                                          .subscribeToUser(_userinfo!.id);
+                                  setState(() => _isSubscribing = false);
+                                },
+                          child: Text('subscribe'.tr),
+                        )
+                      else if (_userinfo != null)
+                        OutlinedButton(
+                          style: const ButtonStyle(
+                            visualDensity:
+                                VisualDensity(horizontal: -4, vertical: -2),
+                          ),
+                          onPressed: _isSubscribing
+                              ? null
+                              : () async {
+                                  setState(() => _isSubscribing = true);
+                                  await Get.find<SubscriptionProvider>()
+                                      .unsubscribeFromUser(_userinfo!.id);
+                                  _subscription = null;
+                                  setState(() => _isSubscribing = false);
+                                },
+                          child: Text('unsubscribe'.tr),
                         ),
-                        onPressed: _isSubscribing
-                            ? null
-                            : () async {
-                                setState(() => _isSubscribing = true);
-                                await Get.find<SubscriptionProvider>()
-                                    .unsubscribeFromUser(_userinfo!.id);
-                                _subscription = null;
-                                setState(() => _isSubscribing = false);
-                              },
-                        child: Text('unsubscribe'.tr),
+                      if (_userinfo != null &&
+                          !_relationshipProvider.hasFriend(_userinfo!))
+                        IconButton(
+                          icon: const Icon(Icons.person_add),
+                          onPressed: _isMakingFriend
+                              ? null
+                              : () async {
+                                  setState(() => _isMakingFriend = true);
+                                  try {
+                                    await _relationshipProvider
+                                        .makeFriend(widget.name);
+                                    context.showSnackbar(
+                                      'accountFriendRequestSent'.tr,
+                                    );
+                                  } catch (e) {
+                                    context.showErrorDialog(e);
+                                  } finally {
+                                    setState(() => _isMakingFriend = false);
+                                  }
+                                },
+                        )
+                      else
+                        const IconButton(
+                          icon: Icon(Icons.handshake),
+                          onPressed: null,
+                        ),
+                      SizedBox(
+                        width: AppTheme.isLargeScreen(context) ? 8 : 16,
                       ),
-                    if (_userinfo != null &&
-                        !_relationshipProvider.hasFriend(_userinfo!))
-                      IconButton(
-                        icon: const Icon(Icons.person_add),
-                        onPressed: _isMakingFriend
-                            ? null
-                            : () async {
-                                setState(() => _isMakingFriend = true);
-                                try {
-                                  await _relationshipProvider
-                                      .makeFriend(widget.name);
-                                  context.showSnackbar(
-                                    'accountFriendRequestSent'.tr,
-                                  );
-                                } catch (e) {
-                                  context.showErrorDialog(e);
-                                } finally {
-                                  setState(() => _isMakingFriend = false);
-                                }
-                              },
-                      )
-                    else
-                      const IconButton(
-                        icon: Icon(Icons.handshake),
-                        onPressed: null,
-                      ),
-                    SizedBox(
-                      width: AppTheme.isLargeScreen(context) ? 8 : 16,
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ).paddingOnly(top: MediaQuery.of(context).padding.top),
                 bottom: TabBar(
                   tabs: [
                     Tab(text: 'profilePage'.tr),
@@ -296,128 +299,132 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
           body: TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              Column(
+              ListView(
                 children: [
                   const Gap(16),
-                  AccountHeadingWidget(
-                    name: _userinfo!.name,
-                    nick: _userinfo!.nick,
-                    desc: _userinfo!.description,
-                    badges: _userinfo!.badges,
-                    banner: _userinfo!.banner,
-                    avatar: _userinfo!.avatar,
-                    status: Get.find<StatusProvider>()
-                        .getSomeoneStatus(_userinfo!.name),
-                    detail: _userinfo,
-                    profile: _userinfo!.profile,
-                    extraWidgets: [
-                      if (_dailySignRecords.isNotEmpty)
-                        Card(
-                          child: SizedBox(
-                            height: 180,
-                            width: max(640, MediaQuery.of(context).size.width),
-                            child: LineChart(
-                              LineChartData(
-                                lineBarsData: [
-                                  LineChartBarData(
-                                    isCurved: true,
-                                    isStrokeCapRound: true,
-                                    isStrokeJoinRound: true,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    belowBarData: BarAreaData(
-                                      show: true,
-                                      gradient: LinearGradient(
-                                        colors: List.filled(
-                                          _dailySignRecords.length,
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.3),
-                                        ).toList(),
-                                      ),
-                                    ),
-                                    spots: _dailySignRecords
-                                        .map(
-                                          (x) => FlSpot(
-                                            x.createdAt
-                                                .copyWith(
-                                                  hour: 0,
-                                                  minute: 0,
-                                                  second: 0,
-                                                  millisecond: 0,
-                                                  microsecond: 0,
-                                                )
-                                                .millisecondsSinceEpoch
-                                                .toDouble(),
-                                            x.resultTier.toDouble(),
-                                          ),
-                                        )
-                                        .toList(),
-                                  )
-                                ],
-                                lineTouchData: LineTouchData(
-                                  touchTooltipData: LineTouchTooltipData(
-                                    getTooltipItems: (spots) => spots
-                                        .map((spot) => LineTooltipItem(
-                                              '${DailySignHistoryChartDialog.signSymbols[spot.y.toInt()]}\n${DateFormat('MM/dd').format(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}',
-                                              TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface,
-                                              ),
-                                            ))
-                                        .toList(),
-                                    getTooltipColor: (_) => Theme.of(context)
-                                        .colorScheme
-                                        .surfaceContainerHigh,
-                                  ),
-                                ),
-                                titlesData: FlTitlesData(
-                                  topTitles: const AxisTitles(
-                                    sideTitles: SideTitles(showTitles: false),
-                                  ),
-                                  rightTitles: const AxisTitles(
-                                    sideTitles: SideTitles(showTitles: false),
-                                  ),
-                                  leftTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      reservedSize: 40,
-                                      interval: 1,
-                                      getTitlesWidget: (value, _) => Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          DailySignHistoryChartDialog
-                                              .signSymbols[value.toInt()],
-                                          textAlign: TextAlign.right,
-                                        ).paddingOnly(right: 8),
-                                      ),
-                                    ),
-                                  ),
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      reservedSize: 28,
-                                      interval: 86400000,
-                                      getTitlesWidget: (value, _) => Text(
-                                        DateFormat('dd').format(
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                            value.toInt(),
-                                          ),
+                  CenteredContainer(
+                    child: AccountHeadingWidget(
+                      name: _userinfo!.name,
+                      nick: _userinfo!.nick,
+                      desc: _userinfo!.description,
+                      badges: _userinfo!.badges,
+                      banner: _userinfo!.banner,
+                      avatar: _userinfo!.avatar,
+                      status: Get.find<StatusProvider>()
+                          .getSomeoneStatus(_userinfo!.name),
+                      detail: _userinfo,
+                      profile: _userinfo!.profile,
+                      extraWidgets: [
+                        if (_dailySignRecords.isNotEmpty)
+                          Card(
+                            child: SizedBox(
+                              height: 180,
+                              width:
+                                  max(640, MediaQuery.of(context).size.width),
+                              child: LineChart(
+                                LineChartData(
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      isCurved: true,
+                                      isStrokeCapRound: true,
+                                      isStrokeJoinRound: true,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          colors: List.filled(
+                                            _dailySignRecords.length,
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.3),
+                                          ).toList(),
                                         ),
-                                        textAlign: TextAlign.center,
-                                      ).paddingOnly(top: 8),
+                                      ),
+                                      spots: _dailySignRecords
+                                          .map(
+                                            (x) => FlSpot(
+                                              x.createdAt
+                                                  .copyWith(
+                                                    hour: 0,
+                                                    minute: 0,
+                                                    second: 0,
+                                                    millisecond: 0,
+                                                    microsecond: 0,
+                                                  )
+                                                  .millisecondsSinceEpoch
+                                                  .toDouble(),
+                                              x.resultTier.toDouble(),
+                                            ),
+                                          )
+                                          .toList(),
+                                    )
+                                  ],
+                                  lineTouchData: LineTouchData(
+                                    touchTooltipData: LineTouchTooltipData(
+                                      getTooltipItems: (spots) => spots
+                                          .map((spot) => LineTooltipItem(
+                                                '${DailySignHistoryChartDialog.signSymbols[spot.y.toInt()]}\n${DateFormat('MM/dd').format(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()))}',
+                                                TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
+                                                ),
+                                              ))
+                                          .toList(),
+                                      getTooltipColor: (_) => Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHigh,
                                     ),
                                   ),
+                                  titlesData: FlTitlesData(
+                                    topTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    rightTitles: const AxisTitles(
+                                      sideTitles: SideTitles(showTitles: false),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 40,
+                                        interval: 1,
+                                        getTitlesWidget: (value, _) => Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            DailySignHistoryChartDialog
+                                                .signSymbols[value.toInt()],
+                                            textAlign: TextAlign.right,
+                                          ).paddingOnly(right: 8),
+                                        ),
+                                      ),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        reservedSize: 28,
+                                        interval: 86400000,
+                                        getTitlesWidget: (value, _) => Text(
+                                          DateFormat('dd').format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                              value.toInt(),
+                                            ),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ).paddingOnly(top: 8),
+                                      ),
+                                    ),
+                                  ),
+                                  gridData: const FlGridData(show: false),
+                                  borderData: FlBorderData(show: false),
                                 ),
-                                gridData: const FlGridData(show: false),
-                                borderData: FlBorderData(show: false),
                               ),
-                            ),
-                          ).marginOnly(right: 24, left: 12, bottom: 8, top: 24),
-                        )
-                    ],
+                            ).marginOnly(
+                                right: 24, left: 12, bottom: 8, top: 24),
+                          )
+                      ],
+                    ),
                   ),
                 ],
               ),

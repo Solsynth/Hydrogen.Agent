@@ -42,6 +42,28 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
 
   final Completer _bootCompleter = Completer();
 
+  void _updateNow(String localVersionString, String remoteVersionString) {
+    context
+        .showConfirmDialog(
+      'updateAvailable'.tr,
+      'updateAvailableDesc'.trParams({
+        'from': localVersionString,
+        'to': remoteVersionString,
+      }),
+    )
+        .then((result) {
+      if (result) {
+        final model = UpdateModel(
+          'https://files.solsynth.dev/d/production01/solian/app-arm64-v8a-release.apk',
+          'solian-app-arm64-v8a-release.apk',
+          'ic_launcher',
+          'https://testflight.apple.com/join/YJ0lmN6O',
+        );
+        AzhonAppUpdate.update(model);
+      }
+    });
+  }
+
   Future<void> _checkForUpdate() async {
     if (PlatformInfo.isWeb) return;
     try {
@@ -70,25 +92,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
               remoteBuildNumber > localBuildNumber) ||
           (remoteVersionString != localVersionString && strictUpdate)) {
         if (PlatformInfo.isAndroid) {
-          context
-              .showConfirmDialog(
-            'updateAvailable'.tr,
-            'updateAvailableDesc'.trParams({
-              'from': localVersionString,
-              'to': remoteVersionString,
-            }),
-          )
-              .then((result) {
-            if (result) {
-              final model = UpdateModel(
-                'https://files.solsynth.dev/d/production01/solian/app-arm64-v8a-release.apk',
-                'solian-app-arm64-v8a-release.apk',
-                'ic_launcher',
-                'https://testflight.apple.com/join/YJ0lmN6O',
-              );
-              AzhonAppUpdate.update(model);
-            }
-          });
+          _updateNow(localVersionString, remoteVersionString);
         } else {
           context.showInfoDialog(
             'updateAvailable'.tr,
@@ -97,9 +101,19 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
         }
       } else if (remoteVersionString != localVersionString) {
         _bootCompleter.future.then((_) {
-          context.showSnackbar('updateMayAvailable'.trParams({
-            'version': remoteVersionString,
-          }));
+          context.showSnackbar(
+            'updateMayAvailable'.trParams({
+              'version': remoteVersionString,
+            }),
+            action: PlatformInfo.isAndroid
+                ? SnackBarAction(
+                    label: 'updateNow'.tr,
+                    onPressed: () {
+                      _updateNow(localVersionString, remoteVersionString);
+                    },
+                  )
+                : null,
+          );
         });
       }
     } catch (e) {

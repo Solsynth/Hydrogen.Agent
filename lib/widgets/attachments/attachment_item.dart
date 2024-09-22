@@ -21,6 +21,7 @@ class AttachmentItem extends StatefulWidget {
   final bool showBadge;
   final bool showHideButton;
   final bool autoload;
+  final bool isDense;
   final BoxFit fit;
   final String? badge;
   final Function? onHide;
@@ -34,6 +35,7 @@ class AttachmentItem extends StatefulWidget {
     this.showBadge = true,
     this.showHideButton = true,
     this.autoload = false,
+    this.isDense = false,
     this.onHide,
   });
 
@@ -53,6 +55,7 @@ class _AttachmentItemState extends State<AttachmentItem> {
           fit: widget.fit,
           showBadge: widget.showBadge,
           showHideButton: widget.showHideButton,
+          isDense: widget.isDense,
           onHide: widget.onHide,
         );
       case 'video':
@@ -120,6 +123,7 @@ class _AttachmentItemImage extends StatelessWidget {
   final bool showBadge;
   final bool showHideButton;
   final BoxFit fit;
+  final bool isDense;
   final String? badge;
   final Function? onHide;
 
@@ -128,6 +132,7 @@ class _AttachmentItemImage extends StatelessWidget {
     required this.item,
     required this.showBadge,
     required this.showHideButton,
+    required this.isDense,
     required this.fit,
     this.badge,
     this.onHide,
@@ -146,6 +151,7 @@ class _AttachmentItemImage extends StatelessWidget {
               '/attachments/${item.rid}',
             ),
             fit: fit,
+            isDense: isDense,
           ),
           if (showBadge && badge != null)
             Positioned(

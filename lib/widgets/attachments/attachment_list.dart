@@ -338,6 +338,7 @@ class AttachmentListEntry extends StatelessWidget {
               badge: showBadge ? badgeContent : null,
               showHideButton: !item!.isMature || showMature,
               autoload: autoload,
+              isDense: isDense,
               onHide: () {
                 onReveal(false);
               },
