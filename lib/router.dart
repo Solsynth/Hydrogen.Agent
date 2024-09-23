@@ -23,7 +23,7 @@ import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
 import 'package:solian/screens/realms/realm_view.dart';
-import 'package:solian/screens/feed.dart';
+import 'package:solian/screens/explore.dart';
 import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/screens/settings.dart';
 import 'package:solian/shells/root_shell.dart';
@@ -78,13 +78,18 @@ abstract class AppRouter {
     builder: (context, state, child) => child,
     routes: [
       GoRoute(
-        path: '/feed',
-        name: 'feed',
-        builder: (context, state) => const FeedScreen(),
+        path: '/explore',
+        name: 'explore',
+        builder: (context, state) => const ExploreScreen(),
       ),
       GoRoute(
-        path: '/feed/search',
-        name: 'feedSearch',
+        path: '/drafts',
+        name: 'draftBox',
+        builder: (context, state) => const DraftBoxScreen(),
+      ),
+      GoRoute(
+        path: '/posts/search',
+        name: 'postSearch',
         builder: (context, state) => TitleShell(
           state: state,
           child: FeedSearchScreen(
@@ -92,11 +97,6 @@ abstract class AppRouter {
             category: state.uri.queryParameters['category'],
           ),
         ),
-      ),
-      GoRoute(
-        path: '/drafts',
-        name: 'draftBox',
-        builder: (context, state) => const DraftBoxScreen(),
       ),
       GoRoute(
         path: '/posts/view/:id',

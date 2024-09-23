@@ -16,14 +16,14 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/posts/post_shuffle_swiper.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
 
-class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key});
+class ExploreScreen extends StatefulWidget {
+  const ExploreScreen({super.key});
 
   @override
-  State<FeedScreen> createState() => _FeedScreenState();
+  State<ExploreScreen> createState() => _ExploreScreenState();
 }
 
-class _FeedScreenState extends State<FeedScreen>
+class _ExploreScreenState extends State<ExploreScreen>
     with SingleTickerProviderStateMixin {
   late final PostListController _postController;
   late final TabController _tabController;
@@ -82,7 +82,7 @@ class _FeedScreenState extends State<FeedScreen>
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                title: AppBarTitle('feed'.tr),
+                title: AppBarTitle('explore'.tr),
                 centerTitle: false,
                 floating: true,
                 toolbarHeight: AppTheme.toolbarHeight(context),

@@ -27,7 +27,7 @@ class PostTagsList extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                AppRouter.instance.pushNamed('feedSearch', queryParameters: {
+                AppRouter.instance.pushNamed('postSearch', queryParameters: {
                   'tag': x.alias,
                 });
               },

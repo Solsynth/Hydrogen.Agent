@@ -54,6 +54,7 @@ class AboutScreen extends StatelessWidget {
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
+                alignment: WrapAlignment.center,
                 children: [
                   TextButton(
                     style: denseButtonStyle,

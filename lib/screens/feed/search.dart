@@ -63,13 +63,13 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
               ListTile(
                 leading: const Icon(Icons.label),
                 tileColor: Theme.of(context).colorScheme.surfaceContainer,
-                title: Text('feedSearchWithTag'.trParams({'key': widget.tag!})),
+                title: Text('postSearchWithTag'.trParams({'key': widget.tag!})),
               ),
             if (widget.category != null)
               ListTile(
                 leading: const Icon(Icons.category),
                 tileColor: Theme.of(context).colorScheme.surfaceContainer,
-                title: Text('feedSearchWithCategory'
+                title: Text('postSearchWithCategory'
                     .trParams({'key': widget.category!})),
               ),
             Expanded(

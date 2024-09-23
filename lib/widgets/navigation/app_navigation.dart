@@ -9,9 +9,9 @@ abstract class AppNavigation {
       page: 'dashboard',
     ),
     AppNavigationDestination(
-      icon: Icons.newspaper,
-      label: 'feed'.tr,
-      page: 'feed',
+      icon: Icons.explore,
+      label: 'explore'.tr,
+      page: 'explore',
     ),
     AppNavigationDestination(
       icon: Icons.workspaces,

@@ -49,6 +49,7 @@ class ChatEventMessage extends StatelessWidget {
     return MarkdownTextContent(
       parentId: 'm${item.id}',
       isSelectable: true,
+      isAutoWarp: true,
       content: body.text,
     );
   }

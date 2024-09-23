@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_selectionarea/flutter_markdown.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:markdown/markdown.dart';
@@ -15,6 +16,7 @@ class MarkdownTextContent extends StatelessWidget {
   final String parentId;
   final bool isSelectable;
   final bool isLargeText;
+  final bool isAutoWarp;
 
   const MarkdownTextContent({
     super.key,
@@ -22,139 +24,175 @@ class MarkdownTextContent extends StatelessWidget {
     required this.parentId,
     this.isSelectable = false,
     this.isLargeText = false,
+    this.isAutoWarp = false,
   });
 
   Widget _buildContent(BuildContext context) {
-    final emojiRegex = RegExp(r':([-\w]+):');
-    final emojiMatch = emojiRegex.allMatches(content);
-    final isOnlyEmoji = content.replaceAll(emojiRegex, '').trim().isEmpty;
+    final stickerRegex = RegExp(r':([-\w]+):');
 
-    return Markdown(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      data: content,
-      padding: EdgeInsets.zero,
-      styleSheet: MarkdownStyleSheet.fromTheme(
-        Theme.of(context),
-      ).copyWith(
-        textScaleFactor: isLargeText ? 1.1 : 1,
-        blockquote: TextStyle(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-        blockquoteDecoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHigh,
-          borderRadius: const BorderRadius.all(Radius.circular(4)),
-        ),
-        horizontalRuleDecoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              width: 1.0,
-              color: Theme.of(context).dividerColor,
+    // Split the content into paragraphs
+    final paragraphs = content.split(RegExp(r'\n\s*\n'));
+
+    // Iterate over each paragraph to process stickers individually
+    List<Widget> contentWidgets = [];
+    for (var idx = 0; idx < paragraphs.length; idx++) {
+      // Getting paragraph
+      var paragraph = paragraphs[idx];
+
+      // Auto adding new-lines
+      if (isAutoWarp) {
+        paragraph = paragraph.replaceAll('\n', '\\\n');
+      }
+
+      // Matching stickers
+      final stickerMatch = stickerRegex.allMatches(paragraph);
+      final isOnlySticker =
+          paragraph.replaceAll(stickerRegex, '').trim().isEmpty;
+
+      contentWidgets.add(
+        Markdown(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          data: paragraph,
+          padding: EdgeInsets.zero,
+          styleSheet: MarkdownStyleSheet.fromTheme(
+            Theme.of(context),
+          ).copyWith(
+            textScaleFactor: isLargeText ? 1.1 : 1,
+            blockquote: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            blockquoteDecoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              borderRadius: const BorderRadius.all(Radius.circular(4)),
+            ),
+            horizontalRuleDecoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  width: 1.0,
+                  color: Theme.of(context).dividerColor,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      extensionSet: markdown.ExtensionSet(
-        markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
-        <markdown.InlineSyntax>[
-          _UserNameCardInlineSyntax(),
-          _CustomEmoteInlineSyntax(),
-          markdown.EmojiSyntax(),
-          markdown.AutolinkSyntax(),
-          markdown.AutolinkExtensionSyntax(),
-          ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
-        ],
-      ),
-      onTapLink: (text, href, title) async {
-        if (href == null) return;
-        if (href.startsWith('solink://')) {
-          final segments = href.replaceFirst('solink://', '').split('/');
-          switch (segments[0]) {
-            case 'users':
-              showModalBottomSheet(
-                useRootNavigator: true,
-                isScrollControlled: true,
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                context: context,
-                builder: (context) => AccountProfilePopup(
-                  name: segments[1],
-                ),
-              );
-          }
-          return;
-        }
-
-        await launchUrlString(
-          href,
-          mode: LaunchMode.externalApplication,
-        );
-      },
-      imageBuilder: (uri, title, alt) {
-        var url = uri.toString();
-        double? width, height;
-        BoxFit? fit;
-        if (url.startsWith('solink://')) {
-          final segments = url.replaceFirst('solink://', '').split('/');
-          switch (segments[0]) {
-            case 'stickers':
-              double radius = 8;
-              final StickerProvider sticker = Get.find();
-              if (emojiMatch.length <= 1 && isOnlyEmoji) {
-                width = 128;
-                height = 128;
-              } else if (emojiMatch.length <= 3 && isOnlyEmoji) {
-                width = 32;
-                height = 32;
-              } else {
-                radius = 4;
-                width = 16;
-                height = 16;
+          extensionSet: markdown.ExtensionSet(
+            markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
+            <markdown.InlineSyntax>[
+              _UserNameCardInlineSyntax(),
+              _CustomEmoteInlineSyntax(),
+              markdown.EmojiSyntax(),
+              markdown.AutolinkSyntax(),
+              markdown.AutolinkExtensionSyntax(),
+              ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
+            ],
+          ),
+          onTapLink: (text, href, title) async {
+            if (href == null) return;
+            if (href.startsWith('solink://')) {
+              final segments = href.replaceFirst('solink://', '').split('/');
+              switch (segments[0]) {
+                case 'users':
+                  showModalBottomSheet(
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    context: context,
+                    builder: (context) => AccountProfilePopup(
+                      name: segments[1],
+                    ),
+                  );
               }
-              fit = BoxFit.contain;
-              return ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(radius)),
-                child: Container(
-                  color: Theme.of(context).colorScheme.surfaceContainer,
-                  child: FutureBuilder(
-                    future: sticker.getStickerByAlias(segments[1]),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return AutoCacheImage(
-                        snapshot.data!.imageUrl,
-                        width: width,
-                        height: height,
-                        fit: fit,
-                        noErrorWidget: true,
-                      );
-                    },
-                  ),
-                ),
-              ).paddingSymmetric(vertical: 4);
-            case 'attachments':
-              const radius = BorderRadius.all(Radius.circular(8));
-              return LimitedBox(
-                maxHeight: MediaQuery.of(context).size.width,
-                child: ClipRRect(
-                  borderRadius: radius,
-                  child: AttachmentSelfContainedEntry(
-                    isDense: true,
-                    parentId: parentId,
-                    rid: segments[1],
-                  ),
-                ),
-              ).paddingSymmetric(vertical: 4);
-          }
-        }
+              return;
+            }
 
-        return AutoCacheImage(
-          url,
-          width: width,
-          height: height,
-          fit: fit,
-        );
-      },
+            await launchUrlString(
+              href,
+              mode: LaunchMode.externalApplication,
+            );
+          },
+          imageBuilder: (uri, title, alt) {
+            var url = uri.toString();
+            double? width, height;
+            BoxFit? fit;
+            if (url.startsWith('solink://')) {
+              final segments = url.replaceFirst('solink://', '').split('/');
+              switch (segments[0]) {
+                case 'stickers':
+                  double radius = 8;
+                  final StickerProvider sticker = Get.find();
+
+                  // Adjust sticker size based on the sticker count in this paragraph
+                  if (stickerMatch.length <= 1 && isOnlySticker) {
+                    width = 128;
+                    height = 128;
+                  } else if (stickerMatch.length <= 3 && isOnlySticker) {
+                    width = 32;
+                    height = 32;
+                  } else {
+                    radius = 4;
+                    width = 16;
+                    height = 16;
+                  }
+                  fit = BoxFit.contain;
+                  return ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(radius)),
+                    child: Container(
+                      width: width,
+                      height: height,
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      child: FutureBuilder(
+                        future: sticker.getStickerByAlias(segments[1]),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          return AutoCacheImage(
+                            snapshot.data!.imageUrl,
+                            width: width,
+                            height: height,
+                            fit: fit,
+                            noErrorWidget: true,
+                          );
+                        },
+                      ),
+                    ),
+                  ).paddingSymmetric(vertical: 4);
+                case 'attachments':
+                  const radius = BorderRadius.all(Radius.circular(8));
+                  return LimitedBox(
+                    maxHeight: MediaQuery.of(context).size.width,
+                    child: ClipRRect(
+                      borderRadius: radius,
+                      child: AttachmentSelfContainedEntry(
+                        isDense: true,
+                        parentId: parentId,
+                        rid: segments[1],
+                      ),
+                    ),
+                  ).paddingSymmetric(vertical: 4);
+              }
+            }
+            return AutoCacheImage(
+              url,
+              width: width,
+              height: height,
+              fit: fit,
+            );
+          },
+        ),
+      );
+
+      if (idx < paragraphs.length - 1) {
+        contentWidgets.add(const Gap(4));
+      }
+    }
+
+    // Return the list of widgets for the paragraphs
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: contentWidgets,
     );
   }
 
