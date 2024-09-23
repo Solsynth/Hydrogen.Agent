@@ -101,11 +101,14 @@ class _PostItemState extends State<PostItem> {
                   onChange: (size) {
                     setState(() => _contentHeight = size.height);
                   },
-                  child: MarkdownTextContent(
-                    parentId: 'p${item.id}',
-                    content: item.body['content'],
-                    isAutoWarp: item.type == 'story',
-                    isSelectable: widget.isContentSelectable,
+                  child: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: MarkdownTextContent(
+                      parentId: 'p${item.id}',
+                      content: item.body['content'],
+                      isAutoWarp: item.type == 'story',
+                      isSelectable: widget.isContentSelectable,
+                    ),
                   ).paddingOnly(
                     left: 16,
                     right: 12,
@@ -374,60 +377,81 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
             child: Column(
               children: snapshot.data!
                   .map(
-                    (reply) => Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AccountAvatar(content: reply.author.avatar, radius: 10),
-                        const Gap(6),
-                        Text(
-                          reply.author.nick,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const Gap(6),
-                        Text(
-                          format(
-                            reply.publishedAt?.toLocal() ?? DateTime.now(),
-                            locale: 'en_short',
-                          ),
-                        ).paddingOnly(top: 0.5),
-                        const Gap(8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MarkdownTextContent(
-                                isAutoWarp: reply.type == 'story',
-                                content: reply.body['content'],
-                                parentId:
-                                    'p${item.id}-featured-reply${reply.id}',
+                    (reply) => ClipRRect(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child: OpenContainer(
+                        closedBuilder: (_, openContainer) => Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AccountAvatar(
+                              content: reply.author.avatar,
+                              radius: 10,
+                            ),
+                            const Gap(6),
+                            Text(
+                              reply.author.nick,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const Gap(6),
+                            Text(
+                              format(
+                                reply.publishedAt?.toLocal() ?? DateTime.now(),
+                                locale: 'en_short',
                               ),
-                              if (reply.body['attachments'] is List &&
-                                  reply.body['attachments'].isNotEmpty)
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.file_copy,
-                                      size: 15,
-                                      color: unFocusColor,
-                                    ).paddingOnly(right: 5),
-                                    Text(
-                                      'attachmentHint'.trParams(
-                                        {
-                                          'count': reply
-                                              .body['attachments'].length
-                                              .toString(),
-                                        },
-                                      ),
-                                      style: TextStyle(color: unFocusColor),
+                            ).paddingOnly(top: 0.5),
+                            const Gap(8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  MarkdownTextContent(
+                                    isAutoWarp: reply.type == 'story',
+                                    content: reply.body['content'],
+                                    parentId:
+                                        'p${item.id}-featured-reply${reply.id}',
+                                  ),
+                                  if (reply.body['attachments'] is List &&
+                                      reply.body['attachments'].isNotEmpty)
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.file_copy,
+                                          size: 15,
+                                          color: unFocusColor,
+                                        ).paddingOnly(right: 5),
+                                        Text(
+                                          'attachmentHint'.trParams(
+                                            {
+                                              'count': reply
+                                                  .body['attachments'].length
+                                                  .toString(),
+                                            },
+                                          ),
+                                          style: TextStyle(color: unFocusColor),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                            ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ).paddingSymmetric(horizontal: 12, vertical: 8),
+                        openBuilder: (_, __) => TitleShell(
+                          title: 'postDetail'.tr,
+                          child: PostDetailScreen(
+                            id: reply.id.toString(),
+                            post: reply,
                           ),
                         ),
-                      ],
-                    ).paddingSymmetric(horizontal: 12, vertical: 8),
+                        closedElevation: 0,
+                        openElevation: 0,
+                        closedColor:
+                            Theme.of(context).colorScheme.surfaceContainer,
+                        openColor: Theme.of(context).colorScheme.surface,
+                      ),
+                    ),
                   )
                   .toList(),
             ),
