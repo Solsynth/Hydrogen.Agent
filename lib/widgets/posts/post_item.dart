@@ -209,14 +209,17 @@ class _PostItemState extends State<PostItem> {
                             onChange: (size) {
                               setState(() => _contentHeight = size.height);
                             },
-                            child: MarkdownTextContent(
-                              parentId: 'p${item.id}-embed',
-                              content: item.body['content'],
-                              isAutoWarp: item.type == 'story',
-                              isSelectable: widget.isContentSelectable,
-                              isLargeText: item.type == 'article' &&
-                                  widget.isFullContent,
-                            ).paddingOnly(left: 12, right: 8),
+                            child: SingleChildScrollView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              child: MarkdownTextContent(
+                                parentId: 'p${item.id}-embed',
+                                content: item.body['content'],
+                                isAutoWarp: item.type == 'story',
+                                isSelectable: widget.isContentSelectable,
+                                isLargeText: item.type == 'article' &&
+                                    widget.isFullContent,
+                              ).paddingOnly(left: 12, right: 8),
+                            ),
                           ),
                         ),
                         if (_contentHeight >= 320 && !widget.isFullContent)
