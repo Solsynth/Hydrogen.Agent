@@ -18,6 +18,7 @@ import 'package:solian/widgets/link_expansion.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/posts/post_tags.dart';
 import 'package:solian/widgets/posts/post_quick_action.dart';
+import 'package:solian/widgets/relative_date.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:timeago/timeago.dart' show format;
 
@@ -69,360 +70,6 @@ class _PostItemState extends State<PostItem> {
     super.initState();
   }
 
-  Widget _buildDate() {
-    if (widget.isFullDate) {
-      return Text(DateFormat('y/M/d HH:mm')
-          .format(item.publishedAt?.toLocal() ?? DateTime.now()));
-    } else {
-      return Text(
-        format(
-          item.publishedAt?.toLocal() ?? DateTime.now(),
-          locale: 'en_short',
-        ),
-      );
-    }
-  }
-
-  Widget _buildThumbnail() {
-    if (widget.item.body['thumbnail'] == null) return const SizedBox.shrink();
-    final border = BorderSide(
-      color: Theme.of(context).dividerColor,
-      width: 0.3,
-    );
-    return Container(
-      decoration: BoxDecoration(border: Border(top: border, bottom: border)),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: AttachmentSelfContainedEntry(
-          rid: widget.item.body['thumbnail'],
-          parentId: 'p${item.id}-thumbnail',
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.isCompact)
-          AccountAvatar(
-            content: item.author.avatar,
-            radius: 10,
-          ).paddingOnly(left: 2, top: 1),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    item.author.nick,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  _buildDate().paddingOnly(left: 4),
-                ],
-              ),
-              if (item.body['title'] != null)
-                Text(
-                  item.body['title'],
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(fontSize: 15),
-                ),
-              if (item.body['description'] != null)
-                Text(
-                  item.body['description'],
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-            ],
-          ).paddingOnly(left: widget.isCompact ? 6 : 12),
-        ),
-        if (widget.item.type == 'article')
-          Badge(
-            label: Text('article'.tr),
-          ).paddingOnly(top: 3),
-      ],
-    );
-  }
-
-  Widget _buildHeaderDivider() {
-    if (item.body['description'] != null || item.body['title'] != null) {
-      return const Divider(thickness: 0.3, height: 1).paddingSymmetric(
-        vertical: 8,
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
-  Widget _buildFooter() {
-    List<String> labels = List.empty(growable: true);
-    if (widget.item.editedAt != null) {
-      labels.add('postEdited'.trParams({
-        'date': DateFormat('yy/M/d HH:mm').format(item.editedAt!.toLocal()),
-      }));
-    }
-    if (widget.item.realm != null) {
-      labels.add('postInRealm'.trParams({
-        'realm': widget.item.realm!.alias,
-      }));
-    }
-
-    List<Widget> widgets = List.empty(growable: true);
-
-    if (widget.item.tags?.isNotEmpty ?? false) {
-      widgets.add(PostTagsList(tags: widget.item.tags!));
-    }
-    if (labels.isNotEmpty) {
-      widgets.add(Text(
-        labels.join(' · '),
-        textAlign: TextAlign.left,
-        style: TextStyle(
-          fontSize: 12,
-          color: _unFocusColor,
-        ),
-      ));
-    }
-    if (widget.item.pinnedAt != null) {
-      widgets.add(Text(
-        'postPinned'.tr,
-        style: TextStyle(fontSize: 12, color: _unFocusColor),
-      ));
-    }
-
-    if (widgets.isEmpty) {
-      return const SizedBox.shrink();
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: widgets,
-      ).paddingOnly(top: 4);
-    }
-  }
-
-  Widget _buildReply(BuildContext context) {
-    return OpenContainer(
-      tappable: widget.isClickable || widget.isOverrideEmbedClickable,
-      closedBuilder: (_, openContainer) => Column(
-        children: [
-          Row(
-            children: [
-              FaIcon(
-                FontAwesomeIcons.reply,
-                size: 16,
-                color: _unFocusColor,
-              ),
-              Expanded(
-                child: Text(
-                  'postRepliedNotify'.trParams(
-                    {'username': '@${widget.item.replyTo!.author.name}'},
-                  ),
-                  style: TextStyle(color: _unFocusColor),
-                ).paddingOnly(left: 6),
-              ),
-            ],
-          ).paddingOnly(left: 12),
-          Card(
-            elevation: 1,
-            child: PostItem(
-              item: widget.item.replyTo!,
-              isCompact: true,
-              attachmentParent: widget.item.id.toString(),
-            ).paddingSymmetric(vertical: 8),
-          ),
-        ],
-      ),
-      openBuilder: (_, __) => TitleShell(
-        title: 'postDetail'.tr,
-        child: PostDetailScreen(
-          id: widget.item.replyTo!.id.toString(),
-          post: widget.item.replyTo!,
-        ),
-      ),
-      closedElevation: 0,
-      openElevation: 0,
-      closedColor:
-          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
-      openColor: Theme.of(context).colorScheme.surface,
-    );
-  }
-
-  Widget _buildRepost(BuildContext context) {
-    return OpenContainer(
-      tappable: widget.isClickable || widget.isOverrideEmbedClickable,
-      closedBuilder: (_, openContainer) => Column(
-        children: [
-          Row(
-            children: [
-              FaIcon(
-                FontAwesomeIcons.retweet,
-                size: 16,
-                color: _unFocusColor,
-              ),
-              Expanded(
-                child: Text(
-                  'postRepostedNotify'.trParams(
-                    {'username': '@${widget.item.repostTo!.author.name}'},
-                  ),
-                  style: TextStyle(color: _unFocusColor),
-                ).paddingOnly(left: 6),
-              ),
-            ],
-          ).paddingOnly(left: 12),
-          Card(
-            elevation: 1,
-            child: PostItem(
-              item: widget.item.repostTo!,
-              isCompact: true,
-              attachmentParent: widget.item.id.toString(),
-            ).paddingSymmetric(vertical: 8),
-          ),
-        ],
-      ),
-      openBuilder: (_, __) => TitleShell(
-        title: 'postDetail'.tr,
-        child: PostDetailScreen(
-          id: widget.item.repostTo!.id.toString(),
-          post: widget.item.repostTo!,
-        ),
-      ),
-      closedElevation: 0,
-      openElevation: 0,
-      closedColor:
-          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
-      openColor: Theme.of(context).colorScheme.surface,
-    );
-  }
-
-  Widget _buildAttachments() {
-    final List<String> attachments = item.body['attachments'] is List
-        ? List.from(item.body['attachments']?.whereType<String>())
-        : List.empty();
-
-    if (attachments.length > 3) {
-      return AttachmentList(
-        parentId: widget.item.id.toString(),
-        attachmentsId: attachments,
-        autoload: false,
-        isGrid: true,
-      ).paddingOnly(left: 36, top: 4, bottom: 4);
-    } else if (attachments.length > 1 || AppTheme.isLargeScreen(context)) {
-      return AttachmentList(
-        parentId: widget.item.id.toString(),
-        attachmentsId: attachments,
-        autoload: false,
-        isColumn: true,
-      ).paddingOnly(left: 60, right: 24, top: 4, bottom: 4);
-    } else {
-      return AttachmentList(
-        flatMaxHeight: MediaQuery.of(context).size.width,
-        parentId: widget.item.id.toString(),
-        attachmentsId: attachments,
-        autoload: false,
-      );
-    }
-  }
-
-  Widget _buildFeaturedReply() {
-    if ((widget.item.metric?.replyCount ?? 0) == 0) {
-      return const SizedBox.shrink();
-    }
-    final List<String> attachments = item.body['attachments'] is List
-        ? List.from(item.body['attachments']?.whereType<String>())
-        : List.empty();
-    final unFocusColor =
-        Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
-    return FutureBuilder(
-      future: Get.find<PostProvider>().listPostFeaturedReply(
-        widget.item.id.toString(),
-      ),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return Container(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Card(
-            margin: EdgeInsets.zero,
-            child: Column(
-              children: snapshot.data!
-                  .map(
-                    (x) => Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AccountAvatar(content: x.author.avatar, radius: 10),
-                        const Gap(6),
-                        Text(
-                          x.author.nick,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const Gap(6),
-                        Text(
-                          format(
-                            x.publishedAt?.toLocal() ?? DateTime.now(),
-                            locale: 'en_short',
-                          ),
-                        ).paddingOnly(top: 0.5),
-                        const Gap(8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MarkdownTextContent(
-                                content: x.body['content'],
-                                parentId: 'p${item.id}-featured-reply${x.id}',
-                              ),
-                              if (x.body['attachments'] is List &&
-                                  x.body['attachments'].length > 0)
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.file_copy,
-                                      size: 15,
-                                      color: unFocusColor,
-                                    ).paddingOnly(right: 5),
-                                    Text(
-                                      'attachmentHint'.trParams(
-                                        {
-                                          'count': x.body['attachments'].length
-                                              .toString()
-                                        },
-                                      ),
-                                      style: TextStyle(color: unFocusColor),
-                                    )
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ).paddingSymmetric(horizontal: 12, vertical: 8),
-                  )
-                  .toList(),
-            ),
-          ),
-        )
-            .animate()
-            .fadeIn(
-              duration: 300.ms,
-              curve: Curves.easeIn,
-            )
-            .paddingOnly(
-              top: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-                  ? 10
-                  : 6,
-              left:
-                  (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-                      ? 24
-                      : 60,
-              right: 16,
-            );
-      },
-    );
-  }
-
   double _contentHeight = 0;
 
   @override
@@ -436,9 +83,15 @@ class _PostItemState extends State<PostItem> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildThumbnail().paddingOnly(bottom: 8),
-          _buildHeader().paddingSymmetric(horizontal: 12),
-          _buildHeaderDivider().paddingSymmetric(horizontal: 12),
+          _PostThumbnail(
+            rid: item.body['thumbnail'],
+            parentId: widget.item.id.toString(),
+          ).paddingOnly(bottom: 8),
+          _PostHeaderWidget(
+            isCompact: widget.isCompact,
+            item: item,
+          ).paddingSymmetric(horizontal: 12),
+          _PostHeaderDividerWidget(item: item).paddingSymmetric(horizontal: 12),
           Stack(
             children: [
               SizedContainer(
@@ -451,6 +104,7 @@ class _PostItemState extends State<PostItem> {
                   child: MarkdownTextContent(
                     parentId: 'p${item.id}',
                     content: item.body['content'],
+                    isAutoWarp: item.type == 'story',
                     isSelectable: widget.isContentSelectable,
                   ).paddingOnly(
                     left: 16,
@@ -489,7 +143,7 @@ class _PostItemState extends State<PostItem> {
             right: 8,
             top: 4,
           ),
-          _buildFooter().paddingOnly(left: 16),
+          _PostFooterWidget(item: item).paddingOnly(left: 16),
           if (attachments.isNotEmpty)
             Row(
               children: [
@@ -515,7 +169,10 @@ class _PostItemState extends State<PostItem> {
       closedBuilder: (_, openContainer) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildThumbnail().paddingOnly(bottom: 4),
+          _PostThumbnail(
+            rid: item.body['thumbnail'],
+            parentId: widget.item.id.toString(),
+          ).paddingOnly(bottom: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -537,8 +194,11 @@ class _PostItemState extends State<PostItem> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(),
-                    _buildHeaderDivider(),
+                    _PostHeaderWidget(
+                      isCompact: widget.isCompact,
+                      item: item,
+                    ),
+                    _PostHeaderDividerWidget(item: item),
                     Stack(
                       children: [
                         SizedContainer(
@@ -552,6 +212,7 @@ class _PostItemState extends State<PostItem> {
                             child: MarkdownTextContent(
                               parentId: 'p${item.id}-embed',
                               content: item.body['content'],
+                              isAutoWarp: item.type == 'story',
                               isSelectable: widget.isContentSelectable,
                               isLargeText: item.type == 'article' &&
                                   widget.isFullContent,
@@ -569,10 +230,14 @@ class _PostItemState extends State<PostItem> {
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Theme.of(context).colorScheme.surface,
-                                      Theme.of(context)
-                                          .colorScheme
-                                          .surface
+                                      (widget.backgroundColor ??
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .surface),
+                                      (widget.backgroundColor ??
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .surface)
                                           .withOpacity(0),
                                     ],
                                   ),
@@ -586,15 +251,33 @@ class _PostItemState extends State<PostItem> {
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
                         padding: const EdgeInsets.only(top: 4),
-                        child: _buildReply(context),
+                        child: _PostEmbedWidget(
+                          isClickable: widget.isClickable,
+                          isOverrideEmbedClickable:
+                              widget.isOverrideEmbedClickable,
+                          item: widget.item.replyTo!,
+                          username: widget.item.replyTo!.author.name,
+                          hintText: 'postRepliedNotify',
+                          icon: FontAwesomeIcons.reply,
+                          id: widget.item.replyTo!.id.toString(),
+                        ),
                       ),
                     if (widget.item.repostTo != null && widget.isShowEmbed)
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
                         padding: const EdgeInsets.only(top: 4),
-                        child: _buildRepost(context),
+                        child: _PostEmbedWidget(
+                          isClickable: widget.isClickable,
+                          isOverrideEmbedClickable:
+                              widget.isOverrideEmbedClickable,
+                          item: widget.item.repostTo!,
+                          username: widget.item.repostTo!.author.name,
+                          hintText: 'postRepostedNotify',
+                          icon: FontAwesomeIcons.retweet,
+                          id: widget.item.repostTo!.id.toString(),
+                        ),
                       ),
-                    _buildFooter().paddingOnly(left: 12),
+                    _PostFooterWidget(item: item).paddingOnly(left: 12),
                     LinkExpansion(content: item.body['content'])
                         .paddingOnly(top: 4),
                   ],
@@ -610,8 +293,8 @@ class _PostItemState extends State<PostItem> {
             right: 16,
             left: 16,
           ),
-          _buildAttachments(),
-          if (widget.showFeaturedReply) _buildFeaturedReply(),
+          _PostAttachmentWidget(item: item),
+          if (widget.showFeaturedReply) _PostFeaturedReplyWidget(item: item),
           if (widget.isShowReply || widget.isReactable)
             PostQuickAction(
               isShowReply: widget.isShowReply,
@@ -650,6 +333,379 @@ class _PostItemState extends State<PostItem> {
       closedColor:
           widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       openColor: Theme.of(context).colorScheme.surface,
+    );
+  }
+}
+
+class _PostFeaturedReplyWidget extends StatelessWidget {
+  final Post item;
+
+  const _PostFeaturedReplyWidget({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final isLargeScreen = AppTheme.isLargeScreen(context);
+    final unFocusColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
+    if ((item.metric?.replyCount ?? 0) == 0) {
+      return const SizedBox.shrink();
+    }
+
+    final List<String> attachments = item.body['attachments'] is List
+        ? List.from(item.body['attachments']?.whereType<String>())
+        : List.empty();
+
+    return FutureBuilder(
+      future:
+          Get.find<PostProvider>().listPostFeaturedReply(item.id.toString()),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Card(
+            margin: EdgeInsets.zero,
+            child: Column(
+              children: snapshot.data!
+                  .map(
+                    (reply) => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AccountAvatar(content: reply.author.avatar, radius: 10),
+                        const Gap(6),
+                        Text(
+                          reply.author.nick,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const Gap(6),
+                        Text(
+                          format(
+                            reply.publishedAt?.toLocal() ?? DateTime.now(),
+                            locale: 'en_short',
+                          ),
+                        ).paddingOnly(top: 0.5),
+                        const Gap(8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              MarkdownTextContent(
+                                isAutoWarp: reply.type == 'story',
+                                content: reply.body['content'],
+                                parentId:
+                                    'p${item.id}-featured-reply${reply.id}',
+                              ),
+                              if (reply.body['attachments'] is List &&
+                                  reply.body['attachments'].isNotEmpty)
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.file_copy,
+                                      size: 15,
+                                      color: unFocusColor,
+                                    ).paddingOnly(right: 5),
+                                    Text(
+                                      'attachmentHint'.trParams(
+                                        {
+                                          'count': reply
+                                              .body['attachments'].length
+                                              .toString(),
+                                        },
+                                      ),
+                                      style: TextStyle(color: unFocusColor),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ).paddingSymmetric(horizontal: 12, vertical: 8),
+                  )
+                  .toList(),
+            ),
+          ),
+        )
+            .animate()
+            .fadeIn(
+              duration: 300.ms,
+              curve: Curves.easeIn,
+            )
+            .paddingOnly(
+              top: (attachments.length == 1 && !isLargeScreen) ? 10 : 6,
+              left: (attachments.length == 1 && !isLargeScreen) ? 24 : 60,
+              right: 16,
+            );
+      },
+    );
+  }
+}
+
+class _PostAttachmentWidget extends StatelessWidget {
+  final Post item;
+
+  const _PostAttachmentWidget({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final isLargeScreen = AppTheme.isLargeScreen(context);
+
+    final List<String> attachments = item.body['attachments'] is List
+        ? List.from(item.body['attachments']?.whereType<String>())
+        : List.empty();
+
+    if (attachments.length > 3) {
+      return AttachmentList(
+        parentId: item.id.toString(),
+        attachmentsId: attachments,
+        autoload: false,
+        isGrid: true,
+      ).paddingOnly(left: 36, top: 4, bottom: 4);
+    } else if (attachments.length > 1 || isLargeScreen) {
+      return AttachmentList(
+        parentId: item.id.toString(),
+        attachmentsId: attachments,
+        autoload: false,
+        isColumn: true,
+      ).paddingOnly(left: 60, right: 24, top: 4, bottom: 4);
+    } else {
+      return AttachmentList(
+        flatMaxHeight: MediaQuery.of(context).size.width,
+        parentId: item.id.toString(),
+        attachmentsId: attachments,
+        autoload: false,
+      );
+    }
+  }
+}
+
+class _PostEmbedWidget extends StatelessWidget {
+  final bool isClickable;
+  final bool isOverrideEmbedClickable;
+  final Post item;
+  final String username;
+  final String hintText;
+  final IconData icon;
+  final String id;
+
+  const _PostEmbedWidget({
+    required this.isClickable,
+    required this.isOverrideEmbedClickable,
+    required this.item,
+    required this.username,
+    required this.hintText,
+    required this.icon,
+    required this.id,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final unFocusColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
+    return OpenContainer(
+      tappable: isClickable || isOverrideEmbedClickable,
+      closedBuilder: (_, openContainer) => Column(
+        children: [
+          Row(
+            children: [
+              FaIcon(
+                icon,
+                size: 16,
+                color: unFocusColor,
+              ),
+              Expanded(
+                child: Text(
+                  hintText.trParams(
+                    {'username': '@$username'},
+                  ),
+                  style: TextStyle(color: unFocusColor),
+                ).paddingOnly(left: 6),
+              ),
+            ],
+          ).paddingOnly(left: 12),
+          Card(
+            elevation: 1,
+            child: PostItem(
+              item: item,
+              isCompact: true,
+              attachmentParent: id,
+            ).paddingSymmetric(vertical: 8),
+          ),
+        ],
+      ),
+      openBuilder: (_, __) => TitleShell(
+        title: 'postDetail'.tr,
+        child: PostDetailScreen(
+          id: id,
+          post: item,
+        ),
+      ),
+      closedElevation: 0,
+      openElevation: 0,
+      closedColor: Theme.of(context).colorScheme.surface,
+      openColor: Theme.of(context).colorScheme.surface,
+    );
+  }
+}
+
+class _PostHeaderDividerWidget extends StatelessWidget {
+  final Post item;
+
+  const _PostHeaderDividerWidget({
+    required this.item,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (item.body['description'] != null || item.body['title'] != null) {
+      return const Divider(thickness: 0.3, height: 1).paddingSymmetric(
+        vertical: 8,
+      );
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+class _PostFooterWidget extends StatelessWidget {
+  final Post item;
+
+  const _PostFooterWidget({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final unFocusColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
+    List<String> labels = List.empty(growable: true);
+    if (item.editedAt != null) {
+      labels.add('postEdited'.trParams({
+        'date': DateFormat('yy/M/d HH:mm').format(item.editedAt!.toLocal()),
+      }));
+    }
+    if (item.realm != null) {
+      labels.add('postInRealm'.trParams({
+        'realm': item.realm!.alias,
+      }));
+    }
+
+    List<Widget> widgets = List.empty(growable: true);
+
+    if (item.tags?.isNotEmpty ?? false) {
+      widgets.add(PostTagsList(tags: item.tags!));
+    }
+    if (labels.isNotEmpty) {
+      widgets.add(Text(
+        labels.join(' · '),
+        textAlign: TextAlign.left,
+        style: TextStyle(
+          fontSize: 12,
+          color: unFocusColor,
+        ),
+      ));
+    }
+    if (item.pinnedAt != null) {
+      widgets.add(Text(
+        'postPinned'.tr,
+        style: TextStyle(fontSize: 12, color: unFocusColor),
+      ));
+    }
+
+    if (widgets.isEmpty) {
+      return const SizedBox.shrink();
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: widgets,
+      ).paddingOnly(top: 4);
+    }
+  }
+}
+
+class _PostHeaderWidget extends StatelessWidget {
+  final bool isCompact;
+  final Post item;
+
+  const _PostHeaderWidget({
+    required this.isCompact,
+    required this.item,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (isCompact)
+          AccountAvatar(
+            content: item.author.avatar,
+            radius: 10,
+          ).paddingOnly(left: 2, top: 1),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    item.author.nick,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  RelativeDate(item.publishedAt?.toLocal() ?? DateTime.now())
+                      .paddingOnly(left: 4),
+                ],
+              ),
+              if (item.body['title'] != null)
+                Text(
+                  item.body['title'],
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(fontSize: 15),
+                ),
+              if (item.body['description'] != null)
+                Text(
+                  item.body['description'],
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+            ],
+          ).paddingOnly(left: isCompact ? 6 : 12),
+        ),
+        if (item.type == 'article')
+          Badge(
+            label: Text('article'.tr),
+          ).paddingOnly(top: 3),
+      ],
+    );
+  }
+}
+
+class _PostThumbnail extends StatelessWidget {
+  final String parentId;
+  final String? rid;
+
+  const _PostThumbnail({required this.parentId, required this.rid});
+
+  @override
+  Widget build(BuildContext context) {
+    if (rid?.isEmpty ?? true) return const SizedBox.shrink();
+    final border = BorderSide(
+      color: Theme.of(context).dividerColor,
+      width: 0.3,
+    );
+    return Container(
+      decoration: BoxDecoration(border: Border(top: border, bottom: border)),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: AttachmentSelfContainedEntry(
+          rid: rid!,
+          parentId: 'p$parentId-thumbnail',
+        ),
+      ),
     );
   }
 }
