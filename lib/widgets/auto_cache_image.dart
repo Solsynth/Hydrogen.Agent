@@ -34,8 +34,17 @@ class AutoCacheImage extends StatelessWidget {
         progressIndicatorBuilder: noProgressIndicator
             ? null
             : (context, url, downloadProgress) => Center(
-                  child: CircularProgressIndicator(
-                    value: downloadProgress.progress,
+                  child: TweenAnimationBuilder(
+                    tween: Tween(
+                      begin: 0,
+                      end: downloadProgress.progress ?? 0,
+                    ),
+                    duration: const Duration(milliseconds: 300),
+                    builder: (context, value, _) => CircularProgressIndicator(
+                      value: downloadProgress.progress != null
+                          ? value.toDouble()
+                          : null,
+                    ),
                   ),
                 ),
         errorWidget: noErrorWidget
@@ -74,11 +83,20 @@ class AutoCacheImage extends StatelessWidget {
               ImageChunkEvent? loadingProgress) {
               if (loadingProgress == null) return child;
               return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
+                child: TweenAnimationBuilder(
+                  tween: Tween(
+                    begin: 0,
+                    end: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : 0,
+                  ),
+                  duration: const Duration(milliseconds: 300),
+                  builder: (context, value, _) => CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? value.toDouble()
+                        : null,
+                  ),
                 ),
               );
             },
