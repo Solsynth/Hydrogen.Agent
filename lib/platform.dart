@@ -27,6 +27,8 @@ abstract class PlatformInfo {
 
   static bool get canCacheImage => isAndroid || isIOS || isMacOS;
 
+  static bool get canRateTheApp => isIOS || isMacOS;
+
   static bool get canRecord => (isMobile || isMacOS);
 
   static bool get canPushNotification => isAndroid || isIOS || isMacOS;

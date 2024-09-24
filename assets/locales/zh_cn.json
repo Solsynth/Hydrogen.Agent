@@ -449,5 +449,9 @@
   "accountDeletionConfirm": "确认账号删除请求",
   "accountDeletionConfirmDesc": "你确定要删除账号 @account 吗？你将会在其绑定的主要邮件地址收到一封包含着确认删除账号连接的邮件，在二十四小时内使用该连接即可完成删除账号。注意，本操作不可撤销，并且账号创建或关联的所有数据都将被删除，请三思而后行。",
   "accountDeletionRequested": "已请求删除账号，检查你的收件箱来确认请求。",
-  "slideToConfirm": "滑动来确认"
+  "slideToConfirm": "滑动来确认",
+  "serviceStatus": "服务状态",
+  "firstBootTime": "首次启动于 @time",
+  "rateTheApp": "给应用评分",
+  "rateTheAppDesc": "在 App Store 上给 Solar Network 评分，让我们更好地为您服务吧！"
 }

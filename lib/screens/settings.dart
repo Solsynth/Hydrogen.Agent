@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exceptions/request.dart';
@@ -205,6 +206,21 @@ class _SettingScreenState extends State<SettingScreen> {
               });
             },
           ),
+          if (PlatformInfo.canRateTheApp)
+            ListTile(
+              leading: const Icon(Icons.star),
+              trailing: const Icon(Icons.chevron_right),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+              title: Text('rateTheApp'.tr),
+              subtitle: Text('rateTheAppDesc'.tr),
+              onTap: () {
+                final inAppReview = InAppReview.instance;
+
+                inAppReview.openStoreListing(
+                  appStoreId: '6499032345',
+                );
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.info_outline),
             trailing: const Icon(Icons.chevron_right),

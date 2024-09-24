@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -52,8 +54,8 @@ class AboutScreen extends StatelessWidget {
             CenteredContainer(
               maxWidth: 280,
               child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: 4,
+                runSpacing: 4,
                 alignment: WrapAlignment.center,
                 children: [
                   TextButton(
@@ -92,6 +94,13 @@ class AboutScreen extends StatelessWidget {
                       launchUrlString('https://solsynth.dev/terms');
                     },
                   ),
+                  TextButton(
+                    style: denseButtonStyle,
+                    child: Text('serviceStatus'.tr),
+                    onPressed: () {
+                      launchUrlString('https://status.solsynth.dev');
+                    },
+                  ),
                 ],
               ),
             ),
@@ -102,6 +111,34 @@ class AboutScreen extends StatelessWidget {
                 fontWeight: FontWeight.w300,
                 fontSize: 12,
               ),
+            ),
+            FutureBuilder(
+              future: SharedPreferences.getInstance(),
+              builder: (context, snapshot) {
+                const textStyle = TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontSize: 12,
+                );
+                if (!snapshot.hasData ||
+                    !snapshot.data!.containsKey('first_boot_time')) {
+                  return Text(
+                    'firstBootTime'.trParams({'time': 'unknown'.tr}),
+                    style: textStyle,
+                  );
+                } else {
+                  return Text(
+                    'firstBootTime'.trParams({
+                      'time': DateFormat('yyyy-MM-dd').format(
+                        DateTime.tryParse(
+                              snapshot.data!.getString('first_boot_time')!,
+                            )?.toLocal() ??
+                            DateTime.now(),
+                      ),
+                    }),
+                    style: textStyle,
+                  );
+                }
+              },
             ),
           ],
         ),

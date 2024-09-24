@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +43,27 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
   int _periodCursor = 0;
 
   final Completer _bootCompleter = Completer();
+
+  void _requestRating() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('first_boot_time')) {
+      final rawTime = prefs.getString('first_boot_time');
+      final time = DateTime.tryParse(rawTime ?? '');
+      if (time != null &&
+          time.isBefore(DateTime.now().subtract(const Duration(days: 3)))) {
+        final inAppReview = InAppReview.instance;
+        if (prefs.getBool('rating_requested') == true) return;
+        if (await inAppReview.isAvailable()) {
+          await inAppReview.requestReview();
+          prefs.setBool('rating_requested', true);
+        } else {
+          log('Unable request app review, unavailable');
+        }
+      }
+    } else {
+      prefs.setString('first_boot_time', DateTime.now().toIso8601String());
+    }
+  }
 
   void _updateNow(String localVersionString, String remoteVersionString) {
     context
@@ -226,6 +249,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
     super.initState();
     _runPeriods();
     _checkForUpdate();
+    _bootCompleter.future.then((_) {
+      _requestRating();
+    });
   }
 
   @override
