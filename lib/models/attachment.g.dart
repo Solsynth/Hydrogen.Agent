@@ -36,7 +36,7 @@ Attachment _$AttachmentFromJson(Map<String, dynamic> json) => Attachment(
       alt: json['alt'] as String,
       mimetype: json['mimetype'] as String,
       hash: json['hash'] as String,
-      destination: json['destination'] as String,
+      destination: (json['destination'] as num).toInt(),
       isAnalyzed: json['is_analyzed'] as bool,
       isUploaded: json['is_uploaded'] as bool,
       metadata: json['metadata'] as Map<String, dynamic>?,

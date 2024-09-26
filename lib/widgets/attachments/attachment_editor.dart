@@ -744,8 +744,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
               return IgnorePointer(
                 ignoring: _uploadController.isUploading.value,
                 child: Container(
-                  height: 64,
                   width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     border: Border(
                       top: BorderSide(
@@ -754,67 +754,72 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                       ),
                     ),
                   ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 0,
-                      alignment: WrapAlignment.center,
-                      runAlignment: WrapAlignment.center,
-                      children: [
-                        if ((PlatformInfo.isDesktop ||
-                                PlatformInfo.isIOS ||
-                                PlatformInfo.isWeb) &&
-                            !widget.imageOnly)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.paste),
-                            label: Text('attachmentAddClipboard'.tr),
-                            style: const ButtonStyle(visualDensity: density),
-                            onPressed: () => _pasteFileToUpload(),
-                          ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.add_photo_alternate),
-                          label: Text('attachmentAddGalleryPhoto'.tr),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    runAlignment: WrapAlignment.center,
+                    children: [
+                      if ((PlatformInfo.isDesktop ||
+                              PlatformInfo.isIOS ||
+                              PlatformInfo.isWeb) &&
+                          !widget.imageOnly)
+                        IconButton(
+                          icon: const Icon(Icons.paste),
+                          tooltip: 'attachmentAddClipboard'.tr,
                           style: const ButtonStyle(visualDensity: density),
-                          onPressed: () => _pickPhotoToUpload(),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _pasteFileToUpload(),
                         ),
-                        if (!widget.imageOnly)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.add_road),
-                            label: Text('attachmentAddGalleryVideo'.tr),
-                            style: const ButtonStyle(visualDensity: density),
-                            onPressed: () => _pickVideoToUpload(),
-                          ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.photo_camera_back),
-                          label: Text('attachmentAddCameraPhoto'.tr),
+                      IconButton(
+                        icon: const Icon(Icons.add_photo_alternate),
+                        tooltip: 'attachmentAddGalleryPhoto'.tr,
+                        style: const ButtonStyle(visualDensity: density),
+                        color: Theme.of(context).colorScheme.primary,
+                        onPressed: () => _pickPhotoToUpload(),
+                      ),
+                      if (!widget.imageOnly)
+                        IconButton(
+                          icon: const Icon(Icons.add_road),
+                          tooltip: 'attachmentAddGalleryVideo'.tr,
                           style: const ButtonStyle(visualDensity: density),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _pickVideoToUpload(),
+                        ),
+                      if (PlatformInfo.isMobile)
+                        IconButton(
+                          icon: const Icon(Icons.photo_camera_back),
+                          tooltip: 'attachmentAddCameraPhoto'.tr,
+                          style: const ButtonStyle(visualDensity: density),
+                          color: Theme.of(context).colorScheme.primary,
                           onPressed: () => _takeMediaToUpload(false),
                         ),
-                        if (!widget.imageOnly)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.video_camera_back_outlined),
-                            label: Text('attachmentAddCameraVideo'.tr),
-                            style: const ButtonStyle(visualDensity: density),
-                            onPressed: () => _takeMediaToUpload(true),
-                          ),
-                        if (!widget.imageOnly)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.file_present_rounded),
-                            label: Text('attachmentAddFile'.tr),
-                            style: const ButtonStyle(visualDensity: density),
-                            onPressed: () => _pickFileToUpload(),
-                          ),
-                        if (!widget.imageOnly)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.link),
-                            label: Text('attachmentAddFile'.tr),
-                            style: const ButtonStyle(visualDensity: density),
-                            onPressed: () => _linkAttachments(),
-                          ),
-                      ],
-                    ).paddingSymmetric(horizontal: 12),
-                  ),
+                      if (!widget.imageOnly && PlatformInfo.isMobile)
+                        IconButton(
+                          icon: const Icon(Icons.video_camera_back_outlined),
+                          tooltip: 'attachmentAddCameraVideo'.tr,
+                          style: const ButtonStyle(visualDensity: density),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _takeMediaToUpload(true),
+                        ),
+                      if (!widget.imageOnly)
+                        IconButton(
+                          icon: const Icon(Icons.file_present_rounded),
+                          tooltip: 'attachmentAddFile'.tr,
+                          style: const ButtonStyle(visualDensity: density),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _pickFileToUpload(),
+                        ),
+                      if (!widget.imageOnly)
+                        IconButton(
+                          icon: const Icon(Icons.link),
+                          tooltip: 'attachmentAddLink'.tr,
+                          style: const ButtonStyle(visualDensity: density),
+                          color: Theme.of(context).colorScheme.primary,
+                          onPressed: () => _linkAttachments(),
+                        ),
+                    ],
+                  ).paddingSymmetric(horizontal: 12),
                 )
                     .animate(
                       target: _uploadController.isUploading.value ? 0 : 1,
