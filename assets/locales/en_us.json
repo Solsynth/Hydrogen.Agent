@@ -98,6 +98,8 @@
   "accountFriendBlocked": "Friend blocklist",
   "accountFriendListHint": "Swipe left to decline, right to approve",
   "accountFriendRequestSent": "Friend request sent, waiting for processing...",
+  "accountBlocked": "Account has been blocked",
+  "accountUnblocked": "Account has been unblocked",
   "accountSuspended": "Account was suspended",
   "accountSuspendedAt": "Account was suspended since @date",
   "aspectRatio": "Aspect Ratio",
@@ -457,5 +459,9 @@
   "serviceStatus": "Status of Service",
   "firstBootTime": "First boot at @time",
   "rateTheApp": "Rate the app",
-  "rateTheAppDesc": "Rate Solar Network on the App Store to let us serve you better!"
+  "rateTheAppDesc": "Rate Solar Network on the App Store to let us serve you better!",
+  "friendAdd": "Add as friend",
+  "blockUser": "Block user",
+  "unblockUser": "Unblock user",
+  "learnMoreAboutPerson": "Learn more about that person"
 }

@@ -28,42 +28,46 @@ class SilverRelativeList extends StatelessWidget {
           showModalBottomSheet(
             useRootNavigator: true,
             isScrollControlled: true,
-            backgroundColor: Theme
-                .of(context)
-                .colorScheme
-                .surface,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             context: context,
-            builder: (context) =>
-                AccountProfilePopup(
-                  name: element.related.name,
-                ),
+            builder: (context) => AccountProfilePopup(
+              name: element.related.name,
+            ),
           );
         },
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if(element.status != 1 && element.status != 3)
+          if (element.status != 1 && element.status != 3)
             IconButton(
               icon: const Icon(Icons.check),
               onPressed: () {
                 final RelationshipProvider provider = Get.find();
                 if (element.status == 0) {
-                  provider.handleRelation(element, true).then((_) => onUpdate());
+                  provider
+                      .handleRelation(element, true)
+                      .then((_) => onUpdate());
                 } else {
-                  provider.editRelation(element, 1).then((_) => onUpdate());
+                  provider
+                      .editRelation(element.relatedId, 1)
+                      .then((_) => onUpdate());
                 }
               },
             ),
-          if(element.status != 2 && element.status != 3)
+          if (element.status != 2 && element.status != 3)
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
                 final RelationshipProvider provider = Get.find();
                 if (element.status == 0) {
-                  provider.handleRelation(element, false).then((_) => onUpdate());
+                  provider
+                      .handleRelation(element, false)
+                      .then((_) => onUpdate());
                 } else {
-                  provider.editRelation(element, 2).then((_) => onUpdate());
+                  provider
+                      .editRelation(element.relatedId, 2)
+                      .then((_) => onUpdate());
                 }
               },
             ),

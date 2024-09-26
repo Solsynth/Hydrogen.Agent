@@ -34,7 +34,7 @@ class Attachment {
   String alt;
   String mimetype;
   String hash;
-  int destination;
+  String destination;
   bool isAnalyzed;
   bool isUploaded;
   Map<String, dynamic>? metadata;

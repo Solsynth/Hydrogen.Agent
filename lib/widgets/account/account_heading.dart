@@ -23,6 +23,7 @@ class AccountHeadingWidget extends StatelessWidget {
   final AccountProfile? profile;
   final List<AccountBadge>? badges;
   final List<Widget>? extraWidgets;
+  final List<Widget>? appendWidgets;
 
   final Future<Response>? status;
   final Function? onEditStatus;
@@ -39,6 +40,7 @@ class AccountHeadingWidget extends StatelessWidget {
     this.profile,
     this.status,
     this.extraWidgets,
+    this.appendWidgets,
     this.onEditStatus,
   });
 
@@ -257,6 +259,7 @@ class AccountHeadingWidget extends StatelessWidget {
               ),
             ),
           ).paddingSymmetric(horizontal: 16),
+          ...?appendWidgets?.map((x) => x.paddingSymmetric(horizontal: 16)),
         ],
       ),
     );

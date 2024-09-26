@@ -106,10 +106,14 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
             extraWidgets: [
               Card(
                 child: ListTile(
+                  leading: const Icon(
+                    Icons.contact_page_outlined,
+                  ),
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                   title: Text('visitProfilePage'.tr),
+                  subtitle: Text('learMoreAboutPerson'.tr),
                   visualDensity:
                       const VisualDensity(horizontal: -4, vertical: -2),
                   trailing: const Icon(Icons.chevron_right),

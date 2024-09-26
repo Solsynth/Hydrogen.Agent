@@ -26,6 +26,19 @@ class RelationshipProvider extends GetxController {
     return _friends.any((x) => x.relatedId == account.id);
   }
 
+  Future<Relationship?> getRelationship(int relatedId) async {
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('auth');
+    final resp = await client.get('/users/me/relations/$relatedId');
+    if (resp.statusCode == 404) {
+      return null;
+    } else if (resp.statusCode != 200) {
+      throw RequestException(resp);
+    }
+
+    return Relationship.fromJson(resp.body);
+  }
+
   Future<Response> listRelation() async {
     final AuthProvider auth = Get.find();
     final client = await auth.configureClient('auth');
@@ -38,7 +51,19 @@ class RelationshipProvider extends GetxController {
     return client.get('/users/me/relations?status=$status');
   }
 
-  Future<Response> makeFriend(String username) async {
+  Future<Relationship?> blockUser(String username) async {
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('auth');
+    final resp =
+        await client.post('/users/me/relations/block?related=$username', {});
+    if (resp.statusCode != 200) {
+      throw RequestException(resp);
+    }
+
+    return Relationship.fromJson(resp.body);
+  }
+
+  Future<Relationship?> makeFriend(String username) async {
     final AuthProvider auth = Get.find();
     final client = await auth.configureClient('auth');
     final resp = await client.post('/users/me/relations?related=$username', {});
@@ -46,7 +71,7 @@ class RelationshipProvider extends GetxController {
       throw RequestException(resp);
     }
 
-    return resp;
+    return Relationship.fromJson(resp.body);
   }
 
   Future<Response> handleRelation(
@@ -64,17 +89,17 @@ class RelationshipProvider extends GetxController {
     return resp;
   }
 
-  Future<Response> editRelation(Relationship relationship, int status) async {
+  Future<Relationship?> editRelation(int relatedId, int status) async {
     final AuthProvider auth = Get.find();
     final client = await auth.configureClient('auth');
-    final resp = await client.patch(
-      '/users/me/relations/${relationship.relatedId}',
+    final resp = await client.put(
+      '/users/me/relations/$relatedId',
       {'status': status},
     );
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
 
-    return resp;
+    return Relationship.fromJson(resp.body);
   }
 }

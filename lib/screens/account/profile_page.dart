@@ -13,6 +13,7 @@ import 'package:solian/models/attachment.dart';
 import 'package:solian/models/daily_sign.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/models/relations.dart';
 import 'package:solian/models/subscription.dart';
 import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/relation.dart';
@@ -26,6 +27,7 @@ import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/daily_sign/history_chart.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
+import 'package:solian/widgets/reports/abuse_report.dart';
 import 'package:solian/widgets/sized_container.dart';
 
 class AccountProfilePage extends StatefulWidget {
@@ -50,6 +52,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
 
   Account? _userinfo;
   Subscription? _subscription;
+  Relationship? _relationship;
   List<Post> _pinnedPosts = List.empty();
   List<DailySignRecord> _dailySignRecords = List.empty();
   int _totalUpvote = 0, _totalDownvote = 0;
@@ -59,6 +62,15 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     _subscription = await Get.find<SubscriptionProvider>()
         .getSubscriptionOnUser(_userinfo!.id);
     setState(() => _isSubscribing = false);
+  }
+
+  Future<void> _getRelationship() async {
+    setState(() => _isBusy = true);
+
+    final relations = Get.find<RelationshipProvider>();
+    _relationship = await relations.getRelationship(_userinfo!.id);
+
+    setState(() => _isBusy = false);
   }
 
   Future<void> _getUserinfo() async {
@@ -151,6 +163,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     });
 
     _getUserinfo().then((_) {
+      _getRelationship();
       _getSubscription();
       _getPinnedPosts();
       _getDailySignRecords();
@@ -221,7 +234,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         ),
                       ),
                       if (_userinfo != null && _subscription == null)
-                        OutlinedButton(
+                        IconButton(
                           style: const ButtonStyle(
                             visualDensity:
                                 VisualDensity(horizontal: -4, vertical: -2),
@@ -235,10 +248,11 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                                           .subscribeToUser(_userinfo!.id);
                                   setState(() => _isSubscribing = false);
                                 },
-                          child: Text('subscribe'.tr),
+                          icon: const Icon(Icons.add_circle_outline),
+                          tooltip: 'subscribe'.tr,
                         )
                       else if (_userinfo != null)
-                        OutlinedButton(
+                        IconButton(
                           style: const ButtonStyle(
                             visualDensity:
                                 VisualDensity(horizontal: -4, vertical: -2),
@@ -252,10 +266,10 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                                   _subscription = null;
                                   setState(() => _isSubscribing = false);
                                 },
-                          child: Text('unsubscribe'.tr),
+                          icon: const Icon(Icons.remove_circle_outline),
+                          tooltip: 'unsubscribe'.tr,
                         ),
-                      if (_userinfo != null &&
-                          !_relationshipProvider.hasFriend(_userinfo!))
+                      if (_userinfo != null && _relationship == null)
                         IconButton(
                           icon: const Icon(Icons.person_add),
                           onPressed: _isMakingFriend
@@ -263,7 +277,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                               : () async {
                                   setState(() => _isMakingFriend = true);
                                   try {
-                                    await _relationshipProvider
+                                    _relationship = await _relationshipProvider
                                         .makeFriend(widget.name);
                                     context.showSnackbar(
                                       'accountFriendRequestSent'.tr,
@@ -274,6 +288,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                                     setState(() => _isMakingFriend = false);
                                   }
                                 },
+                          tooltip: 'friendAdd'.tr,
                         )
                       else
                         const IconButton(
@@ -300,6 +315,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               ListView(
+                padding: EdgeInsets.zero,
                 children: [
                   const Gap(16),
                   CenteredContainer(
@@ -421,8 +437,116 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                                 ),
                               ),
                             ).marginOnly(
-                                right: 24, left: 12, bottom: 8, top: 24),
+                              right: 24,
+                              left: 12,
+                              bottom: 8,
+                              top: 24,
+                            ),
                           )
+                      ],
+                      appendWidgets: [
+                        Card(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 8,
+                            ),
+                            width: double.maxFinite,
+                            child: Wrap(
+                              alignment: WrapAlignment.spaceAround,
+                              children: [
+                                TextButton.icon(
+                                  style: const ButtonStyle(
+                                    visualDensity: VisualDensity(
+                                      horizontal: -4,
+                                      vertical: -2,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AbuseReportDialog(
+                                        resourceId: 'user:${_userinfo!.id}',
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.flag,
+                                    size: 16,
+                                  ),
+                                  label: Text('reportAbuse'.tr),
+                                ),
+                                if (_relationship?.status != 2)
+                                  TextButton.icon(
+                                    style: const ButtonStyle(
+                                      visualDensity: VisualDensity(
+                                        horizontal: -4,
+                                        vertical: -2,
+                                      ),
+                                    ),
+                                    onPressed: _isMakingFriend
+                                        ? null
+                                        : () async {
+                                            setState(
+                                                () => _isMakingFriend = true);
+                                            try {
+                                              _relationship =
+                                                  await _relationshipProvider
+                                                      .blockUser(widget.name);
+                                              context.showSnackbar(
+                                                'accountBlocked'.tr,
+                                              );
+                                            } catch (e) {
+                                              context.showErrorDialog(e);
+                                            } finally {
+                                              setState(() =>
+                                                  _isMakingFriend = false);
+                                            }
+                                          },
+                                    icon: const Icon(
+                                      Icons.block,
+                                      size: 16,
+                                    ),
+                                    label: Text('blockUser'.tr),
+                                  )
+                                else
+                                  TextButton.icon(
+                                    style: const ButtonStyle(
+                                      visualDensity: VisualDensity(
+                                        horizontal: -4,
+                                        vertical: -2,
+                                      ),
+                                    ),
+                                    onPressed: _isMakingFriend
+                                        ? null
+                                        : () async {
+                                            setState(
+                                                () => _isMakingFriend = true);
+                                            try {
+                                              _relationship =
+                                                  await _relationshipProvider
+                                                      .editRelation(
+                                                          _userinfo!.id, 1);
+                                              context.showSnackbar(
+                                                'accountUnblocked'.tr,
+                                              );
+                                            } catch (e) {
+                                              context.showErrorDialog(e);
+                                            } finally {
+                                              setState(() =>
+                                                  _isMakingFriend = false);
+                                            }
+                                          },
+                                    icon: const Icon(
+                                      Icons.add_circle_outline,
+                                      size: 16,
+                                    ),
+                                    label: Text('unblockUser'.tr),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
