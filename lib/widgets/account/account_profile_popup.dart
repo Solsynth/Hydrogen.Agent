@@ -113,7 +113,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                   title: Text('visitProfilePage'.tr),
-                  subtitle: Text('learMoreAboutPerson'.tr),
+                  subtitle: Text('learnMoreAboutPerson'.tr),
                   visualDensity:
                       const VisualDensity(horizontal: -4, vertical: -2),
                   trailing: const Icon(Icons.chevron_right),

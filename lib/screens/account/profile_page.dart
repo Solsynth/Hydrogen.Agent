@@ -132,6 +132,63 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
     }
   }
 
+  Future<void> _subscribeToUser() async {
+    setState(() => _isSubscribing = true);
+    _subscription =
+        await Get.find<SubscriptionProvider>().subscribeToUser(_userinfo!.id);
+    setState(() => _isSubscribing = false);
+  }
+
+  Future<void> _unsubscribeFromUser() async {
+    setState(() => _isSubscribing = true);
+    await Get.find<SubscriptionProvider>().unsubscribeFromUser(_userinfo!.id);
+    _subscription = null;
+    setState(() => _isSubscribing = false);
+  }
+
+  Future<void> _makeFriend() async {
+    setState(() => _isMakingFriend = true);
+    try {
+      _relationship = await _relationshipProvider.makeFriend(widget.name);
+      context.showSnackbar(
+        'accountFriendRequestSent'.tr,
+      );
+    } catch (e) {
+      context.showErrorDialog(e);
+    } finally {
+      setState(() => _isMakingFriend = false);
+    }
+  }
+
+  Future<void> _blockUser() async {
+    setState(() => _isMakingFriend = true);
+    try {
+      _relationship = await _relationshipProvider.blockUser(widget.name);
+      context.showSnackbar(
+        'accountBlocked'.tr,
+      );
+    } catch (e) {
+      context.showErrorDialog(e);
+    } finally {
+      setState(() => _isMakingFriend = false);
+    }
+  }
+
+  Future<void> _unblockUser() async {
+    setState(() => _isMakingFriend = true);
+    try {
+      _relationship =
+          await _relationshipProvider.editRelation(_userinfo!.id, 1);
+      context.showSnackbar(
+        'accountUnblocked'.tr,
+      );
+    } catch (e) {
+      context.showErrorDialog(e);
+    } finally {
+      setState(() => _isMakingFriend = false);
+    }
+  }
+
   int get _userSocialCreditPoints {
     return _totalUpvote * 2 - _totalDownvote + _postController.postTotal.value;
   }
@@ -168,23 +225,6 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       _getPinnedPosts();
       _getDailySignRecords();
     });
-  }
-
-  Widget _buildStatisticsEntry(String label, String content) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          Text(
-            content,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -239,15 +279,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                             visualDensity:
                                 VisualDensity(horizontal: -4, vertical: -2),
                           ),
-                          onPressed: _isSubscribing
-                              ? null
-                              : () async {
-                                  setState(() => _isSubscribing = true);
-                                  _subscription =
-                                      await Get.find<SubscriptionProvider>()
-                                          .subscribeToUser(_userinfo!.id);
-                                  setState(() => _isSubscribing = false);
-                                },
+                          onPressed: _isSubscribing ? null : _subscribeToUser,
                           icon: const Icon(Icons.add_circle_outline),
                           tooltip: 'subscribe'.tr,
                         )
@@ -257,37 +289,15 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                             visualDensity:
                                 VisualDensity(horizontal: -4, vertical: -2),
                           ),
-                          onPressed: _isSubscribing
-                              ? null
-                              : () async {
-                                  setState(() => _isSubscribing = true);
-                                  await Get.find<SubscriptionProvider>()
-                                      .unsubscribeFromUser(_userinfo!.id);
-                                  _subscription = null;
-                                  setState(() => _isSubscribing = false);
-                                },
+                          onPressed:
+                              _isSubscribing ? null : _unsubscribeFromUser,
                           icon: const Icon(Icons.remove_circle_outline),
                           tooltip: 'unsubscribe'.tr,
                         ),
                       if (_userinfo != null && _relationship == null)
                         IconButton(
                           icon: const Icon(Icons.person_add),
-                          onPressed: _isMakingFriend
-                              ? null
-                              : () async {
-                                  setState(() => _isMakingFriend = true);
-                                  try {
-                                    _relationship = await _relationshipProvider
-                                        .makeFriend(widget.name);
-                                    context.showSnackbar(
-                                      'accountFriendRequestSent'.tr,
-                                    );
-                                  } catch (e) {
-                                    context.showErrorDialog(e);
-                                  } finally {
-                                    setState(() => _isMakingFriend = false);
-                                  }
-                                },
+                          onPressed: _isMakingFriend ? null : _makeFriend,
                           tooltip: 'friendAdd'.tr,
                         )
                       else
@@ -315,9 +325,8 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
             physics: const NeverScrollableScrollPhysics(),
             children: [
               ListView(
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.only(top: 16, bottom: 16),
                 children: [
-                  const Gap(16),
                   CenteredContainer(
                     child: AccountHeadingWidget(
                       name: _userinfo!.name,
@@ -484,25 +493,8 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                                         vertical: -2,
                                       ),
                                     ),
-                                    onPressed: _isMakingFriend
-                                        ? null
-                                        : () async {
-                                            setState(
-                                                () => _isMakingFriend = true);
-                                            try {
-                                              _relationship =
-                                                  await _relationshipProvider
-                                                      .blockUser(widget.name);
-                                              context.showSnackbar(
-                                                'accountBlocked'.tr,
-                                              );
-                                            } catch (e) {
-                                              context.showErrorDialog(e);
-                                            } finally {
-                                              setState(() =>
-                                                  _isMakingFriend = false);
-                                            }
-                                          },
+                                    onPressed:
+                                        _isMakingFriend ? null : _blockUser,
                                     icon: const Icon(
                                       Icons.block,
                                       size: 16,
@@ -517,26 +509,8 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                                         vertical: -2,
                                       ),
                                     ),
-                                    onPressed: _isMakingFriend
-                                        ? null
-                                        : () async {
-                                            setState(
-                                                () => _isMakingFriend = true);
-                                            try {
-                                              _relationship =
-                                                  await _relationshipProvider
-                                                      .editRelation(
-                                                          _userinfo!.id, 1);
-                                              context.showSnackbar(
-                                                'accountUnblocked'.tr,
-                                              );
-                                            } catch (e) {
-                                              context.showErrorDialog(e);
-                                            } finally {
-                                              setState(() =>
-                                                  _isMakingFriend = false);
-                                            }
-                                          },
+                                    onPressed:
+                                        _isMakingFriend ? null : _unblockUser,
                                     icon: const Icon(
                                       Icons.add_circle_outline,
                                       size: 16,
@@ -564,7 +538,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildStatisticsEntry(
+                            _StatsWidget(
                               'totalSocialCreditPoints'.tr,
                               _userinfo != null
                                   ? _userSocialCreditPoints.toString()
@@ -577,16 +551,16 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Obx(
-                              () => _buildStatisticsEntry(
+                              () => _StatsWidget(
                                 'totalPostCount'.tr,
                                 _postController.postTotal.value.toString(),
                               ),
                             ),
-                            _buildStatisticsEntry(
+                            _StatsWidget(
                               'totalUpvote'.tr,
                               _totalUpvote.toString(),
                             ),
-                            _buildStatisticsEntry(
+                            _StatsWidget(
                               'totalDownvote'.tr,
                               _totalDownvote.toString(),
                             ),
@@ -680,6 +654,31 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _StatsWidget extends StatelessWidget {
+  final String label;
+  final String content;
+
+  const _StatsWidget(this.label, this.content);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          Text(
+            content,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
       ),
     );
   }
