@@ -83,7 +83,7 @@ class _ExploreScreenState extends State<ExploreScreen>
             return [
               SliverAppBar(
                 title: AppBarTitle('explore'.tr),
-                centerTitle: false,
+                centerTitle: true,
                 floating: true,
                 toolbarHeight: AppTheme.toolbarHeight(context),
                 leading: AppBarLeadingButton.adaptive(context),

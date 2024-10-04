@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:get/utils.dart';
+import 'package:solian/widgets/navigation/app_account_widget.dart';
 
 abstract class AppNavigation {
   static List<AppNavigationDestination> destinations = [
     AppNavigationDestination(
-      icon: Icons.dashboard,
+      icon: const Icon(Icons.dashboard),
       label: 'dashboard'.tr,
       page: 'dashboard',
     ),
     AppNavigationDestination(
-      icon: Icons.explore,
+      icon: const Icon(Icons.explore),
       label: 'explore'.tr,
       page: 'explore',
     ),
     AppNavigationDestination(
-      icon: Icons.workspaces,
+      icon: const Icon(Icons.workspaces),
       label: 'realms'.tr,
       page: 'realms',
     ),
     AppNavigationDestination(
-      icon: Icons.forum,
+      icon: const Icon(Icons.forum),
       label: 'chat'.tr,
       page: 'chat',
+    ),
+    AppNavigationDestination(
+      icon: const AppAccountWidget(),
+      label: 'account'.tr,
+      page: 'account',
     ),
   ];
 
@@ -30,7 +36,7 @@ abstract class AppNavigation {
 }
 
 class AppNavigationDestination {
-  final IconData icon;
+  final Widget icon;
   final String label;
   final String page;
 

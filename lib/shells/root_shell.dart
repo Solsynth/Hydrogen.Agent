@@ -2,7 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
-import 'package:solian/widgets/navigation/app_navigation_drawer.dart';
+import 'package:solian/widgets/navigation/app_navigation_bottom.dart';
 
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -41,15 +41,10 @@ class RootShell extends StatelessWidget {
 
     return Scaffold(
       key: rootScaffoldKey,
-      drawer: AppTheme.isLargeScreen(context)
-          ? null
-          : AppNavigationDrawer(routeName: routeName),
+      bottomNavigationBar: const AppNavigationBottom(),
       body: AppTheme.isLargeScreen(context)
           ? Row(
               children: [
-                if (showNavigation) AppNavigationDrawer(routeName: routeName),
-                if (showNavigation)
-                  const VerticalDivider(thickness: 0.3, width: 1),
                 Expanded(child: child),
               ],
             )
