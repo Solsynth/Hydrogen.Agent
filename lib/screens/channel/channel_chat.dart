@@ -202,7 +202,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     String? placeholder;
 
     final otherside =
-        _channel!.members!.where((e) => e.account.id != _accountId).firstOrNull;
+        _channel?.members!.where((e) => e.account.id != _accountId).firstOrNull;
 
     if (_channel?.type == 1 && otherside != null) {
       title = otherside.account.nick;

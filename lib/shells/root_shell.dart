@@ -2,6 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/navigation/app_navigation.dart';
 import 'package:solian/widgets/navigation/app_navigation_bottom.dart';
 
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
@@ -39,9 +40,16 @@ class RootShell extends StatelessWidget {
       );
     }
 
+    final destNames = AppNavigation.destinations.map((x) => x.page).toList();
+    final showBottomNavigation = destNames.contains(routeName);
+
     return Scaffold(
       key: rootScaffoldKey,
-      bottomNavigationBar: const AppNavigationBottom(),
+      bottomNavigationBar: showBottomNavigation
+          ? AppNavigationBottom(
+              initialIndex: destNames.indexOf(routeName ?? 'page'),
+            )
+          : null,
       body: AppTheme.isLargeScreen(context)
           ? Row(
               children: [

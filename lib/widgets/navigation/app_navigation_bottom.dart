@@ -3,7 +3,9 @@ import 'package:solian/router.dart';
 import 'package:solian/widgets/navigation/app_navigation.dart';
 
 class AppNavigationBottom extends StatefulWidget {
-  const AppNavigationBottom({super.key});
+  final int initialIndex;
+
+  const AppNavigationBottom({super.key, this.initialIndex = 0});
 
   @override
   State<AppNavigationBottom> createState() => _AppNavigationBottomState();
@@ -11,6 +13,14 @@ class AppNavigationBottom extends StatefulWidget {
 
 class _AppNavigationBottomState extends State<AppNavigationBottom> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialIndex >= 0) {
+      _currentIndex = widget.initialIndex;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
