@@ -132,10 +132,10 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         ? const EdgeInsets.symmetric(horizontal: 20)
         : const EdgeInsets.symmetric(horizontal: 16);
 
-    if (item.type == 1) {
-      final otherside =
-          item.members!.where((e) => e.account.id != widget.selfId).first;
+    final otherside =
+        item.members!.where((e) => e.account.id != widget.selfId).firstOrNull;
 
+    if (item.type == 1 && otherside != null) {
       final avatar = AccountAvatar(
         content: otherside.account.avatar,
         radius: widget.isDense ? 12 : 20,

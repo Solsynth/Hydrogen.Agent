@@ -201,9 +201,10 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     String title = _channel?.name ?? 'loading'.tr;
     String? placeholder;
 
-    if (_channel?.type == 1) {
-      final otherside =
-          _channel!.members!.where((e) => e.account.id != _accountId).first;
+    final otherside =
+        _channel!.members!.where((e) => e.account.id != _accountId).firstOrNull;
+
+    if (_channel?.type == 1 && otherside != null) {
       title = otherside.account.nick;
       placeholder = 'messageInputPlaceholder'.trParams(
         {'channel': '@${otherside.account.name}'},
