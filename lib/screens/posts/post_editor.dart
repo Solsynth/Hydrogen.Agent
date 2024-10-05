@@ -376,6 +376,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                     Expanded(
                       child: SingleChildScrollView(
                         child: MarkdownTextContent(
+                          isAutoWarp: _editorController.mode.value == 0,
                           content: _editorController.contentController.text,
                           parentId: 'post-editor-preview',
                         ).paddingOnly(top: 12, right: 16),
