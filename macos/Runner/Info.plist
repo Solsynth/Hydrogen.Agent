@@ -57,5 +57,11 @@
 		<string>INStartCallIntent</string>
 		<string>INSendMessageIntent</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow you take photo/video for your message or post</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allow you record audio for your message or post</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow you add photo to your message or post</string>
 </dict>
 </plist>

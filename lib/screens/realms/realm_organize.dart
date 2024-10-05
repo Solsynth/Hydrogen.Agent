@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -8,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/models/realm.dart';
+import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/router.dart';
@@ -84,36 +83,42 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
+    XFile file;
+
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: image.path,
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'cropImage'.tr,
-          toolbarColor: Theme.of(context).colorScheme.primary,
-          toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
-          aspectRatioPresets: [
-            if (position == 'avatar') CropAspectRatioPreset.square,
-            if (position == 'banner') _BannerCropAspectRatioPreset(),
-          ],
-        ),
-        IOSUiSettings(
-          title: 'cropImage'.tr,
-          aspectRatioPresets: [
-            if (position == 'avatar') CropAspectRatioPreset.square,
-            if (position == 'banner') _BannerCropAspectRatioPreset(),
-          ],
-        ),
-        WebUiSettings(
-          context: context,
-        ),
-      ],
-    );
+    if (PlatformInfo.canCropImage) {
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'cropImage'.tr,
+            toolbarColor: Theme.of(context).colorScheme.primary,
+            toolbarWidgetColor: Theme.of(context).colorScheme.onPrimary,
+            aspectRatioPresets: [
+              if (position == 'avatar') CropAspectRatioPreset.square,
+              if (position == 'banner') _BannerCropAspectRatioPreset(),
+            ],
+          ),
+          IOSUiSettings(
+            title: 'cropImage'.tr,
+            aspectRatioPresets: [
+              if (position == 'avatar') CropAspectRatioPreset.square,
+              if (position == 'banner') _BannerCropAspectRatioPreset(),
+            ],
+          ),
+          WebUiSettings(
+            context: context,
+          ),
+        ],
+      );
 
-    if (croppedFile == null) return;
-    final file = File(croppedFile.path);
+      if (croppedFile == null) return;
+      file = XFile(croppedFile.path);
+    } else {
+      file = XFile(image.path);
+    }
 
     setState(() => _isBusy = true);
 

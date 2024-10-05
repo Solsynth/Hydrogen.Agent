@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/navigation/app_navigation.dart';
 
@@ -54,6 +57,9 @@ class _AppNavigationRailState extends State<AppNavigationRail> {
         setState(() => _currentIndex = idx);
         AppRouter.instance.goNamed(AppNavigation.destinations[idx].page);
       },
+    ).paddingOnly(
+      top: max(16, MediaQuery.of(context).padding.top),
+      bottom: max(16, MediaQuery.of(context).padding.bottom),
     );
   }
 }

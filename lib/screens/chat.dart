@@ -289,7 +289,7 @@ class _ChatListState extends State<ChatList> {
                             ..._realmChannels.values.expand((x) => x),
                           ]),
                           selfId: selfId,
-                          useReplace: false,
+                          useReplace: AppTheme.isLargeScreen(context),
                         ),
                       ),
                       RefreshIndicator(
@@ -297,7 +297,7 @@ class _ChatListState extends State<ChatList> {
                         child: ChannelListWidget(
                           channels: _directChannels,
                           selfId: selfId,
-                          useReplace: false,
+                          useReplace: AppTheme.isLargeScreen(context),
                         ),
                       ),
                       ...realms.availableRealms.map(
@@ -306,7 +306,7 @@ class _ChatListState extends State<ChatList> {
                           child: ChannelListWidget(
                             channels: _realmChannels[x.alias] ?? [],
                             selfId: selfId,
-                            useReplace: false,
+                            useReplace: AppTheme.isLargeScreen(context),
                           ),
                         ),
                       ),

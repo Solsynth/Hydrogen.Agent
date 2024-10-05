@@ -396,7 +396,8 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                     ),
                   if (!element.isCompleted &&
                       element.error == null &&
-                      canBeCrop)
+                      canBeCrop &&
+                      PlatformInfo.canCropImage)
                     Obx(
                       () => IconButton(
                         color: Colors.teal,
