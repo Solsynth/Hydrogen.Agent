@@ -101,6 +101,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 ],
                 bottom: TabBar(
                   controller: _tabController,
+                  dividerColor: Theme.of(context).dividerColor.withOpacity(0.1),
                   tabs: [
                     Tab(text: 'postListNews'.tr),
                     Tab(text: 'postListFriends'.tr),

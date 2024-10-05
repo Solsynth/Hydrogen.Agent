@@ -24,8 +24,7 @@ class ChannelProvider extends GetxController {
     final resp = await listAvailableChannel();
     isLoading.value = false;
 
-    availableChannels.value =
-        resp.body.map((x) => Channel.fromJson(x)).toList().cast<Channel>();
+    availableChannels.value = await listAvailableChannel();
     availableChannels.refresh();
   }
 
@@ -89,18 +88,22 @@ class ChannelProvider extends GetxController {
     return resp;
   }
 
-  Future<Response> listAvailableChannel({String scope = 'global'}) async {
+  Future<List<Channel>> listAvailableChannel({
+    String scope = 'global',
+    bool isDirect = false,
+  }) async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
 
     final client = await auth.configureClient('messaging');
 
-    final resp = await client.get('/channels/$scope/me/available');
+    final resp =
+        await client.get('/channels/$scope/me/available?direct=$isDirect');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
 
-    return resp;
+    return List.from(resp.body.map((x) => Channel.fromJson(x)));
   }
 
   Future<Response> createChannel(String scope, dynamic payload) async {

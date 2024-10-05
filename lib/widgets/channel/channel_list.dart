@@ -4,19 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/database/database.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ChannelListWidget extends StatefulWidget {
   final List<Channel> channels;
   final int selfId;
-  final bool isDense;
-  final bool isCollapsed;
-  final bool noCategory;
   final bool useReplace;
   final Function(Channel)? onSelected;
 
@@ -24,9 +23,6 @@ class ChannelListWidget extends StatefulWidget {
     super.key,
     required this.channels,
     required this.selfId,
-    this.isDense = false,
-    this.isCollapsed = false,
-    this.noCategory = false,
     this.useReplace = false,
     this.onSelected,
   });
@@ -36,9 +32,6 @@ class ChannelListWidget extends StatefulWidget {
 }
 
 class _ChannelListWidgetState extends State<ChannelListWidget> {
-  final List<Channel> _globalChannels = List.empty(growable: true);
-  final Map<String, List<Channel>> _inRealms = {};
-
   Map<int, LocalMessageEventTableData>? _lastMessages;
 
   final ChatEventController _eventController = ChatEventController();
@@ -52,37 +45,9 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     });
   }
 
-  void _mapChannels() {
-    _inRealms.clear();
-    _globalChannels.clear();
-
-    if (widget.noCategory) {
-      _globalChannels.addAll(widget.channels);
-      return;
-    }
-
-    for (final channel in widget.channels) {
-      if (channel.realmId != null) {
-        if (_inRealms[channel.realm!.alias] == null) {
-          _inRealms[channel.realm!.alias] = List.empty(growable: true);
-        }
-        _inRealms[channel.realm!.alias]!.add(channel);
-      } else {
-        _globalChannels.add(channel);
-      }
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant ChannelListWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    setState(() => _mapChannels());
-  }
-
   @override
   void initState() {
     super.initState();
-    _mapChannels();
     _eventController.initialize().then((_) {
       _loadLastMessages();
     });
@@ -112,7 +77,45 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     }
   }
 
-  Widget _buildChannelDescription(Channel item, ChannelMember? otherside) {
+  Widget _buildTitle(Channel item, ChannelMember? otherside) {
+    if (otherside != null) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(child: Text(otherside.account.nick)),
+          if (_lastMessages != null && _lastMessages![item.id] != null)
+            Text(
+              DateFormat('MM/dd').format(
+                _lastMessages![item.id]!.createdAt.toLocal(),
+              ),
+              style: TextStyle(
+                fontSize: 12,
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+              ),
+            ),
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(child: Text(item.name)),
+        if (_lastMessages != null && _lastMessages![item.id] != null)
+          Text(
+            DateFormat('MM/dd').format(
+              _lastMessages![item.id]!.createdAt.toLocal(),
+            ),
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSubtitle(Channel item, ChannelMember? otherside) {
     if (PlatformInfo.isWeb) {
       return otherside != null
           ? Text(
@@ -137,28 +140,49 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
       },
       duration: const Duration(milliseconds: 300),
       child: (_lastMessages == null || _lastMessages![item.id] == null)
-          ? Builder(builder: (context) {
-              return otherside != null
-                  ? Text(
-                      'channelDirectDescription'.trParams(
-                        {'username': '@${otherside.account.name}'},
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : Text(
-                      item.description,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    );
-            })
+          ? Builder(
+              builder: (context) {
+                return otherside != null
+                    ? Text(
+                        'channelDirectDescription'.trParams(
+                          {'username': '@${otherside.account.name}'},
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : Text(
+                        item.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      );
+              },
+            )
           : Builder(
               builder: (context) {
                 final data = _lastMessages![item.id]!.data!;
-                return Text(
-                  '${data.sender.account.nick}: ${data.body['text'] ?? 'Unsupported message to preview'}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (item.type == 0)
+                      Badge(
+                        label: Text(data.sender.account.nick),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondaryContainer,
+                        textColor:
+                            Theme.of(context).colorScheme.onSecondaryContainer,
+                      ),
+                    if (item.type == 0) const Gap(6),
+                    if (data.body['text'] != null)
+                      Expanded(
+                        child: Text(
+                          data.body['text'],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    else
+                      Badge(label: Text('unablePreview'.tr)),
+                  ],
                 );
               },
             ),
@@ -175,9 +199,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   }
 
   Widget _buildEntry(Channel item) {
-    final padding = widget.isDense
-        ? const EdgeInsets.symmetric(horizontal: 20)
-        : const EdgeInsets.symmetric(horizontal: 16);
+    const padding = EdgeInsets.symmetric(horizontal: 20);
 
     final otherside =
         item.members!.where((e) => e.account.id != widget.selfId).firstOrNull;
@@ -185,60 +207,53 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     if (item.type == 1 && otherside != null) {
       final avatar = AccountAvatar(
         content: otherside.account.avatar,
-        radius: widget.isDense ? 12 : 20,
+        radius: 20,
         bgColor: Theme.of(context).colorScheme.primary,
         feColor: Theme.of(context).colorScheme.onPrimary,
       );
 
-      if (widget.isCollapsed) {
-        return Tooltip(
-          message: otherside.account.nick,
-          child: InkWell(
-            child: avatar.paddingSymmetric(vertical: 12),
-            onTap: () => _gotoChannel(item),
-          ),
-        );
-      }
-
       return ListTile(
         leading: avatar,
         contentPadding: padding,
-        title: Text(otherside.account.nick),
-        subtitle:
-            !widget.isDense ? _buildChannelDescription(item, otherside) : null,
+        title: _buildTitle(item, otherside),
+        subtitle: _buildSubtitle(item, otherside),
         onTap: () => _gotoChannel(item),
       );
     } else {
       final avatar = CircleAvatar(
-        backgroundColor: item.realmId == null
-            ? Theme.of(context).colorScheme.primary
-            : Colors.transparent,
-        radius: widget.isDense ? 12 : 20,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        radius: 20,
         child: FaIcon(
           FontAwesomeIcons.hashtag,
-          color: item.realmId == null
-              ? Theme.of(context).colorScheme.onPrimary
-              : Theme.of(context).colorScheme.primary,
-          size: widget.isDense ? 12 : 16,
+          color: Theme.of(context).colorScheme.onPrimary,
+          size: 16,
         ),
       );
 
-      if (widget.isCollapsed) {
-        return Tooltip(
-          message: item.name,
-          child: InkWell(
-            child: avatar.paddingSymmetric(vertical: 12),
-            onTap: () => _gotoChannel(item),
-          ),
-        );
-      }
-
       return ListTile(
-        minTileHeight: widget.isDense ? 48 : null,
-        leading: avatar,
+        minTileHeight: null,
+        leading: item.realmId == null
+            ? avatar
+            : badges.Badge(
+                position: badges.BadgePosition.bottomEnd(bottom: -4, end: -6),
+                badgeStyle: badges.BadgeStyle(
+                  badgeColor: Theme.of(context).colorScheme.secondaryContainer,
+                  padding: const EdgeInsets.all(2),
+                  elevation: 8,
+                ),
+                badgeContent: AccountAvatar(
+                  content: item.realm?.avatar,
+                  radius: 10,
+                  fallbackWidget: const Icon(
+                    Icons.workspaces,
+                    size: 16,
+                  ),
+                ),
+                child: avatar,
+              ),
         contentPadding: padding,
-        title: Text(item.name),
-        subtitle: !widget.isDense ? _buildChannelDescription(item, null) : null,
+        title: _buildTitle(item, null),
+        subtitle: _buildSubtitle(item, null),
         onTap: () => _gotoChannel(item),
       );
     }
@@ -246,49 +261,16 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.noCategory) {
-      return CustomScrollView(
-        slivers: [
-          SliverList.builder(
-            itemCount: _globalChannels.length,
-            itemBuilder: (context, index) {
-              final element = _globalChannels[index];
-              return _buildEntry(element);
-            },
-          ),
-          SliverGap(max(16, MediaQuery.of(context).padding.bottom)),
-        ],
-      );
-    }
-
     return CustomScrollView(
       slivers: [
         SliverList.builder(
-          itemCount: _globalChannels.length,
+          itemCount: widget.channels.length,
           itemBuilder: (context, index) {
-            final element = _globalChannels[index];
+            final element = widget.channels[index];
             return _buildEntry(element);
           },
         ),
-        SliverList.list(
-          children: _inRealms.entries.map((element) {
-            return ExpansionTile(
-              tilePadding: const EdgeInsets.only(left: 20, right: 24),
-              minTileHeight: 48,
-              title: Text(element.value.first.realm!.name),
-              leading: CircleAvatar(
-                backgroundColor: Colors.teal,
-                radius: widget.isDense ? 12 : 24,
-                child: Icon(
-                  Icons.workspaces,
-                  color: Colors.white,
-                  size: widget.isDense ? 12 : 16,
-                ),
-              ),
-              children: element.value.map((x) => _buildEntry(x)).toList(),
-            );
-          }).toList(),
-        ),
+        SliverGap(max(16, MediaQuery.of(context).padding.bottom)),
       ],
     );
   }

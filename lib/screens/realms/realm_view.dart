@@ -68,12 +68,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
       _channels.addAll(
         resp.body.map((e) => Channel.fromJson(e)).toList().cast<Channel>(),
       );
-      _channels.addAll(
-        availableResp.body
-            .map((e) => Channel.fromJson(e))
-            .toList()
-            .cast<Channel>(),
-      );
+      _channels.addAll(availableResp);
       _channels.retainWhere((x) => channelIdx.add(x.id));
     });
 
@@ -260,7 +255,6 @@ class RealmChannelListWidget extends StatelessWidget {
             child: ChannelListWidget(
               channels: channels,
               selfId: auth.userProfile.value!['id'],
-              noCategory: true,
             ),
           )
         ],

@@ -464,5 +464,7 @@
   "blockUser": "Block user",
   "unblockUser": "Unblock user",
   "learnMoreAboutPerson": "Learn more about that person",
-  "global": "Global"
+  "global": "Global",
+  "all": "All",
+  "unablePreview": "Unable to preview"
 }

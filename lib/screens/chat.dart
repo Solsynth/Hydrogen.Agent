@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/channel.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/channel.dart';
+import 'package:solian/providers/content/realm.dart';
+import 'package:solian/providers/database/database.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
+import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
-import 'package:solian/widgets/sized_container.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -23,125 +28,265 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  late final ChannelProvider _channels;
+  List<Channel> _normalChannels = List.empty();
+  List<Channel> _directChannels = List.empty();
+  final Map<String, List<Channel>> _realmChannels = {};
+
+  late final ChannelProvider _channels = Get.find();
+
+  List<Channel> _sortChannels(List<Channel> channels) {
+    channels.sort(
+      (a, b) =>
+          _lastMessages?[b.id]?.createdAt.compareTo(
+                _lastMessages?[a.id]?.createdAt ??
+                    DateTime.fromMillisecondsSinceEpoch(0),
+              ) ??
+          0,
+    );
+    return channels;
+  }
+
+  Future<void> _loadNormalChannels() async {
+    final resp = await _channels.listAvailableChannel(isDirect: false);
+    setState(() {
+      _normalChannels = _sortChannels(resp);
+    });
+  }
+
+  Future<void> _loadDirectChannels() async {
+    final resp = await _channels.listAvailableChannel(isDirect: true);
+    setState(() {
+      _directChannels = _sortChannels(resp);
+    });
+  }
+
+  Future<void> _loadRealmChannels(String realm) async {
+    final resp = await _channels.listAvailableChannel(scope: realm);
+    setState(() {
+      _realmChannels[realm] = _sortChannels(List.from(resp));
+    });
+  }
+
+  Future<void> _loadAllChannels() async {
+    final RealmProvider realms = Get.find();
+    Future.wait([
+      _loadNormalChannels(),
+      _loadDirectChannels(),
+      ...realms.availableRealms.map((x) => _loadRealmChannels(x.alias)),
+    ]);
+  }
+
+  Map<int, LocalMessageEventTableData>? _lastMessages;
+
+  Future<void> _loadLastMessages() async {
+    final ctrl = ChatEventController();
+    await ctrl.initialize();
+    final messages = await ctrl.src.getLastInAllChannels();
+    setState(() {
+      _lastMessages = messages
+          .map((k, v) => MapEntry(k, v.firstOrNull))
+          .cast<int, LocalMessageEventTableData>();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    try {
-      _channels = Get.find();
-      _channels.refreshAvailableChannel();
-    } catch (e) {
-      context.showErrorDialog(e);
-    }
+    _loadLastMessages().then((_) {
+      _loadAllChannels();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
+    final RealmProvider realms = Get.find();
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: Obx(() {
-            final adaptive = AppBarLeadingButton.adaptive(context);
-            if (adaptive != null) return adaptive;
-            if (_channels.isLoading.value) {
-              return const CircularProgressIndicator(
-                strokeWidth: 3,
-              ).paddingAll(18);
-            }
-            return const SizedBox.shrink();
-          }),
-          title: AppBarTitle('chat'.tr),
-          centerTitle: true,
-          toolbarHeight: AppTheme.toolbarHeight(context),
-          actions: [
-            const BackgroundStateWidget(),
-            const NotificationButton(),
-            PopupMenuButton(
-              icon: const Icon(Icons.add_circle),
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem(
-                  child: ListTile(
-                    title: Text('channelOrganizeCommon'.tr),
-                    leading: const Icon(Icons.tag),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
-                  onTap: () {
-                    AppRouter.instance.pushNamed('channelOrganizing').then(
-                      (value) {
-                        if (value != null) {
-                          _channels.refreshAvailableChannel();
-                        }
+    return Obx(
+      () => DefaultTabController(
+        length: 2 + realms.availableRealms.length,
+        child: Material(
+          color: Theme.of(context).colorScheme.surface,
+          child: Scaffold(
+            appBar: AppBar(
+              leading: Obx(() {
+                final adaptive = AppBarLeadingButton.adaptive(context);
+                if (adaptive != null) return adaptive;
+                if (_channels.isLoading.value) {
+                  return const CircularProgressIndicator(
+                    strokeWidth: 3,
+                  ).paddingAll(18);
+                }
+                return const SizedBox.shrink();
+              }),
+              title: AppBarTitle('chat'.tr),
+              centerTitle: true,
+              toolbarHeight: AppTheme.toolbarHeight(context),
+              actions: [
+                const BackgroundStateWidget(),
+                const NotificationButton(),
+                PopupMenuButton(
+                  icon: const Icon(Icons.add_circle),
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem(
+                      child: ListTile(
+                        title: Text('channelOrganizeCommon'.tr),
+                        leading: const Icon(Icons.tag),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onTap: () {
+                        AppRouter.instance.pushNamed('channelOrganizing').then(
+                          (value) {
+                            if (value != null) {
+                              _channels.refreshAvailableChannel();
+                            }
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
-                PopupMenuItem(
-                  child: ListTile(
-                    title: Text('channelOrganizeDirect'.tr),
-                    leading: const FaIcon(
-                      FontAwesomeIcons.userGroup,
-                      size: 16,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
-                  onTap: () {
-                    final ChannelProvider channels = Get.find();
-                    channels
-                        .createDirectChannel(context, 'global')
-                        .then((resp) {
-                      if (resp != null) {
-                        _channels.refreshAvailableChannel();
-                      }
-                    }).catchError((e) {
-                      context.showErrorDialog(e);
-                    });
-                  },
+                    PopupMenuItem(
+                      child: ListTile(
+                        title: Text('channelOrganizeDirect'.tr),
+                        leading: const FaIcon(
+                          FontAwesomeIcons.userGroup,
+                          size: 16,
+                        ),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onTap: () {
+                        final ChannelProvider channels = Get.find();
+                        channels
+                            .createDirectChannel(context, 'global')
+                            .then((resp) {
+                          if (resp != null) {
+                            _channels.refreshAvailableChannel();
+                          }
+                        }).catchError((e) {
+                          context.showErrorDialog(e);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  width: AppTheme.isLargeScreen(context) ? 8 : 16,
                 ),
               ],
-            ),
-            SizedBox(
-              width: AppTheme.isLargeScreen(context) ? 8 : 16,
-            ),
-          ],
-        ),
-        body: Obx(() {
-          if (auth.isAuthorized.isFalse) {
-            return SigninRequiredOverlay(
-              onDone: () => _channels.refreshAvailableChannel(),
-            );
-          }
-
-          final selfId = auth.userProfile.value!['id'];
-
-          return Column(
-            children: [
-              const ChatCallCurrentIndicator(),
-              Expanded(
-                child: CenteredContainer(
-                  child: RefreshIndicator(
-                    onRefresh: _channels.refreshAvailableChannel,
-                    child: Obx(
-                      () => ChannelListWidget(
-                        noCategory: true,
-                        channels: List.from([
-                          ..._channels.groupChannels
-                              .where((x) => x.realmId == null),
-                          ..._channels.directChannels
-                        ]),
-                        selfId: selfId,
-                        useReplace: false,
-                      ),
+              bottom: TabBar(
+                isScrollable: true,
+                dividerColor: Theme.of(context).dividerColor.withOpacity(0.1),
+                tabAlignment: TabAlignment.startOffset,
+                tabs: [
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 14,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          child: const Icon(
+                            Icons.forum,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Gap(8),
+                        Text('all'.tr),
+                      ],
                     ),
                   ),
-                ),
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircleAvatar(
+                          radius: 14,
+                          child: Icon(
+                            Icons.chat_bubble,
+                            size: 16,
+                          ),
+                        ),
+                        const Gap(8),
+                        Text('channelTypeDirect'.tr),
+                      ],
+                    ),
+                  ),
+                  ...realms.availableRealms.map((x) => Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AccountAvatar(
+                              content: x.avatar,
+                              radius: 14,
+                              fallbackWidget: const Icon(
+                                Icons.workspaces,
+                                size: 16,
+                              ),
+                            ),
+                            const Gap(8),
+                            Text(x.name),
+                          ],
+                        ),
+                      )),
+                ],
               ),
-            ],
-          );
-        }),
+            ),
+            body: Obx(() {
+              if (auth.isAuthorized.isFalse) {
+                return SigninRequiredOverlay(
+                  onDone: () => _loadAllChannels(),
+                );
+              }
+
+              final selfId = auth.userProfile.value!['id'];
+
+              return Column(
+                children: [
+                  const ChatCallCurrentIndicator(),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        RefreshIndicator(
+                          onRefresh: _loadNormalChannels,
+                          child: ChannelListWidget(
+                            channels: _sortChannels([
+                              ..._normalChannels,
+                              ..._directChannels,
+                              ..._realmChannels.values.expand((x) => x),
+                            ]),
+                            selfId: selfId,
+                            useReplace: false,
+                          ),
+                        ),
+                        RefreshIndicator(
+                          onRefresh: _loadDirectChannels,
+                          child: ChannelListWidget(
+                            channels: _directChannels,
+                            selfId: selfId,
+                            useReplace: false,
+                          ),
+                        ),
+                        ...realms.availableRealms.map(
+                          (x) => RefreshIndicator(
+                            onRefresh: () => _loadRealmChannels(x.alias),
+                            child: ChannelListWidget(
+                              channels: _realmChannels[x.alias] ?? [],
+                              selfId: selfId,
+                              useReplace: false,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+        ),
       ),
     );
   }

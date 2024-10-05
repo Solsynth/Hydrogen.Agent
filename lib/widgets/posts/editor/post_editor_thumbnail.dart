@@ -29,7 +29,7 @@ class _PostEditorThumbnailDialogState extends State<PostEditorThumbnailDialog> {
             _attachmentController.text = value.toString();
           });
 
-          widget.controller.thumbnail.value = value;
+          widget.controller.thumbnail.value = value.isEmpty ? null : value;
         },
         initialAttachments: const [],
         onRemove: (_) {},
@@ -91,7 +91,8 @@ class _PostEditorThumbnailDialogState extends State<PostEditorThumbnailDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.controller.thumbnail.value = _attachmentController.text;
+            final text = _attachmentController.text;
+            widget.controller.thumbnail.value = text.isEmpty ? null : text;
             Navigator.pop(context);
           },
           child: Text('confirm'.tr),
