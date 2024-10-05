@@ -275,7 +275,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                       channel: _channel!,
                       ongoingCall: _ongoingCall!,
                       onJoin: () {
-                        if (!AppTheme.isLargeScreen(context)) {
+                        if (!AppTheme.isUltraLargeScreen(context)) {
                           final ChatCallProvider call = Get.find();
                           call.gotoScreen(context);
                         }
@@ -329,7 +329,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
             ),
             Obx(() {
               final ChatCallProvider call = Get.find();
-              if (call.isMounted.value && AppTheme.isLargeScreen(context)) {
+              if (call.isMounted.value &&
+                  AppTheme.isUltraLargeScreen(context)) {
                 return const Expanded(
                   child: Row(children: [
                     VerticalDivider(width: 0.3, thickness: 0.3),

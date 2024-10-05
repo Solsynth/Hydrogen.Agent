@@ -6,7 +6,10 @@ abstract class AppTheme {
       MediaQuery.of(context).size.width > 640;
 
   static bool isExtraLargeScreen(BuildContext context) =>
-      MediaQuery.of(context).size.width > 720;
+      MediaQuery.of(context).size.width > 920;
+
+  static bool isUltraLargeScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width > 1200;
 
   static bool isSpecializedMacOS(BuildContext context) =>
       PlatformInfo.isMacOS && !AppTheme.isLargeScreen(context);

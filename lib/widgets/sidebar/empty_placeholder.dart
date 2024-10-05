@@ -8,7 +8,10 @@ class EmptyPagePlaceholder extends StatelessWidget {
     return Material(
       color: Theme.of(context).colorScheme.surface,
       child: Center(
-        child: Image.asset('assets/logo.png', width: 80, height: 80),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          child: Image.asset('assets/logo.png', width: 80, height: 80),
+        ),
       ),
     );
   }

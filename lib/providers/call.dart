@@ -392,7 +392,7 @@ class ChatCallProvider extends GetxController {
   }
 
   Future gotoScreen(BuildContext context) {
-    return Navigator.of(context, rootNavigator: true).push(
+    return Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const CallScreen()),
     );
   }
