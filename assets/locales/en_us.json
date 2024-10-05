@@ -463,5 +463,6 @@
   "friendAdd": "Add as friend",
   "blockUser": "Block user",
   "unblockUser": "Unblock user",
-  "learnMoreAboutPerson": "Learn more about that person"
+  "learnMoreAboutPerson": "Learn more about that person",
+  "global": "Global"
 }

@@ -10,9 +10,9 @@ import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
-import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
+import 'package:solian/widgets/navigation/realm_switcher.dart';
 import 'package:solian/widgets/posts/post_shuffle_swiper.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
 
@@ -55,7 +55,6 @@ class _ExploreScreenState extends State<ExploreScreen>
   @override
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
-    final NavigationStateProvider navState = Get.find();
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -82,8 +81,14 @@ class _ExploreScreenState extends State<ExploreScreen>
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
               SliverAppBar(
-                title: AppBarTitle('explore'.tr),
-                centerTitle: true,
+                flexibleSpace: SizedBox(
+                  height: 48,
+                  child: const Row(
+                    children: [
+                      RealmSwitcher(),
+                    ],
+                  ).paddingSymmetric(horizontal: 8),
+                ).paddingOnly(top: MediaQuery.of(context).padding.top),
                 floating: true,
                 toolbarHeight: AppTheme.toolbarHeight(context),
                 leading: AppBarLeadingButton.adaptive(context),
@@ -114,16 +119,6 @@ class _ExploreScreenState extends State<ExploreScreen>
 
             return Column(
               children: [
-                if (navState.focusedRealm.value != null)
-                  MaterialBanner(
-                    leading: const Icon(Icons.layers),
-                    content: Text(
-                      'postBrowsingIn'.trParams({
-                        'region': '#${navState.focusedRealm.value!.alias}',
-                      }),
-                    ),
-                    actions: const [SizedBox.shrink()],
-                  ),
                 Expanded(
                   child: TabBarView(
                     physics: const NeverScrollableScrollPhysics(),

@@ -459,5 +459,6 @@
   "friendAdd": "添加好友",
   "blockUser": "屏蔽用户",
   "unblockUser": "解除屏蔽用户",
-  "learnMoreAboutPerson": "了解关于 TA 的更多"
+  "learnMoreAboutPerson": "了解关于 TA 的更多",
+  "global": "全局"
 }

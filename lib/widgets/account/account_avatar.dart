@@ -7,6 +7,7 @@ class AccountAvatar extends StatelessWidget {
   final Color? bgColor;
   final Color? feColor;
   final double? radius;
+  final Widget? fallbackWidget;
 
   const AccountAvatar({
     super.key,
@@ -14,6 +15,7 @@ class AccountAvatar extends StatelessWidget {
     this.bgColor,
     this.feColor,
     this.radius,
+    this.fallbackWidget,
   });
 
   @override
@@ -35,11 +37,12 @@ class AccountAvatar extends StatelessWidget {
       backgroundColor: bgColor,
       backgroundImage: !isEmpty ? AutoCacheImage.provider(url) : null,
       child: isEmpty
-          ? Icon(
-              Icons.account_circle,
-              size: radius != null ? radius! * 1.2 : 24,
-              color: feColor,
-            )
+          ? (fallbackWidget ??
+              Icon(
+                Icons.account_circle,
+                size: radius != null ? radius! * 1.2 : 24,
+                color: feColor,
+              ))
           : null,
     );
   }
