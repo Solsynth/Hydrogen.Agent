@@ -6,7 +6,7 @@ abstract class AppNavigation {
   static List<AppNavigationDestination> destinations = [
     AppNavigationDestination(
       icon: const Icon(Icons.dashboard),
-      label: 'dashboard'.tr,
+      label: 'dashboardNav'.tr,
       page: 'dashboard',
     ),
     AppNavigationDestination(
@@ -26,7 +26,7 @@ abstract class AppNavigation {
     ),
     AppNavigationDestination(
       icon: const AppAccountWidget(),
-      label: 'account'.tr,
+      label: 'accountNav'.tr,
       page: 'account',
     ),
   ];

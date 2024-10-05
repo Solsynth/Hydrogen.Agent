@@ -28,6 +28,8 @@ import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/screens/settings.dart';
 import 'package:solian/shells/root_shell.dart';
 import 'package:solian/shells/title_shell.dart';
+import 'package:solian/theme.dart';
+import 'package:solian/widgets/sidebar/empty_placeholder.dart';
 
 abstract class AppRouter {
   static GoRouter instance = GoRouter(
@@ -137,12 +139,14 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _chatRoute = ShellRoute(
-    builder: (context, state, child) => child,
+    builder: (context, state, child) => ChatListShell(child: child),
     routes: [
       GoRoute(
         path: '/chat',
         name: 'chat',
-        builder: (context, state) => const ChatScreen(),
+        builder: (context, state) => AppTheme.isLargeScreen(context)
+            ? const EmptyPagePlaceholder()
+            : const ChatScreen(),
       ),
       GoRoute(
         path: '/chat/organize',

@@ -28,7 +28,7 @@ class _AppNavigationBottomState extends State<AppNavigationBottom> {
       currentIndex: _currentIndex,
       type: BottomNavigationBarType.fixed,
       showUnselectedLabels: false,
-      showSelectedLabels: false,
+      showSelectedLabels: true,
       landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
       items: AppNavigation.destinations
           .map(

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/navigation/app_navigation.dart';
 import 'package:solian/widgets/navigation/app_navigation_bottom.dart';
+import 'package:solian/widgets/navigation/app_navigation_rail.dart';
 
 final GlobalKey<ScaffoldState> rootScaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -40,8 +41,11 @@ class RootShell extends StatelessWidget {
       );
     }
 
+    final showRailNavigation = AppTheme.isLargeScreen(context);
+
     final destNames = AppNavigation.destinations.map((x) => x.page).toList();
-    final showBottomNavigation = destNames.contains(routeName);
+    final showBottomNavigation =
+        destNames.contains(routeName) && !showRailNavigation;
 
     return Scaffold(
       key: rootScaffoldKey,
@@ -53,6 +57,12 @@ class RootShell extends StatelessWidget {
       body: AppTheme.isLargeScreen(context)
           ? Row(
               children: [
+                if (showRailNavigation) const AppNavigationRail(),
+                if (showRailNavigation)
+                  const VerticalDivider(
+                    width: 0.3,
+                    thickness: 0.3,
+                  ),
                 Expanded(child: child),
               ],
             )

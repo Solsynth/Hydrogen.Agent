@@ -462,5 +462,7 @@
   "learnMoreAboutPerson": "了解关于 TA 的更多",
   "global": "全局",
   "all": "全部",
-  "unablePreview": "无法预览"
+  "unablePreview": "无法预览",
+  "dashboardNav": "仪表盘",
+  "accountNav": "您"
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -18,9 +20,10 @@ class RealmSwitcher extends StatelessWidget {
     return Obx(() {
       return DropdownButtonHideUnderline(
         child: DropdownButton2<Realm?>(
+          iconStyleData: const IconStyleData(iconSize: 0),
           isExpanded: true,
           hint: Text(
-            'Select Item',
+            'Realm Region',
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).hintColor,
@@ -71,11 +74,11 @@ class RealmSwitcher extends StatelessWidget {
           onChanged: (Realm? value) {
             navState.focusedRealm.value = value;
           },
-          buttonStyleData: const ButtonStyleData(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          buttonStyleData: ButtonStyleData(
             height: 48,
-            width: 200,
-            decoration: BoxDecoration(
+            width: max(200, MediaQuery.of(context).size.width * 0.4),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(16)),
             ),
           ),

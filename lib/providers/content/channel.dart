@@ -9,24 +9,6 @@ import 'package:uuid/uuid.dart';
 
 class ChannelProvider extends GetxController {
   RxBool isLoading = false.obs;
-  RxList<Channel> availableChannels = RxList.empty(growable: true);
-
-  List<Channel> get groupChannels =>
-      availableChannels.where((x) => x.type == 0).toList();
-  List<Channel> get directChannels =>
-      availableChannels.where((x) => x.type == 1).toList();
-
-  Future<void> refreshAvailableChannel() async {
-    final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) throw const UnauthorizedException();
-
-    isLoading.value = true;
-    final resp = await listAvailableChannel();
-    isLoading.value = false;
-
-    availableChannels.value = await listAvailableChannel();
-    availableChannels.refresh();
-  }
 
   Future<Response> getChannel(String alias, {String realm = 'global'}) async {
     final AuthProvider auth = Get.find();

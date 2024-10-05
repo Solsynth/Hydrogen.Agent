@@ -12,7 +12,6 @@ import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/theme_switcher.dart';
@@ -198,8 +197,6 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
         final AuthProvider auth = Get.find();
         try {
           await Future.wait([
-            if (auth.isAuthorized.isTrue)
-              Get.find<ChannelProvider>().refreshAvailableChannel(),
             if (auth.isAuthorized.isTrue)
               Get.find<RelationshipProvider>().refreshRelativeList(),
             if (auth.isAuthorized.isTrue)

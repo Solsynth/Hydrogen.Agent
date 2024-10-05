@@ -7,7 +7,6 @@ import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/auth.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/providers/content/channel.dart';
 import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/websocket.dart';
@@ -177,7 +176,6 @@ class _SignInScreenState extends State<SignInScreen> {
           await auth.refreshAuthorizeStatus();
           await auth.refreshUserProfile();
 
-          Get.find<ChannelProvider>().refreshAvailableChannel();
           Get.find<RealmProvider>().refreshAvailableRealms();
           Get.find<RelationshipProvider>().refreshRelativeList();
           Get.find<WebSocketProvider>().registerPushNotifications();

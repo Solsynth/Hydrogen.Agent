@@ -466,5 +466,7 @@
   "learnMoreAboutPerson": "Learn more about that person",
   "global": "Global",
   "all": "All",
-  "unablePreview": "Unable to preview"
+  "unablePreview": "Unable to preview",
+  "dashboardNav": "Dash",
+  "accountNav": "You"
 }

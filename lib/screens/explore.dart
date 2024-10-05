@@ -101,11 +101,39 @@ class _ExploreScreenState extends State<ExploreScreen>
                 ],
                 bottom: TabBar(
                   controller: _tabController,
-                  dividerColor: Theme.of(context).dividerColor.withOpacity(0.1),
+                  dividerHeight: 0.3,
+                  tabAlignment: TabAlignment.fill,
                   tabs: [
-                    Tab(text: 'postListNews'.tr),
-                    Tab(text: 'postListFriends'.tr),
-                    Tab(text: 'postListShuffle'.tr),
+                    Tab(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.feed, size: 20),
+                          const Gap(8),
+                          Text('postListNews'.tr),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.people, size: 20),
+                          const Gap(8),
+                          Text('postListFriends'.tr),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.shuffle_on_outlined, size: 20),
+                          const Gap(8),
+                          Text('postListShuffle'.tr),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               )
