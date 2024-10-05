@@ -15,14 +15,14 @@ abstract class AppNavigation {
       page: 'explore',
     ),
     AppNavigationDestination(
-      icon: const Icon(Icons.workspaces),
-      label: 'realms'.tr,
-      page: 'realms',
-    ),
-    AppNavigationDestination(
       icon: const Icon(Icons.forum),
       label: 'chat'.tr,
       page: 'chat',
+    ),
+    AppNavigationDestination(
+      icon: const Icon(Icons.workspaces),
+      label: 'realms'.tr,
+      page: 'realms',
     ),
     AppNavigationDestination(
       icon: const AppAccountWidget(),

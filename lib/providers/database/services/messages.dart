@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:get/get.dart' hide Value;
 import 'package:solian/exceptions/request.dart';
@@ -181,5 +184,27 @@ class MessagesFetchingProvider extends GetxController {
           ..where((x) => x.channelId.equals(channel.id))
           ..orderBy([(t) => OrderingTerm.desc(t.id)]))
         .getSingleOrNull();
+  }
+
+  Future<Map<int, List<LocalMessageEventTableData>>>
+      getLastInAllChannels() async {
+    final database = Get.find<DatabaseProvider>().database;
+    final rows = await database.customSelect('''
+    SELECT id, channel_id, data, created_at
+    FROM ${database.localMessageEventTable.actualTableName}
+    WHERE (channel_id, created_at) IN (
+      SELECT channel_id, MAX(created_at)
+      FROM ${database.localMessageEventTable.actualTableName}
+      GROUP BY channel_id
+    )
+    ''', readsFrom: {database.localMessageEventTable}).get();
+    return rows.map((row) {
+      return LocalMessageEventTableData(
+        id: row.read<int>('id'),
+        channelId: row.read<int>('channel_id'),
+        data: Event.fromJson(jsonDecode(row.read<String>('data'))),
+        createdAt: row.read<DateTime>('created_at'),
+      );
+    }).groupListsBy((x) => x.channelId);
   }
 }

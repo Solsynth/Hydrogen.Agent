@@ -44,7 +44,16 @@ class _ChatScreenState extends State<ChatScreen> {
       color: Theme.of(context).colorScheme.surface,
       child: Scaffold(
         appBar: AppBar(
-          leading: AppBarLeadingButton.adaptive(context),
+          leading: Obx(() {
+            final adaptive = AppBarLeadingButton.adaptive(context);
+            if (adaptive != null) return adaptive;
+            if (_channels.isLoading.value) {
+              return const CircularProgressIndicator(
+                strokeWidth: 3,
+              ).paddingAll(18);
+            }
+            return const SizedBox.shrink();
+          }),
           title: AppBarTitle('chat'.tr),
           centerTitle: true,
           toolbarHeight: AppTheme.toolbarHeight(context),
@@ -110,13 +119,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
           return Column(
             children: [
-              Obx(() {
-                if (_channels.isLoading.isFalse) {
-                  return const SizedBox.shrink();
-                } else {
-                  return const LinearProgressIndicator();
-                }
-              }),
               const ChatCallCurrentIndicator(),
               Expanded(
                 child: CenteredContainer(

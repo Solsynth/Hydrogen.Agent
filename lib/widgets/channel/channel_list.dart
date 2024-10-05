@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/providers/database/database.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 
@@ -38,7 +39,18 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   final List<Channel> _globalChannels = List.empty(growable: true);
   final Map<String, List<Channel>> _inRealms = {};
 
+  Map<int, LocalMessageEventTableData>? _lastMessages;
+
   final ChatEventController _eventController = ChatEventController();
+
+  Future<void> _loadLastMessages() async {
+    final messages = await _eventController.src.getLastInAllChannels();
+    setState(() {
+      _lastMessages = messages
+          .map((k, v) => MapEntry(k, v.firstOrNull))
+          .cast<int, LocalMessageEventTableData>();
+    });
+  }
 
   void _mapChannels() {
     _inRealms.clear();
@@ -71,7 +83,9 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
   void initState() {
     super.initState();
     _mapChannels();
-    _eventController.initialize();
+    _eventController.initialize().then((_) {
+      _loadLastMessages();
+    });
   }
 
   void _gotoChannel(Channel item) {
@@ -98,30 +112,63 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
     }
   }
 
-  Widget _buildDirectMessageDescription(Channel item, ChannelMember otherside) {
+  Widget _buildChannelDescription(Channel item, ChannelMember? otherside) {
     if (PlatformInfo.isWeb) {
-      return Text('channelDirectDescription'.trParams(
-        {'username': '@${otherside.account.name}'},
-      ));
+      return otherside != null
+          ? Text(
+              'channelDirectDescription'.trParams(
+                {'username': '@${otherside.account.name}'},
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )
+          : Text(
+              item.description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            );
     }
 
-    return FutureBuilder(
-      future: Future.delayed(
-        const Duration(milliseconds: 500),
-        () => _eventController.src.getLastInChannel(item),
-      ),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData && snapshot.data == null) {
-          return Text('channelDirectDescription'.trParams(
-            {'username': '@${otherside.account.name}'},
-          ));
-        }
-
-        final data = snapshot.data!.data!;
-        return Text(
-          '${data.sender.account.nick}: ${data.body['text'] ?? 'Unsupported message to preview'}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+    return AnimatedSwitcher(
+      switchInCurve: Curves.easeIn,
+      switchOutCurve: Curves.easeOut,
+      transitionBuilder: (child, animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      duration: const Duration(milliseconds: 300),
+      child: (_lastMessages == null || _lastMessages![item.id] == null)
+          ? Builder(builder: (context) {
+              return otherside != null
+                  ? Text(
+                      'channelDirectDescription'.trParams(
+                        {'username': '@${otherside.account.name}'},
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : Text(
+                      item.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+            })
+          : Builder(
+              builder: (context) {
+                final data = _lastMessages![item.id]!.data!;
+                return Text(
+                  '${data.sender.account.nick}: ${data.body['text'] ?? 'Unsupported message to preview'}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                );
+              },
+            ),
+      layoutBuilder: (currentChild, previousChildren) {
+        return Stack(
+          alignment: Alignment.centerLeft,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
         );
       },
     );
@@ -157,9 +204,8 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         leading: avatar,
         contentPadding: padding,
         title: Text(otherside.account.nick),
-        subtitle: !widget.isDense
-            ? _buildDirectMessageDescription(item, otherside)
-            : null,
+        subtitle:
+            !widget.isDense ? _buildChannelDescription(item, otherside) : null,
         onTap: () => _gotoChannel(item),
       );
     } else {
@@ -192,13 +238,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         leading: avatar,
         contentPadding: padding,
         title: Text(item.name),
-        subtitle: !widget.isDense
-            ? Text(
-                item.description,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              )
-            : null,
+        subtitle: !widget.isDense ? _buildChannelDescription(item, null) : null,
         onTap: () => _gotoChannel(item),
       );
     }

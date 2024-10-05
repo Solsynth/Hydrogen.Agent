@@ -75,6 +75,9 @@ class RealmSwitcher extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16),
             height: 48,
             width: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
           ),
           menuItemStyleData: const MenuItemStyleData(
             height: 48,
