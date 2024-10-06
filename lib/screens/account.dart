@@ -7,6 +7,7 @@ import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_heading.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -49,8 +50,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
     final AuthProvider auth = Get.find();
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: SafeArea(
         child: Obx(() {
           if (auth.isAuthorized.isFalse) {

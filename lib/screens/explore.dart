@@ -15,6 +15,7 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/navigation/realm_switcher.dart';
 import 'package:solian/widgets/posts/post_shuffle_swiper.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -56,8 +57,7 @@ class _ExploreScreenState extends State<ExploreScreen>
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),

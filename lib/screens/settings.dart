@@ -12,6 +12,7 @@ import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/reports/abuse_report.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -75,8 +76,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: ListView(
         children: [
           _buildCaptionHeader('themeColor'.tr),

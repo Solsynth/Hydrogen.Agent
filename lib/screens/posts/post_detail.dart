@@ -6,6 +6,7 @@ import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/last_read.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class PostDetailScreen extends StatefulWidget {
   final String id;
@@ -47,8 +48,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: FutureBuilder(
         future: getDetail(),
         builder: (context, snapshot) {

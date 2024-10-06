@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -15,8 +16,7 @@ class AboutScreen extends StatelessWidget {
     const denseButtonStyle =
         ButtonStyle(visualDensity: VisualDensity(vertical: -4));
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: SizedBox(
         width: double.infinity,
         child: Column(

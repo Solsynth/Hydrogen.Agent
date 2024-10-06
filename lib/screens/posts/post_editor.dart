@@ -19,6 +19,7 @@ import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:solian/widgets/root_container.dart';
 
 class PostPublishArguments {
   final Post? edit;
@@ -151,8 +152,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
       )
     ];
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),

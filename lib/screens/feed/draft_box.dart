@@ -9,6 +9,7 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_owned_list.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class DraftBoxScreen extends StatefulWidget {
   const DraftBoxScreen({super.key});
@@ -54,8 +55,7 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),

@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -65,8 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: CenteredContainer(
         maxWidth: 360,
         child: ListView(

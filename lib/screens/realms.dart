@@ -15,6 +15,7 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 
 class RealmListScreen extends StatefulWidget {
@@ -58,8 +59,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
   Widget build(BuildContext context) {
     final AuthProvider auth = Get.find();
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),

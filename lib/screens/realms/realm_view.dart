@@ -16,6 +16,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/posts/post_list.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class RealmViewScreen extends StatefulWidget {
   final String alias;
@@ -86,8 +87,7 @@ class _RealmViewScreenState extends State<RealmViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: DefaultTabController(
         length: 2,
         child: NestedScrollView(

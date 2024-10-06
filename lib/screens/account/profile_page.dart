@@ -28,6 +28,7 @@ import 'package:solian/widgets/daily_sign/history_chart.dart';
 import 'package:solian/widgets/posts/post_list.dart';
 import 'package:solian/widgets/posts/post_warped_list.dart';
 import 'package:solian/widgets/reports/abuse_report.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 
 class AccountProfilePage extends StatefulWidget {
@@ -233,8 +234,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: DefaultTabController(
         length: 3,
         child: NestedScrollView(

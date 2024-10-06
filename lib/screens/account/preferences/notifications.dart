@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class NotificationPreferencesScreen extends StatefulWidget {
   const NotificationPreferencesScreen({super.key});
@@ -74,8 +75,7 @@ class _NotificationPreferencesScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Column(
         children: [
           if (_isBusy) const LinearProgressIndicator().animate().scaleX(),

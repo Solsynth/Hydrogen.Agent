@@ -11,6 +11,7 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/chat/call/call_controls.dart';
 import 'package:solian/widgets/chat/call/call_participant.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit;
+import 'package:solian/widgets/root_container.dart';
 
 class CallScreen extends StatefulWidget {
   final bool hideAppBar;
@@ -197,8 +198,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ChatCallProvider ctrl = Get.find();
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         appBar: widget.hideAppBar
             ? null

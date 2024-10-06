@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class EmptyPagePlaceholder extends StatelessWidget {
   const EmptyPagePlaceholder({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Center(
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(12)),

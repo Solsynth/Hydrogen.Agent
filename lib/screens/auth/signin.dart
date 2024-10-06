@@ -11,6 +11,7 @@ import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -216,8 +217,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: CenteredContainer(
         maxWidth: 360,
         child: PageTransitionSwitcher(

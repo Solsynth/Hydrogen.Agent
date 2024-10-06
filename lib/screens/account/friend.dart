@@ -6,6 +6,7 @@ import 'package:solian/models/relations.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/relative_list.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class FriendScreen extends StatefulWidget {
   const FriendScreen({super.key});
@@ -117,8 +118,7 @@ class _FriendScreenState extends State<FriendScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         appBar: AppBar(
           centerTitle: false,

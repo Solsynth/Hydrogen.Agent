@@ -17,6 +17,7 @@ import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:version/version.dart';
@@ -255,8 +256,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
   Widget build(BuildContext context) {
     if (_isBusy || _isErrored) {
       return GestureDetector(
-        child: Material(
-          color: Theme.of(context).colorScheme.surface,
+        child: RootContainer(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceAround,

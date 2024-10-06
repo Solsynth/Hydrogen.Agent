@@ -9,6 +9,7 @@ import 'package:solian/providers/content/channel.dart';
 import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:uuid/uuid.dart';
 
 class ChannelOrganizeArguments {
@@ -114,8 +115,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
       ),
     ];
 
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Scaffold(
         appBar: AppBar(
           title: AppBarTitle('channelOrganizing'.tr),

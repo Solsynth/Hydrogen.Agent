@@ -19,6 +19,7 @@ import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sidebar/empty_placeholder.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -26,9 +27,8 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      child: const ChatList(),
+    return const RootContainer(
+      child: ChatList(),
     );
   }
 }
@@ -40,8 +40,7 @@ class ChatListShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
+    return RootContainer(
       child: Row(
         children: [
           const SizedBox(
