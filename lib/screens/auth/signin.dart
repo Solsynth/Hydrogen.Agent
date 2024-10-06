@@ -220,284 +220,295 @@ class _SignInScreenState extends State<SignInScreen> {
     return RootContainer(
       child: CenteredContainer(
         maxWidth: 360,
-        child: PageTransitionSwitcher(
-          transitionBuilder: (
-            Widget child,
-            Animation<double> primaryAnimation,
-            Animation<double> secondaryAnimation,
-          ) {
-            return SharedAxisTransition(
-              animation: primaryAnimation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.horizontal,
-              child: child,
-            );
-          },
-          child: switch (_period % 3) {
-            1 => ListView(
-                shrinkWrap: true,
-                key: const ValueKey<int>(1),
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      child:
-                          Image.asset('assets/logo.png', width: 64, height: 64),
-                    ).paddingOnly(bottom: 8, left: 4),
-                  ),
-                  Text(
-                    'signinPickFactor'.tr,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
+        child: Theme(
+          data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+          child: PageTransitionSwitcher(
+            transitionBuilder: (
+              Widget child,
+              Animation<double> primaryAnimation,
+              Animation<double> secondaryAnimation,
+            ) {
+              return SharedAxisTransition(
+                animation: primaryAnimation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: SharedAxisTransitionType.horizontal,
+                child: child,
+              );
+            },
+            child: switch (_period % 3) {
+              1 => ListView(
+                  shrinkWrap: true,
+                  key: const ValueKey<int>(1),
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                        child: Image.asset('assets/logo.png',
+                            width: 64, height: 64),
+                      ).paddingOnly(bottom: 8, left: 4),
                     ),
-                  ).paddingOnly(left: 4, bottom: 16),
-                  Card(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    child: Column(
-                      children: _factors
-                              ?.map(
-                                (x) => CheckboxListTile(
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8),
-                                    ),
-                                  ),
-                                  secondary: Icon(
-                                    _factorLabelMap[x.type]?.$2 ??
-                                        Icons.question_mark,
-                                  ),
-                                  title: Text(
-                                    _factorLabelMap[x.type]?.$1 ?? 'unknown'.tr,
-                                  ),
-                                  enabled: !_currentTicket!.factorTrail
-                                      .contains(x.id),
-                                  value: _factorPicked == x.id,
-                                  onChanged: (value) {
-                                    if (value == true) {
-                                      setState(() => _factorPicked = x.id);
-                                    }
-                                  },
-                                ),
-                              )
-                              .toList() ??
-                          List.empty(),
-                    ),
-                  ),
-                  Text(
-                    'signinMultiFactor'.trParams(
-                      {'n': _currentTicket!.stepRemain.toString()},
-                    ),
-                    style: TextStyle(color: _unFocusColor, fontSize: 12),
-                  ).paddingOnly(left: 16, right: 16),
-                  const Gap(12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: (_isBusy || _period > 1)
-                            ? null
-                            : () => _previousStep(),
-                        style:
-                            TextButton.styleFrom(foregroundColor: Colors.grey),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.chevron_left),
-                            Text('prev'.tr),
-                          ],
-                        ),
+                    Text(
+                      'signinPickFactor'.tr,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
                       ),
-                      TextButton(
-                        onPressed:
-                            _isBusy ? null : () => _performGetFactorCode(),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('next'.tr),
-                            const Icon(Icons.chevron_right),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            2 => ListView(
-                key: const ValueKey<int>(2),
-                shrinkWrap: true,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      child:
-                          Image.asset('assets/logo.png', width: 64, height: 64),
-                    ).paddingOnly(bottom: 8, left: 4),
-                  ),
-                  Text(
-                    'signinEnterPassword'.tr,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ).paddingOnly(left: 4, bottom: 16),
-                  TextField(
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    controller: _passwordController,
-                    obscureText: true,
-                    autofillHints: [
-                      (_factorLabelMap[_factorPickedType]?.$3 ?? true)
-                          ? AutofillHints.password
-                          : AutofillHints.oneTimeCode
-                    ],
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: const OutlineInputBorder(),
-                      labelText:
-                          (_factorLabelMap[_factorPickedType]?.$3 ?? true)
-                              ? 'passwordOneTime'.tr
-                              : 'password'.tr,
-                      helperText:
-                          (_factorLabelMap[_factorPickedType]?.$3 ?? true)
-                              ? 'passwordOneTimeInputHint'.tr
-                              : 'passwordInputHint'.tr,
-                    ),
-                    onTapOutside: (_) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
-                    onSubmitted: _isBusy ? null : (_) => _performCheckTicket(),
-                  ),
-                  const Gap(12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: _isBusy ? null : () => _previousStep(),
-                        style:
-                            TextButton.styleFrom(foregroundColor: Colors.grey),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.chevron_left),
-                            Text('prev'.tr),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: _isBusy ? null : () => _performCheckTicket(),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('next'.tr),
-                            const Icon(Icons.chevron_right),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            _ => ListView(
-                key: const ValueKey<int>(0),
-                shrinkWrap: true,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      child:
-                          Image.asset('assets/logo.png', width: 64, height: 64),
-                    ).paddingOnly(bottom: 8, left: 4),
-                  ),
-                  Text(
-                    'signinGreeting'.tr,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ).paddingOnly(left: 4, bottom: 16),
-                  TextField(
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    controller: _usernameController,
-                    autofillHints: const [AutofillHints.username],
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: const OutlineInputBorder(),
-                      labelText: 'username'.tr,
-                      helperText: 'usernameInputHint'.tr,
-                    ),
-                    onTapOutside: (_) =>
-                        FocusManager.instance.primaryFocus?.unfocus(),
-                    onSubmitted: _isBusy ? null : (_) => _performNewTicket(),
-                  ),
-                  const Gap(12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed:
-                            _isBusy ? null : () => _requestResetPassword(),
-                        style:
-                            TextButton.styleFrom(foregroundColor: Colors.grey),
-                        child: Text('forgotPassword'.tr),
-                      ),
-                      TextButton(
-                        onPressed: _isBusy ? null : () => _performNewTicket(),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('next'.tr),
-                            const Icon(Icons.chevron_right),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Gap(12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 290),
+                    ).paddingOnly(left: 4, bottom: 16),
+                    Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'termAcceptNextWithAgree'.tr,
-                            textAlign: TextAlign.end,
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withOpacity(0.75),
+                        children: _factors
+                                ?.map(
+                                  (x) => CheckboxListTile(
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
                                     ),
-                          ),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('termAcceptLink'.tr),
-                                  const Gap(4),
-                                  const Icon(Icons.launch, size: 14),
-                                ],
-                              ),
-                              onTap: () {
-                                launchUrlString('https://solsynth.dev/terms');
-                              },
-                            ),
-                          ),
-                        ],
+                                    secondary: Icon(
+                                      _factorLabelMap[x.type]?.$2 ??
+                                          Icons.question_mark,
+                                    ),
+                                    title: Text(
+                                      _factorLabelMap[x.type]?.$1 ??
+                                          'unknown'.tr,
+                                    ),
+                                    enabled: !_currentTicket!.factorTrail
+                                        .contains(x.id),
+                                    value: _factorPicked == x.id,
+                                    onChanged: (value) {
+                                      if (value == true) {
+                                        setState(() => _factorPicked = x.id);
+                                      }
+                                    },
+                                  ),
+                                )
+                                .toList() ??
+                            List.empty(),
                       ),
-                    ).paddingSymmetric(horizontal: 16),
-                  ),
-                ],
-              ),
-          },
+                    ),
+                    Text(
+                      'signinMultiFactor'.trParams(
+                        {'n': _currentTicket!.stepRemain.toString()},
+                      ),
+                      style: TextStyle(color: _unFocusColor, fontSize: 12),
+                    ).paddingOnly(left: 16, right: 16),
+                    const Gap(12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: (_isBusy || _period > 1)
+                              ? null
+                              : () => _previousStep(),
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.chevron_left),
+                              Text('prev'.tr),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed:
+                              _isBusy ? null : () => _performGetFactorCode(),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('next'.tr),
+                              const Icon(Icons.chevron_right),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              2 => ListView(
+                  key: const ValueKey<int>(2),
+                  shrinkWrap: true,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                        child: Image.asset('assets/logo.png',
+                            width: 64, height: 64),
+                      ).paddingOnly(bottom: 8, left: 4),
+                    ),
+                    Text(
+                      'signinEnterPassword'.tr,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ).paddingOnly(left: 4, bottom: 16),
+                    TextField(
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      controller: _passwordController,
+                      obscureText: true,
+                      autofillHints: [
+                        (_factorLabelMap[_factorPickedType]?.$3 ?? true)
+                            ? AutofillHints.password
+                            : AutofillHints.oneTimeCode
+                      ],
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        labelText:
+                            (_factorLabelMap[_factorPickedType]?.$3 ?? true)
+                                ? 'passwordOneTime'.tr
+                                : 'password'.tr,
+                        helperText:
+                            (_factorLabelMap[_factorPickedType]?.$3 ?? true)
+                                ? 'passwordOneTimeInputHint'.tr
+                                : 'passwordInputHint'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      onSubmitted:
+                          _isBusy ? null : (_) => _performCheckTicket(),
+                    ),
+                    const Gap(12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: _isBusy ? null : () => _previousStep(),
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.chevron_left),
+                              Text('prev'.tr),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed:
+                              _isBusy ? null : () => _performCheckTicket(),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('next'.tr),
+                              const Icon(Icons.chevron_right),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              _ => ListView(
+                  key: const ValueKey<int>(0),
+                  shrinkWrap: true,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                        child: Image.asset('assets/logo.png',
+                            width: 64, height: 64),
+                      ).paddingOnly(bottom: 8, left: 4),
+                    ),
+                    Text(
+                      'signinGreeting'.tr,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ).paddingOnly(left: 4, bottom: 16),
+                    TextField(
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      controller: _usernameController,
+                      autofillHints: const [AutofillHints.username],
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: const OutlineInputBorder(),
+                        labelText: 'username'.tr,
+                        helperText: 'usernameInputHint'.tr,
+                      ),
+                      onTapOutside: (_) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      onSubmitted: _isBusy ? null : (_) => _performNewTicket(),
+                    ),
+                    const Gap(12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed:
+                              _isBusy ? null : () => _requestResetPassword(),
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey),
+                          child: Text('forgotPassword'.tr),
+                        ),
+                        TextButton(
+                          onPressed: _isBusy ? null : () => _performNewTicket(),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('next'.tr),
+                              const Icon(Icons.chevron_right),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Gap(12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 290),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'termAcceptNextWithAgree'.tr,
+                              textAlign: TextAlign.end,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.75),
+                                  ),
+                            ),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('termAcceptLink'.tr),
+                                    const Gap(4),
+                                    const Icon(Icons.launch, size: 14),
+                                  ],
+                                ),
+                                onTap: () {
+                                  launchUrlString('https://solsynth.dev/terms');
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).paddingSymmetric(horizontal: 16),
+                    ),
+                  ],
+                ),
+            },
+          ),
         ),
       ).paddingAll(24),
     );

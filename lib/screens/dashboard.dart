@@ -147,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               Text(DateFormat('yyyy/MM/dd').format(DateTime.now().toUtc())),
             ],
-          ).paddingOnly(top: 8, left: 18, right: 18, bottom: 12),
+          ).paddingOnly(top: 16, left: 18, right: 18, bottom: 12),
           Card(
             child: Column(
               children: [

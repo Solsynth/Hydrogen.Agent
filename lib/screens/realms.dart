@@ -99,6 +99,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
                   child: RefreshIndicator(
                     onRefresh: () => _getRealms(),
                     child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       itemCount: _realms.length,
                       itemBuilder: (context, index) {
                         final element = _realms[index];
