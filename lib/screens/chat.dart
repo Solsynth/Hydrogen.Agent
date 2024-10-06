@@ -140,181 +140,186 @@ class _ChatListState extends State<ChatList> {
     return Obx(
       () => DefaultTabController(
         length: 2 + realms.availableRealms.length,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: Obx(() {
-              final adaptive = AppBarLeadingButton.adaptive(context);
-              if (adaptive != null) return adaptive;
-              if (_channels.isLoading.value) {
-                return const CircularProgressIndicator(
-                  strokeWidth: 3,
-                ).paddingAll(18);
-              }
-              return const SizedBox.shrink();
-            }),
-            title: AppBarTitle('chat'.tr),
-            centerTitle: true,
-            toolbarHeight: AppTheme.toolbarHeight(context),
-            actions: [
-              const BackgroundStateWidget(),
-              const NotificationButton(),
-              PopupMenuButton(
-                icon: const Icon(Icons.add_circle),
-                itemBuilder: (BuildContext context) => [
-                  PopupMenuItem(
-                    child: ListTile(
-                      title: Text('channelOrganizeCommon'.tr),
-                      leading: const Icon(Icons.tag),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+        child: RootContainer(
+          child: Scaffold(
+            appBar: AppBar(
+              leading: Obx(() {
+                final adaptive = AppBarLeadingButton.adaptive(context);
+                if (adaptive != null) return adaptive;
+                if (_channels.isLoading.value) {
+                  return const CircularProgressIndicator(
+                    strokeWidth: 3,
+                  ).paddingAll(18);
+                }
+                return const SizedBox.shrink();
+              }),
+              title: AppBarTitle('chat'.tr),
+              centerTitle: true,
+              toolbarHeight: AppTheme.toolbarHeight(context),
+              actions: [
+                const BackgroundStateWidget(),
+                const NotificationButton(),
+                PopupMenuButton(
+                  icon: const Icon(Icons.add_circle),
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem(
+                      child: ListTile(
+                        title: Text('channelOrganizeCommon'.tr),
+                        leading: const Icon(Icons.tag),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onTap: () {
+                        AppRouter.instance.pushNamed('channelOrganizing').then(
+                          (value) {
+                            if (value != null) {
+                              _loadAllChannels();
+                            }
+                          },
+                        );
+                      },
                     ),
-                    onTap: () {
-                      AppRouter.instance.pushNamed('channelOrganizing').then(
-                        (value) {
-                          if (value != null) {
+                    PopupMenuItem(
+                      child: ListTile(
+                        title: Text('channelOrganizeDirect'.tr),
+                        leading: const FaIcon(
+                          FontAwesomeIcons.userGroup,
+                          size: 16,
+                        ),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onTap: () {
+                        final ChannelProvider channels = Get.find();
+                        channels
+                            .createDirectChannel(context, 'global')
+                            .then((resp) {
+                          if (resp != null) {
                             _loadAllChannels();
                           }
-                        },
-                      );
-                    },
-                  ),
-                  PopupMenuItem(
-                    child: ListTile(
-                      title: Text('channelOrganizeDirect'.tr),
-                      leading: const FaIcon(
-                        FontAwesomeIcons.userGroup,
-                        size: 16,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                        }).catchError((e) {
+                          context.showErrorDialog(e);
+                        });
+                      },
                     ),
-                    onTap: () {
-                      final ChannelProvider channels = Get.find();
-                      channels
-                          .createDirectChannel(context, 'global')
-                          .then((resp) {
-                        if (resp != null) {
-                          _loadAllChannels();
-                        }
-                      }).catchError((e) {
-                        context.showErrorDialog(e);
-                      });
-                    },
+                  ],
+                ),
+                SizedBox(
+                  width: AppTheme.isLargeScreen(context) ? 8 : 16,
+                ),
+              ],
+              bottom: TabBar(
+                isScrollable: true,
+                dividerHeight: 0.3,
+                tabAlignment: TabAlignment.startOffset,
+                tabs: [
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 14,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          child: const Icon(
+                            Icons.forum,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Gap(8),
+                        Text('all'.tr),
+                      ],
+                    ),
                   ),
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircleAvatar(
+                          radius: 14,
+                          child: Icon(
+                            Icons.chat_bubble,
+                            size: 16,
+                          ),
+                        ),
+                        const Gap(8),
+                        Text('channelTypeDirect'.tr),
+                      ],
+                    ),
+                  ),
+                  ...realms.availableRealms.map((x) => Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AccountAvatar(
+                              content: x.avatar,
+                              radius: 14,
+                              fallbackWidget: const Icon(
+                                Icons.workspaces,
+                                size: 16,
+                              ),
+                            ),
+                            const Gap(8),
+                            Text(x.name),
+                          ],
+                        ),
+                      )),
                 ],
               ),
-              SizedBox(
-                width: AppTheme.isLargeScreen(context) ? 8 : 16,
-              ),
-            ],
-            bottom: TabBar(
-              isScrollable: true,
-              dividerHeight: 0.3,
-              tabAlignment: TabAlignment.startOffset,
-              tabs: [
-                Tab(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        child: const Icon(
-                          Icons.forum,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Gap(8),
-                      Text('all'.tr),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircleAvatar(
-                        radius: 14,
-                        child: Icon(
-                          Icons.chat_bubble,
-                          size: 16,
-                        ),
-                      ),
-                      const Gap(8),
-                      Text('channelTypeDirect'.tr),
-                    ],
-                  ),
-                ),
-                ...realms.availableRealms.map((x) => Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AccountAvatar(
-                            content: x.avatar,
-                            radius: 14,
-                            fallbackWidget: const Icon(
-                              Icons.workspaces,
-                              size: 16,
-                            ),
-                          ),
-                          const Gap(8),
-                          Text(x.name),
-                        ],
-                      ),
-                    )),
-              ],
             ),
-          ),
-          body: Obx(() {
-            if (auth.isAuthorized.isFalse) {
-              return SigninRequiredOverlay(
-                onDone: () => _loadAllChannels(),
-              );
-            }
+            body: Obx(() {
+              if (auth.isAuthorized.isFalse) {
+                return SigninRequiredOverlay(
+                  onDone: () => _loadAllChannels(),
+                );
+              }
 
-            final selfId = auth.userProfile.value!['id'];
+              final selfId = auth.userProfile.value!['id'];
 
-            return Column(
-              children: [
-                const ChatCallCurrentIndicator(),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      RefreshIndicator(
-                        onRefresh: _loadNormalChannels,
-                        child: ChannelListWidget(
-                          channels: _sortChannels([
-                            ..._normalChannels,
-                            ..._directChannels,
-                            ..._realmChannels.values.expand((x) => x),
-                          ]),
-                          selfId: selfId,
-                          useReplace: AppTheme.isLargeScreen(context),
-                        ),
-                      ),
-                      RefreshIndicator(
-                        onRefresh: _loadDirectChannels,
-                        child: ChannelListWidget(
-                          channels: _directChannels,
-                          selfId: selfId,
-                          useReplace: AppTheme.isLargeScreen(context),
-                        ),
-                      ),
-                      ...realms.availableRealms.map(
-                        (x) => RefreshIndicator(
-                          onRefresh: () => _loadRealmChannels(x.alias),
+              return Column(
+                children: [
+                  const ChatCallCurrentIndicator(),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        RefreshIndicator(
+                          onRefresh: _loadNormalChannels,
                           child: ChannelListWidget(
-                            channels: _realmChannels[x.alias] ?? [],
+                            channels: _sortChannels([
+                              ..._normalChannels,
+                              ..._directChannels,
+                              ..._realmChannels.values.expand((x) => x),
+                            ]),
                             selfId: selfId,
                             useReplace: AppTheme.isLargeScreen(context),
                           ),
                         ),
-                      ),
-                    ],
+                        RefreshIndicator(
+                          onRefresh: _loadDirectChannels,
+                          child: ChannelListWidget(
+                            channels: _directChannels,
+                            selfId: selfId,
+                            useReplace: AppTheme.isLargeScreen(context),
+                          ),
+                        ),
+                        ...realms.availableRealms.map(
+                          (x) => RefreshIndicator(
+                            onRefresh: () => _loadRealmChannels(x.alias),
+                            child: ChannelListWidget(
+                              channels: _realmChannels[x.alias] ?? [],
+                              selfId: selfId,
+                              useReplace: AppTheme.isLargeScreen(context),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            );
-          }),
+                ],
+              );
+            }),
+          ),
         ),
       ),
     );

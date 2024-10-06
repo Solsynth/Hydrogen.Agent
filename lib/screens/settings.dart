@@ -1,16 +1,23 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/theme.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/database/database.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/router.dart';
-import 'package:solian/theme.dart';
 import 'package:solian/widgets/reports/abuse_report.dart';
 import 'package:solian/widgets/root_container.dart';
 
@@ -23,6 +30,7 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   SharedPreferences? _prefs;
+  String _docBasepath = '/';
 
   Widget _buildCaptionHeader(String title) {
     return Container(
@@ -33,39 +41,38 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  Widget _buildThemeColorButton(String label, Color color) {
-    return IconButton(
-      icon: Icon(Icons.circle, color: color),
-      tooltip: label,
-      onPressed: () {
-        context.read<ThemeSwitcher>().setTheme(
-              AppTheme.build(
-                Brightness.light,
-                seedColor: color,
-              ),
-              AppTheme.build(
-                Brightness.dark,
-                seedColor: color,
-              ),
-            );
-        _prefs?.setInt('global_theme_color', color.value);
-        context.clearSnackbar();
-        context.showSnackbar('themeColorApplied'.tr);
-      },
-    );
-  }
-
-  static final List<(String, Color)> _presentTheme = [
-    ('themeColorRed', const Color.fromRGBO(154, 98, 91, 1)),
-    ('themeColorBlue', const Color.fromRGBO(103, 96, 193, 1)),
-    ('themeColorMiku', const Color.fromRGBO(56, 120, 126, 1)),
-    ('themeColorKagamine', const Color.fromRGBO(244, 183, 63, 1)),
-    ('themeColorLuka', const Color.fromRGBO(243, 174, 218, 1)),
+  static final List<SolianThemeData> _presentTheme = [
+    SolianThemeData(
+      id: 'themeColorRed',
+      seedColor: const Color.fromRGBO(154, 98, 91, 1),
+    ),
+    SolianThemeData(
+      id: 'themeColorBlue',
+      seedColor: const Color.fromRGBO(103, 96, 193, 1),
+    ),
+    SolianThemeData(
+      id: 'themeColorMiku',
+      seedColor: const Color.fromRGBO(56, 120, 126, 1),
+    ),
+    SolianThemeData(
+      id: 'themeColorKagamine',
+      seedColor: const Color.fromRGBO(244, 183, 63, 1),
+    ),
+    SolianThemeData(
+      id: 'themeColorLuka',
+      seedColor: const Color.fromRGBO(243, 174, 218, 1),
+    ),
   ];
 
   @override
   void initState() {
     super.initState();
+    getApplicationDocumentsDirectory().then((dir) {
+      _docBasepath = dir.path;
+      if (mounted) {
+        setState(() {});
+      }
+    });
     SharedPreferences.getInstance().then((inst) {
       _prefs = inst;
       if (mounted) {
@@ -79,16 +86,98 @@ class _SettingScreenState extends State<SettingScreen> {
     return RootContainer(
       child: ListView(
         children: [
-          _buildCaptionHeader('themeColor'.tr),
-          SizedBox(
-            height: 56,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: _presentTheme
-                  .map((x) => _buildThemeColorButton(x.$1, x.$2))
-                  .toList(),
-            ).paddingSymmetric(horizontal: 12, vertical: 8),
+          _buildCaptionHeader('theme'.tr),
+          ListTile(
+            leading: const Icon(Icons.palette),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            title: Text('globalTheme'.tr),
+            trailing: DropdownButtonHideUnderline(
+              child: DropdownButton2<SolianThemeData>(
+                isExpanded: true,
+                hint: Text(
+                  'theme'.tr,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+                items: _presentTheme
+                    .map((SolianThemeData item) =>
+                        DropdownMenuItem<SolianThemeData>(
+                          value: item,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.circle, color: item.seedColor),
+                              const Gap(8),
+                              Text(
+                                item.id.tr,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+                value: (_prefs?.containsKey('global_theme') ?? false)
+                    ? SolianThemeData.fromJson(
+                        jsonDecode(_prefs!.getString('global_theme')!),
+                      )
+                    : null,
+                onChanged: (SolianThemeData? value) {
+                  context.read<ThemeSwitcher>().setThemeData(value);
+                  setState(() {});
+                },
+                buttonStyleData: const ButtonStyleData(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  height: 40,
+                  width: 140,
+                ),
+                menuItemStyleData: const MenuItemStyleData(
+                  height: 40,
+                ),
+              ),
+            ),
           ),
+          CheckboxListTile(
+            secondary: const Icon(Icons.military_tech),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            title: Text('agedTheme'.tr),
+            subtitle: Text('agedThemeDesc'.tr),
+            value: _prefs?.getBool('aged_theme') ?? false,
+            onChanged: (value) {
+              if (value != null) {
+                context.read<ThemeSwitcher>().setAgedTheme(value);
+              }
+              setState(() {});
+            },
+          ),
+          if (!PlatformInfo.isWeb)
+            ListTile(
+              leading: const Icon(Icons.wallpaper),
+              contentPadding: const EdgeInsets.only(left: 22, right: 31),
+              title: Text('appBackgroundImage'.tr),
+              subtitle: Text('appBackgroundImageDesc'.tr),
+              trailing: File('$_docBasepath/app_background_image').existsSync()
+                  ? const Icon(Icons.check_box)
+                  : const Icon(Icons.check_box_outline_blank),
+              onTap: () async {
+                if (File('$_docBasepath/app_background_image').existsSync()) {
+                  File('$_docBasepath/app_background_image').deleteSync();
+                } else {
+                  final image = await ImagePicker().pickImage(
+                    source: ImageSource.gallery,
+                  );
+                  if (image == null) return;
+
+                  await File(image.path)
+                      .copy('$_docBasepath/app_background_image');
+                }
+
+                setState(() {});
+              },
+            ),
           _buildCaptionHeader('notification'.tr),
           Tooltip(
             message: 'settingsNotificationBgServiceDesc'.tr,

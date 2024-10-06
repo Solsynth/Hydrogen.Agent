@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solian/models/theme.dart';
 import 'package:solian/platform.dart';
 
 abstract class AppTheme {
@@ -38,6 +39,7 @@ abstract class AppTheme {
         brightness: brightness,
         seedColor: seedColor ?? const Color.fromRGBO(154, 98, 91, 1),
       ),
+      scaffoldBackgroundColor: Colors.transparent,
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
       ),
@@ -48,6 +50,38 @@ abstract class AppTheme {
         'NotoSansJP',
         if (PlatformInfo.isWeb) 'NotoSansEmoji',
       ],
+      typography: Typography.material2021(
+        colorScheme: brightness == Brightness.light
+            ? const ColorScheme.light()
+            : const ColorScheme.dark(),
+      ),
+    );
+  }
+
+  static ThemeData buildFromData(
+    Brightness brightness,
+    SolianThemeData data, {
+    bool useMaterial3 = true,
+  }) {
+    return ThemeData(
+      brightness: brightness,
+      useMaterial3: useMaterial3,
+      colorScheme: ColorScheme.fromSeed(
+        brightness: brightness,
+        seedColor: data.seedColor,
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+      ),
+      scaffoldBackgroundColor: Colors.transparent,
+      fontFamily: data.fontFamily ?? 'Comfortaa',
+      fontFamilyFallback: data.fontFamilyFallback ??
+          [
+            'NotoSansSC',
+            'NotoSansHK',
+            'NotoSansJP',
+            if (PlatformInfo.isWeb) 'NotoSansEmoji',
+          ],
       typography: Typography.material2021(
         colorScheme: brightness == Brightness.light
             ? const ColorScheme.light()

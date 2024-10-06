@@ -471,5 +471,11 @@
   "accountNav": "You",
   "performance": "Performance",
   "animatedMessageList": "Non-animated message list",
-  "animatedMessageListDesc": "Remove animation effects in message list, to reduce cause lag"
+  "animatedMessageListDesc": "Remove animation effects in message list, to reduce cause lag",
+  "theme": "Theme",
+  "globalTheme": "Global theme",
+  "agedTheme": "Old school style theme",
+  "agedThemeDesc": "Downgrade the global theme to Material Design 2. Unexpected issues may occur. For experimental use only.",
+  "appBackgroundImage": "Global background image",
+  "appBackgroundImageDesc": "The global background image will be displayed on all pages"
 }

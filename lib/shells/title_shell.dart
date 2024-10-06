@@ -5,6 +5,7 @@ import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class TitleShell extends StatelessWidget {
   final bool showAppBar;
@@ -26,24 +27,26 @@ class TitleShell extends StatelessWidget {
   Widget build(BuildContext context) {
     assert(state != null || title != null);
 
-    return Scaffold(
-      appBar: showAppBar
-          ? AppBar(
-              leading: AppBarLeadingButton.adaptive(context),
-              title: AppBarTitle(
-                title ?? (state!.topRoute?.name?.tr ?? 'page'.tr),
-              ),
-              centerTitle: isCenteredTitle,
-              toolbarHeight: AppTheme.toolbarHeight(context),
-              actions: [
-                const BackgroundStateWidget(),
-                SizedBox(
-                  width: AppTheme.isLargeScreen(context) ? 8 : 16,
+    return RootContainer(
+      child: Scaffold(
+        appBar: showAppBar
+            ? AppBar(
+                leading: AppBarLeadingButton.adaptive(context),
+                title: AppBarTitle(
+                  title ?? (state!.topRoute?.name?.tr ?? 'page'.tr),
                 ),
-              ],
-            )
-          : null,
-      body: child,
+                centerTitle: isCenteredTitle,
+                toolbarHeight: AppTheme.toolbarHeight(context),
+                actions: [
+                  const BackgroundStateWidget(),
+                  SizedBox(
+                    width: AppTheme.isLargeScreen(context) ? 8 : 16,
+                  ),
+                ],
+              )
+            : null,
+        body: child,
+      ),
     );
   }
 }
