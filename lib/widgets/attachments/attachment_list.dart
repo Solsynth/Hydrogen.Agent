@@ -177,9 +177,6 @@ class _AttachmentListState extends State<AttachmentList> {
           if (element == null) return const SizedBox.shrink();
           double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-            ),
             constraints: BoxConstraints(
               maxWidth: widget.columnMaxWidth,
               maxHeight: 640,
@@ -247,7 +244,7 @@ class _AttachmentListState extends State<AttachmentList> {
         maxHeight: widget.flatMaxHeight,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        color: Colors.transparent,
         border: Border.symmetric(
           horizontal: BorderSide(
             width: 0.3,
@@ -257,6 +254,7 @@ class _AttachmentListState extends State<AttachmentList> {
       ),
       child: CarouselSlider.builder(
         options: CarouselOptions(
+          animateToClosest: true,
           aspectRatio: _aspectRatio,
           viewportFraction:
               widget.viewport ?? (widget.attachmentsId.length > 1 ? 0.95 : 1),

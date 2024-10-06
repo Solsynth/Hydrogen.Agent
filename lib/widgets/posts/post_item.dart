@@ -117,30 +117,16 @@ class _PostItemState extends State<PostItem> {
                   ),
                 ),
               ),
-              if (_contentHeight >= 80 && !widget.isFullContent)
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: IgnorePointer(
-                    child: Container(
-                      height: 80,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Theme.of(context).colorScheme.surfaceContainerLow,
-                            Theme.of(context)
-                                .colorScheme
-                                .surface
-                                .withOpacity(0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
+          if (_contentHeight >= 80 && !widget.isFullContent)
+            Opacity(
+              opacity: 0.8,
+              child: InkWell(child: Text('readMore'.tr)),
+            ).paddingOnly(
+              left: 12,
+              top: 4,
+            ),
           LinkExpansion(content: item.body['content']).paddingOnly(
             left: 8,
             right: 8,
@@ -225,34 +211,16 @@ class _PostItemState extends State<PostItem> {
                             ),
                           ),
                         ),
-                        if (_contentHeight >= 320 && !widget.isFullContent)
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: IgnorePointer(
-                              child: Container(
-                                height: 320,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [
-                                      (widget.backgroundColor ??
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .surface),
-                                      (widget.backgroundColor ??
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .surface)
-                                          .withOpacity(0),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     ),
+                    if (_contentHeight >= 320 && !widget.isFullContent)
+                      Opacity(
+                        opacity: 0.8,
+                        child: InkWell(child: Text('readMore'.tr)),
+                      ).paddingOnly(
+                        left: 12,
+                        top: 4,
+                      ),
                     if (widget.item.replyTo != null && widget.isShowEmbed)
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
@@ -336,8 +304,7 @@ class _PostItemState extends State<PostItem> {
       ),
       closedElevation: 0,
       openElevation: 0,
-      closedColor:
-          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
+      closedColor: Colors.transparent,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }
@@ -574,7 +541,7 @@ class _PostEmbedWidget extends StatelessWidget {
       ),
       closedElevation: 0,
       openElevation: 0,
-      closedColor: Theme.of(context).colorScheme.surface,
+      closedColor: Colors.transparent,
       openColor: Theme.of(context).colorScheme.surface,
     );
   }
