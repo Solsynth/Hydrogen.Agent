@@ -7,7 +7,6 @@ import 'package:solian/providers/account_status.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/router.dart';
 import 'package:solian/widgets/account/account_heading.dart';
-import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -50,112 +49,110 @@ class _AccountScreenState extends State<AccountScreen> {
 
     final AuthProvider auth = Get.find();
 
-    return RootContainer(
-      child: SafeArea(
-        child: Obx(() {
-          if (auth.isAuthorized.isFalse) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _ActionCard(
-                    icon: Icon(
-                      Icons.login,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    title: 'signin'.tr,
-                    caption: 'signinCaption'.tr,
-                    onTap: () {
-                      AppRouter.instance.pushNamed('signin').then((val) async {
-                        if (val == true) {
-                          await auth.refreshUserProfile();
-                        }
-                      });
-                    },
-                  ),
-                  _ActionCard(
-                    icon: Icon(
-                      Icons.add,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    title: 'signup'.tr,
-                    caption: 'signupCaption'.tr,
-                    onTap: () {
-                      AppRouter.instance.pushNamed('signup').then((_) {
-                        setState(() {});
-                      });
-                    },
-                  ),
-                  const Gap(4),
-                  TextButton(
-                    style: const ButtonStyle(
-                      visualDensity: VisualDensity(
-                        horizontal: -4,
-                        vertical: -2,
-                      ),
-                    ),
-                    onPressed: () {
-                      AppRouter.instance.pushNamed('settings');
-                    },
-                    child: Text('settings'.tr),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return CenteredContainer(
-            child: ListView(
+    return SafeArea(
+      child: Obx(() {
+        if (auth.isAuthorized.isFalse) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                if (auth.userProfile.value != null)
-                  const AccountHeading().paddingOnly(bottom: 8, top: 16),
-                ...(actionItems.map(
-                  (x) => ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                    leading: x.$1,
-                    title: Text(x.$2),
-                    onTap: () {
-                      AppRouter.instance
-                          .pushNamed(x.$3)
-                          .then((_) => setState(() {}));
-                    },
+                _ActionCard(
+                  icon: Icon(
+                    Icons.login,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
-                )),
-                const Divider(thickness: 0.3, height: 1)
-                    .paddingSymmetric(vertical: 4),
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                  leading: const Icon(Icons.settings),
-                  title: Text('settings'.tr),
+                  title: 'signin'.tr,
+                  caption: 'signinCaption'.tr,
                   onTap: () {
-                    AppRouter.instance.pushNamed('settings');
+                    AppRouter.instance.pushNamed('signin').then((val) async {
+                      if (val == true) {
+                        await auth.refreshUserProfile();
+                      }
+                    });
                   },
                 ),
-                if (auth.isAuthorized.value)
-                  ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                    leading: const Icon(Icons.edit_notifications),
-                    title: Text('notificationPreferences'.tr),
-                    onTap: () {
-                      AppRouter.instance.pushNamed('notificationPreferences');
-                    },
+                _ActionCard(
+                  icon: Icon(
+                    Icons.add,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
-                const Divider(thickness: 0.3, height: 1)
-                    .paddingSymmetric(vertical: 4),
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
-                  leading: const Icon(Icons.logout),
-                  title: Text('signout'.tr),
+                  title: 'signup'.tr,
+                  caption: 'signupCaption'.tr,
                   onTap: () {
-                    auth.signout();
-                    setState(() {});
+                    AppRouter.instance.pushNamed('signup').then((_) {
+                      setState(() {});
+                    });
                   },
+                ),
+                const Gap(4),
+                TextButton(
+                  style: const ButtonStyle(
+                    visualDensity: VisualDensity(
+                      horizontal: -4,
+                      vertical: -2,
+                    ),
+                  ),
+                  onPressed: () {
+                    AppRouter.instance.pushNamed('settings');
+                  },
+                  child: Text('settings'.tr),
                 ),
               ],
             ),
           );
-        }),
-      ),
+        }
+
+        return CenteredContainer(
+          child: ListView(
+            children: [
+              if (auth.userProfile.value != null)
+                const AccountHeading().paddingOnly(bottom: 8, top: 16),
+              ...(actionItems.map(
+                (x) => ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  leading: x.$1,
+                  title: Text(x.$2),
+                  onTap: () {
+                    AppRouter.instance
+                        .pushNamed(x.$3)
+                        .then((_) => setState(() {}));
+                  },
+                ),
+              )),
+              const Divider(thickness: 0.3, height: 1)
+                  .paddingSymmetric(vertical: 4),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                leading: const Icon(Icons.settings),
+                title: Text('settings'.tr),
+                onTap: () {
+                  AppRouter.instance.pushNamed('settings');
+                },
+              ),
+              if (auth.isAuthorized.value)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  leading: const Icon(Icons.edit_notifications),
+                  title: Text('notificationPreferences'.tr),
+                  onTap: () {
+                    AppRouter.instance.pushNamed('notificationPreferences');
+                  },
+                ),
+              const Divider(thickness: 0.3, height: 1)
+                  .paddingSymmetric(vertical: 4),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                leading: const Icon(Icons.logout),
+                title: Text('signout'.tr),
+                onTap: () {
+                  auth.signout();
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

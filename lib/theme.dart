@@ -39,9 +39,12 @@ abstract class AppTheme {
         brightness: brightness,
         seedColor: seedColor ?? const Color.fromRGBO(154, 98, 91, 1),
       ),
-      scaffoldBackgroundColor: Colors.transparent,
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+      ),
+      scaffoldBackgroundColor: Colors.transparent,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
       ),
       fontFamily: 'Comfortaa',
       fontFamilyFallback: [
@@ -74,6 +77,7 @@ abstract class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
       scaffoldBackgroundColor: Colors.transparent,
+      appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent),
       fontFamily: data.fontFamily ?? 'Comfortaa',
       fontFamilyFallback: data.fontFamilyFallback ??
           [

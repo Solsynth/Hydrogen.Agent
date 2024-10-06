@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/widgets/root_container.dart';
 
 class NotificationPreferencesScreen extends StatefulWidget {
   const NotificationPreferencesScreen({super.key});
@@ -75,44 +74,42 @@ class _NotificationPreferencesScreenState
 
   @override
   Widget build(BuildContext context) {
-    return RootContainer(
-      child: Column(
-        children: [
-          if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-          ListTile(
-            tileColor: Theme.of(context).colorScheme.surfaceContainer,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-            leading: const Icon(Icons.save),
-            title: Text('save'.tr),
-            enabled: !_isBusy,
-            onTap: () {
-              _savePreferences();
+    return Column(
+      children: [
+        if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+        ListTile(
+          tileColor: Theme.of(context).colorScheme.surfaceContainer,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+          leading: const Icon(Icons.save),
+          title: Text('save'.tr),
+          enabled: !_isBusy,
+          onTap: () {
+            _savePreferences();
+          },
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _topicMap.length,
+            itemBuilder: (context, index) {
+              final element = _topicMap.entries.elementAt(index);
+              return CheckboxListTile(
+                title: Text(element.value),
+                subtitle: Text(
+                  element.key,
+                  style: GoogleFonts.robotoMono(fontSize: 12),
+                ),
+                value: _config[element.key] ?? true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                onChanged: (value) {
+                  setState(() {
+                    _config[element.key] = value ?? false;
+                  });
+                },
+              );
             },
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _topicMap.length,
-              itemBuilder: (context, index) {
-                final element = _topicMap.entries.elementAt(index);
-                return CheckboxListTile(
-                  title: Text(element.value),
-                  subtitle: Text(
-                    element.key,
-                    style: GoogleFonts.robotoMono(fontSize: 12),
-                  ),
-                  value: _config[element.key] ?? true,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                  onChanged: (value) {
-                    setState(() {
-                      _config[element.key] = value ?? false;
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

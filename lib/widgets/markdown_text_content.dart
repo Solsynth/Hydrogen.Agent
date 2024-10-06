@@ -43,6 +43,10 @@ class MarkdownTextContent extends StatelessWidget {
       if (isAutoWarp) {
         paragraph = paragraph.replaceAll('\n', '\\\n');
       }
+      const charactersToTrim = '\\\n\t\r ';
+      final trimPattern =
+          RegExp('^[$charactersToTrim]+|[$charactersToTrim]+\$');
+      paragraph = paragraph.trim().replaceAll(trimPattern, '');
 
       // Matching stickers
       final stickerMatch = stickerRegex.allMatches(paragraph);
@@ -184,7 +188,7 @@ class MarkdownTextContent extends StatelessWidget {
       );
 
       if (idx < paragraphs.length - 1) {
-        contentWidgets.add(const Gap(4));
+        contentWidgets.add(isAutoWarp ? const Gap(4) : const Gap(8));
       }
     }
 

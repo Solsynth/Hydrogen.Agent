@@ -187,163 +187,161 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   Widget build(BuildContext context) {
     const double padding = 32;
 
-    return RootContainer(
-      child: ListView(
-        children: [
-          if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
-          const Gap(24),
-          Stack(
-            children: [
-              AccountAvatar(content: _avatar, radius: 40),
-              Positioned(
-                bottom: 0,
-                left: 40,
-                child: FloatingActionButton.small(
-                  heroTag: const Key('avatar-editor'),
-                  onPressed: () => _editImage('avatar'),
-                  child: const Icon(
-                    Icons.camera,
-                  ),
+    return ListView(
+      children: [
+        if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+        const Gap(24),
+        Stack(
+          children: [
+            AccountAvatar(content: _avatar, radius: 40),
+            Positioned(
+              bottom: 0,
+              left: 40,
+              child: FloatingActionButton.small(
+                heroTag: const Key('avatar-editor'),
+                onPressed: () => _editImage('avatar'),
+                child: const Icon(
+                  Icons.camera,
                 ),
               ),
-            ],
-          ).paddingSymmetric(horizontal: padding),
-          const Gap(16),
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Container(
-                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                    child: _banner != null
-                        ? Image.network(
-                            ServiceFinder.buildUrl(
-                                'files', '/attachments/$_banner'),
-                            fit: BoxFit.cover,
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                          )
-                        : Container(),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 16,
-                right: 16,
-                child: FloatingActionButton(
-                  heroTag: const Key('banner-editor'),
-                  onPressed: () => _editImage('banner'),
-                  child: const Icon(
-                    Icons.camera_alt,
-                  ),
-                ),
-              ),
-            ],
-          ).paddingSymmetric(horizontal: padding),
-          const Gap(24),
-          Row(
-            children: [
-              Flexible(
-                flex: 1,
-                child: TextField(
-                  readOnly: true,
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'username'.tr,
-                    prefixText: '@',
-                  ),
-                ),
-              ),
-              const Gap(16),
-              Flexible(
-                flex: 1,
-                child: TextField(
-                  controller: _nicknameController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'nickname'.tr,
-                  ),
-                ),
-              ),
-            ],
-          ).paddingSymmetric(horizontal: padding),
-          const Gap(16),
-          Row(
-            children: [
-              Flexible(
-                flex: 1,
-                child: TextField(
-                  controller: _firstNameController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'firstName'.tr,
-                  ),
-                ),
-              ),
-              const Gap(16),
-              Flexible(
-                flex: 1,
-                child: TextField(
-                  controller: _lastNameController,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'lastName'.tr,
-                  ),
-                ),
-              ),
-            ],
-          ).paddingSymmetric(horizontal: padding),
-          const Gap(16),
-          TextField(
-            controller: _descriptionController,
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            minLines: 3,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'description'.tr,
             ),
-          ).paddingSymmetric(horizontal: padding),
-          const Gap(16),
-          TextField(
-            controller: _birthdayController,
-            readOnly: true,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'birthday'.tr,
+          ],
+        ).paddingSymmetric(horizontal: padding),
+        const Gap(16),
+        Stack(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Container(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  child: _banner != null
+                      ? Image.network(
+                          ServiceFinder.buildUrl(
+                              'files', '/attachments/$_banner'),
+                          fit: BoxFit.cover,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                        )
+                      : Container(),
+                ),
+              ),
             ),
-            onTap: () => _selectBirthday(),
-          ).paddingSymmetric(horizontal: padding),
-          const Gap(16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: _isBusy ? null : () => _syncWidget(),
-                child: Text('reset'.tr),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                heroTag: const Key('banner-editor'),
+                onPressed: () => _editImage('banner'),
+                child: const Icon(
+                  Icons.camera_alt,
+                ),
               ),
-              ElevatedButton(
-                onPressed: _isBusy ? null : () => _editUserInfo(),
-                child: Text('apply'.tr),
+            ),
+          ],
+        ).paddingSymmetric(horizontal: padding),
+        const Gap(24),
+        Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: TextField(
+                readOnly: true,
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'username'.tr,
+                  prefixText: '@',
+                ),
               ),
-            ],
-          ).paddingSymmetric(horizontal: padding),
-        ],
-      ),
+            ),
+            const Gap(16),
+            Flexible(
+              flex: 1,
+              child: TextField(
+                controller: _nicknameController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'nickname'.tr,
+                ),
+              ),
+            ),
+          ],
+        ).paddingSymmetric(horizontal: padding),
+        const Gap(16),
+        Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: TextField(
+                controller: _firstNameController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'firstName'.tr,
+                ),
+              ),
+            ),
+            const Gap(16),
+            Flexible(
+              flex: 1,
+              child: TextField(
+                controller: _lastNameController,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: 'lastName'.tr,
+                ),
+              ),
+            ),
+          ],
+        ).paddingSymmetric(horizontal: padding),
+        const Gap(16),
+        TextField(
+          controller: _descriptionController,
+          keyboardType: TextInputType.multiline,
+          maxLines: null,
+          minLines: 3,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            labelText: 'description'.tr,
+          ),
+        ).paddingSymmetric(horizontal: padding),
+        const Gap(16),
+        TextField(
+          controller: _birthdayController,
+          readOnly: true,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            labelText: 'birthday'.tr,
+          ),
+          onTap: () => _selectBirthday(),
+        ).paddingSymmetric(horizontal: padding),
+        const Gap(16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: _isBusy ? null : () => _syncWidget(),
+              child: Text('reset'.tr),
+            ),
+            ElevatedButton(
+              onPressed: _isBusy ? null : () => _editUserInfo(),
+              child: Text('apply'.tr),
+            ),
+          ],
+        ).paddingSymmetric(horizontal: padding),
+      ],
     );
   }
 
