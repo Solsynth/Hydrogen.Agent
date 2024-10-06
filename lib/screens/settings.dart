@@ -181,6 +181,21 @@ class _SettingScreenState extends State<SettingScreen> {
               ],
             );
           }),
+          _buildCaptionHeader('performance'.tr),
+          CheckboxListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+            secondary: const Icon(Icons.message),
+            title: Text('animatedMessageList'.tr),
+            subtitle: Text('animatedMessageListDesc'.tr),
+            value: _prefs?.getBool('non_animated_message_list') ?? false,
+            onChanged: (value) {
+              _prefs
+                  ?.setBool('non_animated_message_list', value ?? false)
+                  .then((_) {
+                setState(() {});
+              });
+            },
+          ),
           _buildCaptionHeader('more'.tr),
           ListTile(
             leading: const Icon(Icons.delete_sweep),

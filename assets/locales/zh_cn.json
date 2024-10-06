@@ -266,7 +266,7 @@
   "channelMembersAddHint": "到 @channel",
   "channelType": "频道类型",
   "channelTypeCommon": "普通频道",
-  "channelTypeDirect": "私信聊天",
+  "channelTypeDirect": "私信",
   "channelAdjust": "调整频道",
   "channelDetail": "频道详情",
   "channelSettings": "频道设置",
@@ -464,5 +464,8 @@
   "all": "全部",
   "unablePreview": "无法预览",
   "dashboardNav": "仪表盘",
-  "accountNav": "您"
+  "accountNav": "您",
+  "performance": "性能",
+  "animatedMessageList": "无动画消息列表",
+  "animatedMessageListDesc": "在消息列表中禁用动画效果"
 }

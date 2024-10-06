@@ -354,7 +354,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_forward),
                       onPressed: () {
-                        AppRouter.instance.goNamed('feed');
+                        AppRouter.instance.goNamed('explore');
                       },
                     ),
                   ],

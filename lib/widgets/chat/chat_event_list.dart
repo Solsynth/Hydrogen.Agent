@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/models/channel.dart';
@@ -9,6 +10,7 @@ import 'package:solian/widgets/chat/chat_event_action.dart';
 import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 
 class ChatEventList extends StatelessWidget {
+  final bool noAnimated;
   final String scope;
   final Channel channel;
   final ChatEventController chatController;
@@ -23,6 +25,7 @@ class ChatEventList extends StatelessWidget {
     required this.chatController,
     required this.onEdit,
     required this.onReply,
+    this.noAnimated = false,
   });
 
   bool _checkMessageMergeable(Event? a, Event? b) {
@@ -63,15 +66,32 @@ class ChatEventList extends StatelessWidget {
 
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                child: ChatEvent(
-                  key: Key('m${item!.uuid}'),
-                  item: item,
-                  isMerged: isMerged,
-                  chatController: chatController,
-                ).paddingOnly(
-                  top: !isMerged ? 8 : 0,
-                  bottom: !hasMerged ? 8 : 0,
-                ),
+                child: Builder(builder: (context) {
+                  final widget = ChatEvent(
+                    key: Key('m${item!.uuid}'),
+                    item: item,
+                    isMerged: isMerged,
+                    chatController: chatController,
+                  ).paddingOnly(
+                    top: !isMerged ? 8 : 0,
+                    bottom: !hasMerged ? 8 : 0,
+                  );
+
+                  if (noAnimated) {
+                    return widget;
+                  } else {
+                    return widget
+                        .animate(
+                          key: Key('animated-m${item.uuid}'),
+                        )
+                        .slideY(
+                          curve: Curves.fastLinearToSlowEaseIn,
+                          duration: 250.ms,
+                          begin: 0.5,
+                          end: 0,
+                        );
+                  }
+                }),
                 onLongPress: () {
                   showModalBottomSheet(
                     useRootNavigator: true,
@@ -79,7 +99,7 @@ class ChatEventList extends StatelessWidget {
                     builder: (context) => ChatEventAction(
                       channel: channel,
                       realm: channel.realm,
-                      item: item,
+                      item: item!,
                       onEdit: () {
                         onEdit(item);
                       },

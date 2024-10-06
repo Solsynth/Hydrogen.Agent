@@ -468,5 +468,8 @@
   "all": "All",
   "unablePreview": "Unable to preview",
   "dashboardNav": "Dash",
-  "accountNav": "You"
+  "accountNav": "You",
+  "performance": "Performance",
+  "animatedMessageList": "Non-animated message list",
+  "animatedMessageListDesc": "Remove animation effects in message list, to reduce cause lag"
 }

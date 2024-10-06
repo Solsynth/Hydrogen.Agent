@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/controllers/chat_events_controller.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/call.dart';
@@ -179,6 +180,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     }
   }
 
+  late SharedPreferences _prefs;
+
   @override
   void initState() {
     super.initState();
@@ -189,10 +192,13 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
     _chatController = ChatEventController();
     _chatController.initialize();
 
-    _getOngoingCall();
-    _getChannel().then((_) {
-      _chatController.getInitialEvents(_channel!, widget.realm);
-      _listenMessages();
+    SharedPreferences.getInstance().then((inst) {
+      _prefs = inst;
+      _getOngoingCall();
+      _getChannel().then((_) {
+        _chatController.getInitialEvents(_channel!, widget.realm);
+        _listenMessages();
+      });
     });
   }
 
@@ -283,6 +289,8 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
                     ),
                   Expanded(
                     child: ChatEventList(
+                      noAnimated:
+                          _prefs.getBool('non_animated_message_list') ?? false,
                       scope: widget.realm,
                       channel: _channel!,
                       chatController: _chatController,
