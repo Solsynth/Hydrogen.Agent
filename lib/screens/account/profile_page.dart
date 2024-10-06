@@ -231,7 +231,11 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (_isBusy || _userinfo == null) {
-      return const Center(child: CircularProgressIndicator());
+      return RootContainer(
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return RootContainer(
@@ -250,7 +254,11 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                   height: 56,
                   child: Row(
                     children: [
-                      AppBarLeadingButton.adaptive(context) ?? const Gap(8),
+                      AppBarLeadingButton.adaptive(
+                            context,
+                            forceBack: true,
+                          ) ??
+                          const Gap(8),
                       const Gap(8),
                       if (_userinfo != null)
                         AccountAvatar(content: _userinfo!.avatar, radius: 16),

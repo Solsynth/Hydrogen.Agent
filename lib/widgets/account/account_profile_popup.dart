@@ -118,7 +118,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
                       const VisualDensity(horizontal: -4, vertical: -2),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    AppRouter.instance.goNamed(
+                    AppRouter.instance.pushNamed(
                       'accountProfilePage',
                       pathParameters: {'name': _userinfo!.name},
                     );

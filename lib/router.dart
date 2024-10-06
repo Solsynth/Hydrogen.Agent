@@ -178,6 +178,7 @@ abstract class AppRouter {
           final arguments = state.extra as ChannelDetailArguments;
           return TitleShell(
             state: state,
+            isResponsive: true,
             child: ChannelDetailScreen(
               channel: arguments.channel,
               profile: arguments.profile,

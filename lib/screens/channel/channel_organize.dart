@@ -115,7 +115,7 @@ class _ChannelOrganizeScreenState extends State<ChannelOrganizeScreen> {
       ),
     ];
 
-    return RootContainer(
+    return ResponsiveRootContainer(
       child: Scaffold(
         appBar: AppBar(
           title: AppBarTitle('channelOrganizing'.tr),

@@ -11,7 +11,6 @@ import 'package:solian/providers/content/realm.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
-import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

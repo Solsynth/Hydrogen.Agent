@@ -12,7 +12,6 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
-import 'package:solian/widgets/root_container.dart';
 
 class PersonalizeScreen extends StatefulWidget {
   const PersonalizeScreen({super.key});

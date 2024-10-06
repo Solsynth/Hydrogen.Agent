@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:solian/platform.dart';
+import 'package:solian/theme.dart';
 
 class RootContainer extends StatelessWidget {
   final Widget? child;
@@ -44,5 +45,20 @@ class RootContainer extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class ResponsiveRootContainer extends StatelessWidget {
+  final Widget? child;
+
+  const ResponsiveRootContainer({super.key, this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    if (AppTheme.isLargeScreen(context)) {
+      return child ?? SizedBox.shrink();
+    } else {
+      return RootContainer(child: child);
+    }
   }
 }

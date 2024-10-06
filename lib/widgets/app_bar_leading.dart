@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:solian/shells/root_shell.dart';
 
 class AppBarLeadingButton extends StatelessWidget {
-  const AppBarLeadingButton({super.key});
+  final bool forceBack;
 
-  static Widget? adaptive(BuildContext context) {
-    final hasContent =
-        Navigator.canPop(context) || rootScaffoldKey.currentState!.hasDrawer;
-    return hasContent ? const AppBarLeadingButton() : null;
+  const AppBarLeadingButton({super.key, this.forceBack = false});
+
+  static Widget? adaptive(BuildContext context, {bool forceBack = false}) {
+    final hasContent = Navigator.canPop(context) || forceBack;
+    return hasContent ? AppBarLeadingButton(forceBack: forceBack) : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (Navigator.canPop(context)) {
+    if (Navigator.canPop(context) || forceBack) {
       return BackButton(
         onPressed: () => Navigator.pop(context),
       );
     }
-    if (rootScaffoldKey.currentState!.hasDrawer) {
-      return DrawerButton(
-        onPressed: () => rootScaffoldKey.currentState!.openDrawer(),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
+    return const SizedBox.shrink();
   }
 }

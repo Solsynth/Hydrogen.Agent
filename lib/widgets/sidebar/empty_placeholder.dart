@@ -6,7 +6,7 @@ class EmptyPagePlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RootContainer(
+    return ResponsiveRootContainer(
       child: Center(
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(12)),

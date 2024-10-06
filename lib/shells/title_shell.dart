@@ -10,6 +10,7 @@ import 'package:solian/widgets/root_container.dart';
 class TitleShell extends StatelessWidget {
   final bool showAppBar;
   final bool isCenteredTitle;
+  final bool isResponsive;
   final String? title;
   final GoRouterState? state;
   final Widget child;
@@ -21,32 +22,37 @@ class TitleShell extends StatelessWidget {
     this.state,
     this.showAppBar = true,
     this.isCenteredTitle = false,
+    this.isResponsive = false,
   });
 
   @override
   Widget build(BuildContext context) {
     assert(state != null || title != null);
 
-    return RootContainer(
-      child: Scaffold(
-        appBar: showAppBar
-            ? AppBar(
-                leading: AppBarLeadingButton.adaptive(context),
-                title: AppBarTitle(
-                  title ?? (state!.topRoute?.name?.tr ?? 'page'.tr),
+    final widget = Scaffold(
+      appBar: showAppBar
+          ? AppBar(
+              leading: AppBarLeadingButton.adaptive(context),
+              title: AppBarTitle(
+                title ?? (state!.topRoute?.name?.tr ?? 'page'.tr),
+              ),
+              centerTitle: isCenteredTitle,
+              toolbarHeight: AppTheme.toolbarHeight(context),
+              actions: [
+                const BackgroundStateWidget(),
+                SizedBox(
+                  width: AppTheme.isLargeScreen(context) ? 8 : 16,
                 ),
-                centerTitle: isCenteredTitle,
-                toolbarHeight: AppTheme.toolbarHeight(context),
-                actions: [
-                  const BackgroundStateWidget(),
-                  SizedBox(
-                    width: AppTheme.isLargeScreen(context) ? 8 : 16,
-                  ),
-                ],
-              )
-            : null,
-        body: child,
-      ),
+              ],
+            )
+          : null,
+      body: child,
     );
+
+    if (isResponsive) {
+      return ResponsiveRootContainer(child: widget);
+    } else {
+      return RootContainer(child: widget);
+    }
   }
 }

@@ -218,7 +218,7 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
       );
     }
 
-    return RootContainer(
+    return ResponsiveRootContainer(
       child: Scaffold(
         appBar: AppBar(
           leading: AppBarLeadingButton.adaptive(context),

@@ -27,7 +27,7 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const RootContainer(
+    return const ResponsiveRootContainer(
       child: ChatList(),
     );
   }
@@ -140,7 +140,7 @@ class _ChatListState extends State<ChatList> {
     return Obx(
       () => DefaultTabController(
         length: 2 + realms.availableRealms.length,
-        child: RootContainer(
+        child: ResponsiveRootContainer(
           child: Scaffold(
             appBar: AppBar(
               leading: Obx(() {
