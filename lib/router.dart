@@ -139,7 +139,8 @@ abstract class AppRouter {
   );
 
   static final ShellRoute _chatRoute = ShellRoute(
-    builder: (context, state, child) => ChatListShell(child: child),
+    builder: (context, state, child) =>
+        AppTheme.isLargeScreen(context) ? ChatListShell(child: child) : child,
     routes: [
       GoRoute(
         path: '/chat',
