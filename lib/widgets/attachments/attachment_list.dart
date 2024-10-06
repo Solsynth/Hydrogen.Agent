@@ -319,6 +319,7 @@ class AttachmentListEntry extends StatelessWidget {
         width: width ?? MediaQuery.of(context).size.width,
         height: height,
         decoration: BoxDecoration(
+          color: Colors.transparent,
           border: showBorder
               ? Border.symmetric(
                   vertical: BorderSide(

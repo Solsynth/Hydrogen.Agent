@@ -27,7 +27,7 @@ class RootContainer extends StatelessWidget {
                   backgroundBlendMode: BlendMode.darken,
                   color: Theme.of(context).colorScheme.surface,
                   image: DecorationImage(
-                    opacity: 0.5,
+                    opacity: 0.2,
                     image: FileImage(file),
                     fit: BoxFit.cover,
                   ),

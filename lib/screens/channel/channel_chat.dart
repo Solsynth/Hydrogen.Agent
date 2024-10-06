@@ -26,6 +26,7 @@ import 'package:solian/widgets/chat/chat_event_list.dart';
 import 'package:solian/widgets/chat/chat_message_input.dart';
 import 'package:solian/widgets/chat/chat_typing_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/root_container.dart';
 
 class ChannelChatScreen extends StatefulWidget {
   final String alias;
@@ -217,145 +218,149 @@ class _ChannelChatScreenState extends State<ChannelChatScreen>
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: AppBarLeadingButton.adaptive(context),
-        title: AppBarTitle(title),
-        centerTitle: false,
-        titleSpacing: AppTheme.titleSpacing(context),
-        toolbarHeight: AppTheme.toolbarHeight(context),
-        actions: [
-          const BackgroundStateWidget(),
-          Builder(builder: (context) {
-            if (_isBusy || _channel == null) return const SizedBox.shrink();
+    return RootContainer(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: AppBarLeadingButton.adaptive(context),
+          title: AppBarTitle(title),
+          centerTitle: false,
+          titleSpacing: AppTheme.titleSpacing(context),
+          toolbarHeight: AppTheme.toolbarHeight(context),
+          actions: [
+            const BackgroundStateWidget(),
+            Builder(builder: (context) {
+              if (_isBusy || _channel == null) return const SizedBox.shrink();
 
-            return ChatCallButton(
-              realm: _channel!.realm,
-              channel: _channel!,
-              ongoingCall: _ongoingCall,
-            );
-          }),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              if (_channel == null) return;
+              return ChatCallButton(
+                realm: _channel!.realm,
+                channel: _channel!,
+                ongoingCall: _ongoingCall,
+              );
+            }),
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                if (_channel == null) return;
 
-              AppRouter.instance
-                  .pushNamed(
-                'channelDetail',
-                pathParameters: {'alias': widget.alias},
-                queryParameters: {'realm': widget.realm},
-                extra: ChannelDetailArguments(
-                  profile: _channelProfile!,
-                  channel: _channel!,
-                ),
-              )
-                  .then((value) {
-                if (value == false) AppRouter.instance.pop();
-                if (value != null) {
-                  final resp = Channel.fromJson(value as Map<String, dynamic>);
-                  _getChannel(alias: resp.alias);
-                }
-              });
-            },
-          ),
-          SizedBox(
-            width: AppTheme.isLargeScreen(context) ? 8 : 16,
-          ),
-        ],
-      ),
-      body: Builder(builder: (context) {
-        if (_isBusy || _channel == null) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        return Row(
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  if (_ongoingCall != null)
-                    ChannelCallIndicator(
-                      channel: _channel!,
-                      ongoingCall: _ongoingCall!,
-                      onJoin: () {
-                        if (!AppTheme.isUltraLargeScreen(context)) {
-                          final ChatCallProvider call = Get.find();
-                          call.gotoScreen(context);
-                        }
-                      },
-                    ),
-                  Expanded(
-                    child: ChatEventList(
-                      noAnimated:
-                          _prefs.getBool('non_animated_message_list') ?? false,
-                      scope: widget.realm,
-                      channel: _channel!,
-                      chatController: _chatController,
-                      onEdit: (item) {
-                        setState(() => _messageToEditing = item);
-                      },
-                      onReply: (item) {
-                        setState(() => _messageToReplying = item);
-                      },
-                    ),
+                AppRouter.instance
+                    .pushNamed(
+                  'channelDetail',
+                  pathParameters: {'alias': widget.alias},
+                  queryParameters: {'realm': widget.realm},
+                  extra: ChannelDetailArguments(
+                    profile: _channelProfile!,
+                    channel: _channel!,
                   ),
-                  ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
-                      child: SafeArea(
-                        child: Column(
-                          children: [
-                            ChatTypingIndicator(users: _typingUsers),
-                            ChatMessageInput(
-                              edit: _messageToEditing,
-                              reply: _messageToReplying,
-                              realm: widget.realm,
-                              placeholder: placeholder,
-                              channel: _channel!,
-                              onSent: (Event item) {
-                                setState(() {
-                                  _chatController.addPendingEvent(item);
-                                });
-                              },
-                              onReset: () {
-                                setState(() {
-                                  _messageToReplying = null;
-                                  _messageToEditing = null;
-                                });
-                              },
-                            ),
-                          ],
+                )
+                    .then((value) {
+                  if (value == false) AppRouter.instance.pop();
+                  if (value != null) {
+                    final resp =
+                        Channel.fromJson(value as Map<String, dynamic>);
+                    _getChannel(alias: resp.alias);
+                  }
+                });
+              },
+            ),
+            SizedBox(
+              width: AppTheme.isLargeScreen(context) ? 8 : 16,
+            ),
+          ],
+        ),
+        body: Builder(builder: (context) {
+          if (_isBusy || _channel == null) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          return Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    if (_ongoingCall != null)
+                      ChannelCallIndicator(
+                        channel: _channel!,
+                        ongoingCall: _ongoingCall!,
+                        onJoin: () {
+                          if (!AppTheme.isUltraLargeScreen(context)) {
+                            final ChatCallProvider call = Get.find();
+                            call.gotoScreen(context);
+                          }
+                        },
+                      ),
+                    Expanded(
+                      child: ChatEventList(
+                        noAnimated:
+                            _prefs.getBool('non_animated_message_list') ??
+                                false,
+                        scope: widget.realm,
+                        channel: _channel!,
+                        chatController: _chatController,
+                        onEdit: (item) {
+                          setState(() => _messageToEditing = item);
+                        },
+                        onReply: (item) {
+                          setState(() => _messageToReplying = item);
+                        },
+                      ),
+                    ),
+                    ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                        child: SafeArea(
+                          child: Column(
+                            children: [
+                              ChatTypingIndicator(users: _typingUsers),
+                              ChatMessageInput(
+                                edit: _messageToEditing,
+                                reply: _messageToReplying,
+                                realm: widget.realm,
+                                placeholder: placeholder,
+                                channel: _channel!,
+                                onSent: (Event item) {
+                                  setState(() {
+                                    _chatController.addPendingEvent(item);
+                                  });
+                                },
+                                onReset: () {
+                                  setState(() {
+                                    _messageToReplying = null;
+                                    _messageToEditing = null;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Obx(() {
-              final ChatCallProvider call = Get.find();
-              if (call.isMounted.value &&
-                  AppTheme.isUltraLargeScreen(context)) {
-                return const Expanded(
-                  child: Row(children: [
-                    VerticalDivider(width: 0.3, thickness: 0.3),
-                    Expanded(
-                      child: CallScreen(
-                        hideAppBar: true,
-                        isExpandable: true,
+              Obx(() {
+                final ChatCallProvider call = Get.find();
+                if (call.isMounted.value &&
+                    AppTheme.isUltraLargeScreen(context)) {
+                  return const Expanded(
+                    child: Row(children: [
+                      VerticalDivider(width: 0.3, thickness: 0.3),
+                      Expanded(
+                        child: CallScreen(
+                          hideAppBar: true,
+                          isExpandable: true,
+                        ),
                       ),
-                    ),
-                  ]),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
-          ],
-        );
-      }),
+                    ]),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            ],
+          );
+        }),
+      ),
     );
   }
 
