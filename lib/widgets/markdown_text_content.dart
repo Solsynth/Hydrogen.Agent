@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gap/gap.dart';
@@ -277,7 +279,10 @@ class _MarkdownTextCodeElement extends MarkdownElementBuilder {
           await Highlighter.initialize([highlightingPath]);
           return Highlighter(
             language: highlightingPath,
-            theme: await HighlighterTheme.loadLightTheme(),
+            theme: PlatformDispatcher.instance.platformBrightness ==
+                    Brightness.light
+                ? await HighlighterTheme.loadLightTheme()
+                : await HighlighterTheme.loadDarkTheme(),
           );
         })(),
         builder: (context, snapshot) {
