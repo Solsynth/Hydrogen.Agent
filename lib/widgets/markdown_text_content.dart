@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown_selectionarea/flutter_markdown.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:markdown/markdown.dart' as markdown;
-import 'package:markdown/markdown.dart';
+import 'package:path/path.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/auto_cache_image.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'account/account_profile_popup.dart';
@@ -39,15 +41,6 @@ class MarkdownTextContent extends StatelessWidget {
       // Getting paragraph
       var paragraph = paragraphs[idx];
 
-      // Auto adding new-lines
-      if (isAutoWarp) {
-        paragraph = paragraph.replaceAll('\n', '\\\n');
-      }
-      const charactersToTrim = '\\\n\t\r ';
-      final trimPattern =
-          RegExp('^[$charactersToTrim]+|[$charactersToTrim]+\$');
-      paragraph = paragraph.trim().replaceAll(trimPattern, '');
-
       // Matching stickers
       final stickerMatch = stickerRegex.allMatches(paragraph);
       final isOnlySticker =
@@ -62,31 +55,48 @@ class MarkdownTextContent extends StatelessWidget {
           styleSheet: MarkdownStyleSheet.fromTheme(
             Theme.of(context),
           ).copyWith(
-            textScaleFactor: isLargeText ? 1.1 : 1,
-            blockquote: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-            blockquoteDecoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-              borderRadius: const BorderRadius.all(Radius.circular(4)),
-            ),
-            horizontalRuleDecoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  width: 1.0,
-                  color: Theme.of(context).dividerColor,
+              textScaler: TextScaler.linear(isLargeText ? 1.1 : 1),
+              blockquote: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              blockquoteDecoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                borderRadius: const BorderRadius.all(Radius.circular(4)),
+              ),
+              horizontalRuleDecoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    width: 1.0,
+                    color: Theme.of(context).dividerColor,
+                  ),
                 ),
               ),
-            ),
-          ),
+              codeblockDecoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).dividerColor,
+                  width: 0.3,
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(4)),
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+              )),
+          builders: {
+            'code': _MarkdownTextCodeElement(),
+          },
+          softLineBreak: true,
           extensionSet: markdown.ExtensionSet(
-            markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
+            <markdown.BlockSyntax>[
+              markdown.CodeBlockSyntax(),
+              ...markdown.ExtensionSet.commonMark.blockSyntaxes,
+              ...markdown.ExtensionSet.gitHubFlavored.blockSyntaxes,
+            ],
             <markdown.InlineSyntax>[
+              if (isAutoWarp) markdown.LineBreakSyntax(),
               _UserNameCardInlineSyntax(),
               _CustomEmoteInlineSyntax(),
-              markdown.EmojiSyntax(),
               markdown.AutolinkSyntax(),
               markdown.AutolinkExtensionSyntax(),
+              markdown.CodeSyntax(),
+              ...markdown.ExtensionSet.commonMark.inlineSyntaxes,
               ...markdown.ExtensionSet.gitHubFlavored.inlineSyntaxes
             ],
           ),
@@ -209,7 +219,7 @@ class MarkdownTextContent extends StatelessWidget {
   }
 }
 
-class _UserNameCardInlineSyntax extends InlineSyntax {
+class _UserNameCardInlineSyntax extends markdown.InlineSyntax {
   _UserNameCardInlineSyntax() : super(r'@[a-zA-Z0-9_]+');
 
   @override
@@ -225,7 +235,7 @@ class _UserNameCardInlineSyntax extends InlineSyntax {
   }
 }
 
-class _CustomEmoteInlineSyntax extends InlineSyntax {
+class _CustomEmoteInlineSyntax extends markdown.InlineSyntax {
   _CustomEmoteInlineSyntax() : super(r':([-\w]+):');
 
   @override
@@ -243,5 +253,47 @@ class _CustomEmoteInlineSyntax extends InlineSyntax {
     parser.addNode(element);
 
     return true;
+  }
+}
+
+class _MarkdownTextCodeElement extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(
+    markdown.Element element,
+    TextStyle? preferredStyle,
+  ) {
+    var language = '';
+
+    if (element.attributes['class'] != null) {
+      String lg = element.attributes['class'] as String;
+      language = lg.substring(9).trim();
+    }
+    return SizedBox(
+      child: FutureBuilder(
+        future: (() async {
+          final docPath = '../../../';
+          final highlightingPath =
+              join(docPath, 'assets/highlighting', language);
+          await Highlighter.initialize([highlightingPath]);
+          return Highlighter(
+            language: highlightingPath,
+            theme: await HighlighterTheme.loadLightTheme(),
+          );
+        })(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final highlighter = snapshot.data!;
+            return Text.rich(
+              highlighter.highlight(element.textContent.trim()),
+              style: GoogleFonts.robotoMono(),
+            );
+          }
+          return Text(
+            element.textContent.trim(),
+            style: GoogleFonts.robotoMono(),
+          );
+        },
+      ),
+    ).paddingAll(8);
   }
 }
