@@ -1,0 +1,358 @@
+{
+  "name": "C++",
+  "version": "1.0.0",
+  "fileTypes": ["cpp", "hpp", "cc", "h"],
+  "scopeName": "source.cpp",
+
+  "foldingStartMarker": "\\{\\s*$",
+  "foldingStopMarker": "^\\s*\\}",
+
+  "patterns": [
+    {
+      "name": "meta.preprocessor.script.cpp",
+      "match": "^\\s*#\\s*(include|define|if|ifdef|ifndef|else|endif|pragma)\\b"
+    },
+    {
+      "name": "meta.declaration.cpp",
+      "begin": "^\\w*\\b(namespace|class|struct|enum|typedef|template)\\b",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.other.declaration.cpp"
+        }
+      },
+      "end": "(\\{|;)",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.terminator.cpp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#comments"
+        },
+        {
+          "name": "keyword.other.cpp",
+          "match": "\\b(public|private|protected|virtual|override|final)\\b"
+        }
+      ]
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#punctuation"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#constants-and-special-vars"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#strings"
+    }
+  ],
+
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.empty.cpp",
+          "match": "/\\*\\*/",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.cpp"
+            }
+          }
+        },
+        {
+          "include": "#comments-doc-oldschool"
+        },
+        {
+          "include": "#comments-doc"
+        },
+        {
+          "include": "#comments-inline"
+        }
+      ]
+    },
+    "comments-doc-oldschool": {
+      "patterns": [
+        {
+          "name": "comment.block.documentation.cpp",
+          "begin": "/\\*\\*",
+          "end": "\\*/",
+          "patterns": [
+            {
+              "include": "#comments-doc-oldschool"
+            },
+            {
+              "include": "#comments-block"
+            }
+          ]
+        }
+      ]
+    },
+    "comments-doc": {
+      "patterns": [
+        {
+          "name": "comment.block.documentation.cpp",
+          "begin": "///",
+          "while": "^\\s*///",
+          "patterns": [
+            {
+              "include": "#comments-inline"
+            }
+          ]
+        }
+      ]
+    },
+    "comments-inline": {
+      "patterns": [
+        {
+          "include": "#comments-block"
+        },
+        {
+          "match": "(//.*)$",
+          "captures": {
+            "1": {
+              "name": "comment.line.double-slash.cpp"
+            }
+          }
+        }
+      ]
+    },
+    "comments-block": {
+      "patterns": [
+        {
+          "name": "comment.block.cpp",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "patterns": [
+            {
+              "include": "#comments-block"
+            }
+          ]
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "storage.type.annotation.cpp",
+          "match": "__attribute__\\(\\w+\\)"
+        }
+      ]
+    },
+    "constants-and-special-vars": {
+      "patterns": [
+        {
+          "name": "constant.language.cpp",
+          "match": "\\b(true|false|nullptr)\\b"
+        },
+        {
+          "name": "variable.language.cpp",
+          "match": "\\b(this|super)\\b"
+        },
+        {
+          "name": "constant.numeric.cpp",
+          "match": "\\b((0(x|X)[0-9a-fA-F]+)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)\\b"
+        },
+        {
+          "include": "#class-identifier"
+        },
+        {
+          "include": "#function-identifier"
+        }
+      ]
+    },
+    "class-identifier": {
+      "patterns": [
+        {
+          "match": "\\b(bool|int|char|double|float|long|short|signed|unsigned|void)\\b",
+          "name": "storage.type.primitive.cpp"
+        },
+        {
+          "begin": "(\\b[A-Z]\\w*\\b)",
+          "end": "(?!<)",
+          "beginCaptures": {
+            "1": {
+              "name": "support.class.cpp"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#type-args"
+            }
+          ]
+        }
+      ]
+    },
+    "function-identifier": {
+      "patterns": [
+        {
+          "match": "\\b([a-z_][a-zA-Z0-9_]*)\\s*\\(",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.cpp"
+            }
+          }
+        }
+      ]
+    },
+    "type-args": {
+      "begin": "(<)",
+      "end": "(>)",
+      "beginCaptures": {
+        "1": {
+          "name": "other.source.cpp"
+        }
+      },
+      "endCaptures": {
+        "1": {
+          "name": "other.source.cpp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#class-identifier"
+        },
+        {
+          "match": ","
+        },
+        {
+          "name": "keyword.declaration.cpp",
+          "match": "extends"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.cpp",
+          "match": "\\b(if|else|for|while|do|switch|case|break|continue|goto|return)\\b"
+        },
+        {
+          "name": "keyword.operator.cpp",
+          "match": "\\b(sizeof|typeid|decltype|new|delete)\\b"
+        },
+        {
+          "name": "keyword.control.try.cpp",
+          "match": "\\b(try|catch|throw)\\b"
+        },
+        {
+          "name": "keyword.control.cpp",
+          "match": "\\b(static|inline|virtual|override|const|volatile|explicit|friend|constexpr)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.comparison.cpp",
+          "match": "(==|!=|<=?|>=?)"
+        },
+        {
+          "name": "keyword.operator.arithmetic.cpp",
+          "match": "(\\+|\\-|\\*|\\/|%)"
+        },
+        {
+          "name": "keyword.operator.assignment.cpp",
+          "match": "(=|\\+=|-=|\\*=|/=|%=)"
+        },
+        {
+          "name": "keyword.operator.logical.cpp",
+          "match": "(\\&\\&|\\|\\||!)"
+        },
+        {
+          "name": "keyword.operator.bitwise.cpp",
+          "match": "(<<|>>|\\&|\\||\\^|~)"
+        }
+      ]
+    },
+    "string-interp": {
+      "patterns": [
+        {
+          "match": "\\$([a-zA-Z0-9_]+)",
+          "captures": {
+            "1": {
+              "name": "variable.parameter.cpp"
+            }
+          }
+        },
+        {
+          "name": "string.interpolated.expression.cpp",
+          "begin": "\\$\\{",
+          "end": "\\}",
+          "patterns": [
+            {
+              "include": "#constants-and-special-vars",
+              "name": "variable.parameter.cpp"
+            },
+            {
+              "include": "#strings"
+            },
+            {
+              "name": "variable.parameter.cpp",
+              "match": "[a-zA-Z0-9_]+"
+            }
+          ]
+        },
+        {
+          "name": "constant.character.escape.cpp",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.cpp",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.cpp",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.cpp",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.cpp",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.comma.cpp",
+          "match": ","
+        },
+        {
+          "name": "punctuation.terminator.cpp",
+          "match": ";"
+        }
+      ]
+    }
+  }
+}

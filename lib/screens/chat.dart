@@ -117,11 +117,13 @@ class _ChatListState extends State<ChatList> {
     final ctrl = ChatEventController();
     await ctrl.initialize();
     final messages = await ctrl.src.getLastInAllChannels();
-    setState(() {
-      _lastMessages = messages
-          .map((k, v) => MapEntry(k, v.firstOrNull))
-          .cast<int, LocalMessageEventTableData>();
-    });
+    if (mounted) {
+      setState(() {
+        _lastMessages = messages
+            .map((k, v) => MapEntry(k, v.firstOrNull))
+            .cast<int, LocalMessageEventTableData>();
+      });
+    }
   }
 
   @override
