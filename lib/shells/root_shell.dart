@@ -49,6 +49,7 @@ class RootShell extends StatelessWidget {
 
     return Scaffold(
       key: rootScaffoldKey,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       bottomNavigationBar: showBottomNavigation
           ? AppNavigationBottom(
               initialIndex: destNames.indexOf(routeName ?? 'page'),

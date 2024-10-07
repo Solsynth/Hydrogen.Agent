@@ -273,116 +273,69 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
               ),
             if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ListView(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                child: TextField(
-                                  maxLines: null,
-                                  autofocus: true,
-                                  autocorrect: true,
-                                  keyboardType: TextInputType.multiline,
-                                  controller:
-                                      _editorController.contentController,
-                                  focusNode: _contentFocusNode,
-                                  decoration: InputDecoration.collapsed(
-                                    hintText: 'postContentPlaceholder'.tr,
-                                  ),
-                                  onTapOutside: (_) => FocusManager
-                                      .instance.primaryFocus
-                                      ?.unfocus(),
-                                ),
-                              ),
-                              const Gap(120)
+              child: DefaultTabController(
+                length: 2,
+                child: AppTheme.isLargeScreen(context)
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _PostEditorTextField(
+                              focusNode: _contentFocusNode,
+                              controller: _editorController,
+                              onUpdate: () => setState(() {}),
+                            ),
+                          ),
+                          const VerticalDivider(width: 0.3, thickness: 0.3)
+                              .paddingSymmetric(horizontal: 16),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding:
+                                  const EdgeInsets.only(top: 12, bottom: 64),
+                              child: MarkdownTextContent(
+                                isAutoWarp: _editorController.mode.value == 0,
+                                content:
+                                    _editorController.contentController.text,
+                                parentId: 'post-editor-preview',
+                              ).paddingOnly(right: 16),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          TabBar(
+                            tabs: [
+                              const Tab(icon: Icon(Icons.edit)),
+                              const Tab(icon: Icon(Icons.preview)),
                             ],
                           ),
-                        ),
-                        Obx(() {
-                          final textStyle = TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(0.75),
-                          );
-                          final showFactors = [
-                            _editorController.isRestoreFromLocal.value,
-                            _editorController.lastSaveTime.value != null,
-                          ];
-                          final doShow = showFactors.any((x) => x);
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 16,
-                            ),
-                            child: Row(
+                          Expanded(
+                            child: TabBarView(
                               children: [
-                                if (showFactors[0])
-                                  Text('postRestoreFromLocal'.tr,
-                                          style: textStyle)
-                                      .paddingOnly(right: 4),
-                                if (showFactors[0])
-                                  InkWell(
-                                    child: Text('clear'.tr, style: textStyle),
-                                    onTap: () {
-                                      _editorController.localClear();
-                                      _editorController.currentClear();
-                                      setState(() {});
-                                    },
+                                _PostEditorTextField(
+                                  focusNode: _contentFocusNode,
+                                  controller: _editorController,
+                                  onUpdate: () => setState(() {}),
+                                ),
+                                SingleChildScrollView(
+                                  padding: const EdgeInsets.only(
+                                    top: 12,
+                                    bottom: 64,
                                   ),
-                                if (showFactors.where((x) => x).length > 1)
-                                  Text(
-                                    '·',
-                                    style: textStyle,
-                                  ).paddingSymmetric(horizontal: 8),
-                                if (showFactors[1])
-                                  Text(
-                                    'postAutoSaveAt'.trParams({
-                                      'date': DateFormat('HH:mm:ss').format(
-                                        _editorController.lastSaveTime.value ??
-                                            DateTime.now(),
-                                      )
-                                    }),
-                                    style: textStyle,
-                                  ),
+                                  child: MarkdownTextContent(
+                                    isAutoWarp:
+                                        _editorController.mode.value == 0,
+                                    content: _editorController
+                                        .contentController.text,
+                                    parentId: 'post-editor-preview',
+                                  ).paddingOnly(left: 16, right: 16),
+                                )
                               ],
                             ),
-                          )
-                              .animate(
-                                key: const Key('post-editor-hint-animation'),
-                                target: doShow ? 1 : 0,
-                              )
-                              .fade(curve: Curves.easeInOut, duration: 300.ms);
-                        }),
-                      ],
-                    ),
-                  ),
-                  if (AppTheme.isLargeScreen(context))
-                    const VerticalDivider(width: 0.3, thickness: 0.3)
-                        .paddingSymmetric(
-                      horizontal: 16,
-                    ),
-                  if (AppTheme.isLargeScreen(context))
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: MarkdownTextContent(
-                          isAutoWarp: _editorController.mode.value == 0,
-                          content: _editorController.contentController.text,
-                          parentId: 'post-editor-preview',
-                        ).paddingOnly(top: 12, right: 16),
+                          ),
+                        ],
                       ),
-                    ),
-                ],
               ),
             ),
             Material(
@@ -391,6 +344,26 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Divider(thickness: 0.3, height: 0.3),
+                  SizedBox(
+                    height: 40,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: MarkdownToolbar(
+                        width: 38,
+                        height: 38,
+                        iconSize: 20,
+                        spacing: 8,
+                        hideImage: true,
+                        useIncludedTextField: false,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        iconColor: Theme.of(context).colorScheme.onSurface,
+                        controller: _editorController.contentController,
+                        focusNode: _contentFocusNode,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                      ).paddingSymmetric(horizontal: 12),
+                    ),
+                  ).paddingOnly(top: 12),
                   SizedBox(
                     height: 56,
                     child: ListView(
@@ -520,7 +493,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                                 top: -4,
                                 end: -6,
                               ),
-                              child: const Icon(Icons.preview),
+                              child: const Icon(Icons.wallpaper),
                             );
                           }),
                           color: Theme.of(context).colorScheme.primary,
@@ -547,18 +520,6 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                             _editorController.editPublishDate(context);
                           },
                         ),
-                        MarkdownToolbar(
-                          hideImage: true,
-                          useIncludedTextField: false,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surface,
-                          iconColor: Theme.of(context).colorScheme.onSurface,
-                          controller: _editorController.contentController,
-                          focusNode: _contentFocusNode,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20)),
-                          width: 40,
-                        ).paddingSymmetric(horizontal: 2),
                       ],
                     ).paddingSymmetric(horizontal: 6, vertical: 8),
                   ),
@@ -576,5 +537,104 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
     _contentFocusNode.dispose();
     _editorController.dispose();
     super.dispose();
+  }
+}
+
+class _PostEditorTextField extends StatelessWidget {
+  final FocusNode focusNode;
+  final PostEditorController controller;
+  final Function onUpdate;
+
+  const _PostEditorTextField({
+    super.key,
+    required this.focusNode,
+    required this.controller,
+    required this.onUpdate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: TextField(
+                  maxLines: null,
+                  autofocus: true,
+                  autocorrect: true,
+                  keyboardType: TextInputType.multiline,
+                  controller: controller.contentController,
+                  focusNode: focusNode,
+                  decoration: InputDecoration.collapsed(
+                    hintText: 'postContentPlaceholder'.tr,
+                  ),
+                  onTapOutside: (_) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                ),
+              ),
+              const Gap(120)
+            ],
+          ),
+        ),
+        Obx(() {
+          final textStyle = TextStyle(
+            fontSize: 12,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+          );
+          final showFactors = [
+            controller.isRestoreFromLocal.value,
+            controller.lastSaveTime.value != null,
+          ];
+          final doShow = showFactors.any((x) => x);
+          return Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 4,
+              horizontal: 16,
+            ),
+            child: Row(
+              children: [
+                if (showFactors[0])
+                  Text('postRestoreFromLocal'.tr, style: textStyle)
+                      .paddingOnly(right: 4),
+                if (showFactors[0])
+                  InkWell(
+                    child: Text('clear'.tr, style: textStyle),
+                    onTap: () {
+                      controller.localClear();
+                      controller.currentClear();
+                      onUpdate();
+                    },
+                  ),
+                if (showFactors.where((x) => x).length > 1)
+                  Text(
+                    '·',
+                    style: textStyle,
+                  ).paddingSymmetric(horizontal: 8),
+                if (showFactors[1])
+                  Text(
+                    'postAutoSaveAt'.trParams({
+                      'date': DateFormat('HH:mm:ss').format(
+                        controller.lastSaveTime.value ?? DateTime.now(),
+                      )
+                    }),
+                    style: textStyle,
+                  ),
+              ],
+            ),
+          )
+              .animate(
+                key: const Key('post-editor-hint-animation'),
+                target: doShow ? 1 : 0,
+              )
+              .fade(curve: Curves.easeInOut, duration: 300.ms);
+        }),
+      ],
+    );
   }
 }
