@@ -75,10 +75,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final src = Get.find<MessagesFetchingProvider>();
     final out = await src.getWhatsNewEvents(_lastRead.messagesLastReadAt!);
     if (out == null) return;
-    setState(() {
-      _currentMessages = out.$1;
-      _currentMessagesCount = out.$2;
-    });
+    if (mounted) {
+      setState(() {
+        _currentMessages = out.$1;
+        _currentMessagesCount = out.$2;
+      });
+    }
   }
 
   bool _signingDaily = true;

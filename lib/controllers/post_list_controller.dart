@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:get/get.dart';
@@ -33,9 +34,18 @@ class PostListController extends GetxController {
     pagingController.addPageRequestListener(_onPagingControllerRequest);
   }
 
+  Completer<void>? _pagingLoadCompleter;
+
   Future<void> _onPagingControllerRequest(int pageKey) async {
     try {
+      if (_pagingLoadCompleter != null) {
+        await _pagingLoadCompleter!.future;
+        return;
+      }
+      _pagingLoadCompleter = Completer();
       final result = await loadMore();
+      _pagingLoadCompleter!.complete();
+      _pagingLoadCompleter = null;
 
       if (result != null && hasMore.value) {
         pagingController.appendPage(result, nextPageKey.value);
@@ -99,9 +109,6 @@ class PostListController extends GetxController {
       hasMore.value = false;
     }
 
-    final idx = <dynamic>{};
-    postList.retainWhere((x) => idx.add(x.id));
-
     if (postList.isNotEmpty) {
       var lastId = postList.map((x) => x.id).reduce(max);
       Get.find<LastReadProvider>().feedLastReadAt = lastId;
@@ -121,6 +128,7 @@ class PostListController extends GetxController {
         resp = await posts.listPost(
           pageKey,
           author: author,
+          take: 10,
         );
       } else {
         switch (mode.value) {
@@ -129,6 +137,7 @@ class PostListController extends GetxController {
               pageKey,
               channel: 'shuffle',
               realm: realm,
+              take: 10,
             );
             break;
           case 1:
@@ -136,12 +145,14 @@ class PostListController extends GetxController {
               pageKey,
               channel: 'friends',
               realm: realm,
+              take: 10,
             );
             break;
           default:
             resp = await posts.listRecommendations(
               pageKey,
               realm: realm,
+              take: 10,
             );
             break;
         }

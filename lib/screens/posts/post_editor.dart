@@ -546,7 +546,6 @@ class _PostEditorTextField extends StatelessWidget {
   final Function onUpdate;
 
   const _PostEditorTextField({
-    super.key,
     required this.focusNode,
     required this.controller,
     required this.onUpdate,

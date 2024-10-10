@@ -28,11 +28,11 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listRecommendations(int page,
-      {String? realm, String? channel}) async {
+      {String? realm, String? channel, int take = 10}) async {
     GetConnect client;
     final AuthProvider auth = Get.find();
     final queries = [
-      'take=${10}',
+      'take=$take',
       'offset=$page',
       if (realm != null) 'realm=$realm',
     ];
@@ -71,9 +71,9 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listPost(int page,
-      {String? realm, String? author, tag, category}) async {
+      {String? realm, String? author, tag, category, int take = 10}) async {
     final queries = [
-      'take=${10}',
+      'take=$take',
       'offset=$page',
       if (tag != null) 'tag=$tag',
       if (category != null) 'category=$category',

@@ -80,62 +80,85 @@ class _ExploreScreenState extends State<ExploreScreen>
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return [
-              SliverAppBar(
-                flexibleSpace: SizedBox(
-                  height: 48,
-                  child: const Row(
-                    children: [
-                      RealmSwitcher(),
+              SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  final scrollOffset = constraints.scrollOffset;
+                  final colorChangeOffset = 120;
+
+                  final scrollProgress =
+                      (scrollOffset / colorChangeOffset).clamp(0.0, 1.0);
+                  final backgroundColor = Color.lerp(
+                    Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerLow
+                        .withOpacity(0),
+                    Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerLow
+                        .withOpacity(0.9),
+                    scrollProgress,
+                  );
+
+                  return SliverAppBar(
+                    backgroundColor: backgroundColor,
+                    flexibleSpace: SizedBox(
+                      height: 48,
+                      child: const Row(
+                        children: [
+                          RealmSwitcher(),
+                        ],
+                      ).paddingSymmetric(horizontal: 8),
+                    ).paddingOnly(top: MediaQuery.of(context).padding.top),
+                    snap: true,
+                    floating: true,
+                    toolbarHeight: AppTheme.toolbarHeight(context),
+                    leading: AppBarLeadingButton.adaptive(context),
+                    actions: [
+                      const BackgroundStateWidget(),
+                      const NotificationButton(),
+                      SizedBox(
+                        width: AppTheme.isLargeScreen(context) ? 8 : 16,
+                      ),
                     ],
-                  ).paddingSymmetric(horizontal: 8),
-                ).paddingOnly(top: MediaQuery.of(context).padding.top),
-                floating: true,
-                toolbarHeight: AppTheme.toolbarHeight(context),
-                leading: AppBarLeadingButton.adaptive(context),
-                actions: [
-                  const BackgroundStateWidget(),
-                  const NotificationButton(),
-                  SizedBox(
-                    width: AppTheme.isLargeScreen(context) ? 8 : 16,
-                  ),
-                ],
-                bottom: TabBar(
-                  controller: _tabController,
-                  dividerHeight: 0.3,
-                  tabAlignment: TabAlignment.fill,
-                  tabs: [
-                    Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.feed, size: 20),
-                          const Gap(8),
-                          Text('postListNews'.tr),
-                        ],
-                      ),
+                    bottom: TabBar(
+                      controller: _tabController,
+                      dividerHeight: 0.3,
+                      tabAlignment: TabAlignment.fill,
+                      tabs: [
+                        Tab(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.feed, size: 20),
+                              const Gap(8),
+                              Text('postListNews'.tr),
+                            ],
+                          ),
+                        ),
+                        Tab(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.people, size: 20),
+                              const Gap(8),
+                              Text('postListFriends'.tr),
+                            ],
+                          ),
+                        ),
+                        Tab(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.shuffle_on_outlined, size: 20),
+                              const Gap(8),
+                              Text('postListShuffle'.tr),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.people, size: 20),
-                          const Gap(8),
-                          Text('postListFriends'.tr),
-                        ],
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.shuffle_on_outlined, size: 20),
-                          const Gap(8),
-                          Text('postListShuffle'.tr),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               )
             ];
           },
