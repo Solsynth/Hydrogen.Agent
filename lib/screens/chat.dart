@@ -69,6 +69,8 @@ class _ChatListState extends State<ChatList> {
 
   late final ChannelProvider _channels = Get.find();
 
+  bool _isBusy = true;
+
   List<Channel> _sortChannels(List<Channel> channels) {
     channels.sort(
       (a, b) =>
@@ -130,7 +132,12 @@ class _ChatListState extends State<ChatList> {
   void initState() {
     super.initState();
     _loadLastMessages().then((_) {
-      _loadAllChannels();
+      if (!mounted) return;
+      _loadAllChannels().then((_) {
+        if (mounted) {
+          setState(() => _isBusy = false);
+        }
+      });
     });
   }
 
@@ -145,16 +152,7 @@ class _ChatListState extends State<ChatList> {
         child: ResponsiveRootContainer(
           child: Scaffold(
             appBar: AppBar(
-              leading: Obx(() {
-                final adaptive = AppBarLeadingButton.adaptive(context);
-                if (adaptive != null) return adaptive;
-                if (_channels.isLoading.value) {
-                  return const CircularProgressIndicator(
-                    strokeWidth: 3,
-                  ).paddingAll(18);
-                }
-                return const SizedBox.shrink();
-              }),
+              leading: AppBarLeadingButton.adaptive(context),
               title: AppBarTitle('chat'.tr),
               centerTitle: true,
               toolbarHeight: AppTheme.toolbarHeight(context),
@@ -282,6 +280,26 @@ class _ChatListState extends State<ChatList> {
               return Column(
                 children: [
                   const ChatCallCurrentIndicator(),
+                  if (_isBusy)
+                    Container(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerLow
+                          .withOpacity(0.8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          ),
+                          const Gap(8),
+                          Text('loading'.tr)
+                        ],
+                      ).paddingSymmetric(vertical: 8),
+                    ),
                   Expanded(
                     child: TabBarView(
                       children: [
