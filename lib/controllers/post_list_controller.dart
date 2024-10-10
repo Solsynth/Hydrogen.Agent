@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:solian/models/attachment.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
+import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/last_read.dart';
 
@@ -111,33 +113,33 @@ class PostListController extends GetxController {
   Future<List<Post>?> _loadPosts(int pageKey) async {
     isBusy.value = true;
 
-    final PostProvider provider = Get.find();
+    final PostProvider posts = Get.find();
 
     Response resp;
     try {
       if (author != null) {
-        resp = await provider.listPost(
+        resp = await posts.listPost(
           pageKey,
           author: author,
         );
       } else {
         switch (mode.value) {
           case 2:
-            resp = await provider.listRecommendations(
+            resp = await posts.listRecommendations(
               pageKey,
               channel: 'shuffle',
               realm: realm,
             );
             break;
           case 1:
-            resp = await provider.listRecommendations(
+            resp = await posts.listRecommendations(
               pageKey,
               channel: 'friends',
               realm: realm,
             );
             break;
           default:
-            resp = await provider.listRecommendations(
+            resp = await posts.listRecommendations(
               pageKey,
               realm: realm,
             );
@@ -152,6 +154,27 @@ class PostListController extends GetxController {
 
     final result = PaginationResult.fromJson(resp.body);
     final out = result.data?.map((e) => Post.fromJson(e)).toList();
+
+    final AttachmentProvider attach = Get.find();
+
+    if (out != null) {
+      final attachmentIds = out
+          .mapMany((x) => x.body['attachments'] ?? [])
+          .cast<String>()
+          .toSet()
+          .toList();
+      final attachmentOut = await attach.listMetadata(attachmentIds);
+
+      for (var idx = 0; idx < out.length; idx++) {
+        final rids = List<String>.from(out[idx].body['attachments'] ?? []);
+        out[idx].preload = PostPreload(
+          attachments: attachmentOut
+              .where((x) => x != null && rids.contains(x.rid))
+              .cast<Attachment>()
+              .toList(),
+        );
+      }
+    }
 
     postTotal.value = result.count;
 

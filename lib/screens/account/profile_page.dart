@@ -26,7 +26,6 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/daily_sign/history_chart.dart';
 import 'package:solian/widgets/posts/post_list.dart';
-import 'package:solian/widgets/posts/post_warped_list.dart';
 import 'package:solian/widgets/reports/abuse_report.dart';
 import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
@@ -609,7 +608,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   if (_userinfo != null)
-                    PostWarpedListWidget(
+                    ControlledPostListWidget(
                       isPinned: false,
                       controller: _postController.pagingController,
                       onUpdate: () => _postController.reloadAllOver(),

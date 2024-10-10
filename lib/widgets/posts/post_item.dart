@@ -455,14 +455,16 @@ class _PostAttachmentWidget extends StatelessWidget {
     if (attachments.length > 3) {
       return AttachmentList(
         parentId: item.id.toString(),
-        attachmentsId: attachments,
+        attachmentIds: item.preload == null ? attachments : null,
+        attachments: item.preload?.attachments,
         autoload: false,
         isGrid: true,
       ).paddingOnly(left: 36, top: 4, bottom: 4);
     } else if (attachments.length > 1 || isLargeScreen) {
       return AttachmentList(
         parentId: item.id.toString(),
-        attachmentsId: attachments,
+        attachmentIds: item.preload == null ? attachments : null,
+        attachments: item.preload?.attachments,
         autoload: false,
         isColumn: true,
       ).paddingOnly(left: 60, right: 24, top: 4, bottom: 4);
@@ -470,7 +472,8 @@ class _PostAttachmentWidget extends StatelessWidget {
       return AttachmentList(
         flatMaxHeight: MediaQuery.of(context).size.width,
         parentId: item.id.toString(),
-        attachmentsId: attachments,
+        attachmentIds: item.preload == null ? attachments : null,
+        attachments: item.preload?.attachments,
         autoload: false,
       );
     }

@@ -13,8 +13,8 @@ import 'package:solian/widgets/account/signin_required_overlay.dart';
 import 'package:solian/widgets/current_state_action.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/navigation/realm_switcher.dart';
+import 'package:solian/widgets/posts/post_list.dart';
 import 'package:solian/widgets/posts/post_shuffle_swiper.dart';
-import 'package:solian/widgets/posts/post_warped_list.dart';
 import 'package:solian/widgets/root_container.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -156,7 +156,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                       RefreshIndicator(
                         onRefresh: () => _postController.reloadAllOver(),
                         child: CustomScrollView(slivers: [
-                          PostWarpedListWidget(
+                          ControlledPostListWidget(
                             controller: _postController.pagingController,
                             onUpdate: () => _postController.reloadAllOver(),
                           ),
@@ -167,7 +167,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                           return RefreshIndicator(
                             onRefresh: () => _postController.reloadAllOver(),
                             child: CustomScrollView(slivers: [
-                              PostWarpedListWidget(
+                              ControlledPostListWidget(
                                 controller: _postController.pagingController,
                                 onUpdate: () => _postController.reloadAllOver(),
                               ),

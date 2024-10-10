@@ -78,7 +78,7 @@ class ChatEvent extends StatelessWidget {
       child: AttachmentList(
         key: Key('m${item.uuid}attachments'),
         parentId: item.uuid,
-        attachmentsId: attachments,
+        attachmentIds: attachments,
         isColumn: true,
       ),
     );

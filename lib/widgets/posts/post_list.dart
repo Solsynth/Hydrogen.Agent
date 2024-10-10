@@ -48,7 +48,6 @@ class PostListWidget extends StatelessWidget {
 }
 
 class PostListEntryWidget extends StatelessWidget {
-  final int renderOrder;
   final bool isShowEmbed;
   final bool isNestedClickable;
   final bool isClickable;
@@ -59,7 +58,6 @@ class PostListEntryWidget extends StatelessWidget {
 
   const PostListEntryWidget({
     super.key,
-    this.renderOrder = 0,
     required this.isShowEmbed,
     required this.isNestedClickable,
     required this.isClickable,
@@ -98,6 +96,49 @@ class PostListEntryWidget extends StatelessWidget {
           }
         });
       },
+    );
+  }
+}
+
+class ControlledPostListWidget extends StatelessWidget {
+  final bool isShowEmbed;
+  final bool isClickable;
+  final bool isNestedClickable;
+  final bool isPinned;
+  final PagingController<int, Post> controller;
+  final Function? onUpdate;
+
+  const ControlledPostListWidget({
+    super.key,
+    required this.controller,
+    this.isShowEmbed = true,
+    this.isClickable = true,
+    this.isNestedClickable = true,
+    this.isPinned = true,
+    this.onUpdate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PagedSliverList<int, Post>.separated(
+      addRepaintBoundaries: true,
+      pagingController: controller,
+      builderDelegate: PagedChildBuilderDelegate<Post>(
+        itemBuilder: (context, item, index) {
+          if (item.pinnedAt != null && !isPinned) {
+            return const SizedBox.shrink();
+          }
+          return PostListEntryWidget(
+            isShowEmbed: isShowEmbed,
+            isNestedClickable: isNestedClickable,
+            isClickable: isClickable,
+            showFeaturedReply: true,
+            item: item,
+            onUpdate: onUpdate ?? () {},
+          );
+        },
+      ),
+      separatorBuilder: (_, __) => const Divider(thickness: 0.3, height: 0.3),
     );
   }
 }

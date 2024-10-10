@@ -15,7 +15,8 @@ import 'package:solian/widgets/sized_container.dart';
 
 class AttachmentList extends StatefulWidget {
   final String parentId;
-  final List<String> attachmentsId;
+  final List<String>? attachmentIds;
+  final List<Attachment>? attachments;
   final bool isGrid;
   final bool isColumn;
   final bool isForceGrid;
@@ -29,7 +30,8 @@ class AttachmentList extends StatefulWidget {
   const AttachmentList({
     super.key,
     required this.parentId,
-    required this.attachmentsId,
+    this.attachmentIds,
+    this.attachments,
     this.isGrid = false,
     this.isColumn = false,
     this.isForceGrid = false,
@@ -50,21 +52,21 @@ class _AttachmentListState extends State<AttachmentList> {
 
   double _aspectRatio = 1;
 
-  List<Attachment?> _attachmentsMeta = List.empty();
+  List<Attachment?> _attachments = List.empty();
 
   void _getMetadataList() {
     final AttachmentProvider attach = Get.find();
 
-    if (widget.attachmentsId.isEmpty) {
+    if (widget.attachmentIds?.isEmpty ?? false) {
       return;
     } else {
-      _attachmentsMeta = List.filled(widget.attachmentsId.length, null);
+      _attachments = List.filled(widget.attachmentIds!.length, null);
     }
 
-    attach.listMetadata(widget.attachmentsId).then((result) {
+    attach.listMetadata(widget.attachmentIds!).then((result) {
       if (mounted) {
         setState(() {
-          _attachmentsMeta = result;
+          _attachments = result;
           _isLoading = false;
         });
       }
@@ -76,7 +78,7 @@ class _AttachmentListState extends State<AttachmentList> {
     bool isConsistent = true;
     double? consistentValue;
     int portrait = 0, square = 0, landscape = 0;
-    for (var entry in _attachmentsMeta) {
+    for (var entry in _attachments) {
       if (entry == null) continue;
       if (entry.metadata?['ratio'] != null) {
         if (entry.metadata?['ratio'] is int) {
@@ -117,10 +119,9 @@ class _AttachmentListState extends State<AttachmentList> {
       item: element,
       parentId: widget.parentId,
       width: width ?? widget.width,
-      badgeContent: '${idx + 1}/${_attachmentsMeta.length}',
-      showBadge:
-          _attachmentsMeta.length > 1 && !widget.isGrid && !widget.isColumn,
-      showBorder: widget.attachmentsId.length > 1,
+      badgeContent: '${idx + 1}/${_attachments.length}',
+      showBadge: _attachments.length > 1 && !widget.isGrid && !widget.isColumn,
+      showBorder: _attachments.length > 1,
       showMature: _showMature,
       autoload: widget.autoload,
       onReveal: (value) {
@@ -132,7 +133,16 @@ class _AttachmentListState extends State<AttachmentList> {
   @override
   void initState() {
     super.initState();
-    _getMetadataList();
+    assert(widget.attachmentIds != null || widget.attachments != null);
+    if (widget.attachments == null) {
+      _getMetadataList();
+    } else {
+      setState(() {
+        _attachments = widget.attachments!;
+        _isLoading = false;
+      });
+      _calculateAspectRatio();
+    }
   }
 
   Color get _unFocusColor =>
@@ -140,7 +150,7 @@ class _AttachmentListState extends State<AttachmentList> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.attachmentsId.isEmpty) {
+    if (widget.attachmentIds?.isEmpty ?? widget.attachments!.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -154,7 +164,7 @@ class _AttachmentListState extends State<AttachmentList> {
           ).paddingOnly(right: 5),
           Text(
             'attachmentHint'.trParams(
-              {'count': widget.attachmentsId.length.toString()},
+              {'count': _attachments.toString()},
             ),
             style: TextStyle(color: _unFocusColor, fontSize: 12),
           )
@@ -171,8 +181,8 @@ class _AttachmentListState extends State<AttachmentList> {
       return Wrap(
         spacing: 8,
         runSpacing: 8,
-        children: widget.attachmentsId.map((x) {
-          final element = _attachmentsMeta[idx];
+        children: _attachments.map((x) {
+          final element = _attachments[idx];
           idx++;
           if (element == null) return const SizedBox.shrink();
           double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
@@ -202,7 +212,7 @@ class _AttachmentListState extends State<AttachmentList> {
       );
     }
 
-    final isNotPureImage = _attachmentsMeta.any(
+    final isNotPureImage = _attachments.any(
       (x) => x?.mimetype.split('/').firstOrNull != 'image',
     );
     if (widget.isGrid && (widget.isForceGrid || !isNotPureImage)) {
@@ -213,13 +223,13 @@ class _AttachmentListState extends State<AttachmentList> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: math.min(3, widget.attachmentsId.length),
+          crossAxisCount: math.min(3, _attachments.length),
           mainAxisSpacing: 8.0,
           crossAxisSpacing: 8.0,
         ),
-        itemCount: widget.attachmentsId.length,
+        itemCount: _attachments.length,
         itemBuilder: (context, idx) {
-          final element = _attachmentsMeta[idx];
+          final element = _attachments[idx];
           return Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHigh,
@@ -257,12 +267,12 @@ class _AttachmentListState extends State<AttachmentList> {
           animateToClosest: true,
           aspectRatio: _aspectRatio,
           viewportFraction:
-              widget.viewport ?? (widget.attachmentsId.length > 1 ? 0.95 : 1),
+              widget.viewport ?? (_attachments.length > 1 ? 0.95 : 1),
           enableInfiniteScroll: false,
         ),
-        itemCount: _attachmentsMeta.length,
+        itemCount: _attachments.length,
         itemBuilder: (context, idx, _) {
-          final element = _attachmentsMeta[idx];
+          final element = _attachments[idx];
           return _buildEntry(element, idx);
         },
       ),

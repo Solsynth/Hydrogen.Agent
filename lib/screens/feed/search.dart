@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/providers/content/posts.dart';
-import 'package:solian/widgets/posts/post_warped_list.dart';
+import 'package:solian/widgets/posts/post_list.dart';
 
 import '../../models/post.dart';
 
@@ -77,7 +77,7 @@ class _FeedSearchScreenState extends State<FeedSearchScreen> {
                 onRefresh: () => Future.sync(() => _pagingController.refresh()),
                 child: CustomScrollView(
                   slivers: [
-                    PostWarpedListWidget(
+                    ControlledPostListWidget(
                       controller: _pagingController,
                       onUpdate: () => _pagingController.refresh(),
                     ),

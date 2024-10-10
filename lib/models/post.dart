@@ -1,9 +1,18 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:solian/models/account.dart';
+import 'package:solian/models/attachment.dart';
 import 'package:solian/models/post_categories.dart';
 import 'package:solian/models/realm.dart';
 
 part 'post.g.dart';
+
+class PostPreload {
+  List<Attachment> attachments;
+
+  PostPreload({
+    required this.attachments,
+  });
+}
 
 @JsonSerializable()
 class Post {
@@ -32,6 +41,9 @@ class Post {
   int authorId;
   Account author;
   PostMetric? metric;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  PostPreload? preload;
 
   Post({
     required this.id,
