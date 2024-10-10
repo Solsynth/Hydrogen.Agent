@@ -125,7 +125,7 @@ class AuthProvider extends GetConnect {
       userAgent: await ServiceFinder.getUserAgent(),
       sendUserAgent: true,
     );
-    client.httpClient.addAuthenticator(requestAuthenticator);
+    client.httpClient.addRequestModifier(requestAuthenticator);
     client.httpClient.baseUrl = ServiceFinder.buildUrl(service, null);
 
     return client;

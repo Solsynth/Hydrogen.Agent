@@ -41,25 +41,27 @@ class AttachmentProvider extends GetConnect {
       }
     }
 
-    final resp = await get(
-      '/attachments?take=${pendingQuery.length}&id=${pendingQuery.join(',')}',
-    );
-    if (resp.statusCode != 200) return result;
+    if (pendingQuery.isNotEmpty) {
+      final resp = await get(
+        '/attachments?take=${pendingQuery.length}&id=${pendingQuery.join(',')}',
+      );
+      if (resp.statusCode != 200) return result;
 
-    final rawOut = PaginationResult.fromJson(resp.body);
-    if (rawOut.data == null) return result;
+      final rawOut = PaginationResult.fromJson(resp.body);
+      if (rawOut.data == null) return result;
 
-    final List<Attachment> out =
-        rawOut.data!.map((x) => Attachment.fromJson(x)).toList();
-    for (final item in out) {
-      if (item.destination != 0 && item.isAnalyzed) {
-        _cachedResponses[item.rid] = item;
+      final List<Attachment> out =
+          rawOut.data!.map((x) => Attachment.fromJson(x)).toList();
+      for (final item in out) {
+        if (item.destination != 0 && item.isAnalyzed) {
+          _cachedResponses[item.rid] = item;
+        }
       }
-    }
-    for (var i = 0; i < out.length; i++) {
-      for (var j = 0; j < rid.length; j++) {
-        if (out[i].rid == rid[j]) {
-          result[j] = out[i];
+      for (var i = 0; i < out.length; i++) {
+        for (var j = 0; j < rid.length; j++) {
+          if (out[i].rid == rid[j]) {
+            result[j] = out[i];
+          }
         }
       }
     }

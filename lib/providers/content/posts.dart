@@ -3,22 +3,11 @@ import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
-import 'package:solian/services.dart';
 
-class PostProvider extends GetConnect {
-  @override
-  void onInit() {
-    httpClient.baseUrl = ServiceFinder.buildUrl('interactive', null);
-  }
-
+class PostProvider extends GetxController {
   Future<Response> seeWhatsNew(int pivot) async {
-    GetConnect client;
     final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.value) {
-      client = await auth.configureClient('co');
-    } else {
-      client = await ServiceFinder.configureClient('co');
-    }
+    final client = await auth.configureClient('co');
     final resp = await client.get('/whats-new?pivot=$pivot');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
@@ -29,18 +18,13 @@ class PostProvider extends GetConnect {
 
   Future<Response> listRecommendations(int page,
       {String? realm, String? channel, int take = 10}) async {
-    GetConnect client;
-    final AuthProvider auth = Get.find();
     final queries = [
       'take=$take',
       'offset=$page',
       if (realm != null) 'realm=$realm',
     ];
-    if (auth.isAuthorized.value) {
-      client = await auth.configureClient('co');
-    } else {
-      client = await ServiceFinder.configureClient('co');
-    }
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('interactive');
     final resp = await client.get(
       channel == null
           ? '/recommendations?${queries.join('&')}'
@@ -80,7 +64,9 @@ class PostProvider extends GetConnect {
       if (author != null) 'author=$author',
       if (realm != null) 'realm=$realm',
     ];
-    final resp = await get('/posts?${queries.join('&')}');
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('co');
+    final resp = await client.get('/posts?${queries.join('&')}');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
@@ -89,7 +75,10 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> listPostReplies(String alias, int page) async {
-    final resp = await get('/posts/$alias/replies?take=${10}&offset=$page');
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('co');
+    final resp =
+        await client.get('/posts/$alias/replies?take=${10}&offset=$page');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
@@ -98,7 +87,9 @@ class PostProvider extends GetConnect {
   }
 
   Future<List<Post>> listPostFeaturedReply(String alias, {int take = 1}) async {
-    final resp = await get('/posts/$alias/replies/featured?take=$take');
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('co');
+    final resp = await client.get('/posts/$alias/replies/featured?take=$take');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
@@ -107,16 +98,9 @@ class PostProvider extends GetConnect {
   }
 
   Future<Response> getPost(String alias) async {
-    final resp = await get('/posts/$alias');
-    if (resp.statusCode != 200) {
-      throw RequestException(resp);
-    }
-
-    return resp;
-  }
-
-  Future<Response> getArticle(String alias) async {
-    final resp = await get('/articles/$alias');
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('co');
+    final resp = await client.get('/posts/$alias');
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }
