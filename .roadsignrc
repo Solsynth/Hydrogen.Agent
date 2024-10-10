@@ -1,0 +1,13 @@
+{
+  "sync": {
+    "region": "solian",
+    "configPath": "roadsign.toml"
+  },
+  "deployments": [
+    {
+      "region": "solian",
+      "site": "solian-web",
+      "path": "build/web"
+    }
+  ]
+}

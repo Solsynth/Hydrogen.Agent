@@ -340,7 +340,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
   desktop_drop: 69eeff437544aa619c8db7f4481b3a65f7696898
-  device_info_plus: ce1b7762849d3ec103d0e0517299f2db7ad60720
+  device_info_plus: f1aae8670672f75c4c8850ecbe0b2ddef62b0a22
   file_selector_macos: cc3858c981fe6889f364731200d6232dac1d812d
   Firebase: 98e6bf5278170668a7983e12971a66b2cd57fc8c
   firebase_analytics: 30ff72f6d4847ff0b479d8edd92fc8582e719072
