@@ -392,7 +392,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .surfaceContainerLow,
-                              ),
+                              ).paddingAll(8),
                             ),
                           ),
                         ).paddingSymmetric(horizontal: 8),

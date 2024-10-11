@@ -84,7 +84,7 @@ class AccountHeadingWidget extends StatelessWidget {
               Positioned(
                 bottom: -30,
                 left: 32,
-                child: AccountAvatar(content: avatar, radius: 40),
+                child: AttachedCircleAvatar(content: avatar, radius: 40),
               ),
             ],
           ),

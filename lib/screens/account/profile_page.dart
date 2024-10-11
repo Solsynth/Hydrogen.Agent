@@ -260,7 +260,8 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                           const Gap(8),
                       const Gap(8),
                       if (_userinfo != null)
-                        AccountAvatar(content: _userinfo!.avatar, radius: 16),
+                        AttachedCircleAvatar(
+                            content: _userinfo!.avatar, radius: 16),
                       const Gap(12),
                       Expanded(
                         child: Column(

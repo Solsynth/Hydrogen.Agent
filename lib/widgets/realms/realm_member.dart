@@ -149,7 +149,8 @@ class _RealmMemberListPopupState extends State<RealmMemberListPopup> {
                   title: Text(element.account.nick),
                   subtitle: Text(element.account.name),
                   leading: GestureDetector(
-                    child: AccountAvatar(content: element.account.avatar),
+                    child:
+                        AttachedCircleAvatar(content: element.account.avatar),
                     onTap: () {
                       showModalBottomSheet(
                         useRootNavigator: true,

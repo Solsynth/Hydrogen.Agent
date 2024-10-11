@@ -69,7 +69,7 @@ class _AppAccountWidgetState extends State<AppAccountWidget> {
             bottom: 0,
             end: -2,
           ),
-          child: AccountAvatar(
+          child: AttachedCircleAvatar(
             radius: 14,
             content: auth.userProfile.value!['avatar'],
           ),

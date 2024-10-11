@@ -24,11 +24,11 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> {
   Post? item;
 
-  Future<Post?> getDetail() async {
+  Future<Post?> _getDetail() async {
     if (widget.post != null) {
-      item = widget.post;
-      Get.find<LastReadProvider>().feedLastReadAt = item?.id;
-      return widget.post;
+      setState(() {
+        item = widget.post;
+      });
     }
 
     final PostProvider provider = Get.find();
@@ -48,7 +48,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: getDetail(),
+      future: _getDetail(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
           return const Center(

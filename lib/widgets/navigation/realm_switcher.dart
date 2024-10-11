@@ -36,7 +36,7 @@ class RealmSwitcher extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (item != null)
-                          AccountAvatar(
+                          AttachedCircleAvatar(
                             content: item.avatar,
                             radius: 14,
                             fallbackWidget: const Icon(

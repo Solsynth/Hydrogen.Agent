@@ -23,7 +23,7 @@ class SilverRelativeList extends StatelessWidget {
       title: Text(element.related.nick),
       subtitle: Text(element.related.name),
       leading: GestureDetector(
-        child: AccountAvatar(content: element.related.avatar),
+        child: AttachedCircleAvatar(content: element.related.avatar),
         onTap: () {
           showModalBottomSheet(
             useRootNavigator: true,

@@ -156,7 +156,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
                                 size: 18,
                               ),
                             )
-                          : AccountAvatar(
+                          : AttachedCircleAvatar(
                               content: element.avatar!,
                               bgColor: Theme.of(context).colorScheme.primary,
                             ),

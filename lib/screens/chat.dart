@@ -252,7 +252,7 @@ class _ChatListState extends State<ChatList> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            AccountAvatar(
+                            AttachedCircleAvatar(
                               content: x.avatar,
                               radius: 14,
                               fallbackWidget: const Icon(

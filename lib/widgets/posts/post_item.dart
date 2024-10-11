@@ -12,7 +12,6 @@ import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/shells/title_shell.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
-import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/link_expansion.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
@@ -36,6 +35,7 @@ class PostItem extends StatefulWidget {
   final bool showFeaturedReply;
   final String? attachmentParent;
   final Color? backgroundColor;
+  final Function? onComment;
 
   const PostItem({
     super.key,
@@ -52,6 +52,7 @@ class PostItem extends StatefulWidget {
     this.showFeaturedReply = false,
     this.attachmentParent,
     this.backgroundColor,
+    this.onComment,
   });
 
   @override
@@ -92,32 +93,27 @@ class _PostItemState extends State<PostItem> {
             item: item,
           ).paddingSymmetric(horizontal: 12),
           _PostHeaderDividerWidget(item: item).paddingSymmetric(horizontal: 12),
-          Stack(
-            children: [
-              SizedContainer(
-                maxWidth: 640,
-                maxHeight: widget.isFullContent ? double.infinity : 80,
-                child: _MeasureSize(
-                  onChange: (size) {
-                    setState(() => _contentHeight = size.height);
-                  },
-                  child: SingleChildScrollView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    child: MarkdownTextContent(
-                      parentId: 'p${item.id}',
-                      content: item.body['content'],
-                      isAutoWarp: item.type == 'story',
-                      isSelectable: widget.isContentSelectable,
-                    ),
-                  ).paddingOnly(
-                    left: 16,
-                    right: 12,
-                    top: 2,
-                    bottom: hasAttachment ? 4 : 0,
-                  ),
+          SizedContainer(
+            maxWidth: 640,
+            maxHeight: widget.isFullContent ? double.infinity : 80,
+            child: _MeasureSize(
+              onChange: (size) {
+                setState(() => _contentHeight = size.height);
+              },
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: MarkdownTextContent(
+                  parentId: 'p${item.id}',
+                  content: item.body['content'],
+                  isAutoWarp: item.type == 'story',
+                  isSelectable: widget.isContentSelectable,
                 ),
+              ).paddingOnly(
+                left: 12,
+                right: 12,
+                bottom: hasAttachment ? 4 : 0,
               ),
-            ],
+            ),
           ),
           if (_contentHeight >= 80 && !widget.isFullContent)
             Opacity(
@@ -132,7 +128,7 @@ class _PostItemState extends State<PostItem> {
             right: 8,
             top: 4,
           ),
-          _PostFooterWidget(item: item).paddingOnly(left: 16),
+          _PostFooterWidget(item: item).paddingOnly(left: 12),
           if (attachments.isNotEmpty)
             Row(
               children: [
@@ -148,7 +144,7 @@ class _PostItemState extends State<PostItem> {
                   style: TextStyle(color: _unFocusColor),
                 )
               ],
-            ).paddingOnly(left: 16, top: 4),
+            ).paddingOnly(left: 14, top: 4),
         ],
       );
     }
@@ -162,113 +158,80 @@ class _PostItemState extends State<PostItem> {
             rid: item.body['thumbnail'],
             parentId: widget.item.id.toString(),
           ).paddingOnly(bottom: 4),
-          Row(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                child: AccountAvatar(content: item.author.avatar),
-                onTap: () {
-                  showModalBottomSheet(
-                    useRootNavigator: true,
-                    isScrollControlled: true,
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    context: context,
-                    builder: (context) => AccountProfilePopup(
-                      name: item.author.name,
-                    ),
-                  );
-                },
+              _PostHeaderWidget(
+                isCompact: widget.isCompact,
+                item: item,
               ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _PostHeaderWidget(
-                      isCompact: widget.isCompact,
-                      item: item,
+              _PostHeaderDividerWidget(item: item),
+              SizedContainer(
+                maxWidth: 640,
+                maxHeight: widget.isFullContent ? double.infinity : 320,
+                child: _MeasureSize(
+                  onChange: (size) {
+                    setState(() => _contentHeight = size.height);
+                  },
+                  child: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: MarkdownTextContent(
+                      parentId: 'p${item.id}-embed',
+                      content: item.body['content'],
+                      isAutoWarp: item.type == 'story',
+                      isSelectable: widget.isContentSelectable,
+                      isLargeText:
+                          item.type == 'article' && widget.isFullContent,
                     ),
-                    _PostHeaderDividerWidget(item: item),
-                    Stack(
-                      children: [
-                        SizedContainer(
-                          maxWidth: 640,
-                          maxHeight:
-                              widget.isFullContent ? double.infinity : 320,
-                          child: _MeasureSize(
-                            onChange: (size) {
-                              setState(() => _contentHeight = size.height);
-                            },
-                            child: SingleChildScrollView(
-                              physics: const NeverScrollableScrollPhysics(),
-                              child: MarkdownTextContent(
-                                parentId: 'p${item.id}-embed',
-                                content: item.body['content'],
-                                isAutoWarp: item.type == 'story',
-                                isSelectable: widget.isContentSelectable,
-                                isLargeText: item.type == 'article' &&
-                                    widget.isFullContent,
-                              ).paddingOnly(left: 12, right: 8),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_contentHeight >= 320 && !widget.isFullContent)
-                      Opacity(
-                        opacity: 0.8,
-                        child: InkWell(child: Text('readMore'.tr)),
-                      ).paddingOnly(
-                        left: 12,
-                        top: 4,
-                      ),
-                    if (widget.item.replyTo != null && widget.isShowEmbed)
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        padding: const EdgeInsets.only(top: 4),
-                        child: _PostEmbedWidget(
-                          isClickable: widget.isClickable,
-                          isOverrideEmbedClickable:
-                              widget.isOverrideEmbedClickable,
-                          item: widget.item.replyTo!,
-                          username: widget.item.replyTo!.author.name,
-                          hintText: 'postRepliedNotify',
-                          icon: FontAwesomeIcons.reply,
-                          id: widget.item.replyTo!.id.toString(),
-                        ),
-                      ),
-                    if (widget.item.repostTo != null && widget.isShowEmbed)
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        padding: const EdgeInsets.only(top: 4),
-                        child: _PostEmbedWidget(
-                          isClickable: widget.isClickable,
-                          isOverrideEmbedClickable:
-                              widget.isOverrideEmbedClickable,
-                          item: widget.item.repostTo!,
-                          username: widget.item.repostTo!.author.name,
-                          hintText: 'postRepostedNotify',
-                          icon: FontAwesomeIcons.retweet,
-                          id: widget.item.repostTo!.id.toString(),
-                        ),
-                      ),
-                    _PostFooterWidget(item: item).paddingOnly(left: 12),
-                    LinkExpansion(content: item.body['content'])
-                        .paddingOnly(top: 4),
-                  ],
+                  ),
                 ),
               ),
+              if (_contentHeight >= 320 && !widget.isFullContent)
+                Opacity(
+                  opacity: 0.8,
+                  child: InkWell(child: Text('readMore'.tr)),
+                ).paddingOnly(top: 4),
+              if (widget.item.replyTo != null && widget.isShowEmbed)
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _PostEmbedWidget(
+                    isClickable: widget.isClickable,
+                    isOverrideEmbedClickable: widget.isOverrideEmbedClickable,
+                    item: widget.item.replyTo!,
+                    username: widget.item.replyTo!.author.name,
+                    hintText: 'postRepliedNotify',
+                    icon: FontAwesomeIcons.reply,
+                    id: widget.item.replyTo!.id.toString(),
+                  ),
+                ),
+              if (widget.item.repostTo != null && widget.isShowEmbed)
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _PostEmbedWidget(
+                    isClickable: widget.isClickable,
+                    isOverrideEmbedClickable: widget.isOverrideEmbedClickable,
+                    item: widget.item.repostTo!,
+                    username: widget.item.repostTo!.author.name,
+                    hintText: 'postRepostedNotify',
+                    icon: FontAwesomeIcons.retweet,
+                    id: widget.item.repostTo!.id.toString(),
+                  ),
+                ),
+              _PostFooterWidget(item: item),
+              LinkExpansion(content: item.body['content']).paddingOnly(top: 4),
             ],
           ).paddingOnly(
-            top: 10,
-            bottom:
-                (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-                    ? 10
-                    : 0,
             right: 16,
             left: 16,
           ),
           _PostAttachmentWidget(item: item),
-          if (widget.showFeaturedReply) _PostFeaturedReplyWidget(item: item),
+          if (widget.showFeaturedReply)
+            _PostFeaturedReplyWidget(item: item).paddingSymmetric(
+              horizontal: 12,
+            ),
+          if (widget.showFeaturedReply) const Gap(8),
           if (widget.isShowReply || widget.isReactable)
             PostQuickAction(
               isShowReply: widget.isShowReply,
@@ -280,19 +243,15 @@ class _PostItemState extends State<PostItem> {
                       (item.metric!.reactionList[symbol] ?? 0) + changes;
                 });
               },
+              onComment: () {
+                if (widget.onComment != null) {
+                  widget.onComment!();
+                }
+              },
             ).paddingOnly(
-              top: (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-                  ? 10
-                  : 6,
-              left:
-                  (attachments.length == 1 && !AppTheme.isLargeScreen(context))
-                      ? 24
-                      : 60,
-              right: 16,
-              bottom: 10,
+              left: 14,
+              right: 14,
             )
-          else
-            const Gap(10),
         ],
       ),
       openBuilder: (_, __) => TitleShell(
@@ -317,7 +276,6 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLargeScreen = AppTheme.isLargeScreen(context);
     final unFocusColor =
         Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
@@ -325,13 +283,10 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final List<String> attachments = item.body['attachments'] is List
-        ? List.from(item.body['attachments']?.whereType<String>())
-        : List.empty();
-
     return FutureBuilder(
-      future:
-          Get.find<PostProvider>().listPostFeaturedReply(item.id.toString()),
+      future: Get.find<PostProvider>().listPostFeaturedReply(
+        item.id.toString(),
+      ),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const SizedBox.shrink();
@@ -351,7 +306,7 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            AccountAvatar(
+                            AttachedCircleAvatar(
                               content: reply.author.avatar,
                               radius: 10,
                             ),
@@ -423,16 +378,9 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
                   .toList(),
             ),
           ),
-        )
-            .animate()
-            .fadeIn(
+        ).animate().fadeIn(
               duration: 300.ms,
               curve: Curves.easeIn,
-            )
-            .paddingOnly(
-              top: (attachments.length == 1 && !isLargeScreen) ? 10 : 6,
-              left: (attachments.length == 1 && !isLargeScreen) ? 24 : 60,
-              right: 16,
             );
       },
     );
@@ -452,30 +400,33 @@ class _PostAttachmentWidget extends StatelessWidget {
         ? List.from(item.body['attachments']?.whereType<String>())
         : List.empty();
 
-    if (attachments.length > 3) {
+    if (attachments.isEmpty) return const SizedBox.shrink();
+
+    if (attachments.length == 1) {
+      return AttachmentList(
+        parentId: item.id.toString(),
+        attachmentIds: item.preload == null ? attachments : null,
+        attachments: item.preload?.attachments,
+        autoload: false,
+        isFullWidth: true,
+      ).paddingOnly(top: 4);
+    } else if (attachments.length > 1 &&
+        attachments.length % 3 == 0 &&
+        !isLargeScreen) {
       return AttachmentList(
         parentId: item.id.toString(),
         attachmentIds: item.preload == null ? attachments : null,
         attachments: item.preload?.attachments,
         autoload: false,
         isGrid: true,
-      ).paddingOnly(left: 36, top: 4, bottom: 4);
-    } else if (attachments.length > 1 || isLargeScreen) {
-      return AttachmentList(
-        parentId: item.id.toString(),
-        attachmentIds: item.preload == null ? attachments : null,
-        attachments: item.preload?.attachments,
-        autoload: false,
-        isColumn: true,
-      ).paddingOnly(left: 60, right: 24, top: 4, bottom: 4);
+      ).paddingSymmetric(horizontal: 14, vertical: 8);
     } else {
       return AttachmentList(
-        flatMaxHeight: MediaQuery.of(context).size.width,
         parentId: item.id.toString(),
         attachmentIds: item.preload == null ? attachments : null,
         attachments: item.preload?.attachments,
         autoload: false,
-      );
+      ).paddingOnly(bottom: 8, top: 4);
     }
   }
 }
@@ -515,16 +466,17 @@ class _PostEmbedWidget extends StatelessWidget {
                 size: 16,
                 color: unFocusColor,
               ),
+              const Gap(6),
               Expanded(
                 child: Text(
                   hintText.trParams(
                     {'username': '@$username'},
                   ),
                   style: TextStyle(color: unFocusColor),
-                ).paddingOnly(left: 6),
+                ),
               ),
             ],
-          ).paddingOnly(left: 12),
+          ).paddingOnly(left: 2),
           Card(
             elevation: 1,
             child: PostItem(
@@ -560,9 +512,7 @@ class _PostHeaderDividerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (item.body['description'] != null || item.body['title'] != null) {
-      return const Divider(thickness: 0.3, height: 1).paddingSymmetric(
-        vertical: 8,
-      );
+      return const Gap(8);
     }
     return const SizedBox.shrink();
   }
@@ -634,48 +584,58 @@ class _PostHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (isCompact)
-          AccountAvatar(
-            content: item.author.avatar,
-            radius: 10,
-          ).paddingOnly(left: 2, top: 1),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AccountAvatar(
+              content: item.author.avatar,
+              username: item.author.name,
+              radius: isCompact ? 10 : null,
+            ),
+            Gap(isCompact ? 6 : 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.author.nick,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        item.author.nick,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      if (isCompact) const Gap(4),
+                      if (isCompact)
+                        RelativeDate(
+                          item.publishedAt?.toLocal() ?? DateTime.now(),
+                        ).paddingOnly(top: 1),
+                    ],
                   ),
-                  RelativeDate(item.publishedAt?.toLocal() ?? DateTime.now())
-                      .paddingOnly(left: 4),
+                  if (!isCompact)
+                    RelativeDate(item.publishedAt?.toLocal() ?? DateTime.now()),
                 ],
               ),
-              if (item.body['title'] != null)
-                Text(
-                  item.body['title'],
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(fontSize: 15),
-                ),
-              if (item.body['description'] != null)
-                Text(
-                  item.body['description'],
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-            ],
-          ).paddingOnly(left: isCompact ? 6 : 12),
+            ),
+            if (item.type == 'article')
+              Badge(
+                label: Text('article'.tr),
+              ).paddingOnly(top: 3),
+          ],
         ),
-        if (item.type == 'article')
-          Badge(
-            label: Text('article'.tr),
-          ).paddingOnly(top: 3),
+        const Gap(8),
+        if (item.body['title'] != null)
+          Text(
+            item.body['title'],
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        if (item.body['description'] != null)
+          Text(
+            item.body['description'],
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
       ],
     );
   }

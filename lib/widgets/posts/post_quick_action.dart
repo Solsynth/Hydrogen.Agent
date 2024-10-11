@@ -11,6 +11,7 @@ class PostQuickAction extends StatefulWidget {
   final Post item;
   final bool isReactable;
   final bool isShowReply;
+  final Function onComment;
   final void Function(String symbol, int num) onReact;
 
   const PostQuickAction({
@@ -18,6 +19,7 @@ class PostQuickAction extends StatefulWidget {
     required this.item,
     this.isShowReply = true,
     this.isReactable = true,
+    required this.onComment,
     required this.onReact,
   });
 
@@ -106,7 +108,11 @@ class _PostQuickActionState extends State<PostQuickAction> {
                     builder: (context) {
                       return PostReplyListPopup(item: widget.item);
                     },
-                  );
+                  ).then((signal) {
+                    if (signal == true) {
+                      widget.onComment();
+                    }
+                  });
                 },
               ),
             ),

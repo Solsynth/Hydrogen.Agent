@@ -443,7 +443,7 @@ class _ChatMessageInputState extends State<ChatMessageInput> {
                           .map(
                             (x) => ChatMessageSuggestion(
                               type: 'users',
-                              leading: AccountAvatar(content: x.avatar),
+                              leading: AttachedCircleAvatar(content: x.avatar),
                               display: x.nick,
                               content: '@${x.name}',
                             ),

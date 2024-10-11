@@ -152,7 +152,8 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
                   title: Text(element.account.nick),
                   subtitle: Text(element.account.name),
                   leading: GestureDetector(
-                    child: AccountAvatar(content: element.account.avatar),
+                    child:
+                        AttachedCircleAvatar(content: element.account.avatar),
                     onTap: () {
                       showModalBottomSheet(
                         useRootNavigator: true,

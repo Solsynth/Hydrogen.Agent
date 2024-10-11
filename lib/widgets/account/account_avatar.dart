@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:solian/services.dart';
+import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/auto_cache_image.dart';
 
-class AccountAvatar extends StatelessWidget {
+class AttachedCircleAvatar extends StatelessWidget {
   final dynamic content;
   final Color? bgColor;
   final Color? feColor;
   final double? radius;
   final Widget? fallbackWidget;
 
-  const AccountAvatar({
+  const AttachedCircleAvatar({
     super.key,
     required this.content,
     this.bgColor,
@@ -39,11 +40,59 @@ class AccountAvatar extends StatelessWidget {
       child: isEmpty
           ? (fallbackWidget ??
               Icon(
-                Icons.account_circle,
+                Icons.image,
                 size: radius != null ? radius! * 1.2 : 24,
                 color: feColor,
               ))
           : null,
+    );
+  }
+}
+
+class AccountAvatar extends StatelessWidget {
+  final dynamic content;
+  final String username;
+  final Color? bgColor;
+  final Color? feColor;
+  final double? radius;
+  final Widget? fallbackWidget;
+
+  const AccountAvatar({
+    super.key,
+    required this.content,
+    required this.username,
+    this.bgColor,
+    this.feColor,
+    this.radius,
+    this.fallbackWidget,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: AttachedCircleAvatar(
+        content: content,
+        bgColor: bgColor,
+        feColor: feColor,
+        radius: radius,
+        fallbackWidget: (fallbackWidget ??
+            Icon(
+              Icons.account_circle,
+              size: radius != null ? radius! * 1.2 : 24,
+              color: feColor,
+            )),
+      ),
+      onTap: () {
+        showModalBottomSheet(
+          useRootNavigator: true,
+          isScrollControlled: true,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          context: context,
+          builder: (context) => AccountProfilePopup(
+            name: username,
+          ),
+        );
+      },
     );
   }
 }

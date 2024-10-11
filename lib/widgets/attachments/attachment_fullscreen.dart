@@ -175,7 +175,7 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                       Row(
                         children: [
                           IgnorePointer(
-                            child: AccountAvatar(
+                            child: AttachedCircleAvatar(
                               content: widget.item.account!.avatar,
                               radius: 19,
                             ),

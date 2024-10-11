@@ -220,7 +220,7 @@ class ChatEvent extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      AccountAvatar(
+                      AttachedCircleAvatar(
                         content: item.sender.account.avatar,
                         radius: 9,
                       ),
@@ -250,7 +250,8 @@ class ChatEvent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                child: AccountAvatar(content: item.sender.account.avatar),
+                child:
+                    AttachedCircleAvatar(content: item.sender.account.avatar),
                 onTap: () {
                   showModalBottomSheet(
                     useRootNavigator: true,

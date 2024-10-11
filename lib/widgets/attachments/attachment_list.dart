@@ -19,9 +19,8 @@ class AttachmentList extends StatefulWidget {
   final List<Attachment>? attachments;
   final bool isGrid;
   final bool isColumn;
-  final bool isForceGrid;
+  final bool isFullWidth;
   final bool autoload;
-  final double flatMaxHeight;
   final double columnMaxWidth;
 
   final double? width;
@@ -34,9 +33,8 @@ class AttachmentList extends StatefulWidget {
     this.attachments,
     this.isGrid = false,
     this.isColumn = false,
-    this.isForceGrid = false,
+    this.isFullWidth = false,
     this.autoload = false,
-    this.flatMaxHeight = 720,
     this.columnMaxWidth = 480,
     this.width,
     this.viewport,
@@ -175,9 +173,70 @@ class _AttachmentListState extends State<AttachmentList> {
           .fadeIn(duration: 1250.ms);
     }
 
+    const radius = BorderRadius.all(Radius.circular(8));
+
+    if (widget.isFullWidth && _attachments.length == 1) {
+      final element = _attachments.first;
+      double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+      return Container(
+        constraints: BoxConstraints(
+          maxWidth: widget.columnMaxWidth,
+          maxHeight: 640,
+        ),
+        child: AspectRatio(
+          aspectRatio: ratio,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.symmetric(
+                horizontal: BorderSide(
+                  color: Theme.of(context).dividerColor,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: _buildEntry(element, 0),
+          ),
+        ),
+      );
+    }
+
+    final isNotPureImage = _attachments.any(
+      (x) => x?.mimetype.split('/').firstOrNull != 'image',
+    );
+    if (widget.isGrid && !isNotPureImage) {
+      return GridView.builder(
+        padding: EdgeInsets.zero,
+        primary: false,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: math.min(3, _attachments.length),
+          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 8.0,
+        ),
+        itemCount: _attachments.length,
+        itemBuilder: (context, idx) {
+          final element = _attachments[idx];
+          return Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              border: Border.all(
+                color: Theme.of(context).dividerColor,
+                width: 1,
+              ),
+              borderRadius: radius,
+            ),
+            child: ClipRRect(
+              borderRadius: radius,
+              child: _buildEntry(element, idx),
+            ),
+          );
+        },
+      );
+    }
+
     if (widget.isColumn) {
       var idx = 0;
-      const radius = BorderRadius.all(Radius.circular(8));
       return Wrap(
         spacing: 8,
         runSpacing: 8,
@@ -212,68 +271,44 @@ class _AttachmentListState extends State<AttachmentList> {
       );
     }
 
-    final isNotPureImage = _attachments.any(
-      (x) => x?.mimetype.split('/').firstOrNull != 'image',
-    );
-    if (widget.isGrid && (widget.isForceGrid || !isNotPureImage)) {
-      const radius = BorderRadius.all(Radius.circular(8));
-      return GridView.builder(
-        padding: EdgeInsets.zero,
-        primary: false,
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: math.min(3, _attachments.length),
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-        ),
-        itemCount: _attachments.length,
-        itemBuilder: (context, idx) {
-          final element = _attachments[idx];
-          return Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
-              border: Border.all(
-                color: Theme.of(context).dividerColor,
-                width: 1,
-              ),
-              borderRadius: radius,
-            ),
-            child: ClipRRect(
-              borderRadius: radius,
-              child: _buildEntry(element, idx),
-            ),
-          );
-        },
-      ).paddingSymmetric(horizontal: 24);
-    }
-
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      constraints: BoxConstraints(
-        maxHeight: widget.flatMaxHeight,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border.symmetric(
-          horizontal: BorderSide(
-            width: 0.3,
-            color: Theme.of(context).dividerColor,
-          ),
-        ),
-      ),
+    return SizedBox(
+      width: math.min(MediaQuery.of(context).size.width, widget.columnMaxWidth),
       child: CarouselSlider.builder(
         options: CarouselOptions(
+          disableCenter: true,
           animateToClosest: true,
           aspectRatio: _aspectRatio,
-          viewportFraction:
-              widget.viewport ?? (_attachments.length > 1 ? 0.95 : 1),
+          enlargeCenterPage: true,
+          viewportFraction: widget.viewport ?? 0.95,
           enableInfiniteScroll: false,
         ),
         itemCount: _attachments.length,
         itemBuilder: (context, idx, _) {
           final element = _attachments[idx];
-          return _buildEntry(element, idx);
+          if (element == null) const SizedBox.shrink();
+          double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+          return Container(
+            constraints: BoxConstraints(
+              maxWidth: widget.columnMaxWidth,
+              maxHeight: 640,
+            ),
+            child: AspectRatio(
+              aspectRatio: ratio,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
+                    width: 1,
+                  ),
+                  borderRadius: radius,
+                ),
+                child: ClipRRect(
+                  borderRadius: radius,
+                  child: _buildEntry(element, idx),
+                ),
+              ),
+            ),
+          );
         },
       ),
     );

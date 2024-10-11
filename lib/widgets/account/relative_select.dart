@@ -56,7 +56,7 @@ class _RelativeSelectorState extends State<RelativeSelector> {
                 return ListTile(
                   title: Text(element.nick),
                   subtitle: Text(element.name),
-                  leading: AccountAvatar(content: element.avatar),
+                  leading: AttachedCircleAvatar(content: element.avatar),
                   trailing: widget.trailingBuilder != null
                       ? widget.trailingBuilder!(element)
                       : null,

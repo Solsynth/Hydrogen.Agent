@@ -74,7 +74,7 @@ class _NoContentWidgetState extends State<NoContentWidget>
               ),
             )
           ],
-          child: AccountAvatar(
+          child: AttachedCircleAvatar(
             content: widget.userinfo!.avatar,
             bgColor: Colors.transparent,
             radius: radius,

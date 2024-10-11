@@ -192,7 +192,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
         const Gap(24),
         Stack(
           children: [
-            AccountAvatar(content: _avatar, radius: 40),
+            AttachedCircleAvatar(content: _avatar, radius: 40),
             Positioned(
               bottom: 0,
               left: 40,

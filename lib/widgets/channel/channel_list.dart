@@ -205,7 +205,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
         item.members!.where((e) => e.account.id != widget.selfId).firstOrNull;
 
     if (item.type == 1 && otherside != null) {
-      final avatar = AccountAvatar(
+      final avatar = AttachedCircleAvatar(
         content: otherside.account.avatar,
         radius: 20,
         bgColor: Theme.of(context).colorScheme.primary,
@@ -241,7 +241,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
                   padding: const EdgeInsets.all(2),
                   elevation: 8,
                 ),
-                badgeContent: AccountAvatar(
+                badgeContent: AttachedCircleAvatar(
                   content: item.realm?.avatar,
                   radius: 10,
                   fallbackWidget: const Icon(

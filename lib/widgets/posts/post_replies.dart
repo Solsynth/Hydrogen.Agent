@@ -53,6 +53,7 @@ class _PostReplyListState extends State<PostReplyList> {
   @override
   Widget build(BuildContext context) {
     return PostListWidget(
+      padding: EdgeInsets.symmetric(horizontal: 10),
       isShowEmbed: false,
       controller: _pagingController,
       backgroundColor: widget.backgroundColor,
@@ -70,16 +71,30 @@ class PostReplyListPopup extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'postReplies'.tr,
-          style: Theme.of(context).textTheme.headlineSmall,
-        ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'postReplies'.tr,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_comment),
+              visualDensity: const VisualDensity(horizontal: -4),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        ).paddingOnly(left: 24, right: 24, top: 24, bottom: 8),
         Expanded(
           child: CustomScrollView(
             slivers: [
               PostReplyList(
                 item: item,
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                backgroundColor:
+                    Theme.of(context).colorScheme.surfaceContainerLow,
               ),
             ],
           ),

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/router.dart';
+import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 
@@ -12,6 +14,7 @@ class PostListWidget extends StatelessWidget {
   final bool isNestedClickable;
   final PagingController<int, Post> controller;
   final Color? backgroundColor;
+  final EdgeInsets? padding;
 
   const PostListWidget({
     super.key,
@@ -20,6 +23,7 @@ class PostListWidget extends StatelessWidget {
     this.isClickable = true,
     this.isNestedClickable = true,
     this.backgroundColor,
+    this.padding,
   });
 
   @override
@@ -29,16 +33,19 @@ class PostListWidget extends StatelessWidget {
       pagingController: controller,
       builderDelegate: PagedChildBuilderDelegate<Post>(
         itemBuilder: (context, item, index) {
-          return PostListEntryWidget(
-            isShowEmbed: isShowEmbed,
-            isNestedClickable: isNestedClickable,
-            isClickable: isClickable,
-            showFeaturedReply: true,
-            item: item,
-            backgroundColor: backgroundColor,
-            onUpdate: () {
-              controller.refresh();
-            },
+          return Padding(
+            padding: padding ?? EdgeInsets.zero,
+            child: PostListEntryWidget(
+              isShowEmbed: isShowEmbed,
+              isNestedClickable: isNestedClickable,
+              isClickable: isClickable,
+              showFeaturedReply: true,
+              item: item,
+              backgroundColor: backgroundColor,
+              onUpdate: () {
+                controller.refresh();
+              },
+            ),
           );
         },
       ),
@@ -77,6 +84,22 @@ class PostListEntryWidget extends StatelessWidget {
         isClickable: isNestedClickable,
         showFeaturedReply: showFeaturedReply,
         backgroundColor: backgroundColor,
+        onComment: () {
+          AppRouter.instance
+              .pushNamed(
+            'postEditor',
+            extra: PostPublishArguments(reply: item),
+          )
+              .then((value) {
+            if (value is Future) {
+              value.then((_) {
+                onUpdate();
+              });
+            } else if (value != null) {
+              onUpdate();
+            }
+          });
+        },
       ).paddingSymmetric(vertical: 8),
       onLongPress: () {
         final AuthProvider auth = Get.find();
