@@ -49,7 +49,6 @@
 	<string>NSApplication</string>
 	<key>CFBundleLocalizations</key>
 	<array>
-		<string>zh_CN</string>
 		<string>en</string>
 	</array>
 	<key>NSUserActivityTypes</key>
