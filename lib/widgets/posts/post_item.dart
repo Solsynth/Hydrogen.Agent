@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
+import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_detail.dart';
 import 'package:solian/shells/title_shell.dart';
 import 'package:solian/theme.dart';
@@ -34,7 +35,10 @@ class PostItem extends StatefulWidget {
   final bool isContentSelectable;
   final bool showFeaturedReply;
   final String? attachmentParent;
+
+  final EdgeInsets? padding;
   final Color? backgroundColor;
+
   final Function? onComment;
 
   const PostItem({
@@ -51,6 +55,7 @@ class PostItem extends StatefulWidget {
     this.isContentSelectable = false,
     this.showFeaturedReply = false,
     this.attachmentParent,
+    this.padding,
     this.backgroundColor,
     this.onComment,
   });
@@ -126,9 +131,7 @@ class _PostItemState extends State<PostItem> {
           LinkExpansion(content: item.body['content']).paddingOnly(
             left: 8,
             right: 8,
-            top: 4,
           ),
-          _PostFooterWidget(item: item).paddingOnly(left: 12),
           if (attachments.isNotEmpty)
             Row(
               children: [
@@ -149,9 +152,8 @@ class _PostItemState extends State<PostItem> {
       );
     }
 
-    return OpenContainer(
-      tappable: widget.isClickable,
-      closedBuilder: (_, openContainer) => Column(
+    return GestureDetector(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _PostThumbnail(
@@ -220,18 +222,20 @@ class _PostItemState extends State<PostItem> {
                   ),
                 ),
               _PostFooterWidget(item: item),
-              LinkExpansion(content: item.body['content']).paddingOnly(top: 4),
+              LinkExpansion(content: item.body['content']),
             ],
-          ).paddingOnly(
-            right: 16,
-            left: 16,
+          ).paddingSymmetric(
+            horizontal: (widget.padding?.horizontal ?? 0) + 16,
           ),
-          _PostAttachmentWidget(item: item),
+          if (hasAttachment) const Gap(8),
+          _PostAttachmentWidget(
+            item: item,
+            padding: widget.padding,
+          ),
           if (widget.showFeaturedReply)
             _PostFeaturedReplyWidget(item: item).paddingSymmetric(
-              horizontal: 12,
+              horizontal: (widget.padding?.horizontal ?? 0) + 12,
             ),
-          if (widget.showFeaturedReply) const Gap(8),
           if (widget.isShowReply || widget.isReactable)
             PostQuickAction(
               isShowReply: widget.isShowReply,
@@ -249,22 +253,23 @@ class _PostItemState extends State<PostItem> {
                 }
               },
             ).paddingOnly(
-              left: 14,
-              right: 14,
+              top: 8,
+              left: (widget.padding?.left ?? 0) + 14,
+              right: (widget.padding?.right ?? 0) + 14,
             )
         ],
+      ).paddingOnly(
+        top: widget.padding?.top ?? 0,
+        bottom: widget.padding?.bottom ?? 0,
       ),
-      openBuilder: (_, __) => TitleShell(
-        title: 'postDetail'.tr,
-        child: PostDetailScreen(
-          id: item.id.toString(),
-          post: item,
-        ),
-      ),
-      closedElevation: 0,
-      openElevation: 0,
-      closedColor: Colors.transparent,
-      openColor: Theme.of(context).colorScheme.surface,
+      onTap: () {
+        if (widget.isClickable) {
+          AppRouter.instance.pushNamed(
+            'postDetail',
+            pathParameters: {'id': item.id.toString()},
+          );
+        }
+      },
     );
   }
 }
@@ -293,6 +298,7 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
         }
 
         return Container(
+          padding: EdgeInsets.only(top: 8),
           constraints: const BoxConstraints(maxWidth: 480),
           child: Card(
             margin: EdgeInsets.zero,
@@ -389,8 +395,9 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
 
 class _PostAttachmentWidget extends StatelessWidget {
   final Post item;
+  final EdgeInsets? padding;
 
-  const _PostAttachmentWidget({required this.item});
+  const _PostAttachmentWidget({required this.item, required this.padding});
 
   @override
   Widget build(BuildContext context) {
@@ -402,14 +409,22 @@ class _PostAttachmentWidget extends StatelessWidget {
 
     if (attachments.isEmpty) return const SizedBox.shrink();
 
-    if (attachments.length == 1) {
+    if (attachments.length == 1 && !isLargeScreen) {
       return AttachmentList(
         parentId: item.id.toString(),
         attachmentIds: item.preload == null ? attachments : null,
         attachments: item.preload?.attachments,
         autoload: false,
         isFullWidth: true,
-      ).paddingOnly(top: 4);
+      );
+    } else if (attachments.length == 1) {
+      return AttachmentList(
+        parentId: item.id.toString(),
+        attachmentIds: item.preload == null ? attachments : null,
+        attachments: item.preload?.attachments,
+        autoload: false,
+        isColumn: true,
+      ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
     } else if (attachments.length > 1 &&
         attachments.length % 3 == 0 &&
         !isLargeScreen) {
@@ -419,14 +434,17 @@ class _PostAttachmentWidget extends StatelessWidget {
         attachments: item.preload?.attachments,
         autoload: false,
         isGrid: true,
-      ).paddingSymmetric(horizontal: 14, vertical: 8);
+      ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
     } else {
       return AttachmentList(
         parentId: item.id.toString(),
         attachmentIds: item.preload == null ? attachments : null,
         attachments: item.preload?.attachments,
+        padding: EdgeInsets.symmetric(
+          horizontal: (padding?.horizontal ?? 0) + 14,
+        ),
         autoload: false,
-      ).paddingOnly(bottom: 8, top: 4);
+      );
     }
   }
 }
@@ -568,7 +586,7 @@ class _PostFooterWidget extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: widgets,
-      ).paddingOnly(top: 4);
+      ).paddingSymmetric(vertical: 4);
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/last_read.dart';
+import 'package:solian/theme.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
 
@@ -67,11 +68,18 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 isFullContent: true,
                 isShowReply: false,
                 isContentSelectable: true,
+                padding: AppTheme.isLargeScreen(context)
+                    ? EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 8,
+                      )
+                    : EdgeInsets.zero,
               ),
             ),
             SliverToBoxAdapter(
-              child:
-                  const Divider(thickness: 0.3, height: 1).paddingOnly(top: 4),
+              child: const Divider(thickness: 0.3, height: 1).paddingOnly(
+                top: 8,
+              ),
             ),
             SliverToBoxAdapter(
               child: Align(
@@ -82,7 +90,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 ).paddingOnly(left: 24, right: 24, top: 16),
               ),
             ),
-            PostReplyList(item: item!),
+            PostReplyList(
+              item: item!,
+              padding: AppTheme.isLargeScreen(context)
+                  ? EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 8,
+                    )
+                  : EdgeInsets.zero,
+            ),
             SliverToBoxAdapter(
               child: SizedBox(height: MediaQuery.of(context).padding.bottom),
             ),

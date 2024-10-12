@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dismissible_page/dismissible_page.dart';
 import 'package:flutter/material.dart' hide CarouselController;
 import 'package:flutter_animate/flutter_animate.dart';
@@ -23,6 +22,7 @@ class AttachmentList extends StatefulWidget {
   final bool autoload;
   final double columnMaxWidth;
 
+  final EdgeInsets? padding;
   final double? width;
   final double? viewport;
 
@@ -36,6 +36,7 @@ class AttachmentList extends StatefulWidget {
     this.isFullWidth = false,
     this.autoload = false,
     this.columnMaxWidth = 480,
+    this.padding,
     this.width,
     this.viewport,
   });
@@ -161,9 +162,7 @@ class _AttachmentListState extends State<AttachmentList> {
             color: _unFocusColor,
           ).paddingOnly(right: 5),
           Text(
-            'attachmentHint'.trParams(
-              {'count': _attachments.toString()},
-            ),
+            'attachmentHint'.trParams({'count': _attachments.toString()}),
             style: TextStyle(color: _unFocusColor, fontSize: 12),
           )
         ],
@@ -179,8 +178,8 @@ class _AttachmentListState extends State<AttachmentList> {
       final element = _attachments.first;
       double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
       return Container(
+        width: MediaQuery.of(context).size.width,
         constraints: BoxConstraints(
-          maxWidth: widget.columnMaxWidth,
           maxHeight: 640,
         ),
         child: AspectRatio(
@@ -271,26 +270,26 @@ class _AttachmentListState extends State<AttachmentList> {
       );
     }
 
-    return SizedBox(
-      width: math.min(MediaQuery.of(context).size.width, widget.columnMaxWidth),
-      child: CarouselSlider.builder(
-        options: CarouselOptions(
-          disableCenter: true,
-          animateToClosest: true,
-          aspectRatio: _aspectRatio,
-          enlargeCenterPage: true,
-          viewportFraction: widget.viewport ?? 0.95,
-          enableInfiniteScroll: false,
-        ),
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: 320,
+      ),
+      child: ListView.separated(
+        padding: widget.padding,
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
         itemCount: _attachments.length,
-        itemBuilder: (context, idx, _) {
+        itemBuilder: (context, idx) {
           final element = _attachments[idx];
           if (element == null) const SizedBox.shrink();
-          double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+          final ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
             constraints: BoxConstraints(
-              maxWidth: widget.columnMaxWidth,
-              maxHeight: 640,
+              maxWidth: math.min(
+                widget.columnMaxWidth,
+                MediaQuery.of(context).size.width -
+                    (widget.padding?.horizontal ?? 0),
+              ),
             ),
             child: AspectRatio(
               aspectRatio: ratio,
@@ -310,6 +309,7 @@ class _AttachmentListState extends State<AttachmentList> {
             ),
           );
         },
+        separatorBuilder: (context, _) => const Gap(8),
       ),
     );
   }

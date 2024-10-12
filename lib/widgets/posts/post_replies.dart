@@ -8,11 +8,13 @@ import 'package:solian/widgets/posts/post_list.dart';
 
 class PostReplyList extends StatefulWidget {
   final Post item;
+  final EdgeInsets? padding;
   final Color? backgroundColor;
 
   const PostReplyList({
     super.key,
     required this.item,
+    this.padding,
     this.backgroundColor,
   });
 
@@ -53,7 +55,7 @@ class _PostReplyListState extends State<PostReplyList> {
   @override
   Widget build(BuildContext context) {
     return PostListWidget(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: widget.padding,
       isShowEmbed: false,
       controller: _pagingController,
       backgroundColor: widget.backgroundColor,
@@ -93,6 +95,7 @@ class PostReplyListPopup extends StatelessWidget {
             slivers: [
               PostReplyList(
                 item: item,
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 backgroundColor:
                     Theme.of(context).colorScheme.surfaceContainerLow,
               ),

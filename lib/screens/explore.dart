@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -87,28 +88,70 @@ class _ExploreScreenState extends State<ExploreScreen>
 
                   final scrollProgress =
                       (scrollOffset / colorChangeOffset).clamp(0.0, 1.0);
-                  final backgroundColor = Color.lerp(
-                    Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerLow
-                        .withOpacity(0),
-                    Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerLow
-                        .withOpacity(0.9),
-                    scrollProgress,
-                  );
+                  final blurSigma = lerpDouble(0, 10, scrollProgress) ?? 0;
 
                   return SliverAppBar(
-                    backgroundColor: backgroundColor,
-                    flexibleSpace: SizedBox(
-                      height: 48,
-                      child: const Row(
-                        children: [
-                          RealmSwitcher(),
-                        ],
-                      ).paddingSymmetric(horizontal: 8),
-                    ).paddingOnly(top: MediaQuery.of(context).padding.top),
+                    flexibleSpace: ClipRRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: blurSigma,
+                          sigmaY: blurSigma,
+                        ),
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: 48,
+                              child: const Row(
+                                children: [
+                                  RealmSwitcher(),
+                                ],
+                              ).paddingSymmetric(horizontal: 8),
+                            ),
+                            TabBar(
+                              controller: _tabController,
+                              dividerHeight: 0.3,
+                              tabAlignment: TabAlignment.fill,
+                              tabs: [
+                                Tab(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.feed, size: 20),
+                                      const Gap(8),
+                                      Text('postListNews'.tr),
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.people, size: 20),
+                                      const Gap(8),
+                                      Text('postListFriends'.tr),
+                                    ],
+                                  ),
+                                ),
+                                Tab(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.shuffle_on_outlined,
+                                          size: 20),
+                                      const Gap(8),
+                                      Text('postListShuffle'.tr),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ).paddingOnly(top: MediaQuery.of(context).padding.top),
+                      ),
+                    ),
+                    expandedHeight: 96,
                     snap: true,
                     floating: true,
                     toolbarHeight: AppTheme.toolbarHeight(context),
@@ -120,43 +163,6 @@ class _ExploreScreenState extends State<ExploreScreen>
                         width: AppTheme.isLargeScreen(context) ? 8 : 16,
                       ),
                     ],
-                    bottom: TabBar(
-                      controller: _tabController,
-                      dividerHeight: 0.3,
-                      tabAlignment: TabAlignment.fill,
-                      tabs: [
-                        Tab(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.feed, size: 20),
-                              const Gap(8),
-                              Text('postListNews'.tr),
-                            ],
-                          ),
-                        ),
-                        Tab(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.people, size: 20),
-                              const Gap(8),
-                              Text('postListFriends'.tr),
-                            ],
-                          ),
-                        ),
-                        Tab(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.shuffle_on_outlined, size: 20),
-                              const Gap(8),
-                              Text('postListShuffle'.tr),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
                   );
                 },
               )
@@ -180,6 +186,12 @@ class _ExploreScreenState extends State<ExploreScreen>
                         onRefresh: () => _postController.reloadAllOver(),
                         child: CustomScrollView(slivers: [
                           ControlledPostListWidget(
+                            padding: AppTheme.isLargeScreen(context)
+                                ? EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 8,
+                                  )
+                                : EdgeInsets.zero,
                             controller: _postController.pagingController,
                             onUpdate: () => _postController.reloadAllOver(),
                           ),
@@ -191,6 +203,9 @@ class _ExploreScreenState extends State<ExploreScreen>
                             onRefresh: () => _postController.reloadAllOver(),
                             child: CustomScrollView(slivers: [
                               ControlledPostListWidget(
+                                padding: AppTheme.isLargeScreen(context)
+                                    ? EdgeInsets.symmetric(horizontal: 16)
+                                    : EdgeInsets.zero,
                                 controller: _postController.pagingController,
                                 onUpdate: () => _postController.reloadAllOver(),
                               ),

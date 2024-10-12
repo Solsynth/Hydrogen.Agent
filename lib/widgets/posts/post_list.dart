@@ -60,8 +60,9 @@ class PostListEntryWidget extends StatelessWidget {
   final bool isClickable;
   final bool showFeaturedReply;
   final Post item;
-  final Function onUpdate;
   final Color? backgroundColor;
+  final EdgeInsets? padding;
+  final Function onUpdate;
 
   const PostListEntryWidget({
     super.key,
@@ -70,8 +71,9 @@ class PostListEntryWidget extends StatelessWidget {
     required this.isClickable,
     required this.showFeaturedReply,
     required this.item,
-    required this.onUpdate,
     this.backgroundColor,
+    this.padding,
+    required this.onUpdate,
   });
 
   @override
@@ -83,6 +85,7 @@ class PostListEntryWidget extends StatelessWidget {
         isShowEmbed: isShowEmbed,
         isClickable: isNestedClickable,
         showFeaturedReply: showFeaturedReply,
+        padding: padding,
         backgroundColor: backgroundColor,
         onComment: () {
           AppRouter.instance
@@ -129,6 +132,7 @@ class ControlledPostListWidget extends StatelessWidget {
   final bool isNestedClickable;
   final bool isPinned;
   final PagingController<int, Post> controller;
+  final EdgeInsets? padding;
   final Function? onUpdate;
 
   const ControlledPostListWidget({
@@ -138,6 +142,7 @@ class ControlledPostListWidget extends StatelessWidget {
     this.isClickable = true,
     this.isNestedClickable = true,
     this.isPinned = true,
+    this.padding,
     this.onUpdate,
   });
 
@@ -156,6 +161,7 @@ class ControlledPostListWidget extends StatelessWidget {
             isNestedClickable: isNestedClickable,
             isClickable: isClickable,
             showFeaturedReply: true,
+            padding: padding,
             item: item,
             onUpdate: onUpdate ?? () {},
           );

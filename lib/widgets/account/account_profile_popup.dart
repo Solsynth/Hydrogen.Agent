@@ -89,8 +89,7 @@ class _AccountProfilePopupState extends State<AccountProfilePopup> {
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.75,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: ListView(
         children: [
           AccountHeadingWidget(
             avatar: _userinfo!.avatar,

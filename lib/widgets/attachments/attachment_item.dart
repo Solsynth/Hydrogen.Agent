@@ -155,11 +155,18 @@ class _AttachmentItemImage extends StatelessWidget {
           ),
           if (showBadge && badge != null)
             Positioned(
-              right: 12,
-              bottom: 8,
+              right: 8,
+              bottom: 4,
               child: Material(
                 color: Colors.transparent,
-                child: Chip(label: Text(badge!)),
+                child: Chip(
+                  label: Text(badge!),
+                  labelStyle: GoogleFonts.robotoMono(),
+                  visualDensity: const VisualDensity(
+                    horizontal: -4,
+                    vertical: -2,
+                  ),
+                ),
               ),
             ),
           if (showHideButton && item.isMature)
