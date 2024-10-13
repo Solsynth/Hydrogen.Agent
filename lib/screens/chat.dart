@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_resizable_container/flutter_resizable_container.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -42,14 +43,20 @@ class ChatListShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RootContainer(
-      child: Row(
+      child: ResizableContainer(
+        direction: Axis.horizontal,
+        divider: ResizableDivider(
+          thickness: 0.3,
+          color: Theme.of(context).dividerColor,
+        ),
         children: [
-          const SizedBox(
-            width: 360,
+          const ResizableChild(
+            minSize: 280,
+            maxSize: 520,
+            size: ResizableSize.pixels(320),
             child: ChatList(),
           ),
-          const VerticalDivider(thickness: 0.3, width: 0.3),
-          Expanded(child: child ?? const EmptyPagePlaceholder()),
+          ResizableChild(child: child ?? const EmptyPagePlaceholder()),
         ],
       ),
     );
