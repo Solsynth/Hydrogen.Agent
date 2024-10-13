@@ -15,14 +15,15 @@ class PostShareImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final textColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.3);
     return RootContainer(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        runAlignment: WrapAlignment.center,
         children: [
-          const Gap(24),
+          const SizedBox(height: 40),
           Material(
             color: Colors.transparent,
             child: Card(
+              margin: EdgeInsets.zero,
               child: PostItem(
                 item: item,
                 isShowEmbed: true,
@@ -30,11 +31,15 @@ class PostShareImage extends StatelessWidget {
                 showFeaturedReply: false,
                 isReactable: false,
                 isShowReply: false,
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                isNonScrollAttachment: true,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4,
+                  vertical: 8,
+                ),
                 onComment: () {},
               ),
             ),
-          ),
+          ).paddingOnly(bottom: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -80,6 +85,12 @@ class PostShareImage extends StatelessWidget {
                     version: QrVersions.auto,
                     padding: const EdgeInsets.all(4),
                     size: 48,
+                    dataModuleStyle: QrDataModuleStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    eyeStyle: QrEyeStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 ),
               ),

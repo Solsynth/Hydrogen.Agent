@@ -31,6 +31,7 @@ class PostItem extends StatefulWidget {
   final bool isOverrideEmbedClickable;
   final bool isFullDate;
   final bool isContentSelectable;
+  final bool isNonScrollAttachment;
   final bool showFeaturedReply;
   final String? attachmentParent;
 
@@ -49,6 +50,7 @@ class PostItem extends StatefulWidget {
     this.isOverrideEmbedClickable = false,
     this.isFullDate = false,
     this.isContentSelectable = false,
+    this.isNonScrollAttachment = false,
     this.showFeaturedReply = false,
     this.attachmentParent,
     this.padding,
@@ -214,6 +216,7 @@ class _PostItemState extends State<PostItem> {
           _PostAttachmentWidget(
             item: item,
             padding: widget.padding,
+            isNonScrollAttachment: widget.isNonScrollAttachment,
           ),
           if (widget.showFeaturedReply)
             _PostFeaturedReplyWidget(item: item).paddingSymmetric(
@@ -380,8 +383,13 @@ class _PostFeaturedReplyWidget extends StatelessWidget {
 class _PostAttachmentWidget extends StatelessWidget {
   final Post item;
   final EdgeInsets? padding;
+  final bool isNonScrollAttachment;
 
-  const _PostAttachmentWidget({required this.item, required this.padding});
+  const _PostAttachmentWidget({
+    required this.item,
+    required this.padding,
+    required this.isNonScrollAttachment,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -401,14 +409,6 @@ class _PostAttachmentWidget extends StatelessWidget {
         autoload: false,
         isFullWidth: true,
       );
-    } else if (attachments.length == 1) {
-      return AttachmentList(
-        parentId: item.id.toString(),
-        attachmentIds: item.preload == null ? attachments : null,
-        attachments: item.preload?.attachments,
-        autoload: false,
-        isColumn: true,
-      ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
     } else if (attachments.length > 1 &&
         attachments.length % 3 == 0 &&
         !isLargeScreen) {
@@ -418,6 +418,14 @@ class _PostAttachmentWidget extends StatelessWidget {
         attachments: item.preload?.attachments,
         autoload: false,
         isGrid: true,
+      ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
+    } else if (attachments.length == 1 || isNonScrollAttachment) {
+      return AttachmentList(
+        parentId: item.id.toString(),
+        attachmentIds: item.preload == null ? attachments : null,
+        attachments: item.preload?.attachments,
+        autoload: false,
+        isColumn: true,
       ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
     } else {
       return AttachmentList(

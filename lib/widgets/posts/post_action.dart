@@ -89,10 +89,25 @@ class _PostActionState extends State<PostAction> {
   }
 
   Future<void> _shareImage() async {
+    final List<String> attachments = widget.item.body['attachments'] is List
+        ? List.from(widget.item.body['attachments']?.whereType<String>())
+        : List.empty();
+    final hasAttachment = attachments.isNotEmpty;
+
     final screenshot = ScreenshotController();
-    final image = await screenshot.captureFromWidget(
-      PostShareImage(item: widget.item),
+    final image = await screenshot.captureFromLongWidget(
+      MediaQuery(
+        data: MediaQuery.of(context),
+        child: PostShareImage(item: widget.item),
+      ),
       context: context,
+      pixelRatio: 2,
+      constraints: BoxConstraints(
+        minWidth: 480,
+        maxWidth: hasAttachment ? 480 : 640,
+        minHeight: 640,
+        maxHeight: double.infinity,
+      ),
     );
     final directory = await getApplicationDocumentsDirectory();
     final imageFile = await File(
