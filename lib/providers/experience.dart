@@ -4,19 +4,19 @@ import 'package:intl/intl.dart';
 class ExperienceProvider extends GetxController {
   static List<int> experienceToLevelRequirements = [
     0, // Level 0
-    100, // Level 1
-    400, // Level 2
-    900, // Level 3
-    1600, // Level 4
-    2500, // Level 5
-    3600, // Level 6
-    4900, // Level 7
-    6400, // Level 8
-    8100, // Level 9
-    10000, // Level 10
-    12100, // Level 11
-    14400, // Level 12
-    36800 // Level 13
+    1000, // Level 1
+    4000, // Level 2
+    9000, // Level 3
+    16000, // Level 4
+    25000, // Level 5
+    36000, // Level 6
+    49000, // Level 7
+    64000, // Level 8
+    81000, // Level 9
+    100000, // Level 10
+    121000, // Level 11
+    144000, // Level 12
+    368000 // Level 13
   ];
 
   static List<String> levelLabelMapping =
@@ -35,7 +35,7 @@ class ExperienceProvider extends GetxController {
     final idx = experienceToLevelRequirements.indexOf(exp);
     if (idx + 1 >= experienceToLevelRequirements.length) return 1;
     final nextExp = experienceToLevelRequirements[idx + 1];
-    return exp / nextExp;
+    return (experience - exp).abs() / (exp - nextExp).abs();
   }
 
   static String calcLevelUpProgressLevel(int experience) {
@@ -43,9 +43,9 @@ class ExperienceProvider extends GetxController {
         .firstWhere((x) => x <= experience);
     final idx = experienceToLevelRequirements.indexOf(exp);
     if (idx + 1 >= experienceToLevelRequirements.length) return 'Infinity';
-    final nextExp = experienceToLevelRequirements[idx + 1];
+    final nextExp = exp - experienceToLevelRequirements[idx + 1];
     final formatter =
         NumberFormat.compactCurrency(symbol: '', decimalDigits: 1);
-    return '${formatter.format(exp)}/${formatter.format(nextExp)}';
+    return '${formatter.format((exp - experience).abs())}/${formatter.format(nextExp.abs())}';
   }
 }
