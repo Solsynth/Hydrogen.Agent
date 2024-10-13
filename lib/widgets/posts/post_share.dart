@@ -19,7 +19,7 @@ class PostShareImage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Gap(8),
+          const Gap(24),
           Material(
             color: Colors.transparent,
             child: Card(

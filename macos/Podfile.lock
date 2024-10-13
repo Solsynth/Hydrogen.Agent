@@ -101,6 +101,9 @@ PODS:
     - FlutterMacOS
   - flutter_secure_storage_macos (6.1.1):
     - FlutterMacOS
+  - flutter_udid (0.0.1):
+    - FlutterMacOS
+    - SAMKeychain
   - flutter_webrtc (0.11.3):
     - FlutterMacOS
     - WebRTC-SDK (= 125.6422.04)
@@ -188,6 +191,7 @@ PODS:
     - PromisesObjC (= 2.4.0)
   - protocol_handler_macos (0.0.1):
     - FlutterMacOS
+  - SAMKeychain (1.5.3)
   - screen_brightness_macos (0.1.0):
     - FlutterMacOS
   - share_plus (0.0.1):
@@ -233,6 +237,7 @@ DEPENDENCIES:
   - firebase_messaging (from `Flutter/ephemeral/.symlinks/plugins/firebase_messaging/macos`)
   - flutter_local_notifications (from `Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos`)
   - flutter_secure_storage_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_secure_storage_macos/macos`)
+  - flutter_udid (from `Flutter/ephemeral/.symlinks/plugins/flutter_udid/macos`)
   - flutter_webrtc (from `Flutter/ephemeral/.symlinks/plugins/flutter_webrtc/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - gal (from `Flutter/ephemeral/.symlinks/plugins/gal/darwin`)
@@ -272,6 +277,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - PromisesSwift
+    - SAMKeychain
     - sqlite3
     - WebRTC-SDK
 
@@ -296,6 +302,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos
   flutter_secure_storage_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_secure_storage_macos/macos
+  flutter_udid:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_udid/macos
   flutter_webrtc:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_webrtc/macos
   FlutterMacOS:
@@ -358,6 +366,7 @@ SPEC CHECKSUMS:
   FirebaseSessions: 655ff17f3cc1a635cbdc2d69b953878001f9e25b
   flutter_local_notifications: 3805ca215b2fb7f397d78b66db91f6a747af52e4
   flutter_secure_storage_macos: 59459653abe1adb92abbc8ea747d79f8d19866c9
+  flutter_udid: 6b2b89780c3dfeecf0047bdf93f622d6416b1c07
   flutter_webrtc: 2b4e4a2de70a1485836e40fd71a7a94c77d49bd9
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   gal: 61e868295d28fe67ffa297fae6dacebf56fd53e1
@@ -377,6 +386,7 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
   protocol_handler_macos: d10a6c01d6373389ffd2278013ab4c47ed6d6daa
+  SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
   screen_brightness_macos: 2d6d3af2165592d9a55ffcd95b7550970e41ebda
   share_plus: a182a58e04e51647c0481aadabbc4de44b3a2bce
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
