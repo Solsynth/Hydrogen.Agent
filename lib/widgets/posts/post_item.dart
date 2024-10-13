@@ -250,6 +250,7 @@ class _PostItemState extends State<PostItem> {
           AppRouter.instance.pushNamed(
             'postDetail',
             pathParameters: {'id': item.id.toString()},
+            extra: item,
           );
         }
       },

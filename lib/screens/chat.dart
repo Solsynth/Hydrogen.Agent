@@ -19,6 +19,7 @@ import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/channel/channel_list.dart';
 import 'package:solian/widgets/chat/call/chat_call_indicator.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sidebar/empty_placeholder.dart';
 
@@ -280,26 +281,7 @@ class _ChatListState extends State<ChatList> {
               return Column(
                 children: [
                   const ChatCallCurrentIndicator(),
-                  if (_isBusy)
-                    Container(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerLow
-                          .withOpacity(0.8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            height: 16,
-                            width: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2.5),
-                          ),
-                          const Gap(8),
-                          Text('loading'.tr)
-                        ],
-                      ).paddingSymmetric(vertical: 8),
-                    ),
+                  if (_isBusy) const LoadingIndicator(),
                   Expanded(
                     child: TabBarView(
                       children: [

@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:solian/bootstrapper.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
@@ -108,6 +109,7 @@ abstract class AppRouter {
           state: state,
           child: PostDetailScreen(
             id: state.pathParameters['id']!,
+            post: state.extra as Post?,
           ),
         ),
       ),
