@@ -85,6 +85,8 @@ dependencies:
   syntax_highlight: ^0.4.0
   flutter_udid: ^3.0.0
   timeline_tile: ^2.0.0
+  screenshot: ^3.0.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

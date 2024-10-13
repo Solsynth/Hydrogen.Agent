@@ -21,8 +21,7 @@ class AuditLogScreen extends StatefulWidget {
 class _AuditLogScreenState extends State<AuditLogScreen> {
   bool _isBusy = true;
 
-  int _totalEvent = 0;
-  List<AuditEvent> _events = List.empty(growable: true);
+  final List<AuditEvent> _events = List.empty(growable: true);
 
   Future<void> _getEvents() async {
     if (!_isBusy) setState(() => _isBusy = true);
@@ -38,7 +37,6 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
     final result = PaginationResult.fromJson(resp.body);
 
     setState(() {
-      _totalEvent = result.count;
       _events.addAll(
         result.data?.map((x) => AuditEvent.fromJson(x)).toList() ??
             List.empty(),

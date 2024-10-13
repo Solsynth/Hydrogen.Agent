@@ -588,8 +588,6 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                         color:
                             Theme.of(context).colorScheme.surfaceContainerLow,
                         child: PostListEntryWidget(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surfaceContainerLow,
                           item: element,
                           isClickable: true,
                           isNestedClickable: true,

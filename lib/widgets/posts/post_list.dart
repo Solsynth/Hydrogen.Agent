@@ -41,7 +41,6 @@ class PostListWidget extends StatelessWidget {
               isClickable: isClickable,
               showFeaturedReply: true,
               item: item,
-              backgroundColor: backgroundColor,
               onUpdate: () {
                 controller.refresh();
               },
@@ -60,7 +59,6 @@ class PostListEntryWidget extends StatelessWidget {
   final bool isClickable;
   final bool showFeaturedReply;
   final Post item;
-  final Color? backgroundColor;
   final EdgeInsets? padding;
   final Function onUpdate;
 
@@ -71,7 +69,6 @@ class PostListEntryWidget extends StatelessWidget {
     required this.isClickable,
     required this.showFeaturedReply,
     required this.item,
-    this.backgroundColor,
     this.padding,
     required this.onUpdate,
   });

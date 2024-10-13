@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
@@ -12,6 +15,7 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_editor.dart';
+import 'package:solian/widgets/posts/post_share.dart';
 import 'package:solian/widgets/reports/abuse_report.dart';
 
 class PostAction extends StatefulWidget {
@@ -84,6 +88,24 @@ class _PostActionState extends State<PostAction> {
     }
   }
 
+  Future<void> _shareImage() async {
+    final screenshot = ScreenshotController();
+    final image = await screenshot.captureFromWidget(
+      PostShareImage(item: widget.item),
+      context: context,
+    );
+    final directory = await getApplicationDocumentsDirectory();
+    final imageFile = await File(
+      '${directory.path}/temporary_share_image.png',
+    ).create();
+    await imageFile.writeAsBytes(image);
+
+    final file = XFile(imageFile.path);
+    await Share.shareXFiles([file]);
+
+    await imageFile.delete();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -135,16 +157,29 @@ class _PostActionState extends State<PostAction> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                   leading: const Icon(Icons.share),
                   title: Text('share'.tr),
-                  trailing: PlatformInfo.isIOS || PlatformInfo.isAndroid
-                      ? IconButton(
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (PlatformInfo.isIOS || PlatformInfo.isAndroid)
+                        IconButton(
                           icon: const Icon(Icons.link_off),
                           tooltip: 'shareNoUri'.tr,
                           onPressed: () async {
                             await _doShare(noUri: true);
                             Navigator.pop(context);
                           },
-                        )
-                      : null,
+                        ),
+                      if (PlatformInfo.isIOS || PlatformInfo.isAndroid)
+                        IconButton(
+                          icon: const Icon(Icons.image),
+                          tooltip: 'shareImage'.tr,
+                          onPressed: () async {
+                            await _shareImage();
+                            Navigator.pop(context);
+                          },
+                        ),
+                    ],
+                  ),
                   onTap: () async {
                     await _doShare();
                     Navigator.pop(context);

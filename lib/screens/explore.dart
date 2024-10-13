@@ -160,13 +160,13 @@ class _ExploreScreenState extends State<ExploreScreen>
                     toolbarHeight: AppTheme.toolbarHeight(context),
                     leading: AppBarLeadingButton.adaptive(context),
                     actions: [
+                      const BackgroundStateWidget(),
                       IconButton(
                         icon: const Icon(Icons.search),
                         onPressed: () {
                           AppRouter.instance.pushNamed('postSearch');
                         },
                       ),
-                      const BackgroundStateWidget(),
                       const NotificationButton(),
                       SizedBox(
                         width: AppTheme.isLargeScreen(context) ? 8 : 16,
