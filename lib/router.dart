@@ -7,6 +7,7 @@ import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/preferences/notifications.dart';
+import 'package:solian/screens/account/preferences/security.dart';
 import 'package:solian/screens/account/profile_edit.dart';
 import 'package:solian/screens/account/profile_page.dart';
 import 'package:solian/screens/auth/signin.dart';
@@ -262,6 +263,14 @@ abstract class AppRouter {
         builder: (context, state) => TitleShell(
           state: state,
           child: const NotificationPreferencesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/account/preferences/auth',
+        name: 'authPreferences',
+        builder: (context, state) => TitleShell(
+          state: state,
+          child: const AuthPreferencesScreen(),
         ),
       ),
       GoRoute(

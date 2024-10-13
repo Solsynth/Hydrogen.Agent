@@ -473,5 +473,9 @@
   "agedTheme": "过时主题",
   "agedThemeDesc": "将全局主题降级为 Material Design 2，可能发生意料之外的问题，仅供实验使用",
   "appBackgroundImage": "全局背景图片",
-  "appBackgroundImageDesc": "全局背景图片将会在所有页面中展示"
+  "appBackgroundImageDesc": "全局背景图片将会在所有页面中展示",
+  "authPreferences": "安全偏好设置",
+  "authPreferencesDesc": "调整账号的安全行为模式",
+  "authMaximumAuthSteps": "最大认证步数",
+  "authMaximumAuthStepsDesc": "登陆时最多的验证步数，值越高则越安全，反之则会相对方便；默认设置为 2"
 }

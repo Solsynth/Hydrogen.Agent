@@ -131,6 +131,15 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               if (auth.isAuthorized.value)
                 ListTile(
+                  leading: const Icon(Icons.lock),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  title: Text('authPreferences'.tr),
+                  onTap: () {
+                    AppRouter.instance.pushNamed('authPreferences');
+                  },
+                ),
+              if (auth.isAuthorized.value)
+                ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 34),
                   leading: const Icon(Icons.edit_notifications),
                   title: Text('notificationPreferences'.tr),

@@ -477,5 +477,9 @@
   "agedTheme": "Old school style theme",
   "agedThemeDesc": "Downgrade the global theme to Material Design 2. Unexpected issues may occur. For experimental use only.",
   "appBackgroundImage": "Global background image",
-  "appBackgroundImageDesc": "The global background image will be displayed on all pages"
+  "appBackgroundImageDesc": "The global background image will be displayed on all pages",
+  "authPreferences": "Auth preferences",
+  "authPreferencesDesc": "Set the security behavior of your account",
+  "authMaximumAuthSteps": "Maximum authentication steps",
+  "authMaximumAuthStepsDesc": "The maximum number of authentication steps when logging in, higher value is more secure, lower value is more convenient; default is 2"
 }

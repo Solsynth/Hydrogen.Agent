@@ -389,10 +389,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 onUpdate: (_) {
                                   _pullPosts();
                                 },
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 4,
+                                ),
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .surfaceContainerLow,
-                              ).paddingAll(8),
+                              ),
                             ),
                           ),
                         ).paddingSymmetric(horizontal: 8),
