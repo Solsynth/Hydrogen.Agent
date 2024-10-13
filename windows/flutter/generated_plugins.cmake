@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   flutter_acrylic
   flutter_secure_storage_windows
+  flutter_udid
   flutter_webrtc
   gal
   livekit_client

@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exceptions/request.dart';
@@ -172,7 +171,6 @@ class WebSocketProvider extends GetxController {
       log("Unable to active push notifications, couldn't get device uuid");
       return;
     } else {
-      deviceUuid = md5.convert(utf8.encode(deviceUuid)).toString();
       log('Device UUID is $deviceUuid');
     }
 
@@ -198,33 +196,7 @@ class WebSocketProvider extends GetxController {
   }
 
   Future<String?> _getDeviceUuid() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (PlatformInfo.isWeb) {
-      final webInfo = await deviceInfo.webBrowserInfo;
-      return webInfo.vendor! +
-          webInfo.userAgent! +
-          webInfo.hardwareConcurrency.toString();
-    }
-    if (PlatformInfo.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      return androidInfo.id;
-    }
-    if (PlatformInfo.isIOS) {
-      final iosInfo = await deviceInfo.iosInfo;
-      return iosInfo.identifierForVendor!;
-    }
-    if (PlatformInfo.isLinux) {
-      final linuxInfo = await deviceInfo.linuxInfo;
-      return linuxInfo.machineId!;
-    }
-    if (PlatformInfo.isWindows) {
-      final windowsInfo = await deviceInfo.windowsInfo;
-      return windowsInfo.deviceId;
-    }
-    if (PlatformInfo.isMacOS) {
-      final macosInfo = await deviceInfo.macOsInfo;
-      return macosInfo.systemGUID;
-    }
-    return null;
+    if (PlatformInfo.isWeb) return null;
+    return await FlutterUdid.consistentUdid;
   }
 }
