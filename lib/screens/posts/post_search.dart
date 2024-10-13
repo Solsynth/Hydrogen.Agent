@@ -24,7 +24,7 @@ class _PostSearchScreenState extends State<PostSearchScreen> {
   final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
 
-  bool _isBusy = true;
+  late bool _isBusy = widget.tag != null || widget.category != null;
 
   _searchPosts(int pageKey) async {
     if (widget.tag == null &&
