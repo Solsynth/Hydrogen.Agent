@@ -23,6 +23,21 @@ class AttachmentProvider extends GetConnect {
 
   final Map<String, Attachment> _cachedResponses = {};
 
+  List<Attachment?> listMetadataFromCache(List<String> rid) {
+    if (rid.isEmpty) return List.empty();
+
+    List<Attachment?> result = List.filled(rid.length, null);
+    for (var idx = 0; idx < rid.length; idx++) {
+      if (_cachedResponses.containsKey(rid[idx])) {
+        result[idx] = _cachedResponses[rid[idx]];
+      } else {
+        result[idx] = null;
+      }
+    }
+
+    return result;
+  }
+
   Future<List<Attachment?>> listMetadata(
     List<String> rid, {
     noCache = false,

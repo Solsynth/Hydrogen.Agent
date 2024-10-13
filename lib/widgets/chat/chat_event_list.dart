@@ -37,6 +37,7 @@ class ChatEventList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
+      cacheExtent: 100,
       reverse: true,
       slivers: [
         Obx(() {

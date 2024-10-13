@@ -529,7 +529,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 style: TextStyle(color: _unFocusColor, fontSize: 12),
               )
             ],
-          ).paddingAll(8),
+          ).paddingOnly(left: 8, right: 8, top: 8, bottom: 50),
         ],
       ),
     );

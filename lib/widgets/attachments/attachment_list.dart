@@ -134,7 +134,17 @@ class _AttachmentListState extends State<AttachmentList> {
     super.initState();
     assert(widget.attachmentIds != null || widget.attachments != null);
     if (widget.attachments == null) {
-      _getMetadataList();
+      final AttachmentProvider attach = Get.find();
+      final cachedResult = attach.listMetadataFromCache(widget.attachmentIds!);
+      if (cachedResult.every((x) => x != null)) {
+        setState(() {
+          _attachments = cachedResult;
+          _isLoading = false;
+        });
+        _calculateAspectRatio();
+      } else {
+        _getMetadataList();
+      }
     } else {
       setState(() {
         _attachments = widget.attachments!;
@@ -176,7 +186,10 @@ class _AttachmentListState extends State<AttachmentList> {
 
     if (widget.isFullWidth && _attachments.length == 1) {
       final element = _attachments.first;
-      double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+      double ratio = math.max(
+        element!.metadata?['ratio']?.toDouble() ?? 16 / 9,
+        0.5,
+      );
       return Container(
         width: MediaQuery.of(context).size.width,
         constraints: BoxConstraints(
@@ -243,7 +256,10 @@ class _AttachmentListState extends State<AttachmentList> {
           final element = _attachments[idx];
           idx++;
           if (element == null) return const SizedBox.shrink();
-          double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
+          double ratio = math.max(
+            element.metadata?['ratio']?.toDouble() ?? 16 / 9,
+            0.5,
+          );
           return Container(
             constraints: BoxConstraints(
               maxWidth: widget.columnMaxWidth,
@@ -282,7 +298,10 @@ class _AttachmentListState extends State<AttachmentList> {
         itemBuilder: (context, idx) {
           final element = _attachments[idx];
           if (element == null) const SizedBox.shrink();
-          final ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+          double ratio = math.max(
+            element!.metadata?['ratio']?.toDouble() ?? 16 / 9,
+            0.5,
+          );
           return Container(
             constraints: BoxConstraints(
               maxWidth: math.min(
