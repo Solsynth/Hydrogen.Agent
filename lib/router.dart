@@ -18,9 +18,9 @@ import 'package:solian/screens/channel/channel_detail.dart';
 import 'package:solian/screens/channel/channel_organize.dart';
 import 'package:solian/screens/chat.dart';
 import 'package:solian/screens/dashboard.dart';
-import 'package:solian/screens/feed/search.dart';
+import 'package:solian/screens/posts/post_search.dart';
 import 'package:solian/screens/posts/post_detail.dart';
-import 'package:solian/screens/feed/draft_box.dart';
+import 'package:solian/screens/posts/draft_box.dart';
 import 'package:solian/screens/realms.dart';
 import 'package:solian/screens/realms/realm_detail.dart';
 import 'package:solian/screens/realms/realm_organize.dart';
@@ -96,7 +96,7 @@ abstract class AppRouter {
         name: 'postSearch',
         builder: (context, state) => TitleShell(
           state: state,
-          child: FeedSearchScreen(
+          child: PostSearchScreen(
             tag: state.uri.queryParameters['tag'],
             category: state.uri.queryParameters['category'],
           ),

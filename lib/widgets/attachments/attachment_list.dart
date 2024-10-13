@@ -186,7 +186,9 @@ class _AttachmentListState extends State<AttachmentList> {
 
     if (widget.isFullWidth && _attachments.length == 1) {
       final element = _attachments.first;
-      double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+      final isImage = element!.mimetype.split('/').firstOrNull == 'image';
+      double ratio =
+          element.metadata?['ratio']?.toDouble() ?? (isImage ? 1 : 16 / 9);
       return Container(
         width: MediaQuery.of(context).size.width,
         constraints: BoxConstraints(
@@ -260,7 +262,9 @@ class _AttachmentListState extends State<AttachmentList> {
           final element = _attachments[idx];
           idx++;
           if (element == null) return const SizedBox.shrink();
-          double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
+          final isImage = element.mimetype.split('/').firstOrNull == 'image';
+          double ratio =
+              element.metadata?['ratio']?.toDouble() ?? (isImage ? 1 : 16 / 9);
           return Container(
             constraints: BoxConstraints(
               maxWidth: widget.columnMaxWidth,
@@ -303,7 +307,9 @@ class _AttachmentListState extends State<AttachmentList> {
         itemBuilder: (context, idx) {
           final element = _attachments[idx];
           if (element == null) const SizedBox.shrink();
-          final ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
+          final isImage = element!.mimetype.split('/').firstOrNull == 'image';
+          double ratio =
+              element.metadata?['ratio']?.toDouble() ?? (isImage ? 1 : 16 / 9);
           return Container(
             constraints: BoxConstraints(
               maxWidth: math.min(

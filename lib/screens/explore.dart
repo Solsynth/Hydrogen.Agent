@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:solian/controllers/post_list_controller.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/navigation.dart';
+import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/account/signin_required_overlay.dart';
@@ -159,6 +160,12 @@ class _ExploreScreenState extends State<ExploreScreen>
                     toolbarHeight: AppTheme.toolbarHeight(context),
                     leading: AppBarLeadingButton.adaptive(context),
                     actions: [
+                      IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          AppRouter.instance.pushNamed('postSearch');
+                        },
+                      ),
                       const BackgroundStateWidget(),
                       const NotificationButton(),
                       SizedBox(

@@ -54,6 +54,27 @@ class PostProvider extends GetxController {
     return resp;
   }
 
+  Future<Response> searchPost(String probe, int page,
+      {String? realm, String? author, tag, category, int take = 10}) async {
+    final queries = [
+      'probe=$probe',
+      'take=$take',
+      'offset=$page',
+      if (tag != null) 'tag=$tag',
+      if (category != null) 'category=$category',
+      if (author != null) 'author=$author',
+      if (realm != null) 'realm=$realm',
+    ];
+    final AuthProvider auth = Get.find();
+    final client = await auth.configureClient('co');
+    final resp = await client.get('/posts/search?${queries.join('&')}');
+    if (resp.statusCode != 200) {
+      throw RequestException(resp);
+    }
+
+    return resp;
+  }
+
   Future<Response> listPost(int page,
       {String? realm, String? author, tag, category, int take = 10}) async {
     final queries = [

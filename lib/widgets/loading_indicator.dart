@@ -9,7 +9,7 @@ class LoadingIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      color: Theme.of(context).colorScheme.surfaceContainerLow.withOpacity(0.8),
+      color: Theme.of(context).colorScheme.surfaceContainerLow.withOpacity(0.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
