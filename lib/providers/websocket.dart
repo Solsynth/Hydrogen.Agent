@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -165,11 +166,13 @@ class WebSocketProvider extends GetxController {
 
     late final String? token;
     late final String provider;
-    final deviceUuid = await _getDeviceUuid();
+    var deviceUuid = await _getDeviceUuid();
 
     if (deviceUuid == null || deviceUuid.isEmpty) {
       log("Unable to active push notifications, couldn't get device uuid");
+      return;
     } else {
+      deviceUuid = md5.convert(utf8.encode(deviceUuid)).toString();
       log('Device UUID is $deviceUuid');
     }
 
