@@ -131,6 +131,15 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               if (auth.isAuthorized.value)
                 ListTile(
+                  leading: const Icon(Icons.event_repeat),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 34),
+                  title: Text('auditLog'.tr),
+                  onTap: () {
+                    AppRouter.instance.pushNamed('auditLog');
+                  },
+                ),
+              if (auth.isAuthorized.value)
+                ListTile(
                   leading: const Icon(Icons.lock),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 34),
                   title: Text('authPreferences'.tr),

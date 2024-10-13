@@ -481,5 +481,6 @@
   "authPreferences": "Auth preferences",
   "authPreferencesDesc": "Set the security behavior of your account",
   "authMaximumAuthSteps": "Maximum authentication steps",
-  "authMaximumAuthStepsDesc": "The maximum number of authentication steps when logging in, higher value is more secure, lower value is more convenient; default is 2"
+  "authMaximumAuthStepsDesc": "The maximum number of authentication steps when logging in, higher value is more secure, lower value is more convenient; default is 2",
+  "auditLog": "Audit log"
 }

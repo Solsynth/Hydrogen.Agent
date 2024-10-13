@@ -6,6 +6,7 @@ import 'package:solian/models/post.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/screens/about.dart';
 import 'package:solian/screens/account.dart';
+import 'package:solian/screens/account/audit_log.dart';
 import 'package:solian/screens/account/friend.dart';
 import 'package:solian/screens/account/preferences/notifications.dart';
 import 'package:solian/screens/account/preferences/security.dart';
@@ -273,6 +274,14 @@ abstract class AppRouter {
         builder: (context, state) => TitleShell(
           state: state,
           child: const AuthPreferencesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/account/audit',
+        name: 'auditLog',
+        builder: (context, state) => TitleShell(
+          state: state,
+          child: const AuditLogScreen(),
         ),
       ),
       GoRoute(
