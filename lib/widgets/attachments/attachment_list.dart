@@ -186,10 +186,7 @@ class _AttachmentListState extends State<AttachmentList> {
 
     if (widget.isFullWidth && _attachments.length == 1) {
       final element = _attachments.first;
-      double ratio = math.max(
-        element!.metadata?['ratio']?.toDouble() ?? 16 / 9,
-        0.5,
-      );
+      double ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
       return Container(
         width: MediaQuery.of(context).size.width,
         constraints: BoxConstraints(
@@ -199,6 +196,10 @@ class _AttachmentListState extends State<AttachmentList> {
           aspectRatio: ratio,
           child: Container(
             decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer
+                  .withOpacity(0.5),
               border: Border.symmetric(
                 horizontal: BorderSide(
                   color: Theme.of(context).dividerColor,
@@ -231,7 +232,10 @@ class _AttachmentListState extends State<AttachmentList> {
           final element = _attachments[idx];
           return Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainer
+                  .withOpacity(0.5),
               border: Border.all(
                 color: Theme.of(context).dividerColor,
                 width: 1,
@@ -256,10 +260,7 @@ class _AttachmentListState extends State<AttachmentList> {
           final element = _attachments[idx];
           idx++;
           if (element == null) return const SizedBox.shrink();
-          double ratio = math.max(
-            element.metadata?['ratio']?.toDouble() ?? 16 / 9,
-            0.5,
-          );
+          double ratio = element.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
             constraints: BoxConstraints(
               maxWidth: widget.columnMaxWidth,
@@ -269,6 +270,10 @@ class _AttachmentListState extends State<AttachmentList> {
               aspectRatio: ratio,
               child: Container(
                 decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainer
+                      .withOpacity(0.5),
                   border: Border.all(
                     color: Theme.of(context).dividerColor,
                     width: 1,
@@ -298,10 +303,7 @@ class _AttachmentListState extends State<AttachmentList> {
         itemBuilder: (context, idx) {
           final element = _attachments[idx];
           if (element == null) const SizedBox.shrink();
-          double ratio = math.max(
-            element!.metadata?['ratio']?.toDouble() ?? 16 / 9,
-            0.5,
-          );
+          final ratio = element!.metadata?['ratio']?.toDouble() ?? 16 / 9;
           return Container(
             constraints: BoxConstraints(
               maxWidth: math.min(
@@ -314,6 +316,10 @@ class _AttachmentListState extends State<AttachmentList> {
               aspectRatio: ratio,
               child: Container(
                 decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainer
+                      .withOpacity(0.5),
                   border: Border.all(
                     color: Theme.of(context).dividerColor,
                     width: 1,

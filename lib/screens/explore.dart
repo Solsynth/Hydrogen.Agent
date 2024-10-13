@@ -108,10 +108,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                                   RealmSwitcher(),
                                 ],
                               ).paddingSymmetric(horizontal: 8),
-                            ),
+                            ).paddingSymmetric(vertical: 4),
                             TabBar(
                               controller: _tabController,
-                              dividerHeight: 0.3,
+                              dividerHeight: scrollProgress > 0 ? 0 : 0.3,
                               tabAlignment: TabAlignment.fill,
                               tabs: [
                                 Tab(
@@ -138,8 +138,10 @@ class _ExploreScreenState extends State<ExploreScreen>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.shuffle_on_outlined,
-                                          size: 20),
+                                      const Icon(
+                                        Icons.shuffle_on_outlined,
+                                        size: 20,
+                                      ),
                                       const Gap(8),
                                       Text('postListShuffle'.tr),
                                     ],
@@ -151,7 +153,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                         ).paddingOnly(top: MediaQuery.of(context).padding.top),
                       ),
                     ),
-                    expandedHeight: 96,
+                    expandedHeight: 104,
                     snap: true,
                     floating: true,
                     toolbarHeight: AppTheme.toolbarHeight(context),

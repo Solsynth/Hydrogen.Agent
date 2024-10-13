@@ -182,7 +182,10 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              tileColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              tileColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerLow
+                  .withOpacity(0.5),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
