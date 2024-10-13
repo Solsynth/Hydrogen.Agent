@@ -115,8 +115,16 @@ class _PostActionState extends State<PostAction> {
     ).create();
     await imageFile.writeAsBytes(image);
 
+    final box = context.findRenderObject() as RenderBox?;
+
     final file = XFile(imageFile.path);
-    await Share.shareXFiles([file]);
+    await Share.shareXFiles(
+      [file],
+      subject: 'postShareSubject'.trParams({
+        'username': widget.item.author.nick,
+      }),
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
 
     await imageFile.delete();
   }
