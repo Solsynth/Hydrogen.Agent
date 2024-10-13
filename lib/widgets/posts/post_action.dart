@@ -92,7 +92,7 @@ class _PostActionState extends State<PostAction> {
     final List<String> attachments = widget.item.body['attachments'] is List
         ? List.from(widget.item.body['attachments']?.whereType<String>())
         : List.empty();
-    final hasAttachment = attachments.isNotEmpty;
+    final hasMultipleAttachment = attachments.length > 1;
 
     final screenshot = ScreenshotController();
     final image = await screenshot.captureFromLongWidget(
@@ -104,7 +104,7 @@ class _PostActionState extends State<PostAction> {
       pixelRatio: 2,
       constraints: BoxConstraints(
         minWidth: 480,
-        maxWidth: hasAttachment ? 480 : 640,
+        maxWidth: hasMultipleAttachment ? 480 : 640,
         minHeight: 640,
         maxHeight: double.infinity,
       ),
