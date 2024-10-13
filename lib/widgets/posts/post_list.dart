@@ -86,7 +86,6 @@ class PostListEntryWidget extends StatelessWidget {
         isClickable: isNestedClickable,
         showFeaturedReply: showFeaturedReply,
         padding: padding,
-        backgroundColor: backgroundColor,
         onComment: () {
           AppRouter.instance
               .pushNamed(

@@ -65,7 +65,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 isClickable: false,
                 isOverrideEmbedClickable: true,
                 isFullDate: true,
-                isFullContent: true,
                 isShowReply: false,
                 isContentSelectable: true,
                 padding: AppTheme.isLargeScreen(context)

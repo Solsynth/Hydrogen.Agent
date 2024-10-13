@@ -31,13 +31,11 @@ class PostItem extends StatefulWidget {
   final bool isShowEmbed;
   final bool isOverrideEmbedClickable;
   final bool isFullDate;
-  final bool isFullContent;
   final bool isContentSelectable;
   final bool showFeaturedReply;
   final String? attachmentParent;
 
   final EdgeInsets? padding;
-  final Color? backgroundColor;
 
   final Function? onComment;
 
@@ -51,12 +49,10 @@ class PostItem extends StatefulWidget {
     this.isShowEmbed = true,
     this.isOverrideEmbedClickable = false,
     this.isFullDate = false,
-    this.isFullContent = false,
     this.isContentSelectable = false,
     this.showFeaturedReply = false,
     this.attachmentParent,
     this.padding,
-    this.backgroundColor,
     this.onComment,
   });
 
@@ -76,8 +72,6 @@ class _PostItemState extends State<PostItem> {
     super.initState();
   }
 
-  double _contentHeight = 0;
-
   @override
   Widget build(BuildContext context) {
     final List<String> attachments = item.body['attachments'] is List
@@ -95,32 +89,24 @@ class _PostItemState extends State<PostItem> {
           ).paddingOnly(bottom: 8),
           _PostHeaderWidget(
             isCompact: widget.isCompact,
+            isFullDate: widget.isFullDate,
             item: item,
           ).paddingSymmetric(horizontal: 12),
           _PostHeaderDividerWidget(item: item).paddingSymmetric(horizontal: 12),
           SizedContainer(
             maxWidth: 640,
-            maxHeight: widget.isFullContent ? double.infinity : 80,
-            child: _MeasureSize(
-              onChange: (size) {
-                setState(() => _contentHeight = size.height);
-              },
-              child: SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                child: MarkdownTextContent(
-                  parentId: 'p${item.id}',
-                  content: item.body['content'],
-                  isAutoWarp: item.type == 'story',
-                  isSelectable: widget.isContentSelectable,
-                ),
-              ).paddingOnly(
-                left: 12,
-                right: 12,
-                bottom: hasAttachment ? 4 : 0,
-              ),
+            child: MarkdownTextContent(
+              parentId: 'p${item.id}',
+              content: item.body['content'],
+              isAutoWarp: item.type == 'story',
+              isSelectable: widget.isContentSelectable,
             ),
+          ).paddingOnly(
+            left: 12,
+            right: 12,
+            bottom: hasAttachment ? 4 : 0,
           ),
-          if (_contentHeight >= 80 && !widget.isFullContent)
+          if (widget.item.body?['content_truncated'] == true)
             Opacity(
               opacity: 0.8,
               child: InkWell(child: Text('readMore'.tr)),
@@ -165,30 +151,20 @@ class _PostItemState extends State<PostItem> {
             children: [
               _PostHeaderWidget(
                 isCompact: widget.isCompact,
+                isFullDate: widget.isFullDate,
                 item: item,
               ),
               _PostHeaderDividerWidget(item: item),
               SizedContainer(
                 maxWidth: 640,
-                maxHeight: widget.isFullContent ? double.infinity : 320,
-                child: _MeasureSize(
-                  onChange: (size) {
-                    setState(() => _contentHeight = size.height);
-                  },
-                  child: SingleChildScrollView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    child: MarkdownTextContent(
-                      parentId: 'p${item.id}-embed',
-                      content: item.body['content'],
-                      isAutoWarp: item.type == 'story',
-                      isSelectable: widget.isContentSelectable,
-                      isLargeText:
-                          item.type == 'article' && widget.isFullContent,
-                    ),
-                  ),
+                child: MarkdownTextContent(
+                  parentId: 'p${item.id}-embed',
+                  content: item.body['content'],
+                  isAutoWarp: item.type == 'story',
+                  isSelectable: widget.isContentSelectable,
                 ),
               ),
-              if (_contentHeight >= 320 && !widget.isFullContent)
+              if (widget.item.body?['content_truncated'] == true)
                 Opacity(
                   opacity: 0.8,
                   child: InkWell(child: Text('readMore'.tr)),
@@ -593,10 +569,12 @@ class _PostFooterWidget extends StatelessWidget {
 
 class _PostHeaderWidget extends StatelessWidget {
   final bool isCompact;
+  final bool isFullDate;
   final Post item;
 
   const _PostHeaderWidget({
     required this.isCompact,
+    required this.isFullDate,
     required this.item,
   });
 
@@ -629,6 +607,7 @@ class _PostHeaderWidget extends StatelessWidget {
                       if (isCompact)
                         RelativeDate(
                           item.publishedAt?.toLocal() ?? DateTime.now(),
+                          isFull: isFullDate,
                         ).paddingOnly(top: 1),
                     ],
                   ),
@@ -682,47 +661,5 @@ class _PostThumbnail extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-typedef _OnWidgetSizeChange = void Function(Size size);
-
-class _MeasureSizeRenderObject extends RenderProxyBox {
-  Size? oldSize;
-  _OnWidgetSizeChange onChange;
-
-  _MeasureSizeRenderObject(this.onChange);
-
-  @override
-  void performLayout() {
-    super.performLayout();
-
-    Size newSize = child!.size;
-    if (oldSize == newSize) return;
-
-    oldSize = newSize;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      onChange(newSize);
-    });
-  }
-}
-
-class _MeasureSize extends SingleChildRenderObjectWidget {
-  final _OnWidgetSizeChange onChange;
-
-  const _MeasureSize({
-    required this.onChange,
-    required Widget super.child,
-  });
-
-  @override
-  RenderObject createRenderObject(BuildContext context) {
-    return _MeasureSizeRenderObject(onChange);
-  }
-
-  @override
-  void updateRenderObject(
-      BuildContext context, covariant _MeasureSizeRenderObject renderObject) {
-    renderObject.onChange = onChange;
   }
 }

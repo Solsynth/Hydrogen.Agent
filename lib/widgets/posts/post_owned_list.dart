@@ -31,8 +31,6 @@ class PostOwnedListEntry extends StatelessWidget {
               isClickable: false,
               isShowReply: false,
               isReactable: false,
-              isFullContent: isFullContent,
-              backgroundColor: backgroundColor,
             ).paddingSymmetric(vertical: 8),
           ],
         ),
