@@ -20,6 +20,7 @@ Post _$PostFromJson(Map<String, dynamic> json) => Post(
       areaAlias: json['area_alias'] as String?,
       type: json['type'] as String,
       body: json['body'],
+      visibility: (json['visibility'] as num).toInt(),
       tags: (json['tags'] as List<dynamic>?)
           ?.map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -67,6 +68,7 @@ Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
       'alias': instance.alias,
       'area_alias': instance.areaAlias,
       'body': instance.body,
+      'visibility': instance.visibility,
       'tags': instance.tags?.map((e) => e.toJson()).toList(),
       'categories': instance.categories?.map((e) => e.toJson()).toList(),
       'replies': instance.replies?.map((e) => e.toJson()).toList(),

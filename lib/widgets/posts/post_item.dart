@@ -1,6 +1,5 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -65,6 +64,14 @@ class _PostItemState extends State<PostItem> {
 
   Color get _unFocusColor =>
       Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
+  static final visibilityIcons = [
+    Icons.public,
+    Icons.group,
+    Icons.visibility,
+    Icons.visibility_off,
+    Icons.lock,
+  ];
 
   @override
   void initState() {
@@ -612,7 +619,24 @@ class _PostHeaderWidget extends StatelessWidget {
                     ],
                   ),
                   if (!isCompact)
-                    RelativeDate(item.publishedAt?.toLocal() ?? DateTime.now()),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        RelativeDate(
+                          item.publishedAt?.toLocal() ?? DateTime.now(),
+                          isFull: isFullDate,
+                        ),
+                        const Gap(4),
+                        Icon(
+                          _PostItemState.visibilityIcons[item.visibility],
+                          size: 16,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.75),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

@@ -24,6 +24,7 @@ class Post {
   String? alias;
   String? areaAlias;
   dynamic body;
+  int visibility;
   List<Tag>? tags;
   List<Category>? categories;
   List<Post>? replies;
@@ -55,6 +56,7 @@ class Post {
     required this.areaAlias,
     required this.type,
     required this.body,
+    required this.visibility,
     required this.tags,
     required this.categories,
     required this.replies,
