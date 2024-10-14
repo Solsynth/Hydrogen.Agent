@@ -62,10 +62,9 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     return CustomScrollView(
       slivers: [
-        if (_isBusy)
-          SliverToBoxAdapter(
-            child: LoadingIndicator(),
-          ),
+        SliverToBoxAdapter(
+          child: LoadingIndicator(isActive: _isBusy),
+        ),
         SliverToBoxAdapter(
           child: PostItem(
             item: _item!,

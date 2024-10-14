@@ -481,5 +481,6 @@
   "auditLog": "活动日志",
   "shareImage": "分享图片",
   "shareImageFooter": "上 Solar Network 看更多有趣帖子",
-  "fileSavedAt": "文件保存于 @path"
+  "fileSavedAt": "文件保存于 @path",
+  "showIp": "显示 IP 地址"
 }

@@ -38,11 +38,13 @@ class _ChannelListWidgetState extends State<ChannelListWidget> {
 
   Future<void> _loadLastMessages() async {
     final messages = await _eventController.src.getLastInAllChannels();
-    setState(() {
-      _lastMessages = messages
-          .map((k, v) => MapEntry(k, v.firstOrNull))
-          .cast<int, LocalMessageEventTableData>();
-    });
+    if (mounted) {
+      setState(() {
+        _lastMessages = messages
+            .map((k, v) => MapEntry(k, v.firstOrNull))
+            .cast<int, LocalMessageEventTableData>();
+      });
+    }
   }
 
   @override

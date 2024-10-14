@@ -485,5 +485,6 @@
   "auditLog": "Audit log",
   "shareImage": "Share as image",
   "shareImageFooter": "Only on the Solar Network",
-  "fileSavedAt": "File saved at @path"
+  "fileSavedAt": "File saved at @path",
+  "showIp": "Show IP Address"
 }
