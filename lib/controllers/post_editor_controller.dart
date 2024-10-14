@@ -43,14 +43,17 @@ class PostEditorController extends GetxController {
 
   RxBool isRestoreFromLocal = false.obs;
   Rx<DateTime?> lastSaveTime = Rx(null);
-  Timer? _saveTimer;
+  Future? _saveFuture;
 
   PostEditorController() {
     SharedPreferences.getInstance().then((inst) {
       _prefs = inst;
-      _saveTimer = Timer.periodic(
-        const Duration(seconds: 3),
-        (Timer t) {
+    });
+    contentController.addListener(() {
+      contentLength.value = contentController.text.length;
+      _saveFuture ??= Future.delayed(
+        const Duration(seconds: 1),
+        () {
           if (isNotEmpty) {
             localSave();
             lastSaveTime.value = DateTime.now();
@@ -59,11 +62,9 @@ class PostEditorController extends GetxController {
             localClear();
             lastSaveTime.value = null;
           }
+          _saveFuture = null;
         },
       );
-    });
-    contentController.addListener(() {
-      contentLength.value = contentController.text.length;
     });
   }
 
@@ -355,8 +356,6 @@ class PostEditorController extends GetxController {
 
   @override
   void dispose() {
-    _saveTimer?.cancel();
-
     titleController.dispose();
     descriptionController.dispose();
     contentController.dispose();
