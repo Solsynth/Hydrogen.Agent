@@ -484,5 +484,6 @@
   "authMaximumAuthStepsDesc": "The maximum number of authentication steps when logging in, higher value is more secure, lower value is more convenient; default is 2",
   "auditLog": "Audit log",
   "shareImage": "Share as image",
-  "shareImageFooter": "Only on the Solar Network"
+  "shareImageFooter": "Only on the Solar Network",
+  "fileSavedAt": "File saved at @path"
 }

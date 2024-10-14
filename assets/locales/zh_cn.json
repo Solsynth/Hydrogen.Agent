@@ -480,5 +480,6 @@
   "authMaximumAuthStepsDesc": "登陆时最多的验证步数，值越高则越安全，反之则会相对方便；默认设置为 2",
   "auditLog": "活动日志",
   "shareImage": "分享图片",
-  "shareImageFooter": "上 Solar Network 看更多有趣帖子"
+  "shareImageFooter": "上 Solar Network 看更多有趣帖子",
+  "fileSavedAt": "文件保存于 @path"
 }

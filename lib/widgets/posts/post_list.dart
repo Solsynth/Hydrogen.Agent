@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -73,50 +74,59 @@ class PostListEntryWidget extends StatelessWidget {
     required this.onUpdate,
   });
 
+  void _openActions(BuildContext context) {
+    final AuthProvider auth = Get.find();
+    if (auth.isAuthorized.isFalse) return;
+
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      builder: (context) => PostAction(item: item),
+    ).then((value) {
+      if (value is Future) {
+        value.then((_) {
+          onUpdate();
+        });
+      } else if (value != null) {
+        onUpdate();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: PostItem(
-        key: Key('p${item.id}'),
-        item: item,
-        isShowEmbed: isShowEmbed,
-        isClickable: isNestedClickable,
-        showFeaturedReply: showFeaturedReply,
-        padding: padding,
-        onComment: () {
-          AppRouter.instance
-              .pushNamed(
-            'postEditor',
-            extra: PostPublishArguments(reply: item),
-          )
-              .then((value) {
-            if (value is Future) {
-              value.then((_) {
+    return TapRegion(
+      child: GestureDetector(
+        onLongPress: () => _openActions(context),
+        child: PostItem(
+          key: Key('p${item.id}'),
+          item: item,
+          isShowEmbed: isShowEmbed,
+          isClickable: isNestedClickable,
+          showFeaturedReply: showFeaturedReply,
+          padding: padding,
+          onComment: () {
+            AppRouter.instance
+                .pushNamed(
+              'postEditor',
+              extra: PostPublishArguments(reply: item),
+            )
+                .then((value) {
+              if (value is Future) {
+                value.then((_) {
+                  onUpdate();
+                });
+              } else if (value != null) {
                 onUpdate();
-              });
-            } else if (value != null) {
-              onUpdate();
-            }
-          });
-        },
-      ).paddingSymmetric(vertical: 8),
-      onLongPress: () {
-        final AuthProvider auth = Get.find();
-        if (auth.isAuthorized.isFalse) return;
-
-        showModalBottomSheet(
-          useRootNavigator: true,
-          context: context,
-          builder: (context) => PostAction(item: item),
-        ).then((value) {
-          if (value is Future) {
-            value.then((_) {
-              onUpdate();
+              }
             });
-          } else if (value != null) {
-            onUpdate();
-          }
-        });
+          },
+        ).paddingSymmetric(vertical: 8),
+      ),
+      onTapInside: (event) {
+        if (event.buttons == kSecondaryMouseButton) {
+          _openActions(context);
+        }
       },
     );
   }

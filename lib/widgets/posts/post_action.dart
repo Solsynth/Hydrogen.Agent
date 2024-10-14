@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:file_saver/file_saver.dart';
@@ -7,9 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:solian/exts.dart';
@@ -113,16 +109,17 @@ class _PostActionState extends State<PostAction> {
         maxHeight: double.infinity,
       ),
     );
-    final directory = await getApplicationDocumentsDirectory();
-    final imageFile = await File(
-      '${directory.path}/share_image_${DateFormat('yyyy-MM-dd-HH-mm-ss').format(DateTime.now())}.png',
-    ).create();
-    await imageFile.writeAsBytes(image);
+
+    final filename = 'share_post#${widget.item.id}';
 
     if (PlatformInfo.isAndroid || PlatformInfo.isIOS) {
       final box = context.findRenderObject() as RenderBox?;
 
-      final file = XFile(imageFile.path);
+      final file = XFile.fromData(
+        image,
+        mimeType: 'image/png',
+        name: filename,
+      );
       await Share.shareXFiles(
         [file],
         subject: 'postShareSubject'.trParams({
@@ -132,15 +129,14 @@ class _PostActionState extends State<PostAction> {
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
     } else {
-      await FileSaver.instance.saveAs(
-        name: path.basename(imageFile.path),
-        ext: path.extension(imageFile.path),
+      final filepath = await FileSaver.instance.saveFile(
+        name: filename,
+        ext: 'png',
         mimeType: MimeType.png,
-        file: imageFile,
+        bytes: image,
       );
+      context.showSnackbar('fileSavedAt'.trParams({'path': filepath}));
     }
-
-    await imageFile.delete();
   }
 
   @override

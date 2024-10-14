@@ -49,6 +49,7 @@ class _AttachmentListState extends State<AttachmentList> {
   bool _isLoading = true;
   bool _showMature = false;
 
+  // ignore: unused_field
   double _aspectRatio = 1;
 
   List<Attachment?> _attachments = List.empty();
