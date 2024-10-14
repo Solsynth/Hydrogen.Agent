@@ -11,6 +11,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/providers/content/posts.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_editor.dart';
 import 'package:solian/widgets/loading_indicator.dart';
@@ -28,20 +29,14 @@ class PostAction extends StatefulWidget {
 }
 
 class _PostActionState extends State<PostAction> {
-  bool _isBusy = true;
+  bool _isBusy = false;
   bool _canModifyContent = false;
 
   void _checkAbleToModifyContent() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    setState(() => _isBusy = true);
-
-    setState(() {
-      _canModifyContent =
-          auth.userProfile.value!['id'] == widget.item.author.id;
-      _isBusy = false;
-    });
+    _canModifyContent = auth.userProfile.value!['id'] == widget.item.author.id;
   }
 
   Future<void> _doShare({bool noUri = false}) async {
@@ -94,6 +89,8 @@ class _PostActionState extends State<PostAction> {
         : List.empty();
     final hasMultipleAttachment = attachments.length > 1;
 
+    setState(() => _isBusy = true);
+
     final screenshot = ScreenshotController();
     final image = await screenshot.captureFromLongWidget(
       MediaQuery(
@@ -137,6 +134,21 @@ class _PostActionState extends State<PostAction> {
       );
       context.showSnackbar('fileSavedAt'.trParams({'path': filepath}));
     }
+
+    setState(() => _isBusy = false);
+  }
+
+  Future<Post> _getFullPost() async {
+    final PostProvider posts = Get.find();
+
+    try {
+      final resp = await posts.getPost(widget.item.id.toString());
+      return Post.fromJson(resp.body);
+    } catch (e) {
+      context.showErrorDialog(e).then((_) => Navigator.pop(context));
+    }
+
+    return widget.item;
   }
 
   @override
@@ -182,7 +194,13 @@ class _PostActionState extends State<PostAction> {
               ),
             ],
           ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-          LoadingIndicator(isActive: _isBusy),
+          LoadingIndicator(
+            isActive: _isBusy,
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHigh
+                .withOpacity(0.5),
+          ),
           Expanded(
             child: ListView(
               children: [
@@ -205,10 +223,12 @@ class _PostActionState extends State<PostAction> {
                       IconButton(
                         icon: const Icon(Icons.image),
                         tooltip: 'shareImage'.tr,
-                        onPressed: () async {
-                          await _shareImage();
-                          Navigator.pop(context);
-                        },
+                        onPressed: _isBusy
+                            ? null
+                            : () async {
+                                await _shareImage();
+                                Navigator.pop(context);
+                              },
                       ),
                     ],
                   ),
@@ -288,15 +308,23 @@ class _PostActionState extends State<PostAction> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                     leading: const Icon(Icons.edit),
                     title: Text('edit'.tr),
-                    onTap: () async {
-                      Navigator.pop(
-                        context,
-                        AppRouter.instance.pushNamed(
-                          'postEditor',
-                          extra: PostPublishArguments(edit: widget.item),
-                        ),
-                      );
-                    },
+                    onTap: _isBusy
+                        ? null
+                        : () async {
+                            setState(() => _isBusy = true);
+                            var item = widget.item;
+                            if (item.body?['content_truncated'] == true) {
+                              item = await _getFullPost();
+                            }
+                            Navigator.pop(
+                              context,
+                              AppRouter.instance.pushNamed(
+                                'postEditor',
+                                extra: PostPublishArguments(edit: item),
+                              ),
+                            );
+                            if (mounted) setState(() => _isBusy = false);
+                          },
                   ),
                 if (_canModifyContent)
                   ListTile(

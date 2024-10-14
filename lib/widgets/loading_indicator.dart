@@ -4,8 +4,13 @@ import 'package:gap/gap.dart';
 
 class LoadingIndicator extends StatefulWidget {
   final bool isActive;
+  final Color? backgroundColor;
 
-  const LoadingIndicator({super.key, this.isActive = true});
+  const LoadingIndicator({
+    super.key,
+    this.isActive = true,
+    this.backgroundColor,
+  });
 
   @override
   State<LoadingIndicator> createState() => _LoadingIndicatorState();
@@ -63,7 +68,7 @@ class _LoadingIndicatorState extends State<LoadingIndicator>
       axisAlignment: -1, // Align animation from the top
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        color:
+        color: widget.backgroundColor ??
             Theme.of(context).colorScheme.surfaceContainerLow.withOpacity(0.5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
