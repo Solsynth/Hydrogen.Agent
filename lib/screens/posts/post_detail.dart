@@ -6,6 +6,7 @@ import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/last_read.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/loading_indicator.dart';
+import 'package:solian/widgets/posts/post_action.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/posts/post_replies.dart';
 
@@ -40,7 +41,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
     Get.find<LastReadProvider>().feedLastReadAt = _item?.id;
 
-    setState(() => _isBusy = false);
+    if (mounted) setState(() => _isBusy = false);
   }
 
   @override
@@ -67,6 +68,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         ),
         SliverToBoxAdapter(
           child: PostItem(
+            key: ValueKey(_item),
             item: _item!,
             isClickable: false,
             isOverrideEmbedClickable: true,
@@ -79,6 +81,24 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     vertical: 8,
                   )
                 : EdgeInsets.zero,
+            onTapMore: () {
+              showModalBottomSheet(
+                useRootNavigator: true,
+                context: context,
+                builder: (context) => PostAction(
+                  item: _item!,
+                  noReact: true,
+                ),
+              ).then((value) {
+                if (value is Future) {
+                  value.then((_) {
+                    _getDetail();
+                  });
+                } else if (value != null) {
+                  _getDetail();
+                }
+              });
+            },
           ),
         ),
         SliverToBoxAdapter(

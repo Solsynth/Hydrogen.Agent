@@ -38,6 +38,7 @@ class PostItem extends StatefulWidget {
   final EdgeInsets? padding;
 
   final Function? onComment;
+  final Function? onTapMore;
 
   const PostItem({
     super.key,
@@ -55,6 +56,7 @@ class PostItem extends StatefulWidget {
     this.attachmentParent,
     this.padding,
     this.onComment,
+    this.onTapMore,
   });
 
   @override
@@ -99,6 +101,7 @@ class _PostItemState extends State<PostItem> {
           _PostHeaderWidget(
             isCompact: widget.isCompact,
             isFullDate: widget.isFullDate,
+            onTapMore: widget.onTapMore,
             item: item,
           ).paddingSymmetric(horizontal: 12),
           _PostHeaderDividerWidget(item: item).paddingSymmetric(horizontal: 12),
@@ -161,6 +164,7 @@ class _PostItemState extends State<PostItem> {
               _PostHeaderWidget(
                 isCompact: widget.isCompact,
                 isFullDate: widget.isFullDate,
+                onTapMore: widget.onTapMore,
                 item: item,
               ),
               _PostHeaderDividerWidget(item: item),
@@ -588,10 +592,13 @@ class _PostHeaderWidget extends StatelessWidget {
   final bool isFullDate;
   final Post item;
 
+  final Function? onTapMore;
+
   const _PostHeaderWidget({
     required this.isCompact,
     required this.isFullDate,
     required this.item,
+    required this.onTapMore,
   });
 
   @override
@@ -649,10 +656,12 @@ class _PostHeaderWidget extends StatelessWidget {
                 ],
               ),
             ),
-            if (item.type == 'article')
-              Badge(
-                label: Text('article'.tr),
-              ).paddingOnly(top: 3),
+            if (onTapMore != null)
+              IconButton(
+                color: Theme.of(context).colorScheme.primary,
+                icon: const Icon(Icons.more_vert),
+                onPressed: () => onTapMore!(),
+              ),
           ],
         ),
         const Gap(8),
