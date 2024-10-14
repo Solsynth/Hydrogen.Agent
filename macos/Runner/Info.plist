@@ -62,5 +62,9 @@
 	<string>Allow you record audio for your message or post</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow you add photo to your message or post</string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 </dict>
 </plist>

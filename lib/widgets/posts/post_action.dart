@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:file_saver/file_saver.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -73,7 +76,8 @@ class _PostActionState extends State<PostAction> {
           'link': 'https://solsynth.dev/posts/$id',
         }),
         subject: 'postShareSubject'.trParams({
-          'username': widget.item.author.nick,
+          'username': '@${widget.item.author.name}',
+          'title': widget.item.body['title'] ?? '#${widget.item.id}',
         }),
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
@@ -104,27 +108,37 @@ class _PostActionState extends State<PostAction> {
       pixelRatio: 2,
       constraints: BoxConstraints(
         minWidth: 480,
-        maxWidth: hasMultipleAttachment ? 480 : 640,
+        maxWidth: hasMultipleAttachment ? 640 : 480,
         minHeight: 640,
         maxHeight: double.infinity,
       ),
     );
     final directory = await getApplicationDocumentsDirectory();
     final imageFile = await File(
-      '${directory.path}/temporary_share_image.png',
+      '${directory.path}/share_image_${DateFormat('yyyy-MM-dd-HH-mm-ss').format(DateTime.now())}.png',
     ).create();
     await imageFile.writeAsBytes(image);
 
-    final box = context.findRenderObject() as RenderBox?;
+    if (PlatformInfo.isAndroid || PlatformInfo.isIOS) {
+      final box = context.findRenderObject() as RenderBox?;
 
-    final file = XFile(imageFile.path);
-    await Share.shareXFiles(
-      [file],
-      subject: 'postShareSubject'.trParams({
-        'username': widget.item.author.nick,
-      }),
-      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-    );
+      final file = XFile(imageFile.path);
+      await Share.shareXFiles(
+        [file],
+        subject: 'postShareSubject'.trParams({
+          'username': '@${widget.item.author.name}',
+          'title': widget.item.body['title'] ?? '#${widget.item.id}',
+        }),
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    } else {
+      await FileSaver.instance.saveAs(
+        name: path.basename(imageFile.path),
+        ext: path.extension(imageFile.path),
+        mimeType: MimeType.png,
+        file: imageFile,
+      );
+    }
 
     await imageFile.delete();
   }
@@ -192,15 +206,14 @@ class _PostActionState extends State<PostAction> {
                             Navigator.pop(context);
                           },
                         ),
-                      if (PlatformInfo.isIOS || PlatformInfo.isAndroid)
-                        IconButton(
-                          icon: const Icon(Icons.image),
-                          tooltip: 'shareImage'.tr,
-                          onPressed: () async {
-                            await _shareImage();
-                            Navigator.pop(context);
-                          },
-                        ),
+                      IconButton(
+                        icon: const Icon(Icons.image),
+                        tooltip: 'shareImage'.tr,
+                        onPressed: () async {
+                          await _shareImage();
+                          Navigator.pop(context);
+                        },
+                      ),
                     ],
                   ),
                   onTap: () async {

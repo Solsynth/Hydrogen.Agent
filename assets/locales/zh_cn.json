@@ -363,7 +363,7 @@
   "bsRegisteringPushNotify": "正在启用推送通知",
   "bsDismissibleErrorHint": "点击任意地方忽略此错误",
   "postShareContent": "@content\n\n@username 在 Solar Network\n原帖地址：@link",
-  "postShareSubject": "@username 在 Solar Network 上发布了一篇帖子",
+  "postShareSubject": "@username 在 Solar Network 发表的 @title",
   "themeColor": "全局主题色",
   "themeColorRed": "现代红",
   "themeColorBlue": "经典蓝",
