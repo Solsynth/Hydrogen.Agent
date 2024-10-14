@@ -16,6 +16,7 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:solian/widgets/posts/post_item.dart';
 import 'package:badges/badges.dart' as badges;
@@ -274,7 +275,7 @@ class _PostPublishScreenState extends State<PostPublishScreen> {
                   ),
                 ],
               ),
-            if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+            LoadingIndicator(isActive: _isBusy),
             Expanded(
               child: DefaultTabController(
                 length: 2,

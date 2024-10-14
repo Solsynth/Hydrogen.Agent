@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/exceptions/exceptions.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/providers/auth.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 
 class AuthPreferencesScreen extends StatefulWidget {
   const AuthPreferencesScreen({super.key});
@@ -67,7 +67,7 @@ class _AuthPreferencesScreenState extends State<AuthPreferencesScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+        LoadingIndicator(isActive: _isBusy),
         ListTile(
           tileColor: Theme.of(context).colorScheme.surfaceContainer,
           contentPadding: const EdgeInsets.symmetric(horizontal: 24),

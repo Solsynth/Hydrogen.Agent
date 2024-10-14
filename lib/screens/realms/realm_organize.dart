@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +12,7 @@ import 'package:solian/router.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/root_container.dart';
 import 'package:uuid/uuid.dart';
 
@@ -208,7 +208,7 @@ class _RealmOrganizeScreenState extends State<RealmOrganizeScreen> {
           top: false,
           child: Column(
             children: [
-              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+              LoadingIndicator(isActive: _isBusy),
               if (widget.edit != null)
                 MaterialBanner(
                   leading: const Icon(Icons.edit),

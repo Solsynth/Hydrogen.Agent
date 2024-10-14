@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:file_saver/file_saver.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:screenshot/screenshot.dart';
@@ -14,6 +13,7 @@ import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/posts/post_editor.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/posts/post_share.dart';
 import 'package:solian/widgets/reports/abuse_report.dart';
 
@@ -182,7 +182,7 @@ class _PostActionState extends State<PostAction> {
               ),
             ],
           ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-          if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+          LoadingIndicator(isActive: _isBusy),
           Expanded(
             child: ListView(
               children: [

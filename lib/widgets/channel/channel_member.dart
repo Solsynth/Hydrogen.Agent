@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/channel.dart';
@@ -8,6 +7,7 @@ import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
 import 'package:solian/widgets/account/account_profile_popup.dart';
 import 'package:solian/widgets/account/relative_select.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 
 class ChannelMemberListPopup extends StatefulWidget {
   final Channel channel;
@@ -131,7 +131,7 @@ class _ChannelMemberListPopupState extends State<ChannelMemberListPopup> {
             'channelMembers'.tr,
             style: Theme.of(context).textTheme.headlineSmall,
           ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-          if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+          LoadingIndicator(isActive: _isBusy),
           ListTile(
             tileColor: Theme.of(context).colorScheme.surfaceContainerHigh,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20),

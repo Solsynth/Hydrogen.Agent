@@ -135,7 +135,7 @@ class _PostSearchScreenState extends State<PostSearchScreen> {
               },
             ),
           ),
-          if (_isBusy) const LoadingIndicator(),
+          LoadingIndicator(isActive: _isBusy),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => Future.sync(() => _pagingController.refresh()),

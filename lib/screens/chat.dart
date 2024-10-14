@@ -288,7 +288,7 @@ class _ChatListState extends State<ChatList> {
               return Column(
                 children: [
                   const ChatCallCurrentIndicator(),
-                  if (_isBusy) const LoadingIndicator(),
+                  LoadingIndicator(isActive: _isBusy),
                   Expanded(
                     child: TabBarView(
                       children: [

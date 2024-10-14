@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/realm.dart';
@@ -15,6 +14,7 @@ import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
 import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:solian/widgets/current_state_action.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 
@@ -93,7 +93,7 @@ class _RealmListScreenState extends State<RealmListScreen> {
 
           return Column(
             children: [
-              if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+              LoadingIndicator(isActive: _isBusy),
               Expanded(
                 child: CenteredContainer(
                   child: RefreshIndicator(

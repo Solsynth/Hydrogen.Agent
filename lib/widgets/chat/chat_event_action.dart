@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/channel.dart';
@@ -7,6 +6,7 @@ import 'package:solian/models/event.dart';
 import 'package:solian/models/realm.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/widgets/chat/chat_event_deletion.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 
 class ChatEventAction extends StatefulWidget {
   final Channel channel;
@@ -73,7 +73,7 @@ class _ChatEventActionState extends State<ChatEventAction> {
               ),
             ],
           ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-          if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+          LoadingIndicator(isActive: _isBusy),
           Expanded(
             child: ListView(
               children: [

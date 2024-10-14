@@ -21,6 +21,7 @@ import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/widgets/attachments/attachment_attr_editor.dart';
 import 'package:solian/widgets/attachments/attachment_editor_thumbnail.dart';
 import 'package:solian/widgets/attachments/attachment_fullscreen.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 
 class AttachmentEditorPopup extends StatefulWidget {
   final String pool;
@@ -660,7 +661,7 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                 ),
               ],
             ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
-            if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+            LoadingIndicator(isActive: _isBusy),
             Expanded(
               child: CustomScrollView(
                 slivers: [

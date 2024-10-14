@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -12,6 +11,7 @@ import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/attachment.dart';
 import 'package:solian/services.dart';
 import 'package:solian/widgets/account/account_avatar.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 
 class PersonalizeScreen extends StatefulWidget {
   const PersonalizeScreen({super.key});
@@ -188,7 +188,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
     return ListView(
       children: [
-        if (_isBusy) const LinearProgressIndicator().animate().scaleX(),
+        LoadingIndicator(isActive: _isBusy),
         const Gap(24),
         Stack(
           children: [
