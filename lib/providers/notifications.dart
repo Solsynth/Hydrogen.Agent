@@ -53,6 +53,7 @@ class NotificationProvider extends GetxController {
     List<int> markList = List.empty(growable: true);
     for (final element in nty.notifications) {
       if (element.id <= 0) continue;
+      if (element.readAt != null) continue;
       markList.add(element.id);
     }
 
@@ -74,6 +75,8 @@ class NotificationProvider extends GetxController {
 
     if (element.id <= 0) {
       nty.notifications.removeAt(index);
+      return;
+    } else if (element.readAt != null) {
       return;
     }
 

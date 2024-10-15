@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:solian/providers/notifications.dart';
-import 'package:solian/providers/auth.dart';
-import 'package:solian/models/notification.dart' as notify;
 import 'package:solian/widgets/loading_indicator.dart';
 import 'package:uuid/uuid.dart';
 
@@ -14,54 +12,6 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  bool _isBusy = false;
-
-  Future<void> _markAllRead() async {
-    final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) return;
-
-    setState(() => _isBusy = true);
-
-    final NotificationProvider nty = Get.find();
-
-    List<int> markList = List.empty(growable: true);
-    for (final element in nty.notifications) {
-      if (element.id <= 0) continue;
-      markList.add(element.id);
-    }
-
-    if (markList.isNotEmpty) {
-      final client = await auth.configureClient('auth');
-      await client.put('/notifications/read', {'messages': markList});
-    }
-
-    nty.notifications.clear();
-
-    setState(() => _isBusy = false);
-  }
-
-  Future<void> _markOneRead(notify.Notification element, int index) async {
-    final AuthProvider auth = Get.find();
-    if (auth.isAuthorized.isFalse) return;
-
-    final NotificationProvider nty = Get.find();
-
-    if (element.id <= 0) {
-      nty.notifications.removeAt(index);
-      return;
-    }
-
-    setState(() => _isBusy = true);
-
-    final client = await auth.configureClient('auth');
-
-    await client.put('/notifications/read/${element.id}', {});
-
-    nty.notifications.removeAt(index);
-
-    setState(() => _isBusy = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     final NotificationProvider nty = Get.find();
@@ -81,11 +31,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 onRefresh: () => nty.fetchNotification(),
                 child: CustomScrollView(
                   slivers: [
-                    Obx(
-                      () => SliverToBoxAdapter(
-                        child: LoadingIndicator(
-                          isActive: _isBusy || nty.isBusy.value,
-                        ),
+                    SliverToBoxAdapter(
+                      child: LoadingIndicator(
+                        isActive: nty.isBusy.value,
                       ),
                     ),
                     if (nty.notifications
@@ -115,7 +63,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           child: ListTile(
                             leading: const Icon(Icons.checklist),
                             title: Text('notifyAllRead'.tr),
-                            onTap: _isBusy ? null : () => _markAllRead(),
+                            onTap: nty.isBusy.value
+                                ? null
+                                : () => nty.markAllRead(),
                           ),
                         ),
                       ),
@@ -125,12 +75,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         var element = nty.notifications[index];
                         return ClipRect(
                           child: Dismissible(
+                            direction: element.readAt == null
+                                ? DismissDirection.vertical
+                                : DismissDirection.none,
                             key: Key(const Uuid().v4()),
                             background: Container(
                               color: Colors.lightBlue,
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               alignment: Alignment.centerLeft,
+                              child:
+                                  const Icon(Icons.check, color: Colors.white),
+                            ),
+                            secondaryBackground: Container(
+                              color: Colors.lightBlue,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              alignment: Alignment.centerRight,
                               child:
                                   const Icon(Icons.check, color: Colors.white),
                             ),
@@ -149,7 +110,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 ],
                               ),
                             ),
-                            onDismissed: (_) => _markOneRead(element, index),
+                            onDismissed: (_) => nty.markOneRead(element, index),
                           ),
                         );
                       },
