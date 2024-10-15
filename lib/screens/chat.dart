@@ -47,16 +47,19 @@ class ChatListShell extends StatelessWidget {
         direction: Axis.horizontal,
         divider: ResizableDivider(
           thickness: 0.3,
-          color: Theme.of(context).dividerColor,
+          color: Theme.of(context).dividerColor.withOpacity(0.3),
         ),
         children: [
           const ResizableChild(
             minSize: 280,
             maxSize: 520,
-            size: ResizableSize.pixels(320),
+            size: ResizableSize.pixels(360),
             child: ChatList(),
           ),
-          ResizableChild(child: child ?? const EmptyPagePlaceholder()),
+          ResizableChild(
+            minSize: 280,
+            child: child ?? const EmptyPagePlaceholder(),
+          ),
         ],
       ),
     );

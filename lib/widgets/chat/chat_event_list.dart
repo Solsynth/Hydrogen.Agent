@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -34,6 +35,24 @@ class ChatEventList extends StatelessWidget {
     return a.createdAt.difference(b.createdAt).inMinutes <= 3;
   }
 
+  void _openActions(BuildContext context, Event item) {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      builder: (context) => ChatEventAction(
+        channel: channel,
+        realm: channel.realm,
+        item: item,
+        onEdit: () {
+          onEdit(item);
+        },
+        onReply: () {
+          onReply(item);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -65,50 +84,45 @@ class ChatEventList extends StatelessWidget {
 
               final item = chatController.currentEvents[index].data;
 
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                child: Builder(builder: (context) {
-                  final widget = ChatEvent(
-                    key: Key('m${item!.uuid}'),
-                    item: item,
-                    isMerged: isMerged,
-                    chatController: chatController,
-                  ).paddingOnly(
-                    top: !isMerged ? 8 : 0,
-                    bottom: !hasMerged ? 8 : 0,
-                  );
+              return TapRegion(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  child: Builder(builder: (context) {
+                    final widget = ChatEvent(
+                      key: Key('m${item!.uuid}'),
+                      item: item,
+                      isMerged: isMerged,
+                      chatController: chatController,
+                    ).paddingOnly(
+                      top: !isMerged ? 8 : 0,
+                      bottom: !hasMerged ? 8 : 0,
+                    );
 
-                  if (noAnimated) {
-                    return widget;
-                  } else {
-                    return widget
-                        .animate(
-                          key: Key('animated-m${item.uuid}'),
-                        )
-                        .slideY(
-                          curve: Curves.fastLinearToSlowEaseIn,
-                          duration: 250.ms,
-                          begin: 0.5,
-                          end: 0,
-                        );
+                    if (noAnimated) {
+                      return widget;
+                    } else {
+                      return widget
+                          .animate(
+                            key: Key('animated-m${item.uuid}'),
+                          )
+                          .slideY(
+                            curve: Curves.fastLinearToSlowEaseIn,
+                            duration: 250.ms,
+                            begin: 0.5,
+                            end: 0,
+                          );
+                    }
+                  }),
+                  onLongPress: () {
+                    _openActions(context, item!);
+                  },
+                ),
+                onTapInside: (event) {
+                  if (event.buttons == kSecondaryMouseButton) {
+                    _openActions(context, item!);
+                  } else if (event.buttons == kMiddleMouseButton) {
+                    onReply(item!);
                   }
-                }),
-                onLongPress: () {
-                  showModalBottomSheet(
-                    useRootNavigator: true,
-                    context: context,
-                    builder: (context) => ChatEventAction(
-                      channel: channel,
-                      realm: channel.realm,
-                      item: item!,
-                      onEdit: () {
-                        onEdit(item);
-                      },
-                      onReply: () {
-                        onReply(item);
-                      },
-                    ),
-                  );
                 },
               );
             },

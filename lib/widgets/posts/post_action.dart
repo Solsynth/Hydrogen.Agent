@@ -91,17 +91,21 @@ class _PostActionState extends State<PostAction> {
 
     setState(() => _isBusy = true);
 
+    final double width = hasMultipleAttachment ? 640 : 480;
+
     final screenshot = ScreenshotController();
     final image = await screenshot.captureFromLongWidget(
       MediaQuery(
-        data: MediaQuery.of(context),
+        data: MediaQuery.of(context).copyWith(
+          size: Size(width, double.infinity),
+        ),
         child: PostShareImage(item: widget.item),
       ),
       context: context,
       pixelRatio: 2,
       constraints: BoxConstraints(
         minWidth: 480,
-        maxWidth: hasMultipleAttachment ? 640 : 480,
+        maxWidth: width,
         minHeight: 640,
         maxHeight: double.infinity,
       ),
