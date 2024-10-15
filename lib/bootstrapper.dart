@@ -13,6 +13,7 @@ import 'package:solian/exts.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/realm.dart';
+import 'package:solian/providers/notifications.dart';
 import 'package:solian/providers/relation.dart';
 import 'package:solian/providers/theme_switcher.dart';
 import 'package:solian/providers/websocket.dart';
@@ -214,7 +215,7 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
         final AuthProvider auth = Get.find();
         if (auth.isAuthorized.isTrue) {
           try {
-            Get.find<WebSocketProvider>().registerPushNotifications();
+            Get.find<NotificationProvider>().registerPushNotifications();
           } catch (err) {
             context.showSnackbar(
               'pushNotifyRegisterFailed'.trParams({'reason': err.toString()}),

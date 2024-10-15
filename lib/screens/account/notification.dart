@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
-import 'package:solian/providers/websocket.dart';
+import 'package:solian/providers/notifications.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/models/notification.dart' as notify;
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:uuid/uuid.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -22,10 +22,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     setState(() => _isBusy = true);
 
-    final WebSocketProvider provider = Get.find();
+    final NotificationProvider nty = Get.find();
 
     List<int> markList = List.empty(growable: true);
-    for (final element in provider.notifications) {
+    for (final element in nty.notifications) {
       if (element.id <= 0) continue;
       markList.add(element.id);
     }
@@ -35,7 +35,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       await client.put('/notifications/read', {'messages': markList});
     }
 
-    provider.notifications.clear();
+    nty.notifications.clear();
 
     setState(() => _isBusy = false);
   }
@@ -44,10 +44,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
 
-    final WebSocketProvider provider = Get.find();
+    final NotificationProvider nty = Get.find();
 
     if (element.id <= 0) {
-      provider.notifications.removeAt(index);
+      nty.notifications.removeAt(index);
       return;
     }
 
@@ -57,14 +57,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     await client.put('/notifications/read/${element.id}', {});
 
-    provider.notifications.removeAt(index);
+    nty.notifications.removeAt(index);
 
     setState(() => _isBusy = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final WebSocketProvider ws = Get.find();
+    final NotificationProvider nty = Get.find();
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -77,71 +77,87 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ).paddingOnly(left: 24, right: 24, top: 32, bottom: 16),
           Expanded(
             child: Obx(() {
-              return CustomScrollView(
-                slivers: [
-                  if (_isBusy)
-                    SliverToBoxAdapter(
-                      child: const LinearProgressIndicator().animate().scaleX(),
-                    ),
-                  if (ws.notifications.isEmpty)
-                    SliverToBoxAdapter(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        color:
-                            Theme.of(context).colorScheme.surfaceContainerHigh,
-                        child: ListTile(
-                          leading: const Icon(Icons.check),
-                          title: Text('notifyEmpty'.tr),
-                          subtitle: Text('notifyEmptyCaption'.tr),
+              return RefreshIndicator(
+                onRefresh: () => nty.fetchNotification(),
+                child: CustomScrollView(
+                  slivers: [
+                    Obx(
+                      () => SliverToBoxAdapter(
+                        child: LoadingIndicator(
+                          isActive: _isBusy || nty.isBusy.value,
                         ),
                       ),
                     ),
-                  if (ws.notifications.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        child: ListTile(
-                          leading: const Icon(Icons.checklist),
-                          title: Text('notifyAllRead'.tr),
-                          onTap: _isBusy ? null : () => _markAllRead(),
+                    if (nty.notifications
+                        .where((x) => x.readAt == null)
+                        .isEmpty)
+                      SliverToBoxAdapter(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHigh,
+                          child: ListTile(
+                            leading: const Icon(Icons.check),
+                            title: Text('notifyEmpty'.tr),
+                            subtitle: Text('notifyEmptyCaption'.tr),
+                          ),
                         ),
                       ),
+                    if (nty.notifications
+                        .where((x) => x.readAt == null)
+                        .isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          child: ListTile(
+                            leading: const Icon(Icons.checklist),
+                            title: Text('notifyAllRead'.tr),
+                            onTap: _isBusy ? null : () => _markAllRead(),
+                          ),
+                        ),
+                      ),
+                    SliverList.separated(
+                      itemCount: nty.notifications.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var element = nty.notifications[index];
+                        return ClipRect(
+                          child: Dismissible(
+                            key: Key(const Uuid().v4()),
+                            background: Container(
+                              color: Colors.lightBlue,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              alignment: Alignment.centerLeft,
+                              child:
+                                  const Icon(Icons.check, color: Colors.white),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 8,
+                              ),
+                              title: Text(element.title),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (element.subtitle != null)
+                                    Text(element.subtitle!),
+                                  Text(element.body),
+                                ],
+                              ),
+                            ),
+                            onDismissed: (_) => _markOneRead(element, index),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (_, __) =>
+                          const Divider(thickness: 0.3, height: 0.3),
                     ),
-                  SliverList.separated(
-                    itemCount: ws.notifications.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      var element = ws.notifications[index];
-                      return Dismissible(
-                        key: Key(const Uuid().v4()),
-                        background: Container(
-                          color: Colors.lightBlue,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          alignment: Alignment.centerLeft,
-                          child: const Icon(Icons.check, color: Colors.white),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 8,
-                          ),
-                          title: Text(element.title),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (element.subtitle != null)
-                                Text(element.subtitle!),
-                              Text(element.body),
-                            ],
-                          ),
-                        ),
-                        onDismissed: (_) => _markOneRead(element, index),
-                      );
-                    },
-                    separatorBuilder: (_, __) =>
-                        const Divider(thickness: 0.3, height: 0.3),
-                  ),
-                ],
+                  ],
+                ),
               );
             }),
           ),
@@ -156,7 +172,7 @@ class NotificationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WebSocketProvider provider = Get.find();
+    final NotificationProvider nty = Get.find();
 
     final button = IconButton(
       icon: const Icon(Icons.notifications),
@@ -166,16 +182,16 @@ class NotificationButton extends StatelessWidget {
           isScrollControlled: true,
           context: context,
           builder: (context) => const NotificationScreen(),
-        ).then((_) => provider.notificationUnread.value = 0);
+        ).then((_) => nty.notificationUnread.value = 0);
       },
     );
 
     return Obx(() {
-      if (provider.notificationUnread.value > 0) {
+      if (nty.notificationUnread.value > 0) {
         return Badge(
           isLabelVisible: true,
           offset: const Offset(-8, 2),
-          label: Text(provider.notificationUnread.value.toString()),
+          label: Text(nty.notificationUnread.value.toString()),
           child: button,
         );
       } else {

@@ -18,6 +18,7 @@ import 'package:solian/providers/database/services/messages.dart';
 import 'package:solian/providers/last_read.dart';
 import 'package:solian/providers/link_expander.dart';
 import 'package:solian/providers/navigation.dart';
+import 'package:solian/providers/notifications.dart';
 import 'package:solian/providers/stickers.dart';
 import 'package:solian/providers/subscription.dart';
 import 'package:solian/providers/theme_switcher.dart';
@@ -138,11 +139,12 @@ class SolianApp extends StatelessWidget {
     Get.put(NavigationStateProvider());
 
     Get.lazyPut(() => AuthProvider());
+    Get.lazyPut(() => WebSocketProvider());
     Get.lazyPut(() => RelationshipProvider());
     Get.lazyPut(() => PostProvider());
     Get.lazyPut(() => StickerProvider());
     Get.lazyPut(() => AttachmentProvider());
-    Get.lazyPut(() => WebSocketProvider());
+    Get.lazyPut(() => NotificationProvider());
     Get.lazyPut(() => StatusProvider());
     Get.lazyPut(() => ChannelProvider());
     Get.lazyPut(() => RealmProvider());
@@ -154,6 +156,6 @@ class SolianApp extends StatelessWidget {
     Get.lazyPut(() => LastReadProvider());
     Get.lazyPut(() => SubscriptionProvider());
 
-    Get.find<WebSocketProvider>().requestPermissions();
+    Get.find<NotificationProvider>().requestPermissions();
   }
 }

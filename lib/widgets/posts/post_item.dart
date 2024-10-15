@@ -660,6 +660,11 @@ class _PostHeaderWidget extends StatelessWidget {
               IconButton(
                 color: Theme.of(context).colorScheme.primary,
                 icon: const Icon(Icons.more_vert),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                visualDensity: const VisualDensity(
+                  horizontal: -4,
+                  vertical: -2,
+                ),
                 onPressed: () => onTapMore!(),
               ),
           ],

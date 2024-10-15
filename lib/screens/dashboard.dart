@@ -20,7 +20,7 @@ import 'package:solian/providers/content/posts.dart';
 import 'package:solian/providers/daily_sign.dart';
 import 'package:solian/providers/database/services/messages.dart';
 import 'package:solian/providers/last_read.dart';
-import 'package:solian/providers/websocket.dart';
+import 'package:solian/providers/notifications.dart';
 import 'package:solian/router.dart';
 import 'package:solian/screens/account/notification.dart';
 import 'package:solian/theme.dart';
@@ -38,7 +38,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   late final AuthProvider _auth = Get.find();
   late final LastReadProvider _lastRead = Get.find();
-  late final WebSocketProvider _ws = Get.find();
+  late final NotificationProvider _nty = Get.find();
   late final PostProvider _posts = Get.find();
   late final DailySignProvider _dailySign = Get.find();
 
@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   List<Notification> get _pendingNotifications =>
-      List<Notification>.from(_ws.notifications)
+      List<Notification>.from(_nty.notifications)
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
   List<Post>? _currentPosts;
@@ -254,7 +254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Text(
                           'notificationUnreadCount'.trParams({
-                            'count': _ws.notifications.length.toString(),
+                            'count': _nty.notifications.length.toString(),
                           }),
                         ),
                       ],
@@ -267,12 +267,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           isScrollControlled: true,
                           context: context,
                           builder: (context) => const NotificationScreen(),
-                        ).then((_) => _ws.notificationUnread.value = 0);
+                        ).then((_) => _nty.notificationUnread.value = 0);
                       },
                     ),
                   ],
                 ).paddingOnly(left: 18, right: 18, bottom: 8),
-                if (_ws.notifications.isNotEmpty)
+                if (_nty.notifications.isNotEmpty)
                   SizedBox(
                     height: 76,
                     child: ListView.separated(

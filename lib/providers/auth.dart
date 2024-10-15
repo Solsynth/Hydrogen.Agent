@@ -11,6 +11,7 @@ import 'package:solian/exceptions/request.dart';
 import 'package:solian/exceptions/unauthorized.dart';
 import 'package:solian/models/auth.dart';
 import 'package:solian/providers/database/database.dart';
+import 'package:solian/providers/notifications.dart';
 import 'package:solian/providers/websocket.dart';
 import 'package:solian/services.dart';
 
@@ -174,7 +175,7 @@ class AuthProvider extends GetConnect {
     );
 
     Get.find<WebSocketProvider>().connect();
-    Get.find<WebSocketProvider>().notifyPrefetch();
+    Get.find<NotificationProvider>().fetchNotification();
 
     return credentials!;
   }
@@ -184,8 +185,8 @@ class AuthProvider extends GetConnect {
     userProfile.value = null;
 
     Get.find<WebSocketProvider>().disconnect();
-    Get.find<WebSocketProvider>().notifications.clear();
-    Get.find<WebSocketProvider>().notificationUnread.value = 0;
+    Get.find<NotificationProvider>().notifications.clear();
+    Get.find<NotificationProvider>().notificationUnread.value = 0;
 
     AppDatabase.removeDatabase();
     autoStopBackgroundNotificationService();

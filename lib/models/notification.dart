@@ -8,6 +8,7 @@ class Notification {
   DateTime createdAt;
   DateTime updatedAt;
   DateTime? deletedAt;
+  DateTime? readAt;
   String title;
   String? subtitle;
   String body;
@@ -21,6 +22,7 @@ class Notification {
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
+    required this.readAt,
     required this.title,
     required this.subtitle,
     required this.body,
