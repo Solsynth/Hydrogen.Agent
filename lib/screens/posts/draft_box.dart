@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:solian/models/pagination.dart';
 import 'package:solian/models/post.dart';
 import 'package:solian/providers/content/posts.dart';
 import 'package:solian/theme.dart';
 import 'package:solian/widgets/app_bar_leading.dart';
 import 'package:solian/widgets/app_bar_title.dart';
+import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/posts/post_action.dart';
-import 'package:solian/widgets/posts/post_owned_list.dart';
+import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/root_container.dart';
+import 'package:very_good_infinite_list/very_good_infinite_list.dart';
 
 class DraftBoxScreen extends StatefulWidget {
   const DraftBoxScreen({super.key});
@@ -19,38 +20,50 @@ class DraftBoxScreen extends StatefulWidget {
 }
 
 class _DraftBoxScreenState extends State<DraftBoxScreen> {
-  final PagingController<int, Post> _pagingController =
-      PagingController(firstPageKey: 0);
+  bool _isBusy = true;
+  int? _totalPosts;
+  final List<Post> _posts = List.empty(growable: true);
 
-  _getPosts(int pageKey) async {
-    final PostProvider provider = Get.find();
+  _getPosts() async {
+    setState(() => _isBusy = true);
 
-    Response resp;
-    try {
-      resp = await provider.listDraft(pageKey);
-    } catch (e) {
-      _pagingController.error = e;
-      return;
-    }
+    final PostProvider posts = Get.find();
+    final resp = await posts.listDraft(_posts.length);
 
     final PaginationResult result = PaginationResult.fromJson(resp.body);
-    if (result.count == 0) {
-      _pagingController.appendLastPage([]);
-      return;
-    }
 
     final parsed = result.data?.map((e) => Post.fromJson(e)).toList();
-    if (parsed != null && parsed.length >= 10) {
-      _pagingController.appendPage(parsed, pageKey + parsed.length);
-    } else if (parsed != null) {
-      _pagingController.appendLastPage(parsed);
-    }
+    _totalPosts = result.count;
+    _posts.addAll(parsed ?? List.empty());
+
+    setState(() => _isBusy = false);
+  }
+
+  Future<void> _openActions(Post item) async {
+    showModalBottomSheet(
+      useRootNavigator: true,
+      context: context,
+      builder: (context) => PostAction(
+        item: item,
+        noReact: true,
+      ),
+    ).then((value) {
+      if (value is Future) {
+        value.then((_) {
+          _posts.clear();
+          _getPosts();
+        });
+      } else if (value != null) {
+        _posts.clear();
+        _getPosts();
+      }
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    _pagingController.addPageRequestListener(_getPosts);
+    _getPosts();
   }
 
   @override
@@ -68,47 +81,48 @@ class _DraftBoxScreenState extends State<DraftBoxScreen> {
             ),
           ],
         ),
-        body: RefreshIndicator(
-          onRefresh: () => Future.sync(() => _pagingController.refresh()),
-          child: PagedListView<int, Post>(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate(
-              itemBuilder: (context, item, index) {
-                return PostOwnedListEntry(
-                  item: item,
-                  isFullContent: true,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainerLow,
-                  onTap: () async {
-                    showModalBottomSheet(
-                      useRootNavigator: true,
-                      context: context,
-                      builder: (context) => PostAction(
-                        item: item,
-                        noReact: true,
+        body: Column(
+          children: [
+            LoadingIndicator(isActive: _isBusy),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () {
+                  _posts.clear();
+                  return _getPosts();
+                },
+                child: InfiniteList(
+                  itemCount: _posts.length,
+                  hasReachedMax: _totalPosts == _posts.length,
+                  isLoading: _isBusy,
+                  onFetchData: () => _getPosts(),
+                  itemBuilder: (context, index) {
+                    final item = _posts[index];
+                    return Card(
+                      child: GestureDetector(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            PostItem(
+                              key: Key('p${item.id}'),
+                              item: item,
+                              isShowEmbed: false,
+                              isClickable: false,
+                              isShowReply: false,
+                              isReactable: false,
+                              onTapMore: () => _openActions(item),
+                            ).paddingSymmetric(vertical: 8),
+                          ],
+                        ),
+                        onTap: () => _openActions(item),
                       ),
-                    ).then((value) {
-                      if (value is Future) {
-                        value.then((_) {
-                          _pagingController.refresh();
-                        });
-                      } else if (value != null) {
-                        _pagingController.refresh();
-                      }
-                    });
+                    ).paddingOnly(left: 12, right: 12, bottom: 4);
                   },
-                ).paddingOnly(left: 12, right: 12, bottom: 4);
-              },
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
   }
 }
