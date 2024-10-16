@@ -488,5 +488,7 @@
   "fileSavedAt": "File saved at @path",
   "showIp": "Show IP Address",
   "shotOn": "Shot on @device",
-  "unread": "Unread"
+  "unread": "Unread",
+  "searchTook": "Took @time",
+  "searchResult": "@count Matches"
 }

@@ -20,6 +20,9 @@ class PostSearchScreen extends StatefulWidget {
 }
 
 class _PostSearchScreenState extends State<PostSearchScreen> {
+  int? _totalCount;
+  Duration? _lastTook;
+
   final TextEditingController _probeController = TextEditingController();
   final PagingController<int, Post> _pagingController =
       PagingController(firstPageKey: 0);
@@ -43,18 +46,20 @@ class _PostSearchScreenState extends State<PostSearchScreen> {
       _pagingController.nextPageKey = 0;
     }
 
-    final PostProvider provider = Get.find();
+    final PostProvider posts = Get.find();
+
+    Stopwatch stopwatch = new Stopwatch()..start();
 
     Response resp;
     try {
       if (_probeController.text.isEmpty) {
-        resp = await provider.listPost(
+        resp = await posts.listPost(
           pageKey,
           tag: widget.tag,
           category: widget.category,
         );
       } else {
-        resp = await provider.searchPost(
+        resp = await posts.searchPost(
           _probeController.text,
           pageKey,
           tag: widget.tag,
@@ -74,6 +79,11 @@ class _PostSearchScreenState extends State<PostSearchScreen> {
       _pagingController.appendLastPage(parsed);
     }
 
+    stopwatch.stop();
+
+    _totalCount = result.count;
+    _lastTook = stopwatch.elapsed;
+
     setState(() => _isBusy = false);
   }
 
@@ -89,6 +99,9 @@ class _PostSearchScreenState extends State<PostSearchScreen> {
     _pagingController.dispose();
     super.dispose();
   }
+
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +149,42 @@ class _PostSearchScreenState extends State<PostSearchScreen> {
             ),
           ),
           LoadingIndicator(isActive: _isBusy),
+          if (_totalCount != null || _lastTook != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.summarize_outlined,
+                    size: 16,
+                    color: _unFocusColor,
+                  ),
+                  const Gap(4),
+                  if (_totalCount != null)
+                    Text(
+                      'searchResult'.trParams({
+                        'count': _totalCount!.toString(),
+                      }),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: _unFocusColor,
+                      ),
+                    ),
+                  const Gap(4),
+                  if (_lastTook != null)
+                    Text(
+                      'searchTook'.trParams({
+                        'time':
+                            '${(_lastTook!.inMilliseconds / 1000).toStringAsFixed(3)}s',
+                      }),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: _unFocusColor,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => Future.sync(() => _pagingController.refresh()),

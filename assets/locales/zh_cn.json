@@ -484,5 +484,7 @@
   "fileSavedAt": "文件保存于 @path",
   "showIp": "显示 IP 地址",
   "shotOn": "由 @device 拍摄",
-  "unread": "未读"
+  "unread": "未读",
+  "searchTook": "耗时 @time",
+  "searchResult": "匹配到 @count 条结果"
 }
