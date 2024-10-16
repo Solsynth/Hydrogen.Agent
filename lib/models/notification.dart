@@ -5,6 +5,9 @@ part 'notification.g.dart';
 
 const Map<String, IconData> NotificationTopicIcons = {
   'passport.security.alert': Icons.gpp_maybe,
+  'interactive.subscription': Icons.subscriptions,
+  'interactive.feedback': Icons.add_reaction,
+  'messaging.callStart': Icons.call_received,
 };
 
 @JsonSerializable()

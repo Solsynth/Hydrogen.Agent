@@ -5,6 +5,7 @@ import 'package:solian/models/notification.dart';
 import 'package:solian/providers/notifications.dart';
 import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
+import 'package:solian/widgets/relative_date.dart';
 import 'package:uuid/uuid.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -107,12 +108,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Icon(NotificationTopicIcons[element.topic]),
-                                  const Gap(12),
+                                  const Gap(16),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        if (element.readAt == null)
+                                          Badge(
+                                            label: Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.new_releases_outlined,
+                                                  color: Colors.white,
+                                                  size: 12,
+                                                ),
+                                                const Gap(4),
+                                                Text('unread'.tr),
+                                              ],
+                                            ),
+                                          ).paddingOnly(bottom: 4),
                                         Text(
                                           element.title,
                                           style: Theme.of(context)
@@ -126,13 +141,37 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                 .textTheme
                                                 .titleSmall,
                                           ),
-                                        const Gap(4),
+                                        if (element.subtitle != null)
+                                          const Gap(4),
                                         MarkdownTextContent(
                                           content: element.body,
                                           isAutoWarp: true,
                                           isSelectable: true,
                                           parentId:
                                               'notification-${element.id}',
+                                        ),
+                                        const Gap(8),
+                                        Opacity(
+                                          opacity: 0.75,
+                                          child: Row(
+                                            children: [
+                                              RelativeDate(
+                                                element.createdAt,
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                              const Gap(4),
+                                              Text(
+                                                '·',
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                              const Gap(4),
+                                              RelativeDate(
+                                                element.createdAt,
+                                                style: TextStyle(fontSize: 12),
+                                                isFull: true,
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),

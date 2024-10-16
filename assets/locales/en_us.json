@@ -487,5 +487,6 @@
   "shareImageFooter": "Only on the Solar Network",
   "fileSavedAt": "File saved at @path",
   "showIp": "Show IP Address",
-  "shotOn": "Shot on @device"
+  "shotOn": "Shot on @device",
+  "unread": "Unread"
 }

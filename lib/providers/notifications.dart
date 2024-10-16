@@ -55,7 +55,11 @@ class NotificationProvider extends GetxController {
       await client.put('/notifications/read', {'messages': markList});
     }
 
-    nty.notifications.clear();
+    nty.notifications.value = nty.notifications.map((x) {
+      x.readAt = DateTime.now();
+      return x;
+    }).toList();
+    nty.notifications.refresh();
 
     isBusy.value = false;
   }
@@ -79,7 +83,8 @@ class NotificationProvider extends GetxController {
 
     await client.put('/notifications/read/${element.id}', {});
 
-    nty.notifications.removeAt(index);
+    nty.notifications[0].readAt = DateTime.now();
+    nty.notifications.refresh();
 
     isBusy.value = false;
   }
