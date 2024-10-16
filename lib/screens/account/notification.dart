@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:solian/models/notification.dart';
+import 'package:solian/models/post.dart';
 import 'package:solian/providers/notifications.dart';
+import 'package:solian/router.dart';
 import 'package:solian/widgets/loading_indicator.dart';
 import 'package:solian/widgets/markdown_text_content.dart';
+import 'package:solian/widgets/posts/post_item.dart';
 import 'package:solian/widgets/relative_date.dart';
 import 'package:uuid/uuid.dart';
 
@@ -150,6 +153,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           parentId:
                                               'notification-${element.id}',
                                         ),
+                                        if ([
+                                              'interactive.feedback',
+                                              'interactive.subscription'
+                                            ].contains(element.topic) &&
+                                            element.metadata?['related_post'] !=
+                                                null)
+                                          _PostRelatedNotificationWidget(
+                                            metadata: element.metadata!,
+                                          ),
                                         const Gap(8),
                                         Opacity(
                                           opacity: 0.75,
@@ -228,5 +240,33 @@ class NotificationButton extends StatelessWidget {
         return button;
       }
     });
+  }
+}
+
+class _PostRelatedNotificationWidget extends StatelessWidget {
+  final Map<String, dynamic> metadata;
+
+  const _PostRelatedNotificationWidget({super.key, required this.metadata});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        child: PostItem(
+          item: Post.fromJson(metadata['related_post']),
+          isCompact: true,
+        ).paddingAll(8),
+      ),
+      onTap: () {
+        final data = Post.fromJson(metadata['related_post']);
+        Navigator.pop(context);
+        AppRouter.instance.pushNamed(
+          'postDetail',
+          pathParameters: {'id': data.id.toString()},
+          extra: data,
+        );
+      },
+    );
   }
 }
