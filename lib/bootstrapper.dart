@@ -200,6 +200,8 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
         try {
           await Future.wait([
             if (auth.isAuthorized.isTrue)
+              Get.find<NotificationProvider>().fetchNotification(),
+            if (auth.isAuthorized.isTrue)
               Get.find<RelationshipProvider>().refreshRelativeList(),
             if (auth.isAuthorized.isTrue)
               Get.find<RealmProvider>().refreshAvailableRealms(),

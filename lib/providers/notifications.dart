@@ -18,12 +18,6 @@ class NotificationProvider extends GetxController {
   RxList<Notification> notifications =
       List<Notification>.empty(growable: true).obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchNotification();
-  }
-
   Future<void> fetchNotification() async {
     final AuthProvider auth = Get.find();
     if (auth.isAuthorized.isFalse) return;
@@ -35,7 +29,6 @@ class NotificationProvider extends GetxController {
       final result = PaginationResult.fromJson(resp.body);
       final data = result.data?.map((x) => Notification.fromJson(x)).toList();
       if (data != null) {
-        print(data.map((x) => x.toJson()));
         notifications.addAll(data);
         notificationUnread.value = data.where((x) => x.readAt == null).length;
       }

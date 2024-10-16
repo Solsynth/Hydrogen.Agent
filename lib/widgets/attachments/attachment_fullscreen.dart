@@ -8,6 +8,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gal/gal.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:solian/exts.dart';
 import 'package:solian/models/attachment.dart';
 import 'package:solian/platform.dart';
@@ -103,9 +104,10 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final metaTextStyle = TextStyle(
+    final metaTextStyle = GoogleFonts.roboto(
       fontSize: 12,
       color: _unFocusColor,
+      height: 1,
     );
 
     return DismissiblePage(
@@ -239,27 +241,43 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                       child: Wrap(
                         spacing: 6,
                         children: [
-                          Text(
-                            '#${widget.item.rid}',
-                            style: metaTextStyle,
-                          ),
-                          if (widget.item.metadata?['width'] != null &&
-                              widget.item.metadata?['height'] != null)
+                          if (widget.item.metadata?['exif'] == null)
                             Text(
-                              '${widget.item.metadata?['width']}x${widget.item.metadata?['height']}',
+                              '#${widget.item.rid}',
                               style: metaTextStyle,
                             ),
-                          if (widget.item.metadata?['ratio'] != null)
+                          if (widget.item.metadata?['exif']?['Model'] != null)
                             Text(
-                              '${_getRatio().toPrecision(2)}',
+                              'shotOn'.trParams({
+                                'device': widget.item.metadata?['exif']
+                                    ?['Model']
+                              }),
+                              style: metaTextStyle,
+                            ).paddingOnly(right: 2),
+                          if (widget.item.metadata?['exif']?['ShutterSpeed'] !=
+                              null)
+                            Text(
+                              widget.item.metadata?['exif']?['ShutterSpeed'],
+                              style: metaTextStyle,
+                            ).paddingOnly(right: 2),
+                          if (widget.item.metadata?['exif']?['ISO'] != null)
+                            Text(
+                              'ISO${widget.item.metadata?['exif']?['ISO']}',
+                              style: metaTextStyle,
+                            ).paddingOnly(right: 2),
+                          if (widget.item.metadata?['exif']?['Megapixels'] !=
+                              null)
+                            Text(
+                              '${widget.item.metadata?['exif']?['Megapixels']}MP',
+                              style: metaTextStyle,
+                            )
+                          else
+                            Text(
+                              widget.item.size.formatBytes(),
                               style: metaTextStyle,
                             ),
                           Text(
-                            widget.item.size.formatBytes(),
-                            style: metaTextStyle,
-                          ),
-                          Text(
-                            widget.item.mimetype,
+                            '${widget.item.metadata?['width']}x${widget.item.metadata?['height']}',
                             style: metaTextStyle,
                           ),
                         ],

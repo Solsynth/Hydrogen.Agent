@@ -482,5 +482,6 @@
   "shareImage": "分享图片",
   "shareImageFooter": "上 Solar Network 看更多有趣帖子",
   "fileSavedAt": "文件保存于 @path",
-  "showIp": "显示 IP 地址"
+  "showIp": "显示 IP 地址",
+  "shotOn": "由 @device 拍摄"
 }

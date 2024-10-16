@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   List<Notification> get _pendingNotifications =>
-      List<Notification>.from(_nty.notifications)
+      List<Notification>.from(_nty.notifications.where((x) => x.readAt == null))
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
   List<Post>? _currentPosts;
@@ -254,7 +254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Text(
                           'notificationUnreadCount'.trParams({
-                            'count': _nty.notifications.length.toString(),
+                            'count': _pendingNotifications.length.toString(),
                           }),
                         ),
                       ],
@@ -272,7 +272,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ).paddingOnly(left: 18, right: 18, bottom: 8),
-                if (_nty.notifications.isNotEmpty)
+                if (_pendingNotifications.isNotEmpty)
                   SizedBox(
                     height: 76,
                     child: ListView.separated(

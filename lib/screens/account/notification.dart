@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:solian/models/notification.dart';
 import 'package:solian/providers/notifications.dart';
 import 'package:solian/widgets/loading_indicator.dart';
+import 'package:solian/widgets/markdown_text_content.dart';
 import 'package:uuid/uuid.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -76,7 +79,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         return ClipRect(
                           child: Dismissible(
                             direction: element.readAt == null
-                                ? DismissDirection.vertical
+                                ? DismissDirection.horizontal
                                 : DismissDirection.none,
                             key: Key(const Uuid().v4()),
                             background: Container(
@@ -95,18 +98,45 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               child:
                                   const Icon(Icons.check, color: Colors.white),
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 28,
+                                vertical: 16,
                               ),
-                              title: Text(element.title),
-                              subtitle: Column(
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (element.subtitle != null)
-                                    Text(element.subtitle!),
-                                  Text(element.body),
+                                  Icon(NotificationTopicIcons[element.topic]),
+                                  const Gap(12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          element.title,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                        if (element.subtitle != null)
+                                          Text(
+                                            element.subtitle!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall,
+                                          ),
+                                        const Gap(4),
+                                        MarkdownTextContent(
+                                          content: element.body,
+                                          isAutoWarp: true,
+                                          isSelectable: true,
+                                          parentId:
+                                              'notification-${element.id}',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

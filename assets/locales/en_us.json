@@ -486,5 +486,6 @@
   "shareImage": "Share as image",
   "shareImageFooter": "Only on the Solar Network",
   "fileSavedAt": "File saved at @path",
-  "showIp": "Show IP Address"
+  "showIp": "Show IP Address",
+  "shotOn": "Shot on @device"
 }
