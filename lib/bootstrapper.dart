@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solian/exceptions/request.dart';
 import 'package:solian/exts.dart';
+import 'package:solian/models/account.dart';
 import 'package:solian/platform.dart';
 import 'package:solian/providers/auth.dart';
 import 'package:solian/providers/content/realm.dart';
@@ -22,6 +24,11 @@ import 'package:solian/widgets/root_container.dart';
 import 'package:solian/widgets/sized_container.dart';
 import 'package:flutter_app_update/flutter_app_update.dart';
 import 'package:version/version.dart';
+
+enum BootstrapperSpecialState {
+  userBirthday,
+  appAnniversary,
+}
 
 class BootstrapperShell extends StatefulWidget {
   final Widget child;
@@ -42,6 +49,9 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
       Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
 
   int _periodCursor = 0;
+
+  // Special state is some special event triggered after bootstrapping
+  BootstrapperSpecialState? _specialState;
 
   final Completer _bootCompleter = Completer();
 
@@ -206,6 +216,19 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
             if (auth.isAuthorized.isTrue)
               Get.find<RealmProvider>().refreshAvailableRealms(),
           ]);
+
+          if (auth.isAuthorized.isTrue && auth.userProfile.value != null) {
+            final account = Account.fromJson(auth.userProfile.value!);
+            if (account.profile?.birthday != null) {
+              final birthDate = account.profile!.birthday!.toLocal();
+              final isBirthday = birthDate.day == DateTime.now().day;
+              if (isBirthday) {
+                setState(
+                  () => _specialState = BootstrapperSpecialState.userBirthday,
+                );
+              }
+            }
+          }
         } catch (e) {
           context.showErrorDialog(e);
         }
@@ -355,8 +378,142 @@ class _BootstrapperShellState extends State<BootstrapperShell> {
           }
         },
       );
+    } else if (_specialState != null) {
+      return GestureDetector(
+        child: RootContainer(
+          child: switch (_specialState) {
+            BootstrapperSpecialState.appAnniversary => const Placeholder(),
+            _ => _BirthdaySpecialScreen(),
+          },
+        ),
+        onTap: () {
+          setState(() => _specialState = null);
+        },
+      );
     }
 
     return widget.child;
+  }
+}
+
+class _BirthdaySpecialScreen extends StatefulWidget {
+  const _BirthdaySpecialScreen();
+
+  @override
+  State<_BirthdaySpecialScreen> createState() => _BirthdaySpecialScreenState();
+}
+
+class _BirthdaySpecialScreenState extends State<_BirthdaySpecialScreen> {
+  late final ConfettiController _confettiController =
+      ConfettiController(duration: const Duration(seconds: 10));
+
+  @override
+  void initState() {
+    _confettiController.play();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  Color get _unFocusColor =>
+      Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
+  String _toOrdinal(int num) {
+    if (num >= 11 && num <= 13) {
+      return '${num}th';
+    }
+
+    switch (num % 10) {
+      case 1:
+        return '${num}st';
+      case 2:
+        return '${num}nd';
+      case 3:
+        return '${num}rd';
+      default:
+        return '${num}th';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthProvider auth = Get.find();
+    final account = Account.fromJson(auth.userProfile.value!);
+
+    final birthDate = account.profile!.birthday!.toLocal();
+    final birthdayCount = DateTime.now().difference(birthDate).inDays ~/ 365;
+
+    return Stack(
+      children: <Widget>[
+        Align(
+          alignment: Alignment.center,
+          child: ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: true,
+            colors: const [
+              Colors.green,
+              Colors.blue,
+              Colors.pink,
+              Colors.orange,
+              Colors.purple
+            ],
+            maxBlastForce: 30,
+            minBlastForce: 15,
+            emissionFrequency: 0.05,
+            numberOfParticles: 20,
+            gravity: 0.2,
+          ),
+        ),
+        Align(
+          child: CenteredContainer(
+            maxWidth: 320,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '🎂',
+                  style: TextStyle(fontSize: 60),
+                ),
+                const Gap(8),
+                Text(
+                  'happyBirthday'.trParams({
+                    'name': account.profile?.firstName != null
+                        ? [
+                            account.profile?.firstName,
+                            account.profile?.lastName
+                          ].join(' ')
+                        : '@${account.name}',
+                  }),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                Text(
+                  'happyBirthdayDesc'.trParams({
+                    'count': _toOrdinal(birthdayCount),
+                  }),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const Gap(8),
+                Text(
+                  'bsContinuable'.tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: _unFocusColor,
+                  ),
+                ).paddingOnly(bottom: 5),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

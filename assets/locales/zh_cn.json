@@ -362,6 +362,7 @@
   "bsPreparingData": "正在准备用户资料",
   "bsRegisteringPushNotify": "正在启用推送通知",
   "bsDismissibleErrorHint": "点击任意地方忽略此错误",
+  "bsContinuable": "点击任意处继续",
   "postShareContent": "@content\n\n@username 在 Solar Network\n原帖地址：@link",
   "postShareSubject": "@username 在 Solar Network 发表的 @title",
   "themeColor": "全局主题色",
@@ -486,5 +487,7 @@
   "shotOn": "由 @device 拍摄",
   "unread": "未读",
   "searchTook": "耗时 @time",
-  "searchResult": "匹配到 @count 条结果"
+  "searchResult": "匹配到 @count 条结果",
+  "happyBirthday": "生日快乐，@name！",
+  "happyBirthdayDesc": "今天是你的第 @count 个生日"
 }

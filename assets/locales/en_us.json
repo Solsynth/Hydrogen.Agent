@@ -366,6 +366,7 @@
   "bsPreparingData": "Preparing User Data",
   "bsRegisteringPushNotify": "Enabling Push Notifications",
   "bsDismissibleErrorHint": "Click anywhere to ignore this error",
+  "bsContinuable": "Click anywhere to continue",
   "postShareContent": "@content\n\n@username on the Solar Network\nCheck it out: @link",
   "postShareSubject": "@title by @username on Solar Network",
   "themeColor": "Global Theme Color",
@@ -490,5 +491,7 @@
   "shotOn": "Shot on @device",
   "unread": "Unread",
   "searchTook": "Took @time",
-  "searchResult": "@count Matches"
+  "searchResult": "@count Matches",
+  "happyBirthday": "Happy birthday @name!",
+  "happyBirthdayDesc": "Today is your @count birthday"
 }

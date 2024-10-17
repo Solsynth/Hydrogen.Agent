@@ -299,53 +299,71 @@ typedef $$LocalMessageEventTableTableUpdateCompanionBuilder
 });
 
 class $$LocalMessageEventTableTableFilterComposer
-    extends FilterComposer<_$AppDatabase, $LocalMessageEventTableTable> {
-  $$LocalMessageEventTableTableFilterComposer(super.$state);
-  ColumnFilters<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $LocalMessageEventTableTable> {
+  $$LocalMessageEventTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get channelId => $state.composableBuilder(
-      column: $state.table.channelId,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<int> get channelId => $composableBuilder(
+      column: $table.channelId, builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<Event?, Event, String> get data =>
-      $state.composableBuilder(
-          column: $state.table.data,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
+      $composableBuilder(
+          column: $table.data,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
-  ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
-      column: $state.table.createdAt,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$LocalMessageEventTableTableOrderingComposer
-    extends OrderingComposer<_$AppDatabase, $LocalMessageEventTableTable> {
-  $$LocalMessageEventTableTableOrderingComposer(super.$state);
-  ColumnOrderings<int> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+    extends Composer<_$AppDatabase, $LocalMessageEventTableTable> {
+  $$LocalMessageEventTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get channelId => $state.composableBuilder(
-      column: $state.table.channelId,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get channelId => $composableBuilder(
+      column: $table.channelId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get data => $state.composableBuilder(
-      column: $state.table.data,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get createdAt => $state.composableBuilder(
-      column: $state.table.createdAt,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$LocalMessageEventTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalMessageEventTableTable> {
+  $$LocalMessageEventTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get channelId =>
+      $composableBuilder(column: $table.channelId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Event?, String> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
 class $$LocalMessageEventTableTableTableManager extends RootTableManager<
@@ -354,6 +372,7 @@ class $$LocalMessageEventTableTableTableManager extends RootTableManager<
     LocalMessageEventTableData,
     $$LocalMessageEventTableTableFilterComposer,
     $$LocalMessageEventTableTableOrderingComposer,
+    $$LocalMessageEventTableTableAnnotationComposer,
     $$LocalMessageEventTableTableCreateCompanionBuilder,
     $$LocalMessageEventTableTableUpdateCompanionBuilder,
     (
@@ -368,10 +387,15 @@ class $$LocalMessageEventTableTableTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer: $$LocalMessageEventTableTableFilterComposer(
-              ComposerState(db, table)),
-          orderingComposer: $$LocalMessageEventTableTableOrderingComposer(
-              ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $$LocalMessageEventTableTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalMessageEventTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalMessageEventTableTableAnnotationComposer(
+                  $db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> channelId = const Value.absent(),
@@ -410,6 +434,7 @@ typedef $$LocalMessageEventTableTableProcessedTableManager
         LocalMessageEventTableData,
         $$LocalMessageEventTableTableFilterComposer,
         $$LocalMessageEventTableTableOrderingComposer,
+        $$LocalMessageEventTableTableAnnotationComposer,
         $$LocalMessageEventTableTableCreateCompanionBuilder,
         $$LocalMessageEventTableTableUpdateCompanionBuilder,
         (

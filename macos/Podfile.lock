@@ -351,9 +351,9 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos
 
 SPEC CHECKSUMS:
-  connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
+  connectivity_plus: 4c41c08fc6d7c91f63bc7aec70ffe3730b04f563
   desktop_drop: 69eeff437544aa619c8db7f4481b3a65f7696898
-  device_info_plus: f1aae8670672f75c4c8850ecbe0b2ddef62b0a22
+  device_info_plus: 74e614483d05c89290d30a4c8feae15d555f7427
   file_saver: 44e6fbf666677faf097302460e214e977fdd977b
   file_selector_macos: cc3858c981fe6889f364731200d6232dac1d812d
   Firebase: 98e6bf5278170668a7983e12971a66b2cd57fc8c
@@ -386,7 +386,7 @@ SPEC CHECKSUMS:
   media_kit_native_event_loop: 81fd5b45192b72f8b5b69eaf5b540f45777eb8d5
   media_kit_video: c75b07f14d59706c775778e4dd47dd027de8d1e5
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  package_info_plus: d2f71247aab4b6521434f887276093acc70d214c
+  package_info_plus: f5790acc797bf17c3e959e9d6cf162cc68ff7523
   pasteboard: 9b69dba6fedbb04866be632205d532fe2f6b1d99
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -394,7 +394,7 @@ SPEC CHECKSUMS:
   protocol_handler_macos: d10a6c01d6373389ffd2278013ab4c47ed6d6daa
   SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
   screen_brightness_macos: 2d6d3af2165592d9a55ffcd95b7550970e41ebda
-  share_plus: a182a58e04e51647c0481aadabbc4de44b3a2bce
+  share_plus: fd717ef89a2801d3491e737630112b80c310640e
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqflite_darwin: a553b1fd6fe66f53bbb0fe5b4f5bab93f08d7a13
   sqlite3: 0bb0e6389d824e40296f531b858a2a0b71c0d2fb
