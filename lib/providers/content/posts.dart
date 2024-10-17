@@ -44,9 +44,12 @@ class PostProvider extends GetxController {
     final queries = [
       'take=${10}',
       'offset=$page',
+      'truncate=false',
     ];
     final client = await auth.configureClient('interactive');
-    final resp = await client.get('/posts/drafts?${queries.join('&')}');
+    final resp = await client.get(
+      '/posts/drafts?${queries.join('&')}',
+    );
     if (resp.statusCode != 200) {
       throw RequestException(resp);
     }

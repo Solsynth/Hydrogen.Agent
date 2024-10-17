@@ -43,7 +43,10 @@ class RootShell extends StatelessWidget {
 
     final showRailNavigation = AppTheme.isLargeScreen(context);
 
-    final destNames = AppNavigation.destinations.map((x) => x.page).toList();
+    final destNames = [
+      'postDetail',
+      ...AppNavigation.destinations.map((x) => x.page),
+    ];
     final showBottomNavigation =
         destNames.contains(routeName) && !showRailNavigation;
 
@@ -52,13 +55,22 @@ class RootShell extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       bottomNavigationBar: showBottomNavigation
           ? AppNavigationBottom(
-              initialIndex: destNames.indexOf(routeName ?? 'page'),
+              initialIndex: AppNavigation.destinations
+                  .map((x) => x.page)
+                  .toList()
+                  .indexOf(routeName ?? 'page'),
             )
           : null,
       body: AppTheme.isLargeScreen(context)
           ? Row(
               children: [
-                if (showRailNavigation) const AppNavigationRail(),
+                if (showRailNavigation)
+                  AppNavigationRail(
+                    initialIndex: AppNavigation.destinations
+                        .map((x) => x.page)
+                        .toList()
+                        .indexOf(routeName ?? 'page'),
+                  ),
                 if (showRailNavigation)
                   const VerticalDivider(
                     width: 0.3,
