@@ -488,6 +488,6 @@
   "unread": "未读",
   "searchTook": "耗时 @time",
   "searchResult": "匹配到 @count 条结果",
-  "happyBirthday": "生日快乐，@name！",
+  "happyBirthday": "生日快乐，@name!",
   "happyBirthdayDesc": "今天是你的第 @count 个生日"
 }
