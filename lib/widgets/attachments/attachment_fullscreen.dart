@@ -265,8 +265,15 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                               'ISO${widget.item.metadata?['exif']?['ISO']}',
                               style: metaTextStyle,
                             ).paddingOnly(right: 2),
-                          if (widget.item.metadata?['exif']?['Megapixels'] !=
+                          if (widget.item.metadata?['exif']?['Aperture'] !=
                               null)
+                            Text(
+                              'f/${widget.item.metadata?['exif']?['Aperture']}',
+                              style: metaTextStyle,
+                            ).paddingOnly(right: 2),
+                          if (widget.item.metadata?['exif']?['Megapixels'] !=
+                                  null &&
+                              widget.item.metadata?['exif']?['Model'] != null)
                             Text(
                               '${widget.item.metadata?['exif']?['Megapixels']}MP',
                               style: metaTextStyle,

@@ -198,7 +198,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final ChatCallProvider ctrl = Get.find();
 
-    return RootContainer(
+    return ResponsiveRootContainer(
       child: Scaffold(
         appBar: widget.hideAppBar
             ? null

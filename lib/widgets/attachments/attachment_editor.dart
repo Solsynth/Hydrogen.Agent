@@ -229,7 +229,10 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
         .listMetadata(widget.initialAttachments ?? List.empty())
         .then((result) {
       setState(() {
-        _attachments = List.from(result, growable: true);
+        _attachments = List.from(
+          result.where((x) => x != null),
+          growable: true,
+        );
         _isBusy = false;
         _isFirstTimeBusy = false;
       });

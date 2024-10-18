@@ -526,7 +526,7 @@ class _PostHeaderDividerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (item.body['description'] != null || item.body['title'] != null) {
-      return const Gap(8);
+      return const SizedBox(height: 8);
     }
     return const SizedBox.shrink();
   }

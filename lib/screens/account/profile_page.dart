@@ -348,7 +348,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                       detail: _userinfo,
                       profile: _userinfo!.profile,
                       extraWidgets: [
-                        if (_dailySignRecords.isNotEmpty)
+                        if (_dailySignRecords.length > 1)
                           Card(
                             child: SizedBox(
                               height: 180,
