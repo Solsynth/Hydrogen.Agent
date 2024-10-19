@@ -33,12 +33,14 @@ class AttachmentEditorPopup extends StatefulWidget {
   final List<String>? initialAttachments;
   final void Function(String) onAdd;
   final void Function(String) onRemove;
+  final void Function(String)? onInsert;
 
   const AttachmentEditorPopup({
     super.key,
     required this.pool,
     required this.onAdd,
     required this.onRemove,
+    this.onInsert,
     this.singleMode = false,
     this.imageOnly = false,
     this.autoUpload = false,
@@ -557,6 +559,22 @@ class _AttachmentEditorPopupState extends State<AttachmentEditorPopup> {
                           setState(() => _attachments.removeAt(idx));
                         },
                       ),
+                      if (widget.onInsert != null)
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text('insert'.tr),
+                            leading: const Icon(Icons.insert_link),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                            ),
+                          ),
+                          onTap: () {
+                            widget.onInsert!(
+                              '![](solink://attachments/${element.rid})',
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
                     ],
                   ),
                 ],

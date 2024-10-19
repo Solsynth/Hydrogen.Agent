@@ -287,6 +287,16 @@ class _AttachmentFullScreenState extends State<AttachmentFullScreen> {
                             '${widget.item.metadata?['width']}x${widget.item.metadata?['height']}',
                             style: metaTextStyle,
                           ),
+                          if (widget.item.metadata?['ratio'] != null)
+                            Text(
+                              (widget.item.metadata?['ratio'] as num)
+                                  .toStringAsFixed(2),
+                              style: metaTextStyle,
+                            ),
+                          Text(
+                            widget.item.mimetype,
+                            style: metaTextStyle,
+                          ),
                         ],
                       ),
                     ),

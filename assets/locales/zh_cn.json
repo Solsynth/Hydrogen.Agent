@@ -14,6 +14,7 @@
   "about": "关于",
   "edit": "编辑",
   "delete": "删除",
+  "insert": "插入",
   "settings": "设置",
   "settingsNotificationBgService": "常驻通知服务",
   "settingsNotificationBgServiceDesc": "在设备常驻一个通知服务，使得部分不支持推送通知的设备可以在后台收到通知；启用该功能的情况下不会向服务器注册推送通知，并且你会始终在他人眼中成为在线（隐身除外）；可能需要在设置中关闭电量与流量优化。",

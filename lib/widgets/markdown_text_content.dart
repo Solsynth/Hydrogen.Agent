@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -7,7 +6,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:markdown/markdown.dart' as markdown;
 import 'package:path/path.dart';
+import 'package:solian/models/attachment.dart';
 import 'package:solian/providers/stickers.dart';
+import 'package:solian/widgets/attachments/attachment_item.dart';
 import 'package:solian/widgets/attachments/attachment_list.dart';
 import 'package:solian/widgets/auto_cache_image.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
@@ -18,6 +19,7 @@ import 'account/account_profile_popup.dart';
 class MarkdownTextContent extends StatefulWidget {
   final String content;
   final String parentId;
+  final List<Attachment>? attachments;
   final bool isSelectable;
   final bool isLargeText;
   final bool isAutoWarp;
@@ -26,6 +28,7 @@ class MarkdownTextContent extends StatefulWidget {
     super.key,
     required this.content,
     required this.parentId,
+    this.attachments,
     this.isSelectable = false,
     this.isLargeText = false,
     this.isAutoWarp = false,
@@ -189,18 +192,42 @@ class _MarkdownTextContentState extends State<MarkdownTextContent> {
                 ),
               ).paddingSymmetric(vertical: 4);
             case 'attachments':
+              final match = widget.attachments
+                  ?.where((x) => x.rid == segments[1])
+                  .firstOrNull;
               const radius = BorderRadius.all(Radius.circular(8));
-              return LimitedBox(
-                maxHeight: MediaQuery.of(context).size.width,
-                child: ClipRRect(
-                  borderRadius: radius,
-                  child: AttachmentSelfContainedEntry(
-                    isDense: true,
-                    parentId: widget.parentId,
-                    rid: segments[1],
+              if (match != null) {
+                final isImage =
+                    match.mimetype.split('/').firstOrNull == 'image';
+                double ratio = match.metadata?['ratio']?.toDouble() ??
+                    (isImage ? 1 : 16 / 9);
+                return LimitedBox(
+                  maxWidth: 480,
+                  maxHeight: 640,
+                  child: AspectRatio(
+                    aspectRatio: ratio,
+                    child: ClipRRect(
+                      borderRadius: radius,
+                      child: AttachmentItem(
+                        parentId: widget.parentId,
+                        item: match,
+                      ),
+                    ),
                   ),
-                ),
-              ).paddingSymmetric(vertical: 4);
+                ).paddingSymmetric(vertical: 4);
+              } else {
+                return LimitedBox(
+                  maxHeight: MediaQuery.of(context).size.width,
+                  child: ClipRRect(
+                    borderRadius: radius,
+                    child: AttachmentSelfContainedEntry(
+                      isDense: true,
+                      parentId: widget.parentId,
+                      rid: segments[1],
+                    ),
+                  ),
+                ).paddingSymmetric(vertical: 4);
+              }
           }
         }
         return AutoCacheImage(

@@ -125,6 +125,21 @@ class PostEditorController extends GetxController {
         onRemove: (String value) {
           attachments.remove(value);
         },
+        onInsert: (String str) {
+          final text = contentController.text;
+          final selection = contentController.selection;
+          final newText = text.replaceRange(
+            selection.start,
+            selection.end,
+            str,
+          );
+          contentController.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(
+              offset: selection.baseOffset + str.length,
+            ),
+          );
+        },
       ),
     );
   }

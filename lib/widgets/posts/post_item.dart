@@ -110,6 +110,7 @@ class _PostItemState extends State<PostItem> {
             child: MarkdownTextContent(
               parentId: 'p${item.id}',
               content: item.body['content'],
+              attachments: item.preload?.attachments,
               isAutoWarp: item.type == 'story',
               isSelectable: widget.isContentSelectable,
             ),
@@ -131,20 +132,11 @@ class _PostItemState extends State<PostItem> {
             right: 8,
           ),
           if (attachments.isNotEmpty)
-            Row(
-              children: [
-                Icon(
-                  Icons.file_copy,
-                  size: 15,
-                  color: _unFocusColor,
-                ).paddingOnly(right: 5),
-                Text(
-                  'attachmentHint'.trParams(
-                    {'count': attachments.length.toString()},
-                  ),
-                  style: TextStyle(color: _unFocusColor),
-                )
-              ],
+            _PostAttachmentWidget(
+              item: item,
+              padding: widget.padding,
+              isCompact: true,
+              isNonScrollAttachment: widget.isNonScrollAttachment,
             ).paddingOnly(left: 14, top: 4),
         ],
       );
@@ -173,6 +165,7 @@ class _PostItemState extends State<PostItem> {
                 child: MarkdownTextContent(
                   parentId: 'p${item.id}-embed',
                   content: item.body['content'],
+                  attachments: item.preload?.attachments,
                   isAutoWarp: item.type == 'story',
                   isSelectable: widget.isContentSelectable,
                 ),
@@ -220,6 +213,7 @@ class _PostItemState extends State<PostItem> {
           _PostAttachmentWidget(
             item: item,
             padding: widget.padding,
+            isCompact: item.type == 'article',
             isNonScrollAttachment: widget.isNonScrollAttachment,
           ),
           if (widget.showFeaturedReply)
@@ -388,11 +382,13 @@ class _PostAttachmentWidget extends StatelessWidget {
   final Post item;
   final EdgeInsets? padding;
   final bool isNonScrollAttachment;
+  final bool isCompact;
 
   const _PostAttachmentWidget({
     required this.item,
     required this.padding,
     required this.isNonScrollAttachment,
+    this.isCompact = false,
   });
 
   @override
@@ -403,7 +399,31 @@ class _PostAttachmentWidget extends StatelessWidget {
         ? List.from(item.body['attachments']?.whereType<String>())
         : List.empty();
 
+    final unFocusColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+
     if (attachments.isEmpty) return const SizedBox.shrink();
+
+    if (isCompact) {
+      return Row(
+        children: [
+          Icon(
+            Icons.file_copy,
+            size: 13,
+            color: unFocusColor,
+          ).paddingOnly(right: 5),
+          Text(
+            'attachmentHint'.trParams(
+              {'count': attachments.length.toString()},
+            ),
+            style: TextStyle(color: unFocusColor, fontSize: 13),
+          )
+        ],
+      ).paddingOnly(
+        left: (padding?.left ?? 0) + 17,
+        right: (padding?.right ?? 0) + 17,
+      );
+    }
 
     if (attachments.length == 1 && !isLargeScreen) {
       return AttachmentList(
@@ -422,7 +442,10 @@ class _PostAttachmentWidget extends StatelessWidget {
         attachments: item.preload?.attachments,
         autoload: false,
         isGrid: true,
-      ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
+      ).paddingOnly(
+        left: (padding?.left ?? 0) + 14,
+        right: (padding?.right ?? 0) + 14,
+      );
     } else if (attachments.length == 1 || isNonScrollAttachment) {
       return AttachmentList(
         parentId: item.id.toString(),
@@ -430,7 +453,10 @@ class _PostAttachmentWidget extends StatelessWidget {
         attachments: item.preload?.attachments,
         autoload: false,
         isColumn: true,
-      ).paddingSymmetric(horizontal: (padding?.horizontal ?? 0) + 14);
+      ).paddingOnly(
+        left: (padding?.left ?? 0) + 14,
+        right: (padding?.right ?? 0) + 14,
+      );
     } else {
       return AttachmentList(
         parentId: item.id.toString(),
