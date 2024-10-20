@@ -137,7 +137,7 @@ class _PostItemState extends State<PostItem> {
               padding: widget.padding,
               isCompact: true,
               isNonScrollAttachment: widget.isNonScrollAttachment,
-            ).paddingOnly(left: 14, top: 4),
+            ).paddingOnly(top: 4),
         ],
       );
     }

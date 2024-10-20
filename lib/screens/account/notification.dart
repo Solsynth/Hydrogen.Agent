@@ -121,9 +121,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           Badge(
                                             label: Row(
                                               children: [
-                                                const Icon(
+                                                Icon(
                                                   Icons.new_releases_outlined,
-                                                  color: Colors.white,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
                                                   size: 12,
                                                 ),
                                                 const Gap(4),
